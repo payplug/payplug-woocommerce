@@ -1,0 +1,132 @@
+//Title
+.woocommerce_page_wc-settings  {
+    h3.wc-settings-sub-title {
+        font-size: 24px;
+        line-height: 1;
+        color: #bfbfbf;
+        @include smoothText;
+    }
+}
+.title {
+    &--logo {
+        display: block;
+        white-space: nowrap;
+        text-indent: 120%;
+        overflow: hidden;
+        width: 200px;
+        height: 58px;
+        background: url(../images/Payplug_logoGrey.png) no-repeat 50% 50%;
+    }
+}
+//Checkup list
+.success,
+.failed {
+    @include smoothText;
+    position: relative;
+    padding-left: 26px;
+    color:$primary;
+    &:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-family: dashicons;
+        content: "\f147";
+        display: block;
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        font-size: 14px;
+        border-radius: 50%;
+        text-align: center;
+        color: $white;
+        background-color: $primary;
+    }
+}
+.failed {
+    color: $textcolor;
+    &:before {
+        content: "\f335";
+        background-color: $textcolor;
+    }
+}
+//Radio Custom
+.form-table td fieldset .radio--custom,
+.radio--custom {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    .radio {
+        position: absolute;
+        left: -50px;
+        top: 0;
+        visibility: hidden;
+        &:hover,
+        &:focus {
+            &+label {
+                box-shadow: none;
+                color: $white;
+                background-color: rgba($primary, .5);
+            }
+        }
+        &:checked {
+            &+label {
+                box-shadow: none;
+                color: $white;
+                background-color: $primary;
+            }
+        }
+    }
+    label {
+        @include smoothText;
+        margin: 0 !important;
+        padding: 0;
+        border-radius: 4px;
+        width: 200px;
+        height: 30px;
+        line-height: 30px;
+        font-size: 18px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
+        color: #d7d7d7;
+        background-color: $white;
+        box-shadow: inset 0 0 4px rgba(128,128,128, .5);
+        transition: background-color .25s ease, color .25s ease, box-shadow .25s ease;
+    }
+}
+//Logout as link
+input[name="submit_logout"] {
+    cursor: pointer;
+    padding: 0;
+    border: 0;
+    background:none;
+    text-decoration: underline;
+    color: $textcolor;
+    @include hover {
+        text-decoration: none;
+    }
+    &~ a {
+        color: $textcolor;
+        @include hover {
+            color: $textcolor;
+            text-decoration: none;
+        }
+    }
+}
+
+//submit
+.submit {
+    border-top: 1px solid #c8c8c8;
+    .button-primary {
+        text-shadow: none;
+        box-shadow:none;
+        border-color: $textcolor;
+        background-color: $textcolor;
+        @include hover {
+            color: #fff;
+            border-color: darken($textcolor, 5%);
+            background-color: darken($textcolor, 5%);
+        }
+    }
+}

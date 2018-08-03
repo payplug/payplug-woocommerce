@@ -1,0 +1,390 @@
+# Copyright (C) 2018 Payplug
+# This file is distributed under the same license as the Payplug package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Payplug 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
+"woocommerce\n"
+"POT-Creation-Date: 2018-08-03 14:57:35+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2018-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: src/Admin/Metabox.php:51
+msgid "PayPlug payment details"
+msgstr ""
+
+#: src/Admin/Metabox.php:73
+msgid "No metadata available for the current order."
+msgstr ""
+
+#: src/Admin/Metabox.php:76
+msgid "PayPlug Payment ID"
+msgstr ""
+
+#: src/Admin/Metabox.php:78
+msgid "Status"
+msgstr ""
+
+#: src/Admin/Metabox.php:80
+msgid "Refunded"
+msgstr ""
+
+#: src/Admin/Metabox.php:81
+msgid "Partially refunded"
+msgstr ""
+
+#: src/Admin/Metabox.php:82
+msgid "Paid"
+msgstr ""
+
+#: src/Admin/Metabox.php:83
+msgid "Not Paid"
+msgstr ""
+
+#: src/Admin/Metabox.php:86
+msgid "Amount"
+msgstr ""
+
+#: src/Admin/Metabox.php:88
+msgid "Paid at"
+msgstr ""
+
+#: src/Admin/Metabox.php:91
+msgid "Credit card"
+msgstr ""
+
+#: src/Admin/Metabox.php:94
+msgid "Card mask"
+msgstr ""
+
+#: src/Admin/Metabox.php:97
+msgid "3 D Secure"
+msgstr ""
+
+#: src/Admin/Metabox.php:98
+msgid "Yes"
+msgstr ""
+
+#: src/Admin/Metabox.php:98
+msgid "No"
+msgstr ""
+
+#: src/Admin/Metabox.php:100
+msgid "Expiration date"
+msgstr ""
+
+#: src/Admin/Metabox.php:103 src/Gateway/PayplugGateway.php:251
+msgid "Mode"
+msgstr ""
+
+#: src/Admin/Metabox.php:104
+msgid "Live"
+msgstr ""
+
+#: src/Admin/Metabox.php:104
+msgid "Test"
+msgstr ""
+
+#: src/Admin/Notices.php:147
+msgid "Thank you for installing PayPlug your online payment solution"
+msgstr ""
+
+#: src/Admin/Notices.php:149
+msgid "It remains a step to activate the plugin on your site !"
+msgstr ""
+
+#: src/Admin/Notices.php:152 src/Gateway/PayplugGateway.php:496
+msgid "Login"
+msgstr ""
+
+#: src/Admin/Notices.php:163
+msgid "PayPlug is in TEST mode"
+msgstr ""
+
+#: src/Admin/Notices.php:164
+msgid ""
+"When your account is approved by PayPlug, please disconnect and reconnect in "
+"the settings page to activate LIVE mode."
+msgstr ""
+
+#: src/Admin/Notices.php:170
+msgid ""
+"PayPlug is in TEST mode. All payments are fictitious and will not generate "
+"real transactions."
+msgstr ""
+
+#: src/Admin/WoocommerceActions.php:49
+msgid "Retrieve PayPlug transaction data"
+msgstr ""
+
+#: src/Admin/WoocommerceActions.php:77
+msgid "No transaction id found for the order."
+msgstr ""
+
+#: src/Admin/WoocommerceActions.php:91
+msgid ""
+"There was an error with the PayPlug gateway. Please make sure its properly "
+"configure."
+msgstr ""
+
+#: src/Admin/WoocommerceActions.php:112
+msgid "An error occurred while retrieving the payment data from PayPlug."
+msgstr ""
+
+#: src/Admin/WoocommerceActions.php:140
+msgid "An error occurred while retrieving the refund data from PayPlug."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:77
+msgctxt "Gateway method title"
+msgid "PayPlug"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:78
+msgid "Let your customers pay with PayPlug"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:103
+msgid ""
+"You are in TEST MODE. In test mode you can use the card 4242424242424242 "
+"with any valid expiration date and CVC."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:206
+msgid "Enable/Disable"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:208
+msgid "Enable PayPlug"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:209
+msgid "This gateway can only be enable for shop using euro has currency."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:213
+msgid "Title"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:215
+msgid "This controls the title which the user sees during checkout."
+msgstr ""
+
+#. #-#-#-#-#  payplug.pot (Payplug 0.1.0)  #-#-#-#-#
+#. Author of the plugin/theme
+#: src/Gateway/PayplugGateway.php:216
+msgid "PayPlug"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:220
+msgid "Description"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:223
+msgid "This controls the description which the user sees during checkout."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:224
+msgid "Pay via PayPlug."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:227 src/Gateway/PayplugGateway.php:466
+msgid "Connection"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:260
+msgid "Place the payment gateway in test mode using test API keys."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:265 src/PayplugWoocommerce.php:121
+msgid "Settings"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:269
+msgid "Payment method"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:271
+msgid "Choose which payment method will be used."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:275
+msgid "Redirect"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:276
+msgid "Embedded"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:280
+msgid "Debug"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:282
+msgid "Enable Debug Mode"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:286
+msgid "Advanced Settings"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:287
+msgid ""
+"Those settings require a premium account. But you can try them in TEST mode."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:292
+msgid "One Click Payment"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:294
+msgid "Activate"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:295
+msgid "Offers your users to save their credit card for later."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:471 src/Gateway/PayplugGateway.php:475
+msgid "Email"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:477
+msgid "your@email.com"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:483 src/Gateway/PayplugGateway.php:487
+msgid "Password"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:530
+msgid "Successfully logged out."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:591
+msgid "Successfully logged in."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:602
+msgid ""
+"Your account does not currently support LIVE mode, it need to be approved "
+"first. If your account has already been approved, please log out and log "
+"back in."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:613
+msgid "Only Premium accounts can use one click in LIVE mode."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:731 src/Gateway/PayplugGateway.php:734
+#: src/Gateway/PayplugGateway.php:796 src/Gateway/PayplugGateway.php:799
+msgid "Payment processing failed. Please retry."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:754
+msgid "Invalid payment method."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:820
+msgid "The order %s does not exist."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:827
+msgid "No PayPlug transaction found for the order. No refund was made."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:876 src/Gateway/PayplugResponse.php:158
+msgid "Refund %s : Refunded %s"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:895 src/Gateway/PayplugGateway.php:899
+msgid "Refund process failed. Please retry."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:935
+msgid "Total amount of %s is not in the allowed range."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:964
+msgid "Please fill all login fields"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:970 src/Gateway/PayplugGateway.php:975
+msgid "Your credentials are invalid."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:1192
+msgid "Logout"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:1196
+msgid "Go to my dashboard"
+msgstr ""
+
+#: src/Gateway/PayplugGatewayRequirements.php:52
+msgid "PHP cURL extension is enabled on your server."
+msgstr ""
+
+#: src/Gateway/PayplugGatewayRequirements.php:53
+msgid "PHP cURL extension must be enabled on your server."
+msgstr ""
+
+#: src/Gateway/PayplugGatewayRequirements.php:61
+msgid "Your server is running a valid PHP version."
+msgstr ""
+
+#: src/Gateway/PayplugGatewayRequirements.php:70
+msgid "OpenSSL is up to date."
+msgstr ""
+
+#: src/Gateway/PayplugGatewayRequirements.php:79
+msgid "Your shop use Euro as your currency."
+msgstr ""
+
+#: src/Gateway/PayplugGatewayRequirements.php:80
+msgid "Your shop must use Euro as your currency."
+msgstr ""
+
+#: src/Gateway/PayplugGatewayRequirements.php:88
+msgid "Your Payplug account is connected."
+msgstr ""
+
+#: src/Gateway/PayplugGatewayRequirements.php:89
+msgid "You must connect your Payplug account."
+msgstr ""
+
+#: src/Gateway/PayplugResponse.php:79
+msgid "PayPlug IPN OK | Transaction %s"
+msgstr ""
+
+#: src/Gateway/PayplugResponse.php:101
+msgid "PayPlug IPN OK | Transaction %s failed : %s"
+msgstr ""
+
+#: src/PayplugWoocommerce.php:82
+msgid "PayPlug require WooCommerce to be activated to work."
+msgstr ""
+
+#: src/PayplugWoocommerceRequest.php:62
+msgid "Empty cart"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Payplug"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://www.payplug.com/modules/woocomerce"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "The online payment solution created for SMEs"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://www.payplug.com/"
+msgstr ""

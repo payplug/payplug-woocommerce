@@ -1,0 +1,41 @@
+// Bourbon's essentials mixins
+$em-base: 16px !default;
+// Strip units
+@function strip-units($value) {
+	@return ($value / ($value * 0 + 1));
+}
+// PX to EM
+@function em($pxval, $base: $em-base) {
+	@if not unitless($pxval) {
+	  $pxval: strip-units($pxval);
+	}
+	@if not unitless($base) {
+	  $base: strip-units($base);
+	}
+	@return ($pxval / $base) * 1em;
+}
+//Breakpoints
+$breakpoints: (
+    xsm: em(480),
+    sm: em(768),
+    md: em(1024),
+    lg: em(1260),
+    xlg: em(1440)
+);
+
+@mixin breakpoints($breakpoint) {
+    @media screen and (min-width: map-get($map: $breakpoints, $key: $breakpoint)) {
+        @content;
+    }
+}
+// Hover Active Focus pseudo selector mixin
+@mixin hover {
+	&:hover, &:active, &:focus {
+		@content;
+	}
+}
+// Smooth text
+@mixin smoothText {
+	-webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
