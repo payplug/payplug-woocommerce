@@ -166,8 +166,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 */
 	public function get_icon() {
 		$icons = apply_filters( 'payplug_payment_icons', [
-			'visa'       => '<img src="' . WC()->plugin_url() . '/assets/images/icons/credit-cards/visa.svg" alt="Visa" />',
-			'mastercard' => '<img src="' . WC()->plugin_url() . '/assets/images/icons/credit-cards/mastercard.svg" alt="Mastercard" />',
+			'visa'       => '<img src="' . WC()->plugin_url() . '/assets/images/icons/credit-cards/visa.svg" alt="Visa" class="payplug-payment-icon" />',
+			'mastercard' => '<img src="' . WC()->plugin_url() . '/assets/images/icons/credit-cards/mastercard.svg" alt="Mastercard" class="payplug-payment-icon" />',
 		] );
 
 		$icons_str = '';
@@ -349,8 +349,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			return;
 		}
 
-		if ( 'embedded' !== $this->payment_method ) {
+		// Register checkout styles.
+		wp_register_style( 'payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION );
+		wp_enqueue_style( 'payplug-checkout' );
 
+
+		// Register scripts for embedded payment form.
+		if ( 'embedded' !== $this->payment_method ) {
 			return;
 		}
 
