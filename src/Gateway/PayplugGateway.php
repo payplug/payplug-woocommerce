@@ -1285,4 +1285,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	public function user_logged_in() {
 		return ! empty( $this->get_option( 'payplug_test_key' ) );
 	}
+
+	/**
+	 * Check if oneclick payment is activated and merchant can use it.
+	 *
+	 * @return bool
+	 */
+	public function oneclick_available() {
+		return $this->oneclick && $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD );
+	}
 }
