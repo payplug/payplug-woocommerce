@@ -674,7 +674,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			$payment_data = [
 				'amount'           => $amount,
 				'currency'         => get_woocommerce_currency(),
-				'allow_save_card'  => $this->oneclick && $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD ) && (int) $customer_id > 0,
+				'allow_save_card'  => $this->oneclick_available() && (int) $customer_id > 0,
 				'customer'         => [
 					'first_name' => $this->limit_length( $customer_details['first_name'] ),
 					'last_name'  => $this->limit_length( $customer_details['last_name'] ),
