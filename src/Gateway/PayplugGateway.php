@@ -435,7 +435,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			echo wpautop( wptexturize( $description ) );
 		}
 
-		$this->saved_payment_methods();
+		if ( $this->oneclick_available() ) {
+			$this->saved_payment_methods();
+		}
 	}
 
 	/**
