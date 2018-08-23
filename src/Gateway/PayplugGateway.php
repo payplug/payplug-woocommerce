@@ -100,7 +100,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		self::$log_enabled = $this->debug;
 
 		if ( 'test' === $this->mode ) {
-			$this->description .= ' ' . __( 'You are in TEST MODE. In test mode you can use the card 4242424242424242 with any valid expiration date and CVC.', 'payplug' );
+			$this->description .= " \n" . __( 'You are in TEST MODE. In test mode you can use the card 4242424242424242 with any valid expiration date and CVC.', 'payplug' );
 			$this->description = trim( $this->description );
 		}
 
