@@ -303,6 +303,23 @@ class PayplugWoocommerceHelper {
 	}
 
 	/**
+	 * Ensure country code is supported by PayPlug.
+	 *
+	 * @param string $country The ISO 3166-1 alpha-2 code for the country
+	 *
+	 * @return bool
+	 * @author Clément Boirie
+	 */
+	public static function is_country_supported( $country ) {
+		$country = trim( $country );
+		if ( empty( $country ) ) {
+			return false;
+		}
+
+		return in_array( strtoupper( $country ), self::get_supported_countries() );
+	}
+
+	/**
 	 * Get minimum amount allowed by PayPlug.
 	 *
 	 * This amount is in cents.
