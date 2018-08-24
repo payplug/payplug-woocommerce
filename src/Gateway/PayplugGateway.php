@@ -670,6 +670,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		$order_id         = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 		$customer_details = $this->prepare_customer_data( $order );
 
+		if (
+			! empty( $customer_details['country'] )
+			&& ! PayplugWoocommerceHelper::is_country_supported( $customer_details['country'] )
+		) {
+			$customer_details['country'] = '';
+		}
+
 		try {
 			$payment_data = [
 				'amount'           => $amount,
@@ -759,6 +766,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		if ( ! $payment_token || (int) $customer_id !== (int) $payment_token->get_user_id() ) {
 			PayplugGateway::log( 'Could not find the payment token or the payment doesn\'t belong to the current user.', 'error' );
 			throw new \Exception( __( 'Invalid payment method.', 'payplug' ) );
+		}
+
+		if (
+			! empty( $customer_details['country'] )
+			&& ! PayplugWoocommerceHelper::is_country_supported( $customer_details['country'] )
+		) {
+			$customer_details['country'] = '';
 		}
 
 		try {
