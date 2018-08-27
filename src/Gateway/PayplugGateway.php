@@ -1096,8 +1096,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		<tr valign="top">
 			<?php if ( ! $data['hide_label'] ) : ?>
 				<th scope="row" class="titledesc">
-					<?php echo $this->get_tooltip_html( $data ); ?>
-					<label for="<?php echo esc_attr( $field_key ); ?>"><?php echo wp_kses_post( $data['title'] ); ?></label>
+					<label for="<?php echo esc_attr( $field_key ); ?>">
+						<?php echo wp_kses_post( $data['title'] ); ?>
+						<?php echo $this->get_tooltip_html( $data ); ?>
+					</label>
 				</th>
 			<?php endif; ?>
 			<td class="forminp">
@@ -1164,8 +1166,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		?>
 		<tr valign="top">
 			<th scope="row" class="titledesc">
-				<?php echo $this->get_tooltip_html( $data ); ?>
-				<label for="<?php echo esc_attr( $field_key ); ?>"><?php echo wp_kses_post( $data['title'] ); ?></label>
+				<label for="<?php echo esc_attr( $field_key ); ?>">
+					<?php echo wp_kses_post( $data['title'] ); ?>
+					<?php echo $this->get_tooltip_html( $data ); ?>
+				</label>
 			</th>
 			<td class="forminp">
 				<fieldset>
