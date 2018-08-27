@@ -119,14 +119,22 @@ input[name="submit_logout"] {
 .submit {
     border-top: 1px solid #c8c8c8;
     .button-primary {
+        height: 30px;
         text-shadow: none;
         box-shadow:none;
-        border-color: $textcolor;
-        background-color: $textcolor;
+        border-color: $primary;
+        background-color: $primary;
+        @include smoothText;
         @include hover {
             color: #fff;
-            border-color: darken($textcolor, 5%);
-            background-color: darken($textcolor, 5%);
+            border-color: darken($primary, 5%);
+            background-color: darken($primary, 5%);
+        }
+        @include breakpoints(md) {
+            height: 40px;
+            padding-left: 40px;
+            padding-right: 40px;
+            font-size: 18px;
         }
     }
 }
