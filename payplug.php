@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Payplug
  * Plugin URI:      https://www.payplug.com/modules/woocomerce
- * Description:     The online payment solution created for SMEs
+ * Description:     The online payment solution combining simplicity and first-rate support to boost your sales.
  * Author:          PayPlug
  * Author URI:      https://www.payplug.com/
  * Text Domain:     payplug

@@ -49,8 +49,8 @@ class PayplugGatewayRequirements {
 	 */
 	public function curl_requirement() {
 		return ( $this->valid_curl() )
-			? '<p class="success">' . __( 'PHP cURL extension is enabled on your server.', 'payplug' ) . '</p>'
-			: '<p class="failed">' . __( 'PHP cURL extension must be enabled on your server.', 'payplug' ) . '</p>';
+			? '<p class="success">' . __( 'The PHP cURL extension is installed and activated on your server.', 'payplug' ) . '</p>'
+			: '<p class="failed">' . __( 'The PHP cURL extension must be installed and activated on your server.', 'payplug' ) . '</p>';
 	}
 
 	/**
@@ -58,7 +58,7 @@ class PayplugGatewayRequirements {
 	 */
 	public function php_requirement() {
 		return ( $this->valid_php() )
-			? '<p class="success">' . __( 'Your server is running a valid PHP version.', 'payplug' ) . '</p>'
+			? '<p class="success">' . __( 'The PHP version on your server is valid.', 'payplug' ) . '</p>'
 			: '<p class="failed">' . __( sprintf( 'Your PHP version %s is not supported. Your server must run PHP 5.6 or greater.', PHP_VERSION ), 'payplug' ) . '</p>';
 	}
 
@@ -76,8 +76,8 @@ class PayplugGatewayRequirements {
 	 */
 	public function currency_requirement() {
 		return ( $this->valid_currency() )
-			? '<p class="success">' . __( 'Your shop use Euro as your currency.', 'payplug' ) . '</p>'
-			: '<p class="failed">' . __( 'Your shop must use Euro as your currency.', 'payplug' ) . '</p>';
+			? '<p class="success">' . __( 'Your shop currency has been set up with Euro.', 'payplug' ) . '</p>'
+			: '<p class="failed">' . __( 'Your shop currency must be set up with Euro.', 'payplug' ) . '</p>';
 	}
 
 	/**
@@ -85,8 +85,8 @@ class PayplugGatewayRequirements {
 	 */
 	public function account_requirement() {
 		return ( $this->valid_account() )
-			? '<p class="success">' . __( 'Your Payplug account is connected.', 'payplug' ) . '</p>'
-			: '<p class="failed">' . __( 'You must connect your Payplug account.', 'payplug' ) . '</p>';
+			? '<p class="success">' . __( 'You are logged in with your PayPlug account.', 'payplug' ) . '</p>'
+			: '<p class="failed">' . __( 'You must be logged in with your PayPlug account.', 'payplug' ) . '</p>';
 	}
 
 	/**

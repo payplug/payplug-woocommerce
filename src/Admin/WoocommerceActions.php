@@ -46,7 +46,7 @@ class WoocommerceActions {
 			return $actions;
 		}
 
-		$actions[ self::WC_PAYPLUG_RETRIEVE_ACTION ] = __( 'Retrieve PayPlug transaction data', 'payplug' );
+		$actions[ self::WC_PAYPLUG_RETRIEVE_ACTION ] = __( 'Update PayPlug transaction data', 'payplug' );
 
 		return $actions;
 	}
@@ -74,7 +74,7 @@ class WoocommerceActions {
 		if ( empty( $transaction_id ) ) {
 			PayplugGateway::log( sprintf( 'Order #%s : Missing transaction id.', $order_id ), 'error' );
 
-			\WC_Admin_Meta_Boxes::add_error( __( 'No transaction id found for the order.', 'payplug' ) );
+			\WC_Admin_Meta_Boxes::add_error( __( 'No transaction ID was found for this order.', 'payplug' ) );
 
 			return;
 		}
@@ -88,7 +88,7 @@ class WoocommerceActions {
 		) {
 			PayplugGateway::log( sprintf( 'Order #%s : Error with PayPlug gateway. PayPlug gateway not found or PayPlugResponse class not available.', $order_id ), 'error' );
 
-			\WC_Admin_Meta_Boxes::add_error( __( 'There was an error with the PayPlug gateway. Please make sure its properly configure.', 'payplug' ) );
+			\WC_Admin_Meta_Boxes::add_error( __( 'An error occured with PayPlug gateway. Please make sure PayPlug settings are correct.', 'payplug' ) );
 
 			return;
 		}
@@ -109,7 +109,7 @@ class WoocommerceActions {
 				)
 			);
 
-			\WC_Admin_Meta_Boxes::add_error( __( 'An error occurred while retrieving the payment data from PayPlug.', 'payplug' ) );
+			\WC_Admin_Meta_Boxes::add_error( __( 'An error occurred while collecting payment information from PayPlug.', 'payplug' ) );
 
 			return;
 		}
@@ -137,7 +137,7 @@ class WoocommerceActions {
 				)
 			);
 
-			\WC_Admin_Meta_Boxes::add_error( __( 'An error occurred while retrieving the refund data from PayPlug.', 'payplug' ) );
+			\WC_Admin_Meta_Boxes::add_error( __( 'An error occurred while collecting refund information from PayPlug.', 'payplug' ) );
 
 			return;
 		}

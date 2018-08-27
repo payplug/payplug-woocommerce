@@ -79,7 +79,7 @@ class PayplugWoocommerce {
 			add_action( 'admin_notices', function () {
 				?>
 				<div id="message" class="notice notice-error">
-					<p><?php _e( 'PayPlug require WooCommerce to be activated to work.', 'payplug' ); ?></p>
+					<p><?php _e( 'PayPlug requires an active version of WooCommerce', 'payplug' ); ?></p>
 				</div>
 				<?php
 			} );

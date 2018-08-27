@@ -144,9 +144,9 @@ class Notices {
             <div class="notice notice--start">
                 <div class="inside">
                     <div class="main">
-                        <h2 class="notice__title"><?php _e( "Thank you for installing PayPlug your online payment solution", 'payplug' ); ?>
+                        <h2 class="notice__title"><?php _e( 'Thank you for installing PayPlug as your online payment solution.', 'payplug' ); ?>
                             <br>
-                            <strong><?php _e( 'It remains a step to activate the plugin on your site !', 'payplug' ); ?></strong>
+                            <strong><?php _e( 'Only one step left to activate the plugin on your site !', 'payplug' ); ?></strong>
                         </h2>
                         <a href="<?php echo esc_url( PayplugWoocommerceHelper::get_setting_link() ); ?>"
                            class="button button-hero"><?php _e( 'Login', 'payplug' ); ?></a>
@@ -161,13 +161,13 @@ class Notices {
 			?>
             <div class="notice notice-warning">
                 <p><strong><?php _e( 'PayPlug is in TEST mode', 'payplug' ); ?></strong></p>
-                <p><?php _e( 'When your account is approved by PayPlug, please disconnect and reconnect in the settings page to activate LIVE mode.', 'payplug' ); ?></p>
+                <p><?php _e( 'Once your PayPlug account has been validated, please log out and log in again from the configuration page in order to activate LIVE mode.', 'payplug' ); ?></p>
             </div>
 			<?php
 		} elseif ( ! empty( $payplug_live_key ) && $testmode ) {
 			?>
             <div class="notice notice-info">
-                <p><?php _e( 'PayPlug is in TEST mode. All payments are fictitious and will not generate real transactions.', 'payplug' ); ?></p>
+                <p><?php _e( 'Payments in TEST mode will be simulations and will not generate real transactions.', 'payplug' ); ?></p>
             </div>
 			<?php
 		}

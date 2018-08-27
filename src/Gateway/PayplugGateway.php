@@ -75,7 +75,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		$this->icon               = '';
 		$this->has_fields         = false;
 		$this->method_title       = _x( 'PayPlug', 'Gateway method title', 'payplug' );
-		$this->method_description = __( 'Let your customers pay with PayPlug', 'payplug' );
+		$this->method_description = __( 'Enable PayPlug for your customers.', 'payplug' );
 		$this->supports           = array(
 			'products',
 			'refunds',
@@ -206,13 +206,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				'title'       => __( 'Enable/Disable', 'payplug' ),
 				'type'        => 'checkbox',
 				'label'       => __( 'Enable PayPlug', 'payplug' ),
-				'description' => __( 'This gateway can only be enable for shop using euro has currency.', 'payplug' ),
+				'description' => __( 'Only Euro payments can be processed with PayPlug.', 'payplug' ),
 				'default'     => 'no',
 			],
 			'title'                   => [
 				'title'       => __( 'Title', 'payplug' ),
 				'type'        => 'text',
-				'description' => __( 'This controls the title which the user sees during checkout.', 'payplug' ),
+				'description' => __( 'The payment solution title displayed during checkout.', 'payplug' ),
 				'default'     => __( 'PayPlug', 'payplug' ),
 				'desc_tip'    => true,
 			],
@@ -220,8 +220,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				'title'       => __( 'Description', 'payplug' ),
 				'type'        => 'text',
 				'desc_tip'    => true,
-				'description' => __( 'This controls the description which the user sees during checkout.', 'payplug' ),
-				'default'     => __( "Pay via PayPlug.", 'payplug' ),
+				'description' => __( 'The payment solution description displayed during checkout.', 'payplug' ),
+				'default'     => __( 'Credit card checkout via PayPlug', 'payplug' ),
 			],
 			'title_connexion'         => [
 				'title' => __( 'Connection', 'payplug' ),
@@ -257,7 +257,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				'type'        => 'yes_no',
 				'yes'         => 'Live',
 				'no'          => 'Test',
-				'description' => __( 'Place the payment gateway in test mode using test API keys.', 'payplug' ),
+				'description' => __( 'In TEST mode, all payments will be simulations and will not generate real transactions.', 'payplug' ),
 				'default'     => 'no',
 				'hide_label'  => true,
 			],
@@ -266,25 +266,25 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				'type'  => 'title',
 			],
 			'payment_method'          => [
-				'title'       => __( 'Payment method', 'payplug' ),
+				'title'       => __( 'Payment page', 'payplug' ),
 				'type'        => 'radio',
-				'description' => __( 'Choose which payment method will be used.', 'payplug' ),
+				'description' => __( 'Customers will be redirected to a PayPlug payment page to finalize the transaction, or payments will be performed in an embeddable payment form on your website.', 'payplug' ),
 				'default'     => 'redirect',
 				'desc_tip'    => true,
 				'options'     => array(
 					'redirect' => __( 'Redirect', 'payplug' ),
-					'embedded' => __( 'Embedded', 'payplug' ),
+					'embedded' => __( 'Integrated', 'payplug' ),
 				),
 			],
 			'debug'                   => [
 				'title'   => __( 'Debug', 'payplug' ),
 				'type'    => 'checkbox',
-				'label'   => __( 'Enable Debug Mode', 'payplug' ),
+				'label'   => __( 'Activate debug mode', 'payplug' ),
 				'default' => 'no',
 			],
 			'title_advanced_settings' => [
 				'title'       => __( 'Advanced Settings', 'payplug' ),
-				'description' => __( 'Those settings require a premium account. But you can try them in TEST mode.',
+				'description' => __( 'This feature is available to PREMIUM accounts only. You can try it in TEST mode.',
 					'payplug' ),
 				'type'        => 'title',
 			],
@@ -292,7 +292,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				'title'       => __( 'One Click Payment', 'payplug' ),
 				'type'        => 'checkbox',
 				'label'       => __( 'Activate', 'payplug' ),
-				'description' => __( 'Offers your users to save their credit card for later.', 'payplug' ),
+				'description' => __( 'Allow your customers to save their credit card information for later purchases.', 'payplug' ),
 				'default'     => 'no',
 				'desc_tip'    => true,
 			],
@@ -606,7 +606,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		if ( isset( $data[ $mode_fieldkey ] ) && '1' === $data[ $mode_fieldkey ] && empty( $data[ $live_key_fieldkey ] ) ) {
 			$data[ $mode_fieldkey ] = '0';
 			$this->set_post_data( $data );
-			\WC_Admin_Settings::add_error( __( 'Your account does not currently support LIVE mode, it need to be approved first. If your account has already been approved, please log out and log back in.', 'payplug' ) );
+			\WC_Admin_Settings::add_error( __( 'Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug' ) );
 		}
 
 		// Check user permissions before activating one-click feature.
@@ -617,7 +617,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			&& false === $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD )
 		) {
 			$data[ $oneclick_fieldkey ] = '0';
-			\WC_Admin_Settings::add_error( __( 'Only Premium accounts can use one click in LIVE mode.', 'payplug' ) );
+			\WC_Admin_Settings::add_error( __( 'Only PREMIUM accounts can enable the One Click option in LIVE mode.', 'payplug' ) );
 		}
 
 		parent::process_admin_options();
@@ -845,7 +845,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		if ( empty( $transaction_id ) ) {
 			PayplugGateway::log( sprintf( 'The order does not have PayPlug transaction ID associated with it.', $order_id ), 'error' );
 
-			return new \WP_Error( 'process_refund_error', __( 'No PayPlug transaction found for the order. No refund was made.', 'payplug' ) );
+			return new \WP_Error( 'process_refund_error', __( 'No PayPlug transaction was found for this order. The refund could not be processed.', 'payplug' ) );
 		}
 
 		$customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
@@ -913,11 +913,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		} catch ( HttpException $e ) {
 			PayplugGateway::log( sprintf( 'Refund request error for the order %s from PayPlug API : %s', $order_id, wc_print_r( $e->getErrorObject(), true ) ), 'error' );
 
-			return new \WP_Error( 'process_refund_error', __( 'Refund process failed. Please retry.', 'payplug' ) );
+			return new \WP_Error( 'process_refund_error', __( 'The transaction could not be refunded. Please try again.', 'payplug' ) );
 		} catch ( \Exception $e ) {
 			PayplugGateway::log( sprintf( 'Refund request error for the order %s : %s', $order_id, wc_clean( $e->getMessage() ) ), 'error' );
 
-			return new \WP_Error( 'process_refund_error', __( 'Refund process failed. Please retry.', 'payplug' ) );
+			return new \WP_Error( 'process_refund_error', __( 'The transaction could not be refunded. Please try again.', 'payplug' ) );
 		}
 	}
 
@@ -953,7 +953,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		) {
 			return new \WP_Error(
 				'invalid order amount',
-				sprintf( __( 'Total amount of %s is not in the allowed range.', 'payplug' ), \wc_price( $amount / 100 ) )
+				sprintf( __( 'Payments for this amount (%s) are not authorised with this payment gateway.', 'payplug' ), \wc_price( $amount / 100 ) )
 			);
 		}
 
@@ -988,12 +988,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		try {
 			$response = Authentication::getKeysByLogin( $email, $password );
 			if ( empty( $response ) || ! isset( $response['httpResponse'] ) ) {
-				return new \WP_Error( 'invalid_credentials', __( 'Your credentials are invalid.', 'payplug' ) );
+				return new \WP_Error( 'invalid_credentials', __( 'Invalid credentials.', 'payplug' ) );
 			}
 
 			return $response['httpResponse']['secret_keys'];
 		} catch ( HttpException $e ) {
-			return new \WP_Error( 'invalid_credentials', __( 'Your credentials are invalid.', 'payplug' ) );
+			return new \WP_Error( 'invalid_credentials', __( 'Invalid credentials.', 'payplug' ) );
 		}
 	}
 
@@ -1218,7 +1218,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 					<?php wp_nonce_field( 'payplug_user_logout', '_logoutaction' ); ?>
 					|
 					<a href="https://portal.payplug.com"
-					   target="_blank"><?php _e( 'Go to my dashboard', 'payplug' ); ?></a>
+					   target="_blank"><?php _e( 'Go to your PayPlug Portal', 'payplug' ); ?></a>
 				</p>
 			</td>
 		</tr>
