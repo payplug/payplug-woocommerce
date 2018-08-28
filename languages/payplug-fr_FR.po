@@ -5,8 +5,8 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
 "woocommerce\n"
-"POT-Creation-Date: 2018-08-27 08:35:43+00:00\n"
-"PO-Revision-Date: 2018-08-27 10:47+0200\n"
+"POT-Creation-Date: 2018-08-28 06:51:53+00:00\n"
+"PO-Revision-Date: 2018-08-28 08:57+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -80,7 +80,7 @@ msgstr "Non"
 msgid "Expiration date"
 msgstr "Date d'expiration"
 
-#: src/Admin/Metabox.php:103 src/Gateway/PayplugGateway.php:251
+#: src/Admin/Metabox.php:103 src/Gateway/PayplugGateway.php:252
 msgid "Mode"
 msgstr "Mode"
 
@@ -100,7 +100,7 @@ msgstr "Merci d'avoir installé PayPlug, votre solution de paiement en ligne."
 msgid "Only one step left to activate the plugin on your site !"
 msgstr "Il reste un pas pour activer le module sur votre site !"
 
-#: src/Admin/Notices.php:152 src/Gateway/PayplugGateway.php:501
+#: src/Admin/Notices.php:152 src/Gateway/PayplugGateway.php:504
 msgid "Login"
 msgstr "Connectez-vous"
 
@@ -162,62 +162,66 @@ msgstr "PayPlug"
 msgid "Enable PayPlug for your customers."
 msgstr "Permettez à vos clients de payer avec PayPlug."
 
-#: src/Gateway/PayplugGateway.php:103
+#: src/Gateway/PayplugGateway.php:84
+msgid "Pay with another credit card"
+msgstr "Payer avec une autre carte de credit"
+
+#: src/Gateway/PayplugGateway.php:104
 msgid ""
-"You are in TEST mode. In TEST mode, you can use card number "
-"4242424242424242, with any expiration date or CVV."
+"You are in TEST MODE. In test mode you can use the card 4242424242424242 "
+"with any valid expiration date and CVC."
 msgstr ""
 "Vous êtes en mode TEST. En mode test, vous pouvez utiliser la carte "
 "4242424242424242 avec une date d'expiration et un CVV de votre choix."
 
-#: src/Gateway/PayplugGateway.php:206
+#: src/Gateway/PayplugGateway.php:207
 msgid "Enable/Disable"
 msgstr "Activer/Désactiver"
 
-#: src/Gateway/PayplugGateway.php:208
+#: src/Gateway/PayplugGateway.php:209
 msgid "Enable PayPlug"
 msgstr "Activer PayPlug"
 
-#: src/Gateway/PayplugGateway.php:209
+#: src/Gateway/PayplugGateway.php:210
 msgid "Only Euro payments can be processed with PayPlug."
 msgstr ""
 "La passerelle de paiement PayPlug ne peut être activée que pour des "
 "paiements en euros."
 
-#: src/Gateway/PayplugGateway.php:213
+#: src/Gateway/PayplugGateway.php:214
 msgid "Title"
 msgstr "Titre"
 
-#: src/Gateway/PayplugGateway.php:215
+#: src/Gateway/PayplugGateway.php:216
 msgid "The payment solution title displayed during checkout."
 msgstr ""
 "Personnalisez le nom de la passerelle de paiement affiché lors de la "
 "commande."
 
 #. Author of the plugin/theme
-#: src/Gateway/PayplugGateway.php:216
+#: src/Gateway/PayplugGateway.php:217
 msgid "PayPlug"
 msgstr "PayPlug"
 
-#: src/Gateway/PayplugGateway.php:220
+#: src/Gateway/PayplugGateway.php:221
 msgid "Description"
 msgstr "Description"
 
-#: src/Gateway/PayplugGateway.php:223
+#: src/Gateway/PayplugGateway.php:224
 msgid "The payment solution description displayed during checkout."
 msgstr ""
 "Personnalisez la description de la passerelle de paiement affichée lors de "
 "la commande."
 
-#: src/Gateway/PayplugGateway.php:224
+#: src/Gateway/PayplugGateway.php:225
 msgid "Credit card checkout via PayPlug"
 msgstr "Payer par carte bancaire via PayPlug"
 
-#: src/Gateway/PayplugGateway.php:227 src/Gateway/PayplugGateway.php:471
+#: src/Gateway/PayplugGateway.php:228 src/Gateway/PayplugGateway.php:474
 msgid "Connection"
 msgstr "Connexion"
 
-#: src/Gateway/PayplugGateway.php:260
+#: src/Gateway/PayplugGateway.php:261
 msgid ""
 "In TEST mode, all payments will be simulations and will not generate real "
 "transactions."
@@ -225,15 +229,15 @@ msgstr ""
 "En mode TEST, tous les paiements sont des simulations et ne génèreront pas "
 "de transactions réelles."
 
-#: src/Gateway/PayplugGateway.php:265 src/PayplugWoocommerce.php:121
+#: src/Gateway/PayplugGateway.php:266 src/PayplugWoocommerce.php:121
 msgid "Settings"
 msgstr "Réglages"
 
-#: src/Gateway/PayplugGateway.php:269
+#: src/Gateway/PayplugGateway.php:270
 msgid "Payment page"
 msgstr "Page de paiement"
 
-#: src/Gateway/PayplugGateway.php:271
+#: src/Gateway/PayplugGateway.php:272
 msgid ""
 "Customers will be redirected to a PayPlug payment page to finalize the "
 "transaction, or payments will be performed in an embeddable payment form on "
@@ -243,42 +247,42 @@ msgstr ""
 "ou pourrons effectuer le paiement dans un formulaire intégré dans votre "
 "boutique."
 
-#: src/Gateway/PayplugGateway.php:275
+#: src/Gateway/PayplugGateway.php:276
 msgid "Redirect"
 msgstr "Redirigée"
 
-#: src/Gateway/PayplugGateway.php:276
+#: src/Gateway/PayplugGateway.php:277
 msgid "Integrated"
 msgstr "Intégrée"
 
-#: src/Gateway/PayplugGateway.php:280
+#: src/Gateway/PayplugGateway.php:281
 msgid "Debug"
 msgstr "Debug"
 
-#: src/Gateway/PayplugGateway.php:282
+#: src/Gateway/PayplugGateway.php:283
 msgid "Activate debug mode"
 msgstr "Activer le mode debug"
 
-#: src/Gateway/PayplugGateway.php:286
+#: src/Gateway/PayplugGateway.php:287
 msgid "Advanced Settings"
 msgstr "Réglages avancés"
 
-#: src/Gateway/PayplugGateway.php:287
+#: src/Gateway/PayplugGateway.php:288
 msgid ""
 "This feature is available to PREMIUM accounts only. You can try it in TEST "
 "mode."
 msgstr ""
 "Cette fonctionnalité requiert un compte PREMIUM. Essayez-la en mode TEST."
 
-#: src/Gateway/PayplugGateway.php:292
+#: src/Gateway/PayplugGateway.php:293
 msgid "One Click Payment"
 msgstr "Paiement en un clic"
 
-#: src/Gateway/PayplugGateway.php:294
+#: src/Gateway/PayplugGateway.php:295
 msgid "Activate"
 msgstr "Activer"
 
-#: src/Gateway/PayplugGateway.php:295
+#: src/Gateway/PayplugGateway.php:296
 msgid ""
 "Allow your customers to save their credit card information for later "
 "purchases."
@@ -286,27 +290,27 @@ msgstr ""
 "Permettez à vos clients d'enregistrer leurs coordonnées de carte de paiement "
 "pour effectuer ultérieurement d'autres transactions."
 
-#: src/Gateway/PayplugGateway.php:476 src/Gateway/PayplugGateway.php:480
+#: src/Gateway/PayplugGateway.php:479 src/Gateway/PayplugGateway.php:483
 msgid "Email"
 msgstr "Adresse mail"
 
-#: src/Gateway/PayplugGateway.php:482
+#: src/Gateway/PayplugGateway.php:485
 msgid "your@email.com"
 msgstr "votre@email.com"
 
-#: src/Gateway/PayplugGateway.php:488 src/Gateway/PayplugGateway.php:492
+#: src/Gateway/PayplugGateway.php:491 src/Gateway/PayplugGateway.php:495
 msgid "Password"
 msgstr "Mot de passe"
 
-#: src/Gateway/PayplugGateway.php:535
+#: src/Gateway/PayplugGateway.php:538
 msgid "Successfully logged out."
 msgstr "Vous avez été déconnecté."
 
-#: src/Gateway/PayplugGateway.php:596
+#: src/Gateway/PayplugGateway.php:599
 msgid "Successfully logged in."
 msgstr "Vous êtes connecté."
 
-#: src/Gateway/PayplugGateway.php:607
+#: src/Gateway/PayplugGateway.php:610
 msgid ""
 "Your account does not support LIVE mode at the moment, it must be validated "
 "first. If your account has already been validated, please log out and log in "
@@ -316,26 +320,26 @@ msgstr ""
 "validé. Si votre compte a déjà été validé, veuillez vous déconnecter et vous "
 "connecter à nouveau."
 
-#: src/Gateway/PayplugGateway.php:618
+#: src/Gateway/PayplugGateway.php:621
 msgid "Only PREMIUM accounts can enable the One Click option in LIVE mode."
 msgstr ""
 "Seuls les comptes PREMIUM peuvent utiliser la fonctionnalité One Click en "
 "mode LIVE."
 
-#: src/Gateway/PayplugGateway.php:736 src/Gateway/PayplugGateway.php:739
-#: src/Gateway/PayplugGateway.php:801 src/Gateway/PayplugGateway.php:804
+#: src/Gateway/PayplugGateway.php:746 src/Gateway/PayplugGateway.php:749
+#: src/Gateway/PayplugGateway.php:818 src/Gateway/PayplugGateway.php:821
 msgid "Payment processing failed. Please retry."
 msgstr "Le traitement du paiement a échoué. Merci de réessayer."
 
-#: src/Gateway/PayplugGateway.php:759
+#: src/Gateway/PayplugGateway.php:769
 msgid "Invalid payment method."
 msgstr "Méthode de paiement invalide."
 
-#: src/Gateway/PayplugGateway.php:825
+#: src/Gateway/PayplugGateway.php:842
 msgid "The order %s does not exist."
 msgstr "La commande %s n'existe pas."
 
-#: src/Gateway/PayplugGateway.php:832
+#: src/Gateway/PayplugGateway.php:849
 msgid ""
 "No PayPlug transaction was found for this order. The refund could not be "
 "processed."
@@ -343,32 +347,32 @@ msgstr ""
 "Aucune transaction PayPlug ne correspond à cette commande. Aucun "
 "remboursement n'a été effectué."
 
-#: src/Gateway/PayplugGateway.php:881 src/Gateway/PayplugResponse.php:158
+#: src/Gateway/PayplugGateway.php:898 src/Gateway/PayplugResponse.php:158
 msgid "Refund %s : Refunded %s"
 msgstr "Remboursement %s : Montant remboursé %s"
 
-#: src/Gateway/PayplugGateway.php:900 src/Gateway/PayplugGateway.php:904
+#: src/Gateway/PayplugGateway.php:917 src/Gateway/PayplugGateway.php:921
 msgid "The transaction could not be refunded. Please try again."
 msgstr "Le remboursement a échoué. Veuillez réessayer ultérieurement."
 
-#: src/Gateway/PayplugGateway.php:940
+#: src/Gateway/PayplugGateway.php:957
 msgid ""
 "Payments for this amount (%s) are not authorised with this payment gateway."
 msgstr "Le montant total (%s) n'entre pas dans l'intervalle autorisé."
 
-#: src/Gateway/PayplugGateway.php:969
+#: src/Gateway/PayplugGateway.php:986
 msgid "Please fill all login fields"
 msgstr "Merci de remplir tous les champs de connexion"
 
-#: src/Gateway/PayplugGateway.php:975 src/Gateway/PayplugGateway.php:980
+#: src/Gateway/PayplugGateway.php:992 src/Gateway/PayplugGateway.php:997
 msgid "Invalid credentials."
 msgstr "Vos identifiants sont invalides."
 
-#: src/Gateway/PayplugGateway.php:1197
+#: src/Gateway/PayplugGateway.php:1218
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: src/Gateway/PayplugGateway.php:1201
+#: src/Gateway/PayplugGateway.php:1222
 msgid "Go to your PayPlug Portal"
 msgstr "Accéder à mon portail PayPlug"
 
