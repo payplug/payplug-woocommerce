@@ -81,6 +81,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			'refunds',
 			'tokenization',
 		);
+		$this->new_method_label = __( 'Pay with another credit card', 'payplug' );
 
 		$this->init_settings();
 		$this->requirements = new PayplugGatewayRequirements( $this );
