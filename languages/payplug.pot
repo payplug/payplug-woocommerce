@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
 "woocommerce\n"
-"POT-Creation-Date: 2018-08-29 07:43:54+00:00\n"
+"POT-Creation-Date: 2018-08-29 14:57:30+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -236,7 +236,7 @@ msgstr ""
 #: src/Gateway/PayplugGateway.php:282
 msgid ""
 "Debug mode saves additional information on your server for each operation "
-"done by the plugin (Developer setting)."
+"done via the PayPlug plugin (Developer setting)."
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:283
@@ -371,7 +371,7 @@ msgstr ""
 
 #. translators: %s: minimum required OpenSSL version
 #: src/Gateway/PayplugGatewayRequirements.php:74
-msgid "OpenSSL is not up to date. Please update to OpenSSL ver. %s or later."
+msgid "OpenSSL is not up to date. Please update to OpenSSL %s or later."
 msgstr ""
 
 #: src/Gateway/PayplugGatewayRequirements.php:82
