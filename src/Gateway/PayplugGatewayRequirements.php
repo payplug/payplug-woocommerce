@@ -16,6 +16,7 @@ class PayplugGatewayRequirements {
 
 	const PHP_MIN = '5.6';
 	const OPENSSL_MIN = 268439567;
+	const OPENSSL_MIN_TEXT = 'OpenSSL 1.0.1 14 Mar 2012';
 
 	/**
 	 * @var PayplugGateway
@@ -59,7 +60,8 @@ class PayplugGatewayRequirements {
 	public function php_requirement() {
 		return ( $this->valid_php() )
 			? '<p class="success">' . __( 'The PHP version on your server is valid.', 'payplug' ) . '</p>'
-			: '<p class="failed">' . __( sprintf( 'Your PHP version %s is not supported. Your server must run PHP 5.6 or greater.', PHP_VERSION ), 'payplug' ) . '</p>';
+			/* translators: %s: minimum required PHP version */
+			: '<p class="failed">' . sprintf( __( 'The PHP version on your server is not supported. Your server must run PHP %s or greater.', 'payplug' ), self::PHP_MIN ) . '</p>';
 	}
 
 	/**
@@ -68,7 +70,8 @@ class PayplugGatewayRequirements {
 	public function openssl_requirement() {
 		return ( $this->valid_openssl() )
 			? '<p class="success">' . __( 'OpenSSL is up to date.', 'payplug' ) . '</p>'
-			: '<p class="failed">' . __( sprintf( 'Your OpenSSL version %s is not supported. OpenSSL 1.0.1 or later.', OPENSSL_VERSION_TEXT ), 'payplug' ) . '</p>';
+			/* translators: %s: minimum required OpenSSL version */
+			: '<p class="failed">' . sprintf( __( 'OpenSSL is not up to date. Please update to OpenSSL ver. %s or later.', 'payplug' ), self::OPENSSL_MIN . ' ( ' . self::OPENSSL_MIN_TEXT . ' )' ) . '</p>';
 	}
 
 	/**

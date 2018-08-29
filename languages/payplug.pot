@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
 "woocommerce\n"
-"POT-Creation-Date: 2018-08-29 06:38:01+00:00\n"
+"POT-Creation-Date: 2018-08-29 06:43:32+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -352,23 +352,35 @@ msgstr ""
 msgid "The PHP version on your server is valid."
 msgstr ""
 
-#: src/Gateway/PayplugGatewayRequirements.php:70
+#. translators: %s: minimum required PHP version
+#: src/Gateway/PayplugGatewayRequirements.php:63
+msgid ""
+"The PHP version on your server is not supported. Your server must run PHP %s "
+"or greater."
+msgstr ""
+
+#: src/Gateway/PayplugGatewayRequirements.php:71
 msgid "OpenSSL is up to date."
 msgstr ""
 
-#: src/Gateway/PayplugGatewayRequirements.php:79
+#. translators: %s: minimum required OpenSSL version
+#: src/Gateway/PayplugGatewayRequirements.php:73
+msgid "OpenSSL is not up to date. Please update to OpenSSL ver. %s or later."
+msgstr ""
+
+#: src/Gateway/PayplugGatewayRequirements.php:81
 msgid "Your shop currency has been set up with Euro."
 msgstr ""
 
-#: src/Gateway/PayplugGatewayRequirements.php:80
+#: src/Gateway/PayplugGatewayRequirements.php:82
 msgid "Your shop currency must be set up with Euro."
 msgstr ""
 
-#: src/Gateway/PayplugGatewayRequirements.php:88
+#: src/Gateway/PayplugGatewayRequirements.php:90
 msgid "You are logged in with your PayPlug account."
 msgstr ""
 
-#: src/Gateway/PayplugGatewayRequirements.php:89
+#: src/Gateway/PayplugGatewayRequirements.php:91
 msgid "You must be logged in with your PayPlug account."
 msgstr ""
 
