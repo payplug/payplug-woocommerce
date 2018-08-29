@@ -214,7 +214,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				'title'       => __( 'Title', 'payplug' ),
 				'type'        => 'text',
 				'description' => __( 'The payment solution title displayed during checkout.', 'payplug' ),
-				'default'     => __( 'PayPlug', 'payplug' ),
+				'default'     => _x( 'Credit card checkout', 'Default gateway title', 'payplug' ),
 				'desc_tip'    => true,
 			],
 			'description'             => [
@@ -222,7 +222,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				'type'        => 'text',
 				'desc_tip'    => true,
 				'description' => __( 'The payment solution description displayed during checkout.', 'payplug' ),
-				'default'     => __( 'Credit card checkout via PayPlug', 'payplug' ),
+				'default'     => _x( 'Credit card checkout via PayPlug', 'Default gateway description', 'payplug' ),
 			],
 			'title_connexion'         => [
 				'title' => __( 'Connection', 'payplug' ),
