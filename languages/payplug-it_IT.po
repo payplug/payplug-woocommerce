@@ -6,7 +6,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
 "woocommerce\n"
 "POT-Creation-Date: 2018-08-29 14:57:30+00:00\n"
-"PO-Revision-Date: 2018-08-29 17:04+0200\n"
+"PO-Revision-Date: 2018-08-29 17:12+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it_IT\n"
@@ -406,7 +406,7 @@ msgid ""
 "or greater."
 msgstr ""
 "La versione di PHP del tuo server non è compatibile con il modulo. Il tuo "
-"server deve usare una versione di PHP % o superiore."
+"server deve usare una versione di PHP %s o superiore."
 
 #: src/Gateway/PayplugGatewayRequirements.php:72
 msgid "OpenSSL is up to date."
@@ -416,7 +416,7 @@ msgstr "OpenSSL è stato aggiornato."
 #: src/Gateway/PayplugGatewayRequirements.php:74
 msgid "OpenSSL is not up to date. Please update to OpenSSL %s or later."
 msgstr ""
-"OpenSSL non è aggiornato. Devi aggiornarlo alla versione % o superiore."
+"OpenSSL non è aggiornato. Devi aggiornarlo alla versione %s o superiore."
 
 #: src/Gateway/PayplugGatewayRequirements.php:82
 msgid "Your shop currency has been set up with Euro."
