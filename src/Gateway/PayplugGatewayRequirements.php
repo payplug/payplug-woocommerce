@@ -71,7 +71,7 @@ class PayplugGatewayRequirements {
 		return ( $this->valid_openssl() )
 			? '<p class="success">' . __( 'OpenSSL is up to date.', 'payplug' ) . '</p>'
 			/* translators: %s: minimum required OpenSSL version */
-			: '<p class="failed">' . sprintf( __( 'OpenSSL is not up to date. Please update to OpenSSL ver. %s or later.', 'payplug' ), self::OPENSSL_MIN . ' ( ' . self::OPENSSL_MIN_TEXT . ' )' ) . '</p>';
+			: '<p class="failed">' . sprintf( __( 'OpenSSL is not up to date. Please update to OpenSSL %s or later.', 'payplug' ), self::OPENSSL_MIN . ' ( ' . self::OPENSSL_MIN_TEXT . ' )' ) . '</p>';
 	}
 
 	/**
