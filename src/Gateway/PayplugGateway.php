@@ -167,8 +167,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 */
 	public function get_icon() {
 		$icons = apply_filters( 'payplug_payment_icons', [
-			'visa'       => '<img src="' . WC()->plugin_url() . '/assets/images/icons/credit-cards/visa.svg" alt="Visa" class="payplug-payment-icon" />',
-			'mastercard' => '<img src="' . WC()->plugin_url() . '/assets/images/icons/credit-cards/mastercard.svg" alt="Mastercard" class="payplug-payment-icon" />',
+			'payplug' => '<img src="' . PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/cards_icons.svg" alt="Visa & Mastercard" class="payplug-payment-icon" />',
 		] );
 
 		$icons_str = '';
