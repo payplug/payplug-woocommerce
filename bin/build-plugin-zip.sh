@@ -56,14 +56,23 @@ rm -f payplug-woocommerce.zip
 # Generate the plugin zip file
 status "Creating archive..."
 zip -r payplug-woocommerce.zip \
-	payplug.php \
-	readme.txt \
-	LICENSE \
-	src/ \
-	languages/ \
-	assets/ \
-	vendor/ \
-	--exclude=vendor/composer/installers* \
-	--exclude=assets/scss* \
+	../payplug-woocommerce* \
+	--exclude=../payplug-woocommerce/.git* \
+	--exclude=../payplug-woocommerce/.distignore \
+	--exclude=../payplug-woocommerce/.editorconfig \
+	--exclude=../payplug-woocommerce/.gitattributes \
+	--exclude=../payplug-woocommerce/.gitignore \
+	--exclude=../payplug-woocommerce/.travis.yml \
+	--exclude=../payplug-woocommerce/composer.* \
+	--exclude=../payplug-woocommerce/gulpfile.js \
+	--exclude=../payplug-woocommerce/package.json \
+	--exclude=../payplug-woocommerce/package-lock.json \
+	--exclude=../payplug-woocommerce/phpcs.xml.dist \
+	--exclude=../payplug-woocommerce/phpunit.xml.dist \
+	--exclude=../payplug-woocommerce/bin* \
+	--exclude=../payplug-woocommerce/node_modules* \
+	--exclude=../payplug-woocommerce/test* \
+	--exclude=../payplug-woocommerce/vendor/composer/installers* \
+	--exclude=../payplug-woocommerce/assets/scss* \
 
 status "Done."
