@@ -327,7 +327,7 @@ class PayplugWoocommerceHelper {
 	 * @return int
 	 */
 	public static function get_minimum_amount() {
-		return 100;
+		return 99;
 	}
 
 	/**
