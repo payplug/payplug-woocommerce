@@ -1,0 +1,12 @@
+{
+  "name": "payplug",
+  "version": "0.1.0",
+  "description": "PayPLug CSS assets management",
+  "license": "GPL-3.0-or-later",
+  "author": "PayPlug",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-sass": "^4.0.1",
+    "gulp-sourcemaps": "^2.6.4"
+  }
+}

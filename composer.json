@@ -1,0 +1,27 @@
+{
+    "name": "payplug/payplug-woocommerce",
+    "description": "",
+    "license": "GPL-3.0-or-later",
+    "type": "wordpress-plugin",
+    "keywords": ["payplug", "woocommerce", "gateway"],
+    "authors": [
+        {
+            "name": "PayPlug",
+            "email": "support@payplug.com"
+        },
+        {
+            "name": "Be API",
+            "email": "technical@beapi.fr"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0",
+        "composer/installers": "~1.0",
+        "payplug/payplug-php": "^2.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Payplug\\PayplugWoocommerce\\": "src"
+        }
+    }
+}
