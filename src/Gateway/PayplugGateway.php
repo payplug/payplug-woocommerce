@@ -438,6 +438,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		}
 
 		if ( $this->oneclick_available() ) {
+			$this->tokenization_script();
 			$this->saved_payment_methods();
 		}
 	}
