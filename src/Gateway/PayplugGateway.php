@@ -90,8 +90,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		}
 		$this->init_form_fields();
 
-		$this->title          = $this->get_option( 'title' );
-		$this->description    = $this->get_option( 'description' );
+		$this->title          = __( 'Credit card checkout', 'payplug' );
+		$this->description    = ' ';
 		$this->mode           = 'yes' === $this->get_option( 'mode', 'no' ) ? 'live' : 'test';
 		$this->debug          = 'yes' === $this->get_option( 'debug', 'no' );
 		$this->email          = $this->get_option( 'email' );
@@ -101,7 +101,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		self::$log_enabled = $this->debug;
 
 		if ( 'test' === $this->mode ) {
-			$this->description .= " \n" . __( 'You are in TEST MODE. In test mode you can use the card 4242424242424242 with any valid expiration date and CVC.', 'payplug' );
+			$this->description = ( ! empty( $this->description ) ) ? " \n" : '';
+			$this->description .= __( 'You are in TEST MODE. In test mode you can use the card 4242424242424242 with any valid expiration date and CVC.', 'payplug' );
 			$this->description = trim( $this->description );
 		}
 
@@ -208,20 +209,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				'label'       => __( 'Enable PayPlug', 'payplug' ),
 				'description' => __( 'Only Euro payments can be processed with PayPlug.', 'payplug' ),
 				'default'     => 'no',
-			],
-			'title'                   => [
-				'title'       => __( 'Title', 'payplug' ),
-				'type'        => 'text',
-				'description' => __( 'The payment solution title displayed during checkout.', 'payplug' ),
-				'default'     => _x( 'Credit card checkout', 'Default gateway title', 'payplug' ),
-				'desc_tip'    => true,
-			],
-			'description'             => [
-				'title'       => __( 'Description', 'payplug' ),
-				'type'        => 'text',
-				'desc_tip'    => true,
-				'description' => __( 'The payment solution description displayed during checkout.', 'payplug' ),
-				'default'     => _x( 'Credit card checkout via PayPlug', 'Default gateway description', 'payplug' ),
 			],
 			'title_connexion'         => [
 				'title' => __( 'Connection', 'payplug' ),
@@ -433,11 +420,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	}
 
 	public function payment_fields() {
-		if ( $description = $this->get_description() ) {
+		$description = $this->get_description();
+		if ( ! empty( $description ) ) {
 			echo wpautop( wptexturize( $description ) );
 		}
 
 		if ( $this->oneclick_available() ) {
+			$this->tokenization_script();
 			$this->saved_payment_methods();
 		}
 	}
