@@ -1,11 +1,11 @@
-# Copyright (C) 2018 Payplug
-# This file is distributed under the same license as the Payplug package.
+# Copyright (C) 2018 PayPlug pour WooCommerce (Officiel)
+# This file is distributed under the same license as the PayPlug pour WooCommerce (Officiel) package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Payplug 0.1.0\n"
+"Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
 "woocommerce\n"
-"POT-Creation-Date: 2018-08-29 14:57:30+00:00\n"
+"POT-Creation-Date: 2018-09-20 09:20:17+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -77,7 +77,7 @@ msgstr ""
 msgid "Expiration date"
 msgstr ""
 
-#: src/Admin/Metabox.php:103 src/Gateway/PayplugGateway.php:251
+#: src/Admin/Metabox.php:103 src/Gateway/PayplugGateway.php:238
 msgid "Mode"
 msgstr ""
 
@@ -97,7 +97,7 @@ msgstr ""
 msgid "Only one step left to activate the plugin on your site !"
 msgstr ""
 
-#: src/Admin/Notices.php:152 src/Gateway/PayplugGateway.php:505
+#: src/Admin/Notices.php:152 src/Gateway/PayplugGateway.php:493
 msgid "Login"
 msgstr ""
 
@@ -152,197 +152,175 @@ msgstr ""
 msgid "Pay with another credit card"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:104
+#: src/Gateway/PayplugGateway.php:93
+msgid "Credit card checkout"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:105
 msgid ""
 "You are in TEST MODE. In test mode you can use the card 4242424242424242 "
 "with any valid expiration date and CVC."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:206
+#: src/Gateway/PayplugGateway.php:207
 msgid "Enable/Disable"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:208
+#: src/Gateway/PayplugGateway.php:209
 msgid "Enable PayPlug"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:209
+#: src/Gateway/PayplugGateway.php:210
 msgid "Only Euro payments can be processed with PayPlug."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:213
-msgid "Title"
-msgstr ""
-
-#: src/Gateway/PayplugGateway.php:215
-msgid "The payment solution title displayed during checkout."
-msgstr ""
-
-#: src/Gateway/PayplugGateway.php:216
-msgctxt "Default gateway title"
-msgid "Credit card checkout"
-msgstr ""
-
-#: src/Gateway/PayplugGateway.php:220
-msgid "Description"
-msgstr ""
-
-#: src/Gateway/PayplugGateway.php:223
-msgid "The payment solution description displayed during checkout."
-msgstr ""
-
-#: src/Gateway/PayplugGateway.php:224
-msgctxt "Default gateway description"
-msgid "Credit card checkout via PayPlug"
-msgstr ""
-
-#: src/Gateway/PayplugGateway.php:227 src/Gateway/PayplugGateway.php:475
+#: src/Gateway/PayplugGateway.php:214 src/Gateway/PayplugGateway.php:463
 msgid "Connection"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:260
+#: src/Gateway/PayplugGateway.php:247
 msgid ""
 "In TEST mode, all payments will be simulations and will not generate real "
 "transactions."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:265 src/PayplugWoocommerce.php:121
+#: src/Gateway/PayplugGateway.php:252 src/PayplugWoocommerce.php:121
 msgid "Settings"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:269
+#: src/Gateway/PayplugGateway.php:256
 msgid "Payment page"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:271
+#: src/Gateway/PayplugGateway.php:258
 msgid ""
 "Customers will be redirected to a PayPlug payment page to finalize the "
 "transaction, or payments will be performed in an embeddable payment form on "
 "your website."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:275
+#: src/Gateway/PayplugGateway.php:262
 msgid "Redirect"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:276
+#: src/Gateway/PayplugGateway.php:263
 msgid "Integrated"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:280
+#: src/Gateway/PayplugGateway.php:267
 msgid "Debug"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:282
+#: src/Gateway/PayplugGateway.php:269
 msgid ""
 "Debug mode saves additional information on your server for each operation "
 "done via the PayPlug plugin (Developer setting)."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:283
+#: src/Gateway/PayplugGateway.php:270
 msgid "Activate debug mode"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:288
+#: src/Gateway/PayplugGateway.php:275
 msgid "Advanced Settings"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:289
+#: src/Gateway/PayplugGateway.php:276
 msgid ""
 "This feature is available to PREMIUM accounts only. You can try it in TEST "
 "mode."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:294
+#: src/Gateway/PayplugGateway.php:281
 msgid "One Click Payment"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:296
+#: src/Gateway/PayplugGateway.php:283
 msgid "Activate"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:297
+#: src/Gateway/PayplugGateway.php:284
 msgid ""
 "Allow your customers to save their credit card information for later "
 "purchases."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:480 src/Gateway/PayplugGateway.php:484
+#: src/Gateway/PayplugGateway.php:468 src/Gateway/PayplugGateway.php:472
 msgid "Email"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:486
+#: src/Gateway/PayplugGateway.php:474
 msgid "your@email.com"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:492 src/Gateway/PayplugGateway.php:496
+#: src/Gateway/PayplugGateway.php:480 src/Gateway/PayplugGateway.php:484
 msgid "Password"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:539
+#: src/Gateway/PayplugGateway.php:527
 msgid "Successfully logged out."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:600
+#: src/Gateway/PayplugGateway.php:588
 msgid "Successfully logged in."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:611
+#: src/Gateway/PayplugGateway.php:599
 msgid ""
 "Your account does not support LIVE mode at the moment, it must be validated "
 "first. If your account has already been validated, please log out and log in "
 "again."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:622
+#: src/Gateway/PayplugGateway.php:610
 msgid "Only PREMIUM accounts can enable the One Click option in LIVE mode."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:747 src/Gateway/PayplugGateway.php:750
-#: src/Gateway/PayplugGateway.php:819 src/Gateway/PayplugGateway.php:822
+#: src/Gateway/PayplugGateway.php:735 src/Gateway/PayplugGateway.php:738
+#: src/Gateway/PayplugGateway.php:807 src/Gateway/PayplugGateway.php:810
 msgid "Payment processing failed. Please retry."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:770
+#: src/Gateway/PayplugGateway.php:758
 msgid "Invalid payment method."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:843
+#: src/Gateway/PayplugGateway.php:831
 msgid "The order %s does not exist."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:850
+#: src/Gateway/PayplugGateway.php:838
 msgid ""
 "No PayPlug transaction was found for this order. The refund could not be "
 "processed."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:899 src/Gateway/PayplugResponse.php:158
+#: src/Gateway/PayplugGateway.php:887 src/Gateway/PayplugResponse.php:158
 msgid "Refund %s : Refunded %s"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:918 src/Gateway/PayplugGateway.php:922
+#: src/Gateway/PayplugGateway.php:906 src/Gateway/PayplugGateway.php:910
 msgid "The transaction could not be refunded. Please try again."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:958
+#: src/Gateway/PayplugGateway.php:946
 msgid ""
 "Payments for this amount (%s) are not authorised with this payment gateway."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:987
+#: src/Gateway/PayplugGateway.php:975
 msgid "Please fill all login fields"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:993 src/Gateway/PayplugGateway.php:998
+#: src/Gateway/PayplugGateway.php:981 src/Gateway/PayplugGateway.php:986
 msgid "Invalid credentials."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:1219
+#: src/Gateway/PayplugGateway.php:1207
 msgid "Logout"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:1223
+#: src/Gateway/PayplugGateway.php:1211
 msgid "Go to your PayPlug Portal"
 msgstr ""
 
@@ -407,7 +385,7 @@ msgid "Empty cart"
 msgstr ""
 
 #. Plugin Name of the plugin/theme
-msgid "Payplug"
+msgid "PayPlug pour WooCommerce (Officiel)"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
