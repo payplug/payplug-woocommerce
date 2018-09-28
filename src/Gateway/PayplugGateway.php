@@ -91,7 +91,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		$this->init_form_fields();
 
 		$this->title          = __( 'Credit card checkout', 'payplug' );
-		$this->description    = ' ';
+		$this->description    = ( 0 !== count( $this->get_tokens() ) ) ? ' ' : '';
 		$this->mode           = 'yes' === $this->get_option( 'mode', 'no' ) ? 'live' : 'test';
 		$this->debug          = 'yes' === $this->get_option( 'debug', 'no' );
 		$this->email          = $this->get_option( 'email' );
