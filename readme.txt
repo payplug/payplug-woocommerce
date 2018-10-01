@@ -4,7 +4,7 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 4.4
 Tested up to: 4.9
 Requires PHP: 5.6
-Stable tag: 1.0.9
+Stable tag: 1.0.10
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -73,6 +73,9 @@ D’après un sondage effectué entre décembre 2017 et avril 2018, 91% des marc
 2. Un exemple d'affichage sur un site WordPress
 
 == Changelog ==
+
+= 1.0.10 =
+Corrige l'affichage des cartes sauvegardées
 
 = 1.0.7 =
 Fix translations
