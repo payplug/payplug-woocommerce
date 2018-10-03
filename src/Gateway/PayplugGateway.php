@@ -98,8 +98,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 
 		add_filter( 'woocommerce_get_customer_payment_tokens', [ $this, 'filter_tokens' ], 10, 3 );
 
-		$this->title          = __( 'Credit card checkout', 'payplug' );
-		$this->description    = ( 0 !== count( $this->get_tokens() ) ) ? ' ' : '';
+		$this->title       = __( 'Credit card checkout', 'payplug' );
+		$this->description = ( $this->oneclick_available() && 0 !== count( $this->get_tokens() ) )
+			? ' '
+			: '';
 
 		self::$log_enabled = $this->debug;
 
