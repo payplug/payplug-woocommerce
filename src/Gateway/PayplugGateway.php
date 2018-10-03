@@ -90,13 +90,18 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		}
 		$this->init_form_fields();
 
-		$this->title          = __( 'Credit card checkout', 'payplug' );
-		$this->description    = ' ';
 		$this->mode           = 'yes' === $this->get_option( 'mode', 'no' ) ? 'live' : 'test';
 		$this->debug          = 'yes' === $this->get_option( 'debug', 'no' );
 		$this->email          = $this->get_option( 'email' );
 		$this->payment_method = $this->get_option( 'payment_method' );
 		$this->oneclick       = 'yes' === $this->get_option( 'oneclick', 'no' );
+
+		add_filter( 'woocommerce_get_customer_payment_tokens', [ $this, 'filter_tokens' ], 10, 3 );
+
+		$this->title       = __( 'Credit card checkout', 'payplug' );
+		$this->description = ( $this->oneclick_available() && 0 !== count( $this->get_tokens() ) )
+			? ' '
+			: '';
 
 		self::$log_enabled = $this->debug;
 
@@ -109,8 +114,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ] );
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, [ $this, 'process_admin_options' ] );
 		add_action( 'the_post', [ $this, 'validate_payment' ] );
-
-		add_filter( 'woocommerce_get_customer_payment_tokens', [ $this, 'filter_tokens' ], 10, 3 );
 	}
 
 	/**
