@@ -32,7 +32,7 @@ function init() {
 		require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 	}
 
-	PayplugWoocommerceHelper::load_plugin_textdomain( plugin_basename( dirname( __FILE__ ) ) . '/languages' );
+	load_plugin_textdomain( 'payplug', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
 
 	PayplugWoocommerce::get_instance();
 }
