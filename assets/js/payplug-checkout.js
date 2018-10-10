@@ -100,8 +100,12 @@
 			return token.length > 0 && 'new' !== token.val();
 		},
 		submit_error: function (error_message) {
+			var parsedHtml = $.parseHTML(error_message, document, false);
 			$('.woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message').remove();
-			payplug_checkout.$form.prepend('<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">' + error_message + '</div>');
+			$('<div></div>')
+				.addClass('woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout')
+				.html( parsedHtml )
+				.prependTo( payplug_checkout.$form );
 			payplug_checkout.$form.removeClass('processing').unblock();
 			payplug_checkout.$form.find('.input-text, select, input:checkbox').trigger('validate').blur();
 			payplug_checkout.scroll_to_notices();
