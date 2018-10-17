@@ -4,7 +4,7 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 4.4
 Tested up to: 4.9
 Requires PHP: 5.6
-Stable tag: 1.0.11
+Stable tag: 1.0.12
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -69,6 +69,10 @@ Based on a recent survey, 91% of merchants using PlayPlug would recommend the so
 2. Display on a WordPress website
 
 == Changelog ==
+
+= 1.0.12 =
+Security fix in dependencies
+Fix typos in translations
 
 = 1.0.11 =
 Fix wrong message on the payment page

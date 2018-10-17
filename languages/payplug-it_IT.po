@@ -431,8 +431,8 @@ msgid "PayPlug pour WooCommerce (Officiel)"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
-msgid "https://www.payplug.com/modules/woocomerce"
-msgstr "https://www.payplug.com/it/modules/woocomerce"
+msgid "https://www.payplug.com/modules/woocommerce"
+msgstr "https://www.payplug.com/it/modules/woocommerce"
 
 #. Description of the plugin/theme
 msgid ""
