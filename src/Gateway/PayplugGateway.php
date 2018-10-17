@@ -271,7 +271,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				'type'    => 'checkbox',
 				'description' => __( 'Debug mode saves additional information on your server for each operation done via the PayPlug plugin (Developer setting).', 'payplug' ),
 				'label'   => __( 'Activate debug mode', 'payplug' ),
-				'default' => 'no',
+				'default' => 'yes',
 				'desc_tip'    => true,
 			],
 			'title_advanced_settings' => [
