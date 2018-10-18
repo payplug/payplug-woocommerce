@@ -416,24 +416,4 @@ class PayplugWoocommerceHelper {
 			}
 		}
 	}
-
-	/**
-	 * Load translations from plugin languages folder.
-	 *
-	 * @param string $plugin_rel_path
-	 *
-	 * @return bool
-	 */
-	public static function load_plugin_textdomain( $plugin_rel_path ) {
-
-		$domain = 'payplug';
-
-		$locale = apply_filters( 'plugin_locale', is_admin() ? get_user_locale() : get_locale(), $domain );
-
-		$mofile = $domain . '-' . $locale . '.mo';
-
-		$path = WP_PLUGIN_DIR . '/' . trim( $plugin_rel_path, '/' );
-
-		return load_textdomain( $domain, $path . '/' . $mofile );
-	}
 }
