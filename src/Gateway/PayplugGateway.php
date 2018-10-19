@@ -62,12 +62,17 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 *     emergency|alert|critical|error|warning|notice|info|debug
 	 */
 	public static function log( $message, $level = 'info' ) {
-		if ( self::$log_enabled ) {
-			if ( empty( self::$log ) ) {
-				self::$log = wc_get_logger();
-			}
-			self::$log->log( $level, $message, array( 'source' => 'payplug_gateway' ) );
+		if ( ! self::$log_enabled ) {
+			return;
 		}
+
+		if ( empty( self::$log ) ) {
+			self::$log = PayplugWoocommerceHelper::is_pre_30() ? new \WC_Logger() : wc_get_logger();
+		}
+
+		PayplugWoocommerceHelper::is_pre_30()
+			? self::$log->add( 'payplug_gateway', $message )
+			: self::$log->log( $level, $message, array( 'source' => 'payplug_gateway' ) );
 	}
 
 	public function __construct() {
@@ -526,6 +531,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			$data['payplug_merchant_id'] = '';
 			$data['enabled']             = 'no';
 			$data['mode']                = 'no';
+			$data['oneclick']            = 'no';
 			update_option( $this->get_option_key(),
 				apply_filters( 'woocommerce_settings_api_sanitized_fields_' . $this->id, $data ) );
 			\WC_Admin_Settings::add_message( __( 'Successfully logged out.', 'payplug' ) );
@@ -608,7 +614,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		if (
 			isset( $data[ $oneclick_fieldkey ] )
 			&& '1' === $data[ $oneclick_fieldkey ]
-			&& false === $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD )
+			&& (
+				! $this->user_logged_in()
+				|| false === $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD )
+			)
 		) {
 			$data[ $oneclick_fieldkey ] = '0';
 			\WC_Admin_Settings::add_error( __( 'Only PREMIUM accounts can enable the One Click option in LIVE mode.', 'payplug' ) );
@@ -1306,6 +1315,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 * @return bool
 	 */
 	public function oneclick_available() {
-		return $this->oneclick && $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD );
+		return $this->user_logged_in()
+               && $this->oneclick
+               && $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD );
 	}
 }
