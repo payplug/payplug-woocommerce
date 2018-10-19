@@ -47,7 +47,7 @@ class PayplugResponse {
 		PayplugGateway::log( sprintf( 'Order #%s : Begin processing payment IPN %s', $order_id, $resource->id ) );
 
 		// Ignore paid orders
-		if ( $order->has_status( wc_get_is_paid_statuses() ) ) {
+		if ( $order->is_paid() ) {
 			PayplugGateway::log( sprintf( 'Order #%s : Order is already complete. Ignoring IPN.', $order_id ) );
 
 			return;

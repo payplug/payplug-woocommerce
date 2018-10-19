@@ -62,12 +62,17 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 *     emergency|alert|critical|error|warning|notice|info|debug
 	 */
 	public static function log( $message, $level = 'info' ) {
-		if ( self::$log_enabled ) {
-			if ( empty( self::$log ) ) {
-				self::$log = wc_get_logger();
-			}
-			self::$log->log( $level, $message, array( 'source' => 'payplug_gateway' ) );
+		if ( ! self::$log_enabled ) {
+			return;
 		}
+
+		if ( empty( self::$log ) ) {
+			self::$log = PayplugWoocommerceHelper::is_pre_30() ? new \WC_Logger() : wc_get_logger();
+		}
+
+		PayplugWoocommerceHelper::is_pre_30()
+			? self::$log->add( 'payplug_gateway', $message )
+			: self::$log->log( $level, $message, array( 'source' => 'payplug_gateway' ) );
 	}
 
 	public function __construct() {
