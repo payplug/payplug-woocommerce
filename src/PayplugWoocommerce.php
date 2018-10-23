@@ -87,6 +87,10 @@ class PayplugWoocommerce {
 			return;
 		}
 
+		if ( PayplugWoocommerceHelper::is_pre_30() ) {
+			require_once PAYPLUG_GATEWAY_PLUGIN_DIR . '/woocommerce-compat.php';
+		}
+
 		$this->notices  = new Notices();
 		$this->metabox  = new Metabox();
 		$this->actions  = new WoocommerceActions();
