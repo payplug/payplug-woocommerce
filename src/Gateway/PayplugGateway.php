@@ -116,9 +116,35 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			$this->description = trim( $this->description );
 		}
 
+		add_filter( 'woocommerce_get_order_item_totals', [ $this, 'customize_gateway_title' ], 10, 2 );
 		add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ] );
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, [ $this, 'process_admin_options' ] );
 		add_action( 'the_post', [ $this, 'validate_payment' ] );
+	}
+
+	/**
+	 * Customize gateway title in emails.
+	 *
+	 * @param array $total_rows
+	 * @param \WC_Order $order
+	 *
+	 * @return array
+	 *
+	 * @author Clément Boirie
+	 */
+	public function customize_gateway_title( $total_rows, $order ) {
+
+		$payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
+		if (
+			$this->id !== $payment_method
+			|| ! isset( $total_rows['payment_method'] )
+		) {
+			return $total_rows;
+		}
+
+		$total_rows['payment_method']['value'] = __( 'Credit card', 'payplug' );
+
+		return $total_rows;
 	}
 
 	/**
