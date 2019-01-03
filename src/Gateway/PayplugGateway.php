@@ -175,8 +175,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 * @return string
 	 */
 	public function get_icon() {
+
+		$src = ( 'it_IT' === get_locale() )
+			? PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/logos_scheme_PostePay.svg'
+			: PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/logos_scheme_CB.svg';
+
 		$icons = apply_filters( 'payplug_payment_icons', [
-			'payplug' => '<img src="' . PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/cards_icons.svg" alt="Visa & Mastercard" class="payplug-payment-icon" />',
+			'payplug' => sprintf( '<img src="%s" alt="Visa & Mastercard" class="payplug-payment-icon" />', esc_url( $src ) ),
 		] );
 
 		$icons_str = '';
