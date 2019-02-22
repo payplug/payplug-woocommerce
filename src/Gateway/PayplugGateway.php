@@ -86,7 +86,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			'refunds',
 			'tokenization',
 		);
-		$this->new_method_label = __( 'Pay with another credit card', 'payplug' );
+		$this->new_method_label   = __( 'Pay with another credit card', 'payplug' );
 
 		$this->init_settings();
 		$this->requirements = new PayplugGatewayRequirements( $this );
@@ -95,6 +95,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		}
 		$this->init_form_fields();
 
+		$this->title          = $this->get_option( 'title' );
+		$this->description    = $this->get_option( 'description' );
 		$this->mode           = 'yes' === $this->get_option( 'mode', 'no' ) ? 'live' : 'test';
 		$this->debug          = 'yes' === $this->get_option( 'debug', 'no' );
 		$this->email          = $this->get_option( 'email' );
@@ -103,15 +105,15 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 
 		add_filter( 'woocommerce_get_customer_payment_tokens', [ $this, 'filter_tokens' ], 10, 3 );
 
-		$this->title       = __( 'Credit card checkout', 'payplug' );
-		$this->description = ( $this->oneclick_available() && 0 !== count( $this->get_tokens() ) )
-			? ' '
-			: '';
-
 		self::$log_enabled = $this->debug;
 
 		if ( 'test' === $this->mode ) {
-			$this->description = ( ! empty( $this->description ) ) ? " \n" : '';
+			if ( ! empty( $this->description ) ) {
+				$this->description .= " \n";
+			} else {
+				$this->description = '';
+			}
+
 			$this->description .= __( 'You are in TEST MODE. In test mode you can use the card 4242424242424242 with any valid expiration date and CVC.', 'payplug' );
 			$this->description = trim( $this->description );
 		}
@@ -249,6 +251,20 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				'description' => __( 'Only Euro payments can be processed with PayPlug.', 'payplug' ),
 				'default'     => 'no',
 			],
+			'title'                   => [
+				'title'       => __( 'Title', 'payplug' ),
+				'type'        => 'text',
+				'description' => __( 'The payment solution title displayed during checkout.', 'payplug' ),
+				'default'     => _x( 'Credit card checkout', 'Default gateway title', 'payplug' ),
+				'desc_tip'    => true,
+			],
+			'description'             => [
+				'title'       => __( 'Description', 'payplug' ),
+				'type'        => 'text',
+				'description' => __( 'The payment solution description displayed during checkout.', 'payplug' ),
+				'default'     => '',
+				'desc_tip'    => true,
+			],
 			'title_connexion'         => [
 				'title' => __( 'Connection', 'payplug' ),
 				'type'  => 'title',
@@ -303,11 +319,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				),
 			],
 			'debug'                   => [
-				'title'   => __( 'Debug', 'payplug' ),
-				'type'    => 'checkbox',
+				'title'       => __( 'Debug', 'payplug' ),
+				'type'        => 'checkbox',
 				'description' => __( 'Debug mode saves additional information on your server for each operation done via the PayPlug plugin (Developer setting).', 'payplug' ),
-				'label'   => __( 'Activate debug mode', 'payplug' ),
-				'default' => 'yes',
+				'label'       => __( 'Activate debug mode', 'payplug' ),
+				'default'     => 'yes',
 				'desc_tip'    => true,
 			],
 			'title_advanced_settings' => [
