@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name:     PayPlug pour WooCommerce (Officiel)
- * Plugin URI:      https://www.payplug.com/modules/woocomerce
+ * Plugin URI:      https://www.payplug.com/modules/woocommerce
  * Description:     The online payment solution combining simplicity and first-rate support to boost your sales.
  * Author:          PayPlug
  * Author URI:      https://www.payplug.com/
  * Text Domain:     payplug
  * Domain Path:     /languages
- * Version:         1.0.0
+ * Version:         1.0.12
  * License:         GPLv3 or later
  * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PAYPLUG_GATEWAY_VERSION', '1.0.0' );
+define( 'PAYPLUG_GATEWAY_VERSION', '1.0.12' );
 define( 'PAYPLUG_GATEWAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );

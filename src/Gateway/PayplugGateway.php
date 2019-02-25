@@ -62,12 +62,17 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 *     emergency|alert|critical|error|warning|notice|info|debug
 	 */
 	public static function log( $message, $level = 'info' ) {
-		if ( self::$log_enabled ) {
-			if ( empty( self::$log ) ) {
-				self::$log = wc_get_logger();
-			}
-			self::$log->log( $level, $message, array( 'source' => 'payplug_gateway' ) );
+		if ( ! self::$log_enabled ) {
+			return;
 		}
+
+		if ( empty( self::$log ) ) {
+			self::$log = PayplugWoocommerceHelper::is_pre_30() ? new \WC_Logger() : wc_get_logger();
+		}
+
+		PayplugWoocommerceHelper::is_pre_30()
+			? self::$log->add( 'payplug_gateway', $message )
+			: self::$log->log( $level, $message, array( 'source' => 'payplug_gateway' ) );
 	}
 
 	public function __construct() {
@@ -90,13 +95,18 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		}
 		$this->init_form_fields();
 
-		$this->title          = __( 'Credit card checkout', 'payplug' );
-		$this->description    = ' ';
 		$this->mode           = 'yes' === $this->get_option( 'mode', 'no' ) ? 'live' : 'test';
 		$this->debug          = 'yes' === $this->get_option( 'debug', 'no' );
 		$this->email          = $this->get_option( 'email' );
 		$this->payment_method = $this->get_option( 'payment_method' );
 		$this->oneclick       = 'yes' === $this->get_option( 'oneclick', 'no' );
+
+		add_filter( 'woocommerce_get_customer_payment_tokens', [ $this, 'filter_tokens' ], 10, 3 );
+
+		$this->title       = __( 'Credit card checkout', 'payplug' );
+		$this->description = ( $this->oneclick_available() && 0 !== count( $this->get_tokens() ) )
+			? ' '
+			: '';
 
 		self::$log_enabled = $this->debug;
 
@@ -106,11 +116,35 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			$this->description = trim( $this->description );
 		}
 
+		add_filter( 'woocommerce_get_order_item_totals', [ $this, 'customize_gateway_title' ], 10, 2 );
 		add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ] );
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, [ $this, 'process_admin_options' ] );
 		add_action( 'the_post', [ $this, 'validate_payment' ] );
+	}
 
-		add_filter( 'woocommerce_get_customer_payment_tokens', [ $this, 'filter_tokens' ], 10, 3 );
+	/**
+	 * Customize gateway title in emails.
+	 *
+	 * @param array $total_rows
+	 * @param \WC_Order $order
+	 *
+	 * @return array
+	 *
+	 * @author Clément Boirie
+	 */
+	public function customize_gateway_title( $total_rows, $order ) {
+
+		$payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
+		if (
+			$this->id !== $payment_method
+			|| ! isset( $total_rows['payment_method'] )
+		) {
+			return $total_rows;
+		}
+
+		$total_rows['payment_method']['value'] = __( 'Credit card', 'payplug' );
+
+		return $total_rows;
 	}
 
 	/**
@@ -167,8 +201,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 * @return string
 	 */
 	public function get_icon() {
+
+		$src = ( 'it_IT' === get_locale() )
+			? PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/logos_scheme_PostePay.svg'
+			: PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/logos_scheme_CB.svg';
+
 		$icons = apply_filters( 'payplug_payment_icons', [
-			'payplug' => '<img src="' . PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/cards_icons.svg" alt="Visa & Mastercard" class="payplug-payment-icon" />',
+			'payplug' => sprintf( '<img src="%s" alt="Visa & Mastercard" class="payplug-payment-icon" />', esc_url( $src ) ),
 		] );
 
 		$icons_str = '';
@@ -268,7 +307,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				'type'    => 'checkbox',
 				'description' => __( 'Debug mode saves additional information on your server for each operation done via the PayPlug plugin (Developer setting).', 'payplug' ),
 				'label'   => __( 'Activate debug mode', 'payplug' ),
-				'default' => 'no',
+				'default' => 'yes',
 				'desc_tip'    => true,
 			],
 			'title_advanced_settings' => [
@@ -348,7 +387,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			return;
 		}
 
-		wp_register_script( 'payplug', 'https://api.payplug.com/js/1.2/form.js', [], '1.2', true );
+		wp_register_script( 'payplug', 'https://api.payplug.com/js/1.3/form.js', [], '1.3', true );
 		wp_register_script( 'payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [
 			'jquery',
 			'payplug'
@@ -492,6 +531,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				<tr valign="top">
 					<td class="forminp">
 						<input class="button" type="submit" value="<?php _e( 'Login', 'payplug' ); ?>">
+						<input type="hidden" name="save" value="login">
 						<?php wp_nonce_field( 'payplug_user_login', '_loginaction' ); ?>
 					</td>
 				</tr>
@@ -523,6 +563,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			$data['payplug_merchant_id'] = '';
 			$data['enabled']             = 'no';
 			$data['mode']                = 'no';
+			$data['oneclick']            = 'no';
 			update_option( $this->get_option_key(),
 				apply_filters( 'woocommerce_settings_api_sanitized_fields_' . $this->id, $data ) );
 			\WC_Admin_Settings::add_message( __( 'Successfully logged out.', 'payplug' ) );
@@ -605,7 +646,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 		if (
 			isset( $data[ $oneclick_fieldkey ] )
 			&& '1' === $data[ $oneclick_fieldkey ]
-			&& false === $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD )
+			&& (
+				! $this->user_logged_in()
+				|| false === $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD )
+			)
 		) {
 			$data[ $oneclick_fieldkey ] = '0';
 			\WC_Admin_Settings::add_error( __( 'Only PREMIUM accounts can enable the One Click option in LIVE mode.', 'payplug' ) );
@@ -1206,6 +1250,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				<p><?php echo $this->get_option( 'email' ); ?></p>
 				<p>
 					<input type="submit" name="submit_logout" value="<?php _e( 'Logout', 'payplug' ); ?>">
+					<input type="hidden" name="save" value="logout">
 					<?php wp_nonce_field( 'payplug_user_logout', '_logoutaction' ); ?>
 					|
 					<a href="https://portal.payplug.com"
@@ -1303,6 +1348,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 * @return bool
 	 */
 	public function oneclick_available() {
-		return $this->oneclick && $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD );
+		return $this->user_logged_in()
+               && $this->oneclick
+               && $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD );
 	}
 }
