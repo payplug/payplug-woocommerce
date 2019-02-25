@@ -46,9 +46,21 @@ class PayplugResponse {
 
 		PayplugGateway::log( sprintf( 'Order #%s : Begin processing payment IPN %s', $order_id, $resource->id ) );
 
+		// Check if a response is already being processed for the order
+		if ( $this->is_locked( $order_id ) ) {
+			PayplugGateway::log( sprintf( 'Order #%s : Order is already being processed. Ignoring IPN', $order_id ) );
+
+			return;
+		}
+
+		// Lock order to avoid processing a response multiple time
+		$this->lock_order( $order_id );
+
 		// Ignore paid orders
 		if ( $order->is_paid() ) {
 			PayplugGateway::log( sprintf( 'Order #%s : Order is already complete. Ignoring IPN.', $order_id ) );
+
+			$this->unlock_order( $order_id );
 
 			return;
 		}
@@ -57,12 +69,16 @@ class PayplugResponse {
 		if ( $order->has_status( 'cancelled' ) ) {
 			PayplugGateway::log( sprintf( 'Order #%s : Order has been cancelled. Ignoring IPN', $order_id ) );
 
+			$this->unlock_order( $order_id );
+
 			return;
 		}
 
-		// Ignore cancelled orders
+		// Ignore refunded orders
 		if ( $order->has_status( 'refunded' ) ) {
 			PayplugGateway::log( sprintf( 'Order #%s : Order has been refunded. Ignoring IPN', $order_id ) );
+
+			$this->unlock_order( $order_id );
 
 			return;
 		}
@@ -70,44 +86,40 @@ class PayplugResponse {
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata( $resource );
 		PayplugWoocommerceHelper::save_transaction_metadata( $order, $metadata );
 
-		if ( $resource->is_paid ) {
+		if ( ! $resource->is_paid ) {
 
-			if ( ! $is_payment_with_token ) {
-				$this->maybe_save_card( $resource );
-			}
+			$message = isset( $resource->failure->message ) ? $resource->failure->message : '';
 
+			$order->update_status(
+				'failed',
+				sprintf( __( 'PayPlug IPN OK | Transaction %s failed : %s', 'payplug' ), $resource->id, wc_clean( $message ) )
+			);
+
+		} else {
 			$order->add_order_note( sprintf( __( 'PayPlug IPN OK | Transaction %s', 'payplug' ), wc_clean( $resource->id ) ) );
 			$order->payment_complete( wc_clean( $resource->id ) );
 			if ( PayplugWoocommerceHelper::is_pre_30() ) {
 				$order->reduce_order_stock();
 			}
 
-			/**
-			 * Fires once a payment response has been processed.
-			 *
-			 * @param int             $order_id Order ID
-			 * @param PaymentResource $resource Payment resource
-			 */
-			\do_action( 'payplug_gateway_payment_response_processed', $order_id, $resource );
-
-			PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed.', $order_id, $resource->id ) );
-
-			return;
+			if ( ! $is_payment_with_token ) {
+				$this->maybe_save_card( $resource );
+			}
 		}
 
-		if ( ! empty( $resource->failure ) ) {
-			$order->update_status(
-				'failed',
-				sprintf( __( 'PayPlug IPN OK | Transaction %s failed : %s', 'payplug' ), $resource->id, wc_clean( $resource->failure->message ) )
-			);
+		/**
+		 * Fires once a payment response has been processed.
+		 *
+		 * @param int $order_id Order ID
+		 * @param PaymentResource $resource Payment resource
+		 */
+		\do_action( 'payplug_gateway_payment_response_processed', $order_id, $resource );
 
-			/** This action is documented in src/Gateway/PayplugResponse */
-			\do_action( 'payplug_gateway_payment_response_processed', $order_id, $resource );
+		$this->unlock_order( $order_id );
 
-			PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed.', $order_id, $resource->id ) );
+		PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed.', $order_id, $resource->id ) );
 
-			return;
-		}
+		return;
 	}
 
 	/**
@@ -164,16 +176,17 @@ class PayplugResponse {
 		/**
 		 * Fires once a refund response has been processed.
 		 *
-		 * @param int            $order_id Order ID
+		 * @param int $order_id Order ID
 		 * @param RefundResource $resource Refund resource
 		 */
 		\do_action( 'payplug_gateway_refund_response_processed', $order_id, $resource );
 
 		try {
-			$payment = $this->gateway->api->payment_retrieve( $transaction_id );
+			$payment  = $this->gateway->api->payment_retrieve( $transaction_id );
 			$metadata = PayplugWoocommerceHelper::extract_transaction_metadata( $payment );
 			PayplugWoocommerceHelper::save_transaction_metadata( $order, $metadata );
-		} catch ( \Exception $e ) {}
+		} catch ( \Exception $e ) {
+		}
 
 		PayplugGateway::log( sprintf( 'Order #%s : Refund IPN %s processing completed.', $order_id, $resource->id ) );
 	}
@@ -279,8 +292,69 @@ class PayplugResponse {
 		$token->add_meta_data( 'payplug_account', \wc_clean( $merchant_id ), true );
 		$token->save();
 
-		PayplugGateway::log( sprintf( 'Payment card saved', wc_clean( $resource->id ), $customer->ID ) );
+		PayplugGateway::log( 'Payment card saved' );
 
 		return true;
+	}
+
+	/**
+	 * Lock an order.
+	 *
+	 * Set a transient with an expiration of one minute.
+	 *
+	 * @param string $order_id
+	 *
+	 * @return bool
+	 * @throws \Exception
+	 */
+	protected function lock_order( $order_id ) {
+		if ( $this->is_locked( $order_id ) ) {
+			return false;
+		}
+
+		$now = new \DateTime();
+
+		return set_transient(
+			$this->get_lock_name( $order_id ),
+			$now->format( 'Y-m-d H:i:s' ),
+			MINUTE_IN_SECONDS
+		);
+	}
+
+	/**
+	 * Remove lock for an order.
+	 *
+	 * Delete the associated transient.
+	 *
+	 * @param string $order_id
+	 *
+	 * @return bool
+	 */
+	protected function unlock_order( $order_id ) {
+		return delete_transient( $this->get_lock_name( $order_id ) );
+	}
+
+	/**
+	 * Check if an order is locked and if the lock is not expired.
+	 *
+	 * Transient should automatically be discarded when expired.
+	 *
+	 * @param $order_id
+	 *
+	 * @return bool
+	 */
+	protected function is_locked( $order_id ) {
+		$lock = get_transient( $this->get_lock_name( $order_id ) );
+
+		return ( ! empty( $lock ) );
+	}
+
+	/**
+	 * @param string $order_id
+	 *
+	 * @return string
+	 */
+	protected function get_lock_name( $order_id ) {
+		return sprintf( 'pp_lock_order_%s', $order_id );
 	}
 }
