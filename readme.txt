@@ -4,7 +4,7 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 4.4
 Tested up to: 4.9
 Requires PHP: 5.6
-Stable tag: 1.0.12
+Stable tag: 1.0.13
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -69,6 +69,13 @@ Based on a recent survey, 91% of merchants using PlayPlug would recommend the so
 2. Display on a WordPress website
 
 == Changelog ==
+
+= 1.0.13 =
+Fix message for Payment Method in the order confirmation email
+Fix payment scheme logo size on checkout step
+Fix lightbox access error
+Upgrade payment scheme logos on checkout step
+Specific payment scheme logos for Italian visitors (PostePay instead of CB) on checkout step
 
 = 1.0.12 =
 Security fix in dependencies
