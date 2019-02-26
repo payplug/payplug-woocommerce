@@ -116,9 +116,35 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			$this->description = trim( $this->description );
 		}
 
+		add_filter( 'woocommerce_get_order_item_totals', [ $this, 'customize_gateway_title' ], 10, 2 );
 		add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ] );
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, [ $this, 'process_admin_options' ] );
 		add_action( 'the_post', [ $this, 'validate_payment' ] );
+	}
+
+	/**
+	 * Customize gateway title in emails.
+	 *
+	 * @param array $total_rows
+	 * @param \WC_Order $order
+	 *
+	 * @return array
+	 *
+	 * @author Clément Boirie
+	 */
+	public function customize_gateway_title( $total_rows, $order ) {
+
+		$payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
+		if (
+			$this->id !== $payment_method
+			|| ! isset( $total_rows['payment_method'] )
+		) {
+			return $total_rows;
+		}
+
+		$total_rows['payment_method']['value'] = __( 'Credit card', 'payplug' );
+
+		return $total_rows;
 	}
 
 	/**
@@ -175,8 +201,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 * @return string
 	 */
 	public function get_icon() {
+
+		$src = ( 'it_IT' === get_locale() )
+			? PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/logos_scheme_PostePay.svg'
+			: PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/logos_scheme_CB.svg';
+
 		$icons = apply_filters( 'payplug_payment_icons', [
-			'payplug' => '<img src="' . PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/cards_icons.svg" alt="Visa & Mastercard" class="payplug-payment-icon" />',
+			'payplug' => sprintf( '<img src="%s" alt="Visa & Mastercard" class="payplug-payment-icon" />', esc_url( $src ) ),
 		] );
 
 		$icons_str = '';
@@ -356,7 +387,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			return;
 		}
 
-		wp_register_script( 'payplug', 'https://api.payplug.com/js/1.2/form.js', [], '1.2', true );
+		wp_register_script( 'payplug', 'https://api.payplug.com/js/1.3/form.js', [], '1.3', true );
 		wp_register_script( 'payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [
 			'jquery',
 			'payplug'
@@ -500,6 +531,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				<tr valign="top">
 					<td class="forminp">
 						<input class="button" type="submit" value="<?php _e( 'Login', 'payplug' ); ?>">
+						<input type="hidden" name="save" value="login">
 						<?php wp_nonce_field( 'payplug_user_login', '_loginaction' ); ?>
 					</td>
 				</tr>
@@ -1218,6 +1250,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 				<p><?php echo $this->get_option( 'email' ); ?></p>
 				<p>
 					<input type="submit" name="submit_logout" value="<?php _e( 'Logout', 'payplug' ); ?>">
+					<input type="hidden" name="save" value="logout">
 					<?php wp_nonce_field( 'payplug_user_logout', '_logoutaction' ); ?>
 					|
 					<a href="https://portal.payplug.com"
