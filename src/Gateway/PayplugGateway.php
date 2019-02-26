@@ -107,12 +107,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 
 		self::$log_enabled = $this->debug;
 
+		// Ensure the description is not empty to correctly display users's save cards
+		if ( empty( $this->description ) && 0 !== count( $this->get_tokens() ) ) {
+			$this->description = ' ';
+		}
+
 		if ( 'test' === $this->mode ) {
-			if ( ! empty( $this->description ) ) {
-				$this->description .= " \n";
-			} else {
-				$this->description = '';
-			}
+			$this->description .= " \n";
 
 			$this->description .= __( 'You are in TEST MODE. In test mode you can use the card 4242424242424242 with any valid expiration date and CVC.', 'payplug' );
 			$this->description = trim( $this->description );
