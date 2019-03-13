@@ -2,9 +2,9 @@
 Contributors: PayPlug
 Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, carte bancaire, paiement, one click, paiement en ligne
 Requires at least: 4.4
-Tested up to: 4.9
+Tested up to: 5.1
 Requires PHP: 5.6
-Stable tag: 1.0.13
+Stable tag: 1.0.15
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -70,7 +70,11 @@ Based on a recent survey, 91% of merchants using PlayPlug would recommend the so
 
 == Changelog ==
 
-= 1.0.13 =
+= 1.0.15 =
+Fix notification processing
+Add new settings (Payment Gateway): Title and description
+
+= 1.0.14 =
 Fix message for Payment Method in the order confirmation email
 Fix payment scheme logo size on checkout step
 Fix lightbox access error
