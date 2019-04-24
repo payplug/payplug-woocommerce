@@ -1192,8 +1192,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	/**
 	 * Generate Radio Input HTML.
 	 *
-	 * @param  string $key
-	 * @param  array $data
+	 * @param string $key
+	 * @param array $data
 	 *
 	 * @return string
 	 */
@@ -1285,8 +1285,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 *
 	 * Make sure the data is escaped correctly, etc.
 	 *
-	 * @param  string $key
-	 * @param  string|null $value Posted Value
+	 * @param string $key
+	 * @param string|null $value Posted Value
 	 *
 	 * @return string
 	 */
@@ -1299,8 +1299,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	/**
 	 * Validate Yes/No Field.
 	 *
-	 * @param  string $key
-	 * @param  string $value Posted Value
+	 * @param string $key
+	 * @param string $value Posted Value
 	 *
 	 * @return string
 	 */
@@ -1342,6 +1342,20 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	}
 
 	/**
+	 * Check if an api key exist for a mode.
+	 *
+	 * @param string $mode
+	 *
+	 * @return bool
+	 */
+	public function has_api_key( $mode = 'test' ) {
+		$key = $this->get_api_key( $mode );
+		$key = trim( $key );
+
+		return ! empty( $key );
+	}
+
+	/**
 	 * Get current merchant id.
 	 *
 	 * @return string
@@ -1366,7 +1380,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 */
 	public function oneclick_available() {
 		return $this->user_logged_in()
-               && $this->oneclick
-               && $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD );
+		       && $this->oneclick
+		       && $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD );
 	}
 }
