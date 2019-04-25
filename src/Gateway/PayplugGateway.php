@@ -594,7 +594,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			&& false !== check_admin_referer( 'payplug_user_login', '_loginaction' )
 		) {
 			$email    = $data['payplug_email'];
-			$password = $data['payplug_password'];
+			$password = wp_unslash( $data['payplug_password'] );
 			$response = $this->retrieve_user_api_keys( $email, $password );
 			if ( is_wp_error( $response ) ) {
 				\WC_Admin_Settings::add_error( $response->get_error_message() );
