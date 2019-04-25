@@ -1,6 +1,7 @@
 .notice {
     $parent: &;
     @include smoothText;
+    margin: 5px 15px 2px;
     &--start {
         position:relative;
         border:0;
@@ -16,9 +17,11 @@
             background-color: $secondary;
             opacity:.28;
         }
-        &#{$parent}__img {
+        #{$parent}__img {
             display:block;
             margin:auto;
+            max-width: 200px;
+            height: auto;
             @include breakpoints(md) {
                 margin:0;
                 position:absolute;
@@ -27,7 +30,7 @@
                 transform:translateY(-50%);
             }
         }
-        &#{$parent}__title {
+        #{$parent}__title {
             margin-top:0;
             color: #fff;
             font-size: 16px;

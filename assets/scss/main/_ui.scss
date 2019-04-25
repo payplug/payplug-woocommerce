@@ -13,9 +13,9 @@
         white-space: nowrap;
         text-indent: 120%;
         overflow: hidden;
-        width: 200px;
-        height: 58px;
-        background: url(../images/Payplug_logoGrey.png) no-repeat 50% 50%;
+        width: 230px;
+        height: 88px;
+        background: url(../images/PAYPLUG_LOGO.svg) no-repeat 50% 50%;
     }
 }
 //Checkup list
@@ -117,8 +117,7 @@ input[name="submit_logout"] {
 
 //submit
 .submit {
-    border-top: 1px solid #c8c8c8;
-    .button-primary {
+    .button-primary.woocommerce-save-button {
         height: 30px;
         text-shadow: none;
         box-shadow:none;
