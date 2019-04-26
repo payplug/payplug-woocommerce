@@ -499,7 +499,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			PAYPLUG_GATEWAY_VERSION
 		);
 
-		if ( $this->user_logged_in() ) {
+		if ( $this->user_logged_in() && false === $this->has_api_key( 'live' ) ) {
+
 			wp_enqueue_script(
 				'payplug-gateway-admin',
 				PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin.js',
@@ -508,26 +509,30 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			);
 
 			wp_localize_script( 'payplug-gateway-admin', 'payplug_admin_config', array(
-				'ajax_url'     => admin_url( 'admin-ajax.php' ),
-				'action'       => Ajax::REFRESH_KEY_ACTION,
-				'has_live_key' => ( false === $this->has_api_key( 'live' ) ) ? false : true,
+				'ajax_url'      => admin_url( 'admin-ajax.php' ),
+				'has_live_key'  => ( false === $this->has_api_key( 'live' ) ) ? false : true,
+				'general_error' => __( 'Something went wrong. Please refresh the page and retry.', 'payplug' ),
 			) );
 
 			add_action( 'admin_footer', function () {
 				$email = $this->get_option( 'email' );
 				?>
-                <div id="payplug-refresh-keys-modal" title="<?php esc_attr_e( 'Mode LIVE', 'payplug' ); ?>">
-                    <form id="payplug-refresh-keys-modal__form">
-                        <p><?php esc_html_e( 'Please enter your PayPlug account password', 'payplug' ); ?></p>
-                        <input type="password"
-                               name="password"
-                               title="<?php esc_attr_e( 'Enter your PayPlug account password' ); ?>"/>
-                        <input type="hidden" name="email"
-                               value="<?php echo esc_attr( $email ); ?>">
-                        <input type="hidden" name="action" value="<?php echo esc_attr( Ajax::REFRESH_KEY_ACTION ); ?>">
+				<div id="payplug-refresh-keys-modal" title="<?php esc_attr_e( 'Mode LIVE', 'payplug' ); ?>">
+					<form id="payplug-refresh-keys-modal__form">
+						<p id="dialog-msg"></p>
+						<p><?php esc_html_e( 'Please enter your PayPlug account password', 'payplug' ); ?></p>
+						<input type="password"
+							   name="password"
+							   required
+							   title="<?php esc_attr_e( 'Enter your PayPlug account password' ); ?>"/>
+						<input type="hidden" name="email"
+							   value="<?php echo esc_attr( $email ); ?>">
+						<input type="hidden" name="action"
+							   value="<?php echo esc_attr( Ajax::REFRESH_KEY_ACTION ); ?>">
 						<?php wp_nonce_field( sprintf( '%s_%s', $email, Ajax::REFRESH_KEY_ACTION ) ); ?>
-                    </form>
-                </div>
+						<input class="ui-dialog-sronly" type="submit" tabindex="-1">
+					</form>
+				</div>
 				<?php
 			} );
 		}

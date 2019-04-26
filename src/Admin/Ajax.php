@@ -72,7 +72,23 @@ class Ajax {
 			);
 		}
 
-		$this->update_api_keys( $keys, $payplug_gateway );
+		$success = $this->update_api_keys( $keys, $payplug_gateway );
+
+		if ( empty( $keys['live'] ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug' ),
+				)
+			);
+		}
+
+		if ( ! $success ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Something went wrong.', 'payplug' ),
+				)
+			);
+		}
 
 		wp_send_json_success(
 			array(
@@ -96,6 +112,9 @@ class Ajax {
 
 		$payplug_gateway->settings['payplug_test_key'] = $keys['test'];
 		$payplug_gateway->settings['payplug_live_key'] = $keys['live'];
+		if ( ! empty( $keys['live'] ) ) {
+			$payplug_gateway->settings['mode'] = 'yes';
+		}
 
 		return update_option(
 			$payplug_gateway->get_option_key(),
