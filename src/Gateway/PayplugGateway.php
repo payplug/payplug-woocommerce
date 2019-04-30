@@ -511,20 +511,22 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			wp_localize_script( 'payplug-gateway-admin', 'payplug_admin_config', array(
 				'ajax_url'      => admin_url( 'admin-ajax.php' ),
 				'has_live_key'  => ( false === $this->has_api_key( 'live' ) ) ? false : true,
-				'general_error' => __( 'Something went wrong. Please refresh the page and retry.', 'payplug' ),
+				'btn_ok'        => _x( 'Ok', 'modal', 'payplug' ),
+				'btn_label'     => _x( 'Cancel', 'modal', 'payplug' ),
+				'general_error' => _x( 'Something went wrong. Please refresh the page and retry.', 'modal', 'payplug' ),
 			) );
 
 			add_action( 'admin_footer', function () {
 				$email = $this->get_option( 'email' );
 				?>
-				<div id="payplug-refresh-keys-modal" title="<?php esc_attr_e( 'Mode LIVE', 'payplug' ); ?>">
+				<div id="payplug-refresh-keys-modal" title="<?php echo esc_attr_x( 'Mode LIVE', 'modal', 'payplug' ); ?>">
 					<form id="payplug-refresh-keys-modal__form">
 						<p id="dialog-msg"></p>
-						<p><?php esc_html_e( 'Please enter your PayPlug account password', 'payplug' ); ?></p>
+						<p><?php echo esc_html_x( 'Please enter your PayPlug account password', 'modal', 'payplug' ); ?></p>
 						<input type="password"
 							   name="password"
 							   required
-							   title="<?php esc_attr_e( 'Enter your PayPlug account password' ); ?>"/>
+							   title="<?php echo esc_attr_x( 'Enter your PayPlug account password', 'modal', 'payplug' ); ?>"/>
 						<input type="hidden" name="email"
 							   value="<?php echo esc_attr( $email ); ?>">
 						<input type="hidden" name="action"

@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
 "woocommerce\n"
-"POT-Creation-Date: 2019-04-26 14:56:26+00:00\n"
+"POT-Creation-Date: 2019-04-30 06:47:33+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -28,7 +28,7 @@ msgid ""
 "correct."
 msgstr ""
 
-#: src/Admin/Ajax.php:80 src/Gateway/PayplugGateway.php:697
+#: src/Admin/Ajax.php:80 src/Gateway/PayplugGateway.php:699
 msgid ""
 "Your account does not support LIVE mode at the moment, it must be validated "
 "first. If your account has already been validated, please log out and log in "
@@ -127,7 +127,7 @@ msgstr ""
 msgid "Only one step left to activate the plugin on your site !"
 msgstr ""
 
-#: src/Admin/Notices.php:152 src/Gateway/PayplugGateway.php:589
+#: src/Admin/Notices.php:152 src/Gateway/PayplugGateway.php:591
 msgid "Login"
 msgstr ""
 
@@ -215,7 +215,7 @@ msgstr ""
 msgid "The payment solution description displayed during checkout."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:271 src/Gateway/PayplugGateway.php:559
+#: src/Gateway/PayplugGateway.php:271 src/Gateway/PayplugGateway.php:561
 msgid "Connection"
 msgstr ""
 
@@ -287,90 +287,104 @@ msgid ""
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:514
+msgctxt "modal"
+msgid "Ok"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:515
+msgctxt "modal"
+msgid "Cancel"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:516
+msgctxt "modal"
 msgid "Something went wrong. Please refresh the page and retry."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:520
+#: src/Gateway/PayplugGateway.php:522
+msgctxt "modal"
 msgid "Mode LIVE"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:523
+#: src/Gateway/PayplugGateway.php:525
+msgctxt "modal"
 msgid "Please enter your PayPlug account password"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:527
+#: src/Gateway/PayplugGateway.php:529
+msgctxt "modal"
 msgid "Enter your PayPlug account password"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:564 src/Gateway/PayplugGateway.php:568
+#: src/Gateway/PayplugGateway.php:566 src/Gateway/PayplugGateway.php:570
 msgid "Email"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:570
+#: src/Gateway/PayplugGateway.php:572
 msgid "your@email.com"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:576 src/Gateway/PayplugGateway.php:580
+#: src/Gateway/PayplugGateway.php:578 src/Gateway/PayplugGateway.php:582
 msgid "Password"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:625
+#: src/Gateway/PayplugGateway.php:627
 msgid "Successfully logged out."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:686
+#: src/Gateway/PayplugGateway.php:688
 msgid "Successfully logged in."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:711
+#: src/Gateway/PayplugGateway.php:713
 msgid "Only PREMIUM accounts can enable the One Click option in LIVE mode."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:836 src/Gateway/PayplugGateway.php:839
-#: src/Gateway/PayplugGateway.php:908 src/Gateway/PayplugGateway.php:911
+#: src/Gateway/PayplugGateway.php:838 src/Gateway/PayplugGateway.php:841
+#: src/Gateway/PayplugGateway.php:910 src/Gateway/PayplugGateway.php:913
 msgid "Payment processing failed. Please retry."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:859
+#: src/Gateway/PayplugGateway.php:861
 msgid "Invalid payment method."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:932
+#: src/Gateway/PayplugGateway.php:934
 msgid "The order %s does not exist."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:939
+#: src/Gateway/PayplugGateway.php:941
 msgid ""
 "No PayPlug transaction was found for this order. The refund could not be "
 "processed."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:988 src/Gateway/PayplugResponse.php:158
+#: src/Gateway/PayplugGateway.php:990 src/Gateway/PayplugResponse.php:158
 msgid "Refund %s : Refunded %s"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:1007 src/Gateway/PayplugGateway.php:1011
+#: src/Gateway/PayplugGateway.php:1009 src/Gateway/PayplugGateway.php:1013
 msgid "The transaction could not be refunded. Please try again."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:1047
+#: src/Gateway/PayplugGateway.php:1049
 msgid ""
 "Payments for this amount (%s) are not authorised with this payment gateway."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:1076
+#: src/Gateway/PayplugGateway.php:1078
 msgid "Please fill all login fields"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:1082 src/Gateway/PayplugGateway.php:1087
+#: src/Gateway/PayplugGateway.php:1084 src/Gateway/PayplugGateway.php:1089
 msgid "Invalid credentials."
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:1308
+#: src/Gateway/PayplugGateway.php:1310
 msgid "Logout"
 msgstr ""
 
-#: src/Gateway/PayplugGateway.php:1313
+#: src/Gateway/PayplugGateway.php:1315
 msgid "Go to your PayPlug Portal"
 msgstr ""
 

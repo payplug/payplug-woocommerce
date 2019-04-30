@@ -18,12 +18,12 @@
 				buttons: [
 					{
 						class: "ui-dialog-submit",
-						text: "Ok",
+						text: payplug_admin_config.btn_ok,
 						click: payplug_admin.refreshKeys
 					},
 					{
 						class: "ui-dialog-cancel",
-						text: "Cancel",
+						text: payplug_admin_config.btn_label,
 						click: payplug_admin.onCancelClick
 					}
 				],
