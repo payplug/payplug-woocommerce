@@ -11,6 +11,7 @@ use Payplug\Authentication;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\HttpException;
 use Payplug\Payplug;
+use Payplug\PayplugWoocommerce\Admin\Ajax;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
@@ -497,6 +498,46 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			[],
 			PAYPLUG_GATEWAY_VERSION
 		);
+
+		if ( $this->user_logged_in() && false === $this->has_api_key( 'live' ) ) {
+
+			wp_enqueue_script(
+				'payplug-gateway-admin',
+				PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin.js',
+				[ 'jquery-ui-dialog' ],
+				PAYPLUG_GATEWAY_VERSION
+			);
+
+			wp_localize_script( 'payplug-gateway-admin', 'payplug_admin_config', array(
+				'ajax_url'      => admin_url( 'admin-ajax.php' ),
+				'has_live_key'  => ( false === $this->has_api_key( 'live' ) ) ? false : true,
+				'btn_ok'        => _x( 'Ok', 'modal', 'payplug' ),
+				'btn_label'     => _x( 'Cancel', 'modal', 'payplug' ),
+				'general_error' => _x( 'Something went wrong. Please refresh the page and retry.', 'modal', 'payplug' ),
+			) );
+
+			add_action( 'admin_footer', function () {
+				$email = $this->get_option( 'email' );
+				?>
+				<div id="payplug-refresh-keys-modal" title="<?php echo esc_attr_x( 'Mode LIVE', 'modal', 'payplug' ); ?>">
+					<form id="payplug-refresh-keys-modal__form">
+						<p id="dialog-msg"></p>
+						<p><?php echo esc_html_x( 'Please enter your PayPlug account password', 'modal', 'payplug' ); ?></p>
+						<input type="password"
+							   name="password"
+							   required
+							   title="<?php echo esc_attr_x( 'Enter your PayPlug account password', 'modal', 'payplug' ); ?>"/>
+						<input type="hidden" name="email"
+							   value="<?php echo esc_attr( $email ); ?>">
+						<input type="hidden" name="action"
+							   value="<?php echo esc_attr( Ajax::REFRESH_KEY_ACTION ); ?>">
+						<?php wp_nonce_field( sprintf( '%s_%s', $email, Ajax::REFRESH_KEY_ACTION ) ); ?>
+						<input class="ui-dialog-sronly" type="submit" tabindex="-1">
+					</form>
+				</div>
+				<?php
+			} );
+		}
 
 		$payplug_requirements = new PayplugGatewayRequirements( $this ); ?>
 
@@ -1192,8 +1233,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	/**
 	 * Generate Radio Input HTML.
 	 *
-	 * @param  string $key
-	 * @param  array $data
+	 * @param string $key
+	 * @param array $data
 	 *
 	 * @return string
 	 */
@@ -1285,8 +1326,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 *
 	 * Make sure the data is escaped correctly, etc.
 	 *
-	 * @param  string $key
-	 * @param  string|null $value Posted Value
+	 * @param string $key
+	 * @param string|null $value Posted Value
 	 *
 	 * @return string
 	 */
@@ -1299,8 +1340,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	/**
 	 * Validate Yes/No Field.
 	 *
-	 * @param  string $key
-	 * @param  string $value Posted Value
+	 * @param string $key
+	 * @param string $value Posted Value
 	 *
 	 * @return string
 	 */
@@ -1342,6 +1383,20 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	}
 
 	/**
+	 * Check if an api key exist for a mode.
+	 *
+	 * @param string $mode
+	 *
+	 * @return bool
+	 */
+	public function has_api_key( $mode = 'test' ) {
+		$key = $this->get_api_key( $mode );
+		$key = trim( $key );
+
+		return ! empty( $key );
+	}
+
+	/**
 	 * Get current merchant id.
 	 *
 	 * @return string
@@ -1366,7 +1421,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 */
 	public function oneclick_available() {
 		return $this->user_logged_in()
-               && $this->oneclick
-               && $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD );
+		       && $this->oneclick
+		       && $this->permissions->has_permissions( PayplugPermissions::SAVE_CARD );
 	}
 }

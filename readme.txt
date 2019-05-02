@@ -4,7 +4,7 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 4.4
 Tested up to: 5.1
 Requires PHP: 5.6
-Stable tag: 1.0.15
+Stable tag: 1.0.16
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -69,6 +69,13 @@ Based on a recent survey, 91% of merchants using PlayPlug would recommend the so
 2. Display on a WordPress website
 
 == Changelog ==
+
+
+= 1.0.16 =
+Fix  special characters in password for the PayPlug login
+Update screens according to the new graphic charter
+Upgrade LIVE keys retrieve when switching form TEST to LIVE mode, once PayPlug account has been activated (Password request pop-in)
+Tested up to Woocommerce 3.6
 
 = 1.0.15 =
 Fix notification processing

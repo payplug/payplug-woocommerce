@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Payplug\PayplugWoocommerce\Admin\Ajax;
 use Payplug\PayplugWoocommerce\Admin\Metabox;
 use Payplug\PayplugWoocommerce\Admin\Notices;
 use Payplug\PayplugWoocommerce\Admin\WoocommerceActions;
@@ -43,6 +44,13 @@ class PayplugWoocommerce {
 	 * @var PayplugWoocommerceRequest
 	 */
 	public $requests;
+
+	/**
+	 * Ajax actions handler
+	 *
+	 * @var Ajax
+	 */
+	public $ajax;
 
 	/**
 	 * Get the singleton instance.
@@ -95,6 +103,7 @@ class PayplugWoocommerce {
 		$this->metabox  = new Metabox();
 		$this->actions  = new WoocommerceActions();
 		$this->requests = new PayplugWoocommerceRequest();
+		$this->ajax     = new Ajax();
 
 		add_action( 'woocommerce_payment_gateways', [ $this, 'register_payplug_gateway' ] );
 		add_filter( 'plugin_action_links_' . PAYPLUG_GATEWAY_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
