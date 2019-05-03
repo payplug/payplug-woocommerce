@@ -1,0 +1,89 @@
+.ui-dialog {
+  $parent: &;
+
+  &.ui-widget {
+    border-color: #ccc;
+  }
+  &.ui-widget,
+  &.ui-widget * {
+    font-family: inherit;
+  }
+
+  #{$parent}-sronly {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    white-space: nowrap; /* 1 */
+  }
+
+  #{$parent}-titlebar {
+    background: white;
+    border: none;
+    #{$parent}-titlebar-close {
+      border:0;
+      background: none;
+      &:before {
+        font-family: dashicons;
+        content: "\f335";
+        font-size: 1.25em;
+      }
+      .ui-icon {
+        display: none;
+      }
+    }
+  }
+
+  #{$parent}-buttonpane  {
+    margin: 1em 1em 0;
+    padding: 1em;
+    border-color: #ccc;
+    #{$parent}-buttonset {
+      float: none;
+      display: flex;
+      justify-content: space-between;
+      flex-direction: row-reverse;
+    }
+    .ui-button {
+      margin: 0;
+    }
+    #{$parent}-cancel {
+      background: transparent;
+      &>span {
+        background-color: transparent;
+      }
+    }
+    #{$parent}-submit {
+      border-color: $primary;
+      &>span {
+        color: $white;
+        background-color: $primary;
+      }
+      @include hover {
+        border-color: darken($primary, 5%);
+        &>span {
+          background-color: darken($primary, 5%);
+        }
+      }
+    }
+  }
+
+  input[type=password] {
+    margin: 0 auto;
+  }
+
+  #payplug-refresh-keys-modal__form {
+    text-align: center;
+    #dialog-msg.error {
+      color: #b00814;
+    }
+
+    #dialog-msg.success {
+      color: #43b040;
+    }
+  }
+}
