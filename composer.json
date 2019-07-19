@@ -17,7 +17,8 @@
     "require": {
         "php": ">=5.6.0",
         "composer/installers": "~1.0",
-        "payplug/payplug-php": "^3.0"
+        "payplug/payplug-php": "^3.0",
+        "giggsey/libphonenumber-for-php": "^8.10"
     },
     "autoload": {
         "psr-4": {
