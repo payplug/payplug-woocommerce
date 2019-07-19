@@ -760,30 +760,17 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 */
 	public function process_standard_payment( $order, $amount, $customer_id ) {
 
-		$order_id         = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
-		$customer_details = $this->prepare_customer_data( $order );
-
-		if (
-			! empty( $customer_details['country'] )
-			&& ! PayplugWoocommerceHelper::is_country_supported( $customer_details['country'] )
-		) {
-			$customer_details['country'] = '';
-		}
+		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 
 		try {
+			$address_data = PayplugAddressData::from_order( $order );
+
 			$payment_data = [
 				'amount'           => $amount,
 				'currency'         => get_woocommerce_currency(),
 				'allow_save_card'  => $this->oneclick_available() && (int) $customer_id > 0,
-				'customer'         => [
-					'first_name' => $this->limit_length( $customer_details['first_name'] ),
-					'last_name'  => $this->limit_length( $customer_details['last_name'] ),
-					'email'      => $this->limit_length( $customer_details['email'], 255 ),
-					'address1'   => ( ! empty( $customer_details['address1'] ) ) ? $this->limit_length( $customer_details['address1'], 255 ) : null,
-					'postcode'   => ( ! empty( $customer_details['postcode'] ) ) ? $this->limit_length( $customer_details['postcode'], 16 ) : null,
-					'city'       => ( ! empty( $customer_details['city'] ) ) ? $this->limit_length( $customer_details['city'] ) : null,
-					'country'    => ( ! empty( $customer_details['country'] ) ) ? $this->limit_length( $customer_details['country'], 2 ) : null,
-				],
+				'billing'          => $address_data->get_billing(),
+				'shipping'         => $address_data->get_shipping(),
 				'hosted_payment'   => [
 					'return_url' => esc_url_raw( $order->get_checkout_order_received_url() ),
 					'cancel_url' => esc_url_raw( $order->get_cancel_order_url_raw() ),
@@ -802,8 +789,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			 * @param array $payment_data
 			 * @param int $order_id
 			 * @param array $customer_details
+			 * @param PayplugAddressData $address_data
 			 */
-			$payment_data = apply_filters( 'payplug_gateway_payment_data', $payment_data, $order_id, $customer_details );
+			$payment_data = apply_filters( 'payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data );
 			$payment      = $this->api->payment_create( $payment_data );
 
 			// Save transaction id for the order
@@ -853,35 +841,22 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 	 */
 	public function process_payment_with_token( $order, $amount, $customer_id, $token_id ) {
 
-		$order_id         = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
-		$customer_details = $this->prepare_customer_data( $order );
-		$payment_token    = WC_Payment_Tokens::get( $token_id );
+		$order_id      = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
+		$payment_token = WC_Payment_Tokens::get( $token_id );
 		if ( ! $payment_token || (int) $customer_id !== (int) $payment_token->get_user_id() ) {
 			PayplugGateway::log( 'Could not find the payment token or the payment doesn\'t belong to the current user.', 'error' );
 			throw new \Exception( __( 'Invalid payment method.', 'payplug' ) );
 		}
 
-		if (
-			! empty( $customer_details['country'] )
-			&& ! PayplugWoocommerceHelper::is_country_supported( $customer_details['country'] )
-		) {
-			$customer_details['country'] = '';
-		}
-
 		try {
+			$address_data = PayplugAddressData::from_order( $order );
+
 			$payment_data = [
 				'amount'           => $amount,
 				'currency'         => get_woocommerce_currency(),
 				'payment_method'   => $payment_token->get_token(),
-				'customer'         => [
-					'first_name' => $this->limit_length( $customer_details['first_name'] ),
-					'last_name'  => $this->limit_length( $customer_details['last_name'] ),
-					'email'      => $this->limit_length( $customer_details['email'], 255 ),
-					'address1'   => ( ! empty( $customer_details['address1'] ) ) ? $this->limit_length( $customer_details['address1'], 255 ) : null,
-					'postcode'   => ( ! empty( $customer_details['postcode'] ) ) ? $this->limit_length( $customer_details['postcode'], 16 ) : null,
-					'city'       => ( ! empty( $customer_details['city'] ) ) ? $this->limit_length( $customer_details['city'] ) : null,
-					'country'    => ( ! empty( $customer_details['country'] ) ) ? $this->limit_length( $customer_details['country'], 2 ) : null,
-				],
+				'billing'          => $address_data->get_billing(),
+				'shipping'         => $address_data->get_shipping(),
 				'notification_url' => esc_url_raw( WC()->api_request_url( 'PayplugGateway' ) ),
 				'metadata'         => [
 					'order_id'    => $order_id,
@@ -891,7 +866,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			];
 
 			/** This filter is documented in src/Gateway/PayplugGateway */
-			$payment_data = apply_filters( 'payplug_gateway_payment_data', $payment_data, $order_id, $customer_details );
+			$payment_data = apply_filters( 'payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data );
 			$payment      = $this->api->payment_create( $payment_data );
 
 			/** This action is documented in src/Gateway/PayplugGateway */
@@ -1012,24 +987,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 
 			return new \WP_Error( 'process_refund_error', __( 'The transaction could not be refunded. Please try again.', 'payplug' ) );
 		}
-	}
-
-	/**
-	 * @param \WC_Order $order
-	 *
-	 * @return array
-	 */
-	public function prepare_customer_data( $order ) {
-		return [
-			'first_name' => PayplugWoocommerceHelper::is_pre_30() ? $order->billing_first_name : $order->get_billing_first_name(),
-			'last_name'  => PayplugWoocommerceHelper::is_pre_30() ? $order->billing_last_name : $order->get_billing_last_name(),
-			'email'      => PayplugWoocommerceHelper::is_pre_30() ? $order->billing_email : $order->get_billing_email(),
-			'address1'   => PayplugWoocommerceHelper::is_pre_30() ? $order->billing_address_1 : $order->get_billing_address_1(),
-			'address2'   => PayplugWoocommerceHelper::is_pre_30() ? $order->billing_address_2 : $order->get_billing_address_2(),
-			'postcode'   => PayplugWoocommerceHelper::is_pre_30() ? $order->billing_postcode : $order->get_billing_postcode(),
-			'city'       => PayplugWoocommerceHelper::is_pre_30() ? $order->billing_city : $order->get_billing_city(),
-			'country'    => PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country(),
-		];
 	}
 
 	/**
