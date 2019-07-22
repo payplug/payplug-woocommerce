@@ -101,7 +101,7 @@ class PayplugAddressData {
 		}
 
 		// We need to know if current cart contain products we will be shipped to the customer
-		// to set the correct `delivery_type` :
+		// to set the correct `delivery_type` value
 		if ( WC()->cart->needs_shipping() ) {
 			$has_shipping_address = PayplugWoocommerceHelper::is_pre_30()
 				? $order->shipping_address_1
@@ -139,7 +139,7 @@ class PayplugAddressData {
 				$this->shipping['delivery_type'] = self::DELIVERY_TYPE_BILLING;
 			}
 		} else {
-			// Set the delivery_type to `OTHER` since we reuse the billing address for shipping
+			// Set the delivery_type to `OTHER` since we dont't need to ship the products
 			$this->shipping                  = $this->billing;
 			$this->shipping['delivery_type'] = self::DELIVERY_TYPE_OTHER;
 		}
