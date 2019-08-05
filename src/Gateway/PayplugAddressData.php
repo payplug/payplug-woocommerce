@@ -86,6 +86,10 @@ class PayplugAddressData {
 		$billing_postcode   = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_postcode : $order->get_billing_postcode();
 		$billing_city       = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_city : $order->get_billing_city();
 		$billing_country    = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();
+		if ( ! PayplugWoocommerceHelper::is_country_supported( $billing_country ) ) {
+			$billing_country = PayplugWoocommerceHelper::get_default_country();
+		}
+
 		$this->billing      = [
 			'first_name' => $this->limit_length( $billing_first_name ),
 			'last_name'  => $this->limit_length( $billing_last_name ),
@@ -117,6 +121,10 @@ class PayplugAddressData {
 				$shipping_postcode = PayplugWoocommerceHelper::is_pre_30() ? $order->shipping_postcode : $order->get_shipping_postcode();
 				$shipping_city     = PayplugWoocommerceHelper::is_pre_30() ? $order->shipping_city : $order->get_shipping_city();
 				$shipping_country  = PayplugWoocommerceHelper::is_pre_30() ? $order->shipping_country : $order->get_shipping_country();
+				if ( ! PayplugWoocommerceHelper::is_country_supported( $shipping_country ) ) {
+					$shipping_country = PayplugWoocommerceHelper::get_default_country();
+				}
+
 				$this->shipping    = [
 					'first_name' => $this->limit_length( $shipping_first_name ),
 					'last_name'  => $this->limit_length( $shipping_last_name ),
