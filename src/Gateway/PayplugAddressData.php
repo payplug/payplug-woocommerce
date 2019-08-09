@@ -22,6 +22,15 @@ class PayplugAddressData {
 	const DELIVERY_TYPE_TRAVEL_OR_EVENT = 'TRAVEL_OR_EVENT';
 	const DELIVERY_TYPE_OTHER = 'OTHER';
 
+	public static $address_fields = [
+		'address1',
+		'address2',
+		'postcode',
+		'city',
+		'state',
+		'country'
+	];
+
 	/**
 	 * @var array
 	 */
@@ -54,6 +63,68 @@ class PayplugAddressData {
 	}
 
 	/**
+	 * Check if an address has already been used by a customer
+	 *
+	 * @param int $customer
+	 * @param string $hash
+	 *
+	 * @return bool
+	 */
+	public static function address_already_used( $customer, $hash ) {
+		$hash_list = self::get_customer_addresses_hash( $customer );
+
+		return ! empty( $hash_list ) && in_array( $hash, $hash_list );
+	}
+
+	/**
+	 * Get the list of hash of all addresses used by the customer
+	 *
+	 * @param int $customer
+	 *
+	 * @return array
+	 */
+	public static function get_customer_addresses_hash( $customer ) {
+		$hash_list = get_user_meta( $customer, 'payplug_addresses_hash', true );
+
+		return is_array( $hash_list ) ? $hash_list : [];
+	}
+
+	/**
+	 * Update the list of hash of all addresses used by the customer
+	 *
+	 * @param int $customer
+	 * @param array $hash_list
+	 *
+	 * @return bool
+	 */
+	public static function update_customer_addresses_hash( $customer, $hash_list ) {
+		$result = update_user_meta( $customer, 'payplug_addresses_hash', $hash_list );
+
+		return false !== $result;
+	}
+
+	/**
+	 * Hash an address
+	 *
+	 * @param array $address
+	 *
+	 * @return string
+	 */
+	public static function hash_address( $address ) {
+
+		$to_hash = '';
+		foreach ( self::$address_fields as $field ) {
+			if ( empty( $address[ $field ] ) ) {
+				continue;
+			}
+
+			$to_hash .= strtolower( remove_accents( $address[ $field ] ) );
+		}
+
+		return md5( $to_hash );
+	}
+
+	/**
 	 * Get billing data.
 	 *
 	 * @return array|null
@@ -78,6 +149,8 @@ class PayplugAddressData {
 	 */
 	protected function prepare_address_data( $order ) {
 
+		$customer = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
+
 		$billing_first_name = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_first_name : $order->get_billing_first_name();
 		$billing_last_name  = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_last_name : $order->get_billing_last_name();
 		$billing_email      = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_email : $order->get_billing_email();
@@ -90,7 +163,7 @@ class PayplugAddressData {
 			$billing_country = PayplugWoocommerceHelper::get_default_country();
 		}
 
-		$this->billing      = [
+		$this->billing = [
 			'first_name' => $this->limit_length( $billing_first_name ),
 			'last_name'  => $this->limit_length( $billing_last_name ),
 			'email'      => $this->limit_length( $billing_email, 255 ),
@@ -125,7 +198,7 @@ class PayplugAddressData {
 					$shipping_country = PayplugWoocommerceHelper::get_default_country();
 				}
 
-				$this->shipping    = [
+				$this->shipping = [
 					'first_name' => $this->limit_length( $shipping_first_name ),
 					'last_name'  => $this->limit_length( $shipping_last_name ),
 					'email'      => $this->limit_length( $shipping_email, 255 ),
@@ -139,12 +212,35 @@ class PayplugAddressData {
 					$this->shipping['address2'] = $this->limit_length( $shipping_address2, 255 );
 				}
 
-				// Set the delivery_type to `NEW` since we have separate shipping address
-				$this->shipping['delivery_type'] = self::DELIVERY_TYPE_NEW;
+				if ( $customer > 0 ) {
+					$address_hash         = self::hash_address( $this->shipping );
+					$address_already_used = self::address_already_used( $customer, $address_hash );
+
+					// Set the delivery_type to `VERIFIED` if the customer has already used the address before
+					// otherwise set it to `NEW` since we have separate shipping address
+					$this->shipping['delivery_type'] = ( $address_already_used )
+						? self::DELIVERY_TYPE_VERIFIED
+						: self::DELIVERY_TYPE_NEW;
+				} else {
+					// Set the delivery_type to `NEW` since we have separate shipping address
+					$this->shipping['delivery_type'] = self::DELIVERY_TYPE_NEW;
+				}
 			} else {
-				// Set the delivery_type to `BILLING` since we reuse the billing address for shipping
-				$this->shipping                  = $this->billing;
-				$this->shipping['delivery_type'] = self::DELIVERY_TYPE_BILLING;
+				$this->shipping = $this->billing;
+
+				if ( $customer > 0 ) {
+					$address_hash         = self::hash_address( $this->shipping );
+					$address_already_used = self::address_already_used( $customer, $address_hash );
+
+					// Set the delivery_type to `VERIFIED` if the customer has already used the address before
+					// otherwise set it to `BILLING` since we reuse the billing address for shipping
+					$this->shipping['delivery_type'] = ( $address_already_used )
+						? self::DELIVERY_TYPE_VERIFIED
+						: self::DELIVERY_TYPE_BILLING;
+				} else {
+					// Set the delivery_type to `BILLING` since we reuse the billing address for shipping
+					$this->shipping['delivery_type'] = self::DELIVERY_TYPE_BILLING;
+				}
 			}
 		} else {
 			// Set the delivery_type to `OTHER` since we dont't need to ship the products
