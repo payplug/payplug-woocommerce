@@ -5,8 +5,8 @@
   "license": "GPL-3.0-or-later",
   "author": "PayPlug",
   "devDependencies": {
-    "gulp": "^4.0.0",
-    "gulp-sass": "^4.0.1",
-    "gulp-sourcemaps": "^2.6.4"
+    "gulp": "^4.0.2",
+    "gulp-sass": "^4.0.2",
+    "gulp-sourcemaps": "^2.6.5"
   }
 }
