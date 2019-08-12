@@ -54,13 +54,6 @@ class PayplugResponse {
 		}
 
 		// Ignore cancelled orders
-		if ( $order->has_status( 'cancelled' ) ) {
-			PayplugGateway::log( sprintf( 'Order #%s : Order has been cancelled. Ignoring IPN', $order_id ) );
-
-			return;
-		}
-
-		// Ignore cancelled orders
 		if ( $order->has_status( 'refunded' ) ) {
 			PayplugGateway::log( sprintf( 'Order #%s : Order has been refunded. Ignoring IPN', $order_id ) );
 

@@ -2,9 +2,9 @@
 Contributors: PayPlug
 Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, carte bancaire, paiement, one click, paiement en ligne
 Requires at least: 4.4
-Tested up to: 5.1
+Tested up to: 5.2
 Requires PHP: 5.6
-Stable tag: 1.0.17
+Stable tag: 1.0.18
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -70,6 +70,11 @@ Based on a recent survey, 91% of merchants using PlayPlug would recommend the so
 
 == Changelog ==
 
+
+= 1.0.18 =
+Fix on cancelled orders with successful payment : allow PayPlug notification responses for cancelled orders
+Fix on  miscreated orders : loading of the PayPlug form.js latest version from the plugin. With the latest version of form.js, the plugin does not have to wait for url_return redirection (5sec) to create payment within WooCommerce
+Update devDependencies
 
 = 1.0.17 =
 Fix  special characters in password for the PayPlug login
