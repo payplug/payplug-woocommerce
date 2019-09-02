@@ -320,6 +320,17 @@ class PayplugWoocommerceHelper {
 	}
 
 	/**
+	 * Get default country.
+	 *
+	 * @return string
+	 */
+	public static function get_default_country() {
+		$country = \WC()->countries->get_base_country();
+
+		return ( self::is_country_supported( $country ) ) ? strtoupper( $country ) : 'FR';
+	}
+
+	/**
 	 * Get minimum amount allowed by PayPlug.
 	 *
 	 * This amount is in cents.

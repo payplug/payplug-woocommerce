@@ -69,6 +69,8 @@ class PayplugResponse {
 				$this->maybe_save_card( $resource );
 			}
 
+			$this->maybe_save_address_hash( $resource );
+
 			$order->add_order_note( sprintf( __( 'PayPlug IPN OK | Transaction %s', 'payplug' ), wc_clean( $resource->id ) ) );
 			$order->payment_complete( wc_clean( $resource->id ) );
 			if ( PayplugWoocommerceHelper::is_pre_30() ) {
@@ -273,6 +275,38 @@ class PayplugResponse {
 		$token->save();
 
 		PayplugGateway::log( sprintf( 'Payment card saved', wc_clean( $resource->id ), $customer->ID ) );
+
+		return true;
+	}
+
+	/**
+	 * Save shipping address.
+	 *
+	 * @param IVerifiableAPIResource $resource
+	 *
+	 * @return bool
+	 */
+	protected function maybe_save_address_hash( $resource ) {
+
+		if ( ! isset( $resource->metadata['customer_id'] ) ) {
+			return false;
+		}
+
+		$customer = get_user_by( 'id', $resource->metadata['customer_id'] );
+		if ( ! $customer || 0 === (int) $customer->ID ) {
+			return false;
+		}
+
+		$shipping = [];
+		foreach ( PayplugAddressData::$address_fields as $field ) {
+			$shipping[ $field ] = $resource->shipping->{$field};
+		}
+
+		$shipping_hash = PayplugAddressData::hash_address( $shipping );
+		$hash_list     = PayplugAddressData::get_customer_addresses_hash( $customer->ID );
+		$hash_list[]   = $shipping_hash;
+		$hash_list     = array_unique( $hash_list );
+		PayplugAddressData::update_customer_addresses_hash( $customer->ID, $hash_list );
 
 		return true;
 	}
