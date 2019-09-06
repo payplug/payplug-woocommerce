@@ -4,7 +4,7 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 4.4
 Tested up to: 5.2
 Requires PHP: 5.6
-Stable tag: 1.0.18
+Stable tag: 1.0.19
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -70,6 +70,9 @@ Based on a recent survey, 91% of merchants using PlayPlug would recommend the so
 
 == Changelog ==
 
+= 1.0.19 =
+PSD 2 compatibility
+Tested up to Woocommerce 3.7
 
 = 1.0.18 =
 Fix on cancelled orders with successful payment : allow PayPlug notification responses for cancelled orders

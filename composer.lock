@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d7a1a4d2e6deb6edd9470a63e92ac6a4",
+    "content-hash": "770e401c61ee2f3274ba425fa5e7c445",
     "packages": [
         {
             "name": "composer/installers",
-            "version": "v1.5.0",
+            "version": "v1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "049797d727261bf27f2690430d935067710049c2"
+                "reference": "cfcca6b1b60bc4974324efb5783c13dca6932b5b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/049797d727261bf27f2690430d935067710049c2",
-                "reference": "049797d727261bf27f2690430d935067710049c2",
+                "url": "https://api.github.com/repos/composer/installers/zipball/cfcca6b1b60bc4974324efb5783c13dca6932b5b",
+                "reference": "cfcca6b1b60bc4974324efb5783c13dca6932b5b",
                 "shasum": ""
             },
             "require": {
@@ -124,20 +124,20 @@
                 "zend",
                 "zikula"
             ],
-            "time": "2017-12-29T09:13:20+00:00"
+            "time": "2018-08-27T06:10:37+00:00"
         },
         {
             "name": "payplug/payplug-php",
-            "version": "2.5.1",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "b382d15065284adb1e054b33e7e8ad5490a891fb"
+                "reference": "97a948ae8fa0fc9bcff8ee0101c15dfcf4dee794"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/b382d15065284adb1e054b33e7e8ad5490a891fb",
-                "reference": "b382d15065284adb1e054b33e7e8ad5490a891fb",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/97a948ae8fa0fc9bcff8ee0101c15dfcf4dee794",
+                "reference": "97a948ae8fa0fc9bcff8ee0101c15dfcf4dee794",
                 "shasum": ""
             },
             "require": {
