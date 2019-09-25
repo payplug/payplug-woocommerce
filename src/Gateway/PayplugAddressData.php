@@ -256,6 +256,10 @@ class PayplugAddressData {
 				$phone_number_util = PhoneNumberUtil::getInstance();
 				$phone_number      = $phone_number_util->parse( $phone, $country );
 
+				if ( ! $phone_number_util->isValidNumber( $phone_number ) ) {
+					throw new \Exception( 'Invalid phone number' );
+				}
+
 				if ( PhoneNumberType::MOBILE === $phone_number_util->getNumberType( $phone_number ) ) {
 					$this->billing['mobile_phone_number'] = $phone_number_util->format( $phone_number, PhoneNumberFormat::E164 );
 				} else {
