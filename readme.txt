@@ -2,7 +2,7 @@
 Contributors: PayPlug
 Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, carte bancaire, paiement, one click, paiement en ligne
 Requires at least: 4.4
-Tested up to: 5.2
+Tested up to: 5.4
 Requires PHP: 5.6
 Stable tag: 1.0.22
 License: GPLv3 or later
@@ -72,6 +72,8 @@ Based on a recent survey, 91% of merchants using PlayPlug would recommend the so
 
 = 1.0.22 =
 Update dependencies
+Tested up to WordPress 5.4
+Tested up to Woocommerce 4.0
 
 = 1.0.21 =
 The customer's phone number is now only forwarded to the bank networks if its format complies with the E.164 standard.
