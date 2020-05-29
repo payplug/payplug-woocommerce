@@ -83,6 +83,19 @@ class PayplugApi {
 	}
 
 	/**
+	 * Retrieve refund data from PayPlug API.
+	 *
+	 * @param string $transaction_id
+	 * @param string $refund_id
+	 *
+	 * @return \Payplug\Resource\Refund
+	 * @throws \Payplug\Exception\ConfigurationException
+	 */
+	public function refund_retrieve( $transaction_id, $refund_id ) {
+		return $this->do_request_with_fallback( '\Payplug\Refund::retrieve', [ $transaction_id, $refund_id ] );
+	}
+
+	/**
 	 * Create a refund.
 	 *
 	 * @param string $transaction_id
