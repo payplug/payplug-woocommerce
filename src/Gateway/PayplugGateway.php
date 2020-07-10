@@ -911,7 +911,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 
 		$transaction_id = PayplugWoocommerceHelper::is_pre_30() ? get_post_meta( $order_id, '_transaction_id', true ) : $order->get_transaction_id();
 		if ( empty( $transaction_id ) ) {
-			PayplugGateway::log( sprintf( 'The order does not have PayPlug transaction ID associated with it.', $order_id ), 'error' );
+			PayplugGateway::log( sprintf( 'The order #%s does not have PayPlug transaction ID associated with it.', $order_id ), 'error' );
 
 			return new \WP_Error( 'process_refund_error', __( 'No PayPlug transaction was found for this order. The refund could not be processed.', 'payplug' ) );
 		}
@@ -922,6 +922,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC {
 			'metadata' => [
 				'order_id'    => $order_id,
 				'customer_id' => ( (int) $customer_id > 0 ) ? $customer_id : 'guest',
+				'refund_from' => 'woocommerce',
 			]
 		];
 

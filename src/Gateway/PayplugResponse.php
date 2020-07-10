@@ -109,10 +109,13 @@ class PayplugResponse {
 	 * Process refund.
 	 *
 	 * @param $resource
+	 * @param bool $ignore_woocommerce_refund Flag to determine if IPN notification for refunds created by WooCommerce
+	 *                                        should be ignored or not. Default to true.
 	 *
 	 * @throws \Exception
 	 */
-	public function process_refund( $resource ) {
+	public function process_refund( $resource, $ignore_woocommerce_refund = true ) {
+		$refund_id      = wc_clean( $resource->id );
 		$transaction_id = wc_clean( $resource->payment_id );
 		$order          = $this->get_order_from_transaction_id( $transaction_id );
 		if ( ! $order ) {
@@ -124,9 +127,29 @@ class PayplugResponse {
 
 		PayplugGateway::log( sprintf( 'Order #%s : Begin processing refund IPN %s', $order_id, $resource->id ) );
 
-		$refund_exist = $this->refund_exist_for_order( $order_id, $resource->id );
+		$refund_exist = $this->refund_exist_for_order( $order_id, $refund_id );
 		if ( $refund_exist ) {
-			PayplugGateway::log( sprintf( 'Order %s : Refund has already been processed. Ignoring IPN.', $order_id ) );
+			PayplugGateway::log( sprintf( 'Order #%s : Refund has already been processed. Ignoring IPN.', $order_id ) );
+
+			return;
+		}
+
+		// Since refund notification doesn't contain the full resource, we need to retrieve
+		// the refund resource to access its metadata.
+		try {
+			$refund = $this->gateway->api->refund_retrieve( $transaction_id, $refund_id );
+		} catch ( \Exception $e ) {
+			PayplugGateway::log( sprintf( 'Order #%s : Fail to retrieve refund data with error %s', $order_id, $e->getMessage() ) );
+
+			return;
+		}
+
+		if (
+			$ignore_woocommerce_refund
+			&& isset( $refund->metadata['refund_from'] )
+			&& 'woocommerce' === $refund->metadata['refund_from']
+		) {
+			PayplugGateway::log( sprintf( 'Order #%s : Refund created by WooCommerce. Ignoring IPN.', $order_id ) );
 
 			return;
 		}
