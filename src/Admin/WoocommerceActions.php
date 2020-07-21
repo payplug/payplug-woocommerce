@@ -126,7 +126,7 @@ class WoocommerceActions {
 				PayplugGateway::log( sprintf( 'Order #%s : Found %d refund(s) for the transaction.', $order_id, count( $refunds ) ), 'info' );
 
 				foreach ( $refunds as $refund ) {
-					$gateway->response->process_refund( $refund );
+					$gateway->response->process_refund( $refund, false );
 				}
 			}
 		} catch ( \Exception $e ) {
