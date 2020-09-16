@@ -1,6 +1,8 @@
+#payment .payment_methods li label[for=payment_method_payplug] {
+    display: flex;
+}
 #payment .payment_methods li img.payplug-payment-icon {
-    float: right;
+    margin-left: 5px;
     max-width: 144px;
     max-height: 25px;
-    border-radius: 0;
 }
