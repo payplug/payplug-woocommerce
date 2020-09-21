@@ -939,6 +939,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return new \WP_Error('process_refund_error', sprintf(__('The order %s does not exist.', 'payplug'), $order_id));
         }
 
+        if ($order->get_status() === "cancelled") {
+            PayplugGateway::log(sprintf('The order #%s cannot be refund.', $order_id), 'error');
+
+            return new \WP_Error('process_refund_error', sprintf(__('The order %s cannot be refund.', 'payplug'), $order_id));
+        }
+
         $transaction_id = PayplugWoocommerceHelper::is_pre_30() ? get_post_meta($order_id, '_transaction_id', true) : $order->get_transaction_id();
         if (empty($transaction_id)) {
             PayplugGateway::log(sprintf('The order #%s does not have PayPlug transaction ID associated with it.', $order_id), 'error');
@@ -1421,5 +1427,18 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             }
         }
         return $gateways;
+    }
+
+    
+    /**
+     * Can the order be refunded via this gateway?
+     *
+     *
+     * @param  WC_Order $order Order object.
+     * @return bool If false, the automatic refund button is hidden in the UI.
+     */
+    public function can_refund_order($order)
+    {
+        return $order && $this->supports('refunds') && $order->get_status() !== "cancelled";
     }
 }
