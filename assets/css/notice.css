@@ -3,10 +3,9 @@
   -moz-osx-font-smoothing: grayscale;
   margin: 5px 15px 2px; }
   .notice--start {
-    min-height: 400px;
     position: relative;
     border: 0;
-    padding: 30px 40px !important;
+    padding: 30px 40px;
     background: url(../images/bg_notice--start.jpg) no-repeat 50% 50%;
     background-size: cover; }
     .notice--start:before {
