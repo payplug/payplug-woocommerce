@@ -6,15 +6,16 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
 "woocommerce\n"
 "POT-Creation-Date: 2018-09-20 09:20:17+00:00\n"
-"PO-Revision-Date: 2018-09-20 11:23+0200\n"
+"PO-Revision-Date: 2020-09-24 12:45+0000\n"
 "Last-Translator: \n"
-"Language-Team: \n"
+"Language-Team: Italian\n"
 "Language: it_IT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.1.1\n"
+"X-Generator: Loco https://localise.biz/\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Loco-Version: 2.4.3; wp-5.5.1"
 
 #: src/Admin/Metabox.php:51
 msgid "PayPlug payment details"
@@ -250,10 +251,13 @@ msgstr "Impostazioni avanzate"
 
 #: src/Gateway/PayplugGateway.php:276
 msgid ""
-"This feature is available to PREMIUM accounts only. You can try it in TEST "
-"mode."
+"Your current offer does not allow this option. Try it on TEST mode. More "
+"information <a href=\"https://www.payplug.com/pricing\" target=\"_blank\">"
+"here.</a>"
 msgstr ""
-"Questa funzione richiede un account Premium. Puoi provarla in modalità Test."
+"La tua offerta non ti permette di usufruire di questa funzione. Puoi "
+"provarla in modalità TEST. Per più informazioni <a href=\"https://www."
+"payplug.com/it/tariffe\" target=\"_blank\">clicca</a>"
 
 #: src/Gateway/PayplugGateway.php:281
 msgid "One Click Payment"
@@ -449,68 +453,3 @@ msgstr "PayPlug"
 #. Author URI of the plugin/theme
 msgid "https://www.payplug.com/"
 msgstr "https://www.payplug.com/"
-
-#~ msgid "Title"
-#~ msgstr "Titolo"
-
-#~ msgid "The payment solution title displayed during checkout."
-#~ msgstr ""
-#~ "Personalizza il nome del metodo di pagamento che compare al momento del "
-#~ "checkout."
-
-#~ msgid "Description"
-#~ msgstr "Descrizione"
-
-#~ msgid "The payment solution description displayed during checkout."
-#~ msgstr ""
-#~ "Personalizza la descrizione del metodo di pagamento al momento del "
-#~ "checkout."
-
-#~ msgctxt "Default gateway description"
-#~ msgid "Credit card checkout via PayPlug"
-#~ msgstr "Paga con carta di credito o debito via PayPlug"
-
-#~ msgid "Payplug"
-#~ msgstr "Payplug"
-
-#~ msgid "Let your customers pay with PayPlug"
-#~ msgstr "Permetti ai tuoi clienti di acquistare con PayPlug."
-
-#~ msgid "This gateway can only be enable for shop using euro has currency."
-#~ msgstr "PayPlug ti permette di effettuare solo transazioni in euro."
-
-#~ msgid "Place the payment gateway in test mode using test API keys."
-#~ msgstr ""
-#~ "La modalità TEST permette di effettuare solo delle simulazioni di "
-#~ "pagamento e non genera reali transazioni."
-
-#~ msgid "Refund process failed. Please retry."
-#~ msgstr ""
-#~ "Non è possibile effettuare il rimborso. La preghiamo di tentare "
-#~ "nuovamente."
-
-#~ msgid "Total amount of %s is not in the allowed range."
-#~ msgstr ""
-#~ "Trasazioni di questo valore (%s) non sono consentite con questo metodo di "
-#~ "pagamento."
-
-#~ msgid "Your credentials are invalid."
-#~ msgstr "Le tue credenziali non sono valide"
-
-#~ msgid "Your server is running a valid PHP version."
-#~ msgstr "La versione PHP del tuo server è compatibile con l'estensione."
-
-#~ msgid "Your shop use Euro as your currency."
-#~ msgstr ""
-#~ "L'euro è stato impostatato come valuta di pagamento sul tuo e-commerce."
-
-#~ msgid "Your shop must use Euro as your currency."
-#~ msgstr "Devi impostare l'euro come valuta di pagamento sul tuo e-commerce."
-
-#~ msgid "Your Payplug account is connected."
-#~ msgstr "Sei connesso al tuo conto PayPlug."
-
-#~ msgid "The online payment solution created for SMEs"
-#~ msgstr ""
-#~ "La soluzione di pagamento online che con semplicità e assistenza ti aiuta "
-#~ "ad aumentare le vendite."

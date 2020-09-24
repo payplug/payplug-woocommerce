@@ -352,7 +352,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             'title_advanced_settings' => [
                 'title'       => __('Advanced Settings', 'payplug'),
                 'description' => __(
-                    'This feature is available to PREMIUM accounts only. You can try it in TEST mode.',
+                    'Your current offer does not allow this option. Try it on TEST mode. More information <a href="https://www.payplug.com/pricing" target="_blank">here.</a>',
                     'payplug'
                 ),
                 'type'        => 'title',
