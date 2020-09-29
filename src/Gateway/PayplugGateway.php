@@ -363,13 +363,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'label'       => __('Activate', 'payplug'),
                 'description' => __('Allow your customers to save their credit card information for later purchases.', 'payplug'),
                 'default'     => 'no',
-                'desc_tip'    => true,
+                'desc_tip'    => true
             ],
         ];
 
-        // Disable One-Click checkbox if the user doesn't have the permission to use it.
-        if ($this->user_logged_in() && 'live' === $this->get_current_mode()) {
-            $fields['oneclick']['disabled'] = !$this->permissions->has_permissions(PayplugPermissions::SAVE_CARD);
+        if ('live' === $this->get_current_mode()) {
+            if ($this->user_logged_in()  && !$this->permissions->has_permissions(PayplugPermissions::SAVE_CARD)) {
+                $fields['oneclick']['disabled'] = true;
+            } else {
+                unset($fields['title_advanced_settings']);
+            }
         }
 
         /**
@@ -929,7 +932,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function process_refund($order_id, $amount = null, $reason = '')
     {
-
         PayplugGateway::log(sprintf('Processing refund for order #%s', $order_id));
 
         $order = wc_get_order($order_id);
@@ -1410,8 +1412,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             && $this->permissions->has_permissions(PayplugPermissions::SAVE_CARD);
     }
 
-    
-
     /**
      * Check if the gatteway is allowed for the order amount
      *
@@ -1429,7 +1429,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         return $gateways;
     }
 
-    
     /**
      * Can the order be refunded via this gateway?
      *
