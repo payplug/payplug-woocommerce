@@ -3,9 +3,10 @@
     @include smoothText;
     margin: 5px 15px 2px;
     &--start {
+        min-height: 400px;
         position:relative;
         border:0;
-        padding: 30px 40px;
+        padding: 30px 40px !important;
         background: url(../images/bg_notice--start.jpg) no-repeat 50% 50%;
         background-size: cover;
         &:before {
