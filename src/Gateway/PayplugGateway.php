@@ -367,11 +367,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             ],
         ];
 
-        if ('live' === $this->get_current_mode()) {
-            if ($this->user_logged_in()  && !$this->permissions->has_permissions(PayplugPermissions::SAVE_CARD)) {
-                $fields['oneclick']['disabled'] = true;
-            } else {
+        if ($this->user_logged_in()) { 
+            if ($this->permissions->has_permissions(PayplugPermissions::SAVE_CARD)) {
                 unset($fields['title_advanced_settings']);
+            } else if  ('live' === $this->get_current_mode()){
+                $fields['oneclick']['disabled'] = true;
             }
         }
 
