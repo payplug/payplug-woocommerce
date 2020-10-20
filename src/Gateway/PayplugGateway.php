@@ -367,12 +367,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             ],
         ];
 
-        if ($this->user_logged_in()) { 
-            if ($this->permissions->has_permissions(PayplugPermissions::SAVE_CARD)) {
-                unset($fields['title_advanced_settings']);
-            } else if  ('live' === $this->get_current_mode()){
-                $fields['oneclick']['disabled'] = true;
-            }
+        if ($this->user_logged_in() && !$this->permissions->has_permissions(PayplugPermissions::SAVE_CARD) && 'live' === $this->get_current_mode()) {
+            $fields['oneclick']['disabled'] = true;
         }
 
         /**
@@ -530,22 +526,22 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             PAYPLUG_GATEWAY_VERSION
         );
 
+        wp_enqueue_script(
+            'payplug-gateway-admin',
+            PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin.js',
+            ['jquery-ui-dialog'],
+            PAYPLUG_GATEWAY_VERSION
+        );
+
+        wp_localize_script('payplug-gateway-admin', 'payplug_admin_config', array(
+            'ajax_url'      => admin_url('admin-ajax.php'),
+            'has_live_key'  => (false === $this->has_api_key('live')) ? false : true,
+            'btn_ok'        => _x('Ok', 'modal', 'payplug'),
+            'btn_label'     => _x('Cancel', 'modal', 'payplug'),
+            'general_error' => _x('Something went wrong. Please refresh the page and retry.', 'modal', 'payplug'),
+        ));
+
         if ($this->user_logged_in() && false === $this->has_api_key('live')) {
-
-            wp_enqueue_script(
-                'payplug-gateway-admin',
-                PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin.js',
-                ['jquery-ui-dialog'],
-                PAYPLUG_GATEWAY_VERSION
-            );
-
-            wp_localize_script('payplug-gateway-admin', 'payplug_admin_config', array(
-                'ajax_url'      => admin_url('admin-ajax.php'),
-                'has_live_key'  => (false === $this->has_api_key('live')) ? false : true,
-                'btn_ok'        => _x('Ok', 'modal', 'payplug'),
-                'btn_label'     => _x('Cancel', 'modal', 'payplug'),
-                'general_error' => _x('Something went wrong. Please refresh the page and retry.', 'modal', 'payplug'),
-            ));
 
             add_action('admin_footer', function () {
                 $email = $this->get_option('email');

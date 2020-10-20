@@ -3,6 +3,8 @@
 namespace Payplug\PayplugWoocommerce\Admin;
 
 // Exit if accessed directly
+use Payplug\Payplug;
+use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,6 +22,7 @@ class Ajax {
 
 	public function __construct() {
 		add_action( 'wp_ajax_' . self::REFRESH_KEY_ACTION, [ $this, 'handle_refresh_keys' ] );
+		add_action( 'wp_ajax_' . self::CHECK_LIVE_PERMISSIONS, [ $this, 'check_live_permissions' ] );
 	}
 
 	public function handle_refresh_keys() {
@@ -95,6 +98,12 @@ class Ajax {
 				'message' => __( 'Your API keys has successfully been updated.', 'payplug' ),
 			)
 		);
+    }
+    
+    public function check_live_permissions() {
+		$account = Authentication::getAccount(new Payplug($_POST['livekey']));
+        $permissions = $account['httpResponse']['permissions'];
+		wp_send_json_success($permissions);
 	}
 
 	/**
