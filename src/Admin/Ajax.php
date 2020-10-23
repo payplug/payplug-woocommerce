@@ -19,6 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Ajax {
 
 	const REFRESH_KEY_ACTION = 'payplug_refresh_keys';
+	const CHECK_LIVE_PERMISSIONS = 'check_live_permissions';
 
 	public function __construct() {
 		add_action( 'wp_ajax_' . self::REFRESH_KEY_ACTION, [ $this, 'handle_refresh_keys' ] );
