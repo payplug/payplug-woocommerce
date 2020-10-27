@@ -2,9 +2,9 @@
 Contributors: PayPlug
 Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, carte bancaire, paiement, one click, paiement en ligne
 Requires at least: 4.4
-Tested up to: 5.2
+Tested up to: 5.4
 Requires PHP: 5.6
-Stable tag: 1.0.21
+Stable tag: 1.0.22
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -70,6 +70,11 @@ Based on a recent survey, 91% of merchants using PlayPlug would recommend the so
 
 == Changelog ==
 
+= 1.0.22 =
+Update dependencies
+Tested up to WordPress 5.4
+Tested up to Woocommerce 4.0
+
 = 1.0.21 =
 The customer's phone number is now only forwarded to the bank networks if its format complies with the E.164 standard.
 An incorrect phone number will not block the transaction
@@ -84,7 +89,7 @@ Fix on  miscreated orders : loading of the PayPlug form.js latest version from t
 Update devDependencies
 
 = 1.0.17 =
-Fix  special characters in password for the PayPlug login
+Fix special characters in password for the PayPlug login
 Update screens according to the new graphic charter
 Upgrade LIVE keys retrieve when switching form TEST to LIVE mode, once PayPlug account has been activated (Password request pop-in)
 Tested up to Woocommerce 3.6

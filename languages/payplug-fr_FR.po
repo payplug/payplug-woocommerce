@@ -6,15 +6,16 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
 "woocommerce\n"
 "POT-Creation-Date: 2018-09-20 09:20:17+00:00\n"
-"PO-Revision-Date: 2018-09-20 11:22+0200\n"
+"PO-Revision-Date: 2020-09-24 12:45+0000\n"
 "Last-Translator: \n"
-"Language-Team: \n"
-"Language: fr\n"
+"Language-Team: Français\n"
+"Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.1.1\n"
+"X-Generator: Loco https://localise.biz/\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Loco-Version: 2.4.3; wp-5.5.1"
 
 #: src/Admin/Metabox.php:51
 msgid "PayPlug payment details"
@@ -253,10 +254,13 @@ msgstr "Réglages avancés"
 
 #: src/Gateway/PayplugGateway.php:276
 msgid ""
-"This feature is available to PREMIUM accounts only. You can try it in TEST "
-"mode."
+"Your current offer does not allow this option. Try it on TEST mode. More "
+"information <a href=\"https://www.payplug.com/pricing\" target=\"_blank\">"
+"here.</a>"
 msgstr ""
-"Cette fonctionnalité requiert un compte PREMIUM. Essayez-la en mode TEST."
+"Votre offre actuelle ne vous permet pas d’utiliser cette option. Essayez-la "
+"en mode TEST. Plus d’information <a href=\"https://www.payplug."
+"com/fr/tarifs\" target=\"blank\">ici</a>"
 
 #: src/Gateway/PayplugGateway.php:281
 msgid "One Click Payment"
@@ -447,89 +451,3 @@ msgstr "PayPlug"
 #. Author URI of the plugin/theme
 msgid "https://www.payplug.com/"
 msgstr "https://www.payplug.com/"
-
-#~ msgid "Title"
-#~ msgstr "Titre"
-
-#~ msgid "The payment solution title displayed during checkout."
-#~ msgstr ""
-#~ "Personnalisez le nom de la passerelle de paiement affiché lors de la "
-#~ "commande."
-
-#~ msgid "Description"
-#~ msgstr "Description"
-
-#~ msgid "The payment solution description displayed during checkout."
-#~ msgstr ""
-#~ "Personnalisez la description de la passerelle de paiement affichée lors "
-#~ "de la commande."
-
-#~ msgctxt "Default gateway description"
-#~ msgid "Credit card checkout via PayPlug"
-#~ msgstr "Payer par carte bancaire via PayPlug"
-
-#~ msgid "Payplug"
-#~ msgstr "Payplug"
-
-#~ msgid "Let your customers pay with PayPlug"
-#~ msgstr "Permettez à vos clients de payer avec PayPlug."
-
-#~ msgid "This gateway can only be enable for shop using euro has currency."
-#~ msgstr ""
-#~ "La passerelle de paiement PayPlug ne peut être activée que pour des "
-#~ "paiements en euros."
-
-#~ msgid "Pay via PayPlug."
-#~ msgstr "Payer via PayPlug."
-
-#~ msgid "Place the payment gateway in test mode using test API keys."
-#~ msgstr ""
-#~ "En mode TEST, tous les paiements sont des simulations et ne génèreront "
-#~ "pas de transactions réelles."
-
-#~ msgid "Choose which payment method will be used."
-#~ msgstr "Choisissez la méthode de paiement qui sera utilisée."
-
-#~ msgid "Embedded"
-#~ msgstr "Lightbox"
-
-#~ msgid "Refund process failed. Please retry."
-#~ msgstr "Le remboursement a échoué. Veuillez réessayer ultérieurement."
-
-#~ msgid "Total amount of %s is not in the allowed range."
-#~ msgstr "Le montant total (%s) n'entre pas dans l'intervalle autorisé."
-
-#~ msgid "Your credentials are invalid."
-#~ msgstr "Vos identifiants sont invalide."
-
-#~ msgid "Go to my dashboard"
-#~ msgstr "Voir mon tableau de bord"
-
-#~ msgid "Your server is running a valid PHP version."
-#~ msgstr "La version PHP de votre serveur est compatible avec l'extension."
-
-#~ msgid "Your shop use Euro as your currency."
-#~ msgstr "Votre boutique utilise l'euro comme monnaie de paiement."
-
-#~ msgid "Your shop must use Euro as your currency."
-#~ msgstr "Votre boutique doit utiliser l'euro comme monnaie de paiement."
-
-#~ msgid "Your Payplug account is connected."
-#~ msgstr "Votre compte PayPlug est connecté."
-
-#~ msgid "PayPlug require WooCommerce to be activated to work."
-#~ msgstr "PayPlug nécessite que WooCommerce soit installé pour fonctionner."
-
-#~ msgid "The online payment solution created for SMEs"
-#~ msgstr ""
-#~ "La solution de paiement en ligne qui combine simplicité et accompagnement "
-#~ "pour booster vos ventes."
-
-#~ msgid "The PHP Curl extention is installed and available."
-#~ msgstr "L'extension PHP Curl est installée et disponible."
-
-#~ msgid "The PHP Curl extention was not found."
-#~ msgstr "L'extension PHP Curl n'est pas disponible."
-
-#~ msgid "Your PHP version is up-to-date."
-#~ msgstr "La version PHP de votre serveur est à jour."

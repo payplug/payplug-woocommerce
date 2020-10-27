@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Payplug\Authentication;
-use Payplug\Exception\ConfigurationNotSetException;
+use Payplug\Exception\PayplugException;
 
 class PayplugPermissions {
 
@@ -95,7 +95,7 @@ class PayplugPermissions {
 			set_transient( $this->get_key(), $this->permissions, DAY_IN_SECONDS );
 
 			return true;
-		} catch ( ConfigurationNotSetException $e ) {
+		} catch ( PayplugException $e ) {
 			$this->permissions = [];
 		}
 
