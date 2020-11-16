@@ -159,18 +159,20 @@ class PayplugAddressData {
 		$billing_postcode   = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_postcode : $order->get_billing_postcode();
 		$billing_city       = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_city : $order->get_billing_city();
 		$billing_country    = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();
+        $billing_company    = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_company : $order->get_billing_company();
 		if ( ! PayplugWoocommerceHelper::is_country_supported( $billing_country ) ) {
 			$billing_country = PayplugWoocommerceHelper::get_default_country();
 		}
 
 		$this->billing = [
-			'first_name' => $this->limit_length( $billing_first_name ),
-			'last_name'  => $this->limit_length( $billing_last_name ),
-			'email'      => $this->limit_length( $billing_email, 255 ),
-			'address1'   => $this->limit_length( $billing_address1, 255 ),
-			'postcode'   => $this->limit_length( $billing_postcode, 16 ),
-			'city'       => $this->limit_length( $billing_city ),
-			'country'    => $this->limit_length( $billing_country, 2 ),
+			'first_name'   => $this->limit_length( $billing_first_name ),
+			'last_name'    => $this->limit_length( $billing_last_name ),
+			'email'        => $this->limit_length( $billing_email, 255 ),
+			'address1'     => $this->limit_length( $billing_address1, 255 ),
+			'postcode'     => $this->limit_length( $billing_postcode, 16 ),
+			'city'         => $this->limit_length( $billing_city ),
+			'country'      => $this->limit_length( $billing_country, 2 ),
+            'company_name' => $this->limit_length( $billing_company )
 		];
 
 		if ( ! empty( $billing_address2 ) ) {
@@ -194,6 +196,7 @@ class PayplugAddressData {
 				$shipping_postcode = PayplugWoocommerceHelper::is_pre_30() ? $order->shipping_postcode : $order->get_shipping_postcode();
 				$shipping_city     = PayplugWoocommerceHelper::is_pre_30() ? $order->shipping_city : $order->get_shipping_city();
 				$shipping_country  = PayplugWoocommerceHelper::is_pre_30() ? $order->shipping_country : $order->get_shipping_country();
+				$shipping_company = PayplugWoocommerceHelper::is_pre_30() ? $order->shipping_company : $order->get_shipping_company();
 				if ( ! PayplugWoocommerceHelper::is_country_supported( $shipping_country ) ) {
 					$shipping_country = PayplugWoocommerceHelper::get_default_country();
 				}
@@ -205,7 +208,8 @@ class PayplugAddressData {
 					'address1'   => $this->limit_length( $shipping_address1, 255 ),
 					'postcode'   => $this->limit_length( $shipping_postcode, 16 ),
 					'city'       => $this->limit_length( $shipping_city ),
-					'country'    => $this->limit_length( $shipping_country, 2 ),
+                    'country'    => $this->limit_length( $shipping_country, 2 ),
+                    'company_name' => $this->limit_length( $shipping_company )
 				];
 
 				if ( ! empty( $shipping_address2 ) ) {
@@ -262,6 +266,7 @@ class PayplugAddressData {
 
 				if ( PhoneNumberType::MOBILE === $phone_number_util->getNumberType( $phone_number ) ) {
 					$this->billing['mobile_phone_number'] = $phone_number_util->format( $phone_number, PhoneNumberFormat::E164 );
+					$this->shipping['mobile_phone_number'] = $phone_number_util->format( $phone_number, PhoneNumberFormat::E164 );
 				} else {
 					$this->billing['landline_phone_number'] = $phone_number_util->format( $phone_number, PhoneNumberFormat::E164 );
 				}

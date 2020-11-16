@@ -18,6 +18,7 @@ use Payplug\Resource\Refund as RefundResource;
 use WC_Payment_Gateway_CC;
 use WC_Payment_Tokens;
 
+         
 /**
  * PayPlug WooCommerce Gateway.
  *
@@ -152,7 +153,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function customize_gateway_title($total_rows, $order)
     {
-
         $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
         if (
             $this->id !== $payment_method
@@ -266,6 +266,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function init_form_fields()
     {
+
         $fields = [
             'enabled'                 => [
                 'title'       => __('Enable/Disable', 'payplug'),
@@ -365,14 +366,30 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'default'     => 'no',
                 'desc_tip'    => true
             ],
+            'oney'                => [
+                'title'       => __('Split Oney Payment', 'payplug'),
+                'type'        => 'checkbox',
+                'label'       => __('Activate', 'payplug'),
+                // TRAD
+                'description' => __('Allow your customers to save their credit card information for later purchases.', 'payplug'),
+                'default'     => 'no',
+                'desc_tip'    => true
+            ],
+            'oneycgv'                => [
+                'type'        => 'checkbox',
+                'label'       => __(' I have integrated the Oney legal notices into the GCSs of my site', 'payplug'),
+                // TRAD
+                'default'     => 'no'
+            ]
         ];
 
-        if ('live' === $this->get_current_mode()) {
-            if ($this->user_logged_in()  && !$this->permissions->has_permissions(PayplugPermissions::SAVE_CARD)) {
-                $fields['oneclick']['disabled'] = true;
-            } else {
+        
+        if ($this->user_logged_in()) {
+            if ($this->permissions->has_permissions(PayplugPermissions::SAVE_CARD)) {
                 unset($fields['title_advanced_settings']);
-            }
+            } else if  ('live' === $this->get_current_mode()){
+                $fields['oneclick']['disabled'] = true;
+            }            
         }
 
         /**
@@ -397,6 +414,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
         // Register IPN handler
         new PayplugIpnResponse($this);
+
     }
 
     /**
@@ -528,10 +546,19 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/app.css',
             [],
             PAYPLUG_GATEWAY_VERSION
+        );          
+        
+        wp_enqueue_script(
+            'payplug-gateway-admin-oney',
+            PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin-oney.js',
+            ['jquery-ui-dialog'],
+            PAYPLUG_GATEWAY_VERSION
         );
-
+        wp_localize_script('payplug-gateway-admin-oney', 'payplug_admin_config', array(
+            'ajax_url'      => admin_url('admin-ajax.php'),
+            'btn_ok'        => _x('Ok', 'modal', 'payplug'),
+        ));
         if ($this->user_logged_in() && false === $this->has_api_key('live')) {
-
             wp_enqueue_script(
                 'payplug-gateway-admin',
                 PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin.js',
@@ -546,6 +573,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'btn_label'     => _x('Cancel', 'modal', 'payplug'),
                 'general_error' => _x('Something went wrong. Please refresh the page and retry.', 'modal', 'payplug'),
             ));
+    
 
             add_action('admin_footer', function () {
                 $email = $this->get_option('email');
@@ -575,6 +603,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             <?php echo $payplug_requirements->openssl_requirement(); ?>
             <?php echo $payplug_requirements->account_requirement(); ?>
             <?php echo $payplug_requirements->currency_requirement(); ?>
+            <?php echo $payplug_requirements->oney_requirement(); ?>
         </div>
         <?php echo wp_kses_post(wpautop($this->get_method_description())); ?>
 
@@ -621,6 +650,15 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             </table>
         <?php
         endif;
+        ?>
+        <div id="payplug-oney-modal" title="<?php echo esc_attr_x('Mode LIVE', 'modal', 'payplug'); ?>">
+            <p>
+                <?php echo esc_html_x('Attention, pour utiliser la méthode de paiement Oney en mode LIVE merci de nous contacter à', 'modal', 'payplug'); ?>
+                <br/>
+                <a href="mailto:support@payplug.com">support@payplug.com</a>
+            </p>
+        </div>
+        <?php
     }
 
     /**
@@ -631,11 +669,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function process_admin_options()
     {
         $data = $this->get_post_data();
-
+		$settings = get_option( 'woocommerce_payplug_settings', [] );
+        $oneclick_fieldkey = $this->get_field_key('oneclick');
+        
         // Handle logout process
         if (
             isset($data['submit_logout'])
-            && false !== check_admin_referer('payplug_user_logout', '_logoutaction')
+            && false !== check_admin_referer('payplug_user_logout', '_logoutaction') 
         ) {
 
             if ($this->permissions) {
@@ -1438,6 +1478,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function can_refund_order($order)
     {
-        return $order && $this->supports('refunds') && $order->get_status() !== "cancelled";
+        $status = $order->get_status();
+        return $order && $this->supports('refunds') && $status !== "cancelled" && $status !== "failed";
     }
 }

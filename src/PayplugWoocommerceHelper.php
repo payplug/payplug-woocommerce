@@ -8,6 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Payplug\Resource\APIResource;
+use Payplug\Payplug;
+use Payplug\Authentication;
+use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 
 /**
  * Helper class.
@@ -426,5 +429,43 @@ class PayplugWoocommerceHelper {
 				$order->save();
 			}
 		}
+	}
+
+	/**
+	 * Get current option from payplug settings
+	 *
+	 * @return array
+	 */
+	public static function get_account_data_from_options() {
+		$options          = get_option( 'woocommerce_payplug_settings', [] );
+		$payplug_test_key = ! empty( $options['payplug_test_key'] ) ? $options['payplug_test_key'] : '';
+		$payplug_live_key = ! empty( $options['payplug_live_key'] ) ? $options['payplug_live_key'] : '';
+		$account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
+		$account['oney'] = $options['oney'];
+		$account['oneycgv'] = $options['oneycgv'];
+		return $account;
+	}
+
+	/**
+	 * Get min and max for oney payment
+	 *
+	 * @return array
+	 */
+	public static function get_min_max_oney() {
+		$account = self::get_account_data_from_options();
+		return [
+			'min' => floatval($account['httpResponse']['configuration']['oney']['min_amounts']['EUR'])/100,
+			'max' => floatval($account['httpResponse']['configuration']['oney']['max_amounts']['EUR'])/100
+		];
+	}
+
+	/**
+	 * Check if oney is available with current settings
+	 *
+	 * @return boolean
+	 */
+	public static function is_oney_available() {
+		$account = self::get_account_data_from_options();
+		return ($account['httpResponse'] && $account['httpResponse']['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oney'] === "yes" && $account['oneycgv'] === "yes");
 	}
 }
