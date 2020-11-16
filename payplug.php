@@ -8,10 +8,13 @@
  * Text Domain:     payplug
  * Domain Path:     /languages
  * Version:         1.0.22
- * WC tested up to: 4.0
+ * Requires PHP: 7.0
+ * Requires at least: 5.5.1
+ * WC tested up to: 4.4.1
  * License:         GPLv3 or later
  * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
  */
+
 
 namespace Payplug\PayplugWoocommerce;
 

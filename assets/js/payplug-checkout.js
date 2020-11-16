@@ -57,7 +57,10 @@
 			Payplug.showPayment(response.redirect);
 		},
 		isPayplugChosen: function () {
-			return $('#payment_method_payplug').is(':checked');
+			return $('#payment_method_payplug').is(':checked') && this.isOneyPayplugChosen();
+		},
+		isOneyPayplugChosen: function () {
+			return $('#payment_method_oney_x3_with_fees').is(':checked') || $('#payment_method_oney_x4_with_fees').is(':checked');
 		},
 		isPaymentTokenSelected: function () {
 			var token = $('input[name=wc-payplug-payment-token]:checked');

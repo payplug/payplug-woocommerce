@@ -1,5 +1,4 @@
 /* global jQuery */
-
 (function ($, undefined) {
 
     if (undefined === payplug_admin_config) {
@@ -55,17 +54,14 @@
                 }
             }
         },
-        onClick: function (event) {
-            payplug_admin.$payplug_oneclick.prop('disabled', true)
-            payplug_admin.oneclickPermissionsCheck()
-
-            if ('0' === event.currentTarget.value || payplug_admin_config.has_live_key) {
-                // ignore event if user choose TEST mode or already has LIVE keys
-                return;
-            }
-
-            payplug_admin.$dialog.dialog('open');
-        },
+		onClick: function (event) {
+			const live = payplug_admin.$payplug_mode.filter('#woocommerce_payplug_mode-yes');
+			if (!live.prop('checked')) {
+				// ignore event if user choose TEST mode or already has LIVE keys
+				return;
+			}
+			payplug_admin.$dialog.dialog('open');
+		},
         onCancelClick: function () {
             payplug_admin.$dialog.dialog('close');
         },
@@ -81,10 +77,9 @@
 
             var live = payplug_admin.$payplug_mode.filter('#woocommerce_payplug_mode-yes');
             var test = payplug_admin.$payplug_mode.filter('#woocommerce_payplug_mode-no');
-
-            if (!payplug_admin_config.has_live_key && live.prop('checked')) {
-                test.prop('checked', 'checked');
-            }
+			if (payplug_admin_config.has_live_key && live.prop('checked') && !payplug_admin.is_oney_refresh) {
+				test.prop('checked', 'checked');
+			}
         },
         oneclickPermissionsCheck: () => {
             if ('0' === $('input[name=woocommerce_payplug_mode]:checked').val()) {
@@ -140,8 +135,14 @@
                     if (false === res.success) {
                         payplug_admin._displayError(res.data.message);
                     } else {
-                        payplug_admin._displaySuccess(res.data.message);
-                        window.location.reload();
+						payplug_admin._displaySuccess(res.data.message);
+						if (false === res.data.can_use_oney) {
+							payplug_admin.is_oney_refresh = true;
+							payplug_admin.$dialog.dialog('close');
+							payplug_admin.$dialogoney.dialog('open');
+						} else {
+							window.location.reload();
+						}
                     }
                 })
                 .fail(function (res) {
@@ -180,4 +181,5 @@
     };
 
     payplug_admin.init();
+
 })(jQuery);

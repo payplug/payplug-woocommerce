@@ -1,5 +1,7 @@
 <?php
 
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+
 namespace Payplug\PayplugWoocommerce\Gateway;
 
 // Exit if accessed directly
@@ -7,6 +9,7 @@ use const OPENSSL_VERSION_TEXT;
 use const PHP_VERSION;
 use function sprintf;
 use function var_dump;
+use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,6 +26,19 @@ class PayplugGatewayRequirements {
 	 */
 	private $gateway;
 
+
+    /**
+     * @var PayplugPermissions
+     */
+	private $permissions;
+	
+	/**
+	 * Gateway settings.
+	 *
+	 * @var array
+	 */
+	protected $settings;
+
 	/**
 	 * PayplugGatewayRequirements constructor.
 	 *
@@ -30,6 +46,8 @@ class PayplugGatewayRequirements {
 	 */
 	public function __construct( PayplugGateway $gateway ) {
 		$this->gateway = $gateway;
+		$this->permissions = new PayplugPermissions($gateway);
+		$this->settings = get_option( 'woocommerce_payplug_settings', [] );
 	}
 
 	/**
@@ -93,6 +111,16 @@ class PayplugGatewayRequirements {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function oney_requirement() {
+		return ($this->valid_oney_check()) ? ($this->valid_oney() )
+			? '<p class="success">' . __( 'Oney is active on your store.', 'payplug' ) . '</p>'
+			: '<p class="failed-oney">' . __( 'Please fill in the GCSs relating to oney.', 'payplug' ) . '</p>' :
+			'';
+	}
+
+	/**
 	 * Check if CURL is available and support SSL
 	 *
 	 * @return bool
@@ -145,5 +173,24 @@ class PayplugGatewayRequirements {
 	 */
 	public function valid_account() {
 		return $this->gateway->user_logged_in();
+	}
+	
+
+	/**
+	 * Check if the user is in live mode and has activated oney
+	 *
+	 * @return bool
+	 */
+	public function valid_oney_check() {
+		return ("yes" === $this->settings['mode'] && "yes" === $this->settings['oney'] && $this->permissions->has_permissions(PayplugPermissions::USE_ONEY));
+	}
+
+	/**
+	 * Check if CGV checkbox is check
+	 *
+	 * @return bool
+	 */
+	public function valid_oney() {
+		return ("yes" === $this->settings['oneycgv']);
 	}
 }
