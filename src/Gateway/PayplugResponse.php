@@ -11,6 +11,7 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\IVerifiableAPIResource;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
+use WC_Payment_Tokens;
 use WC_Payment_Token_CC;
 
 /**
@@ -285,13 +286,32 @@ class PayplugResponse {
 
 		PayplugGateway::log( sprintf( 'Saving card from transaction %s for customer %s', wc_clean( $resource->id ), $customer->ID ) );
 
-		$token = new WC_Payment_Token_CC();
-		$token->set_token( wc_clean( $resource->card->id ) );
+        $token = new WC_Payment_Token_CC();
+        $existing_tokens = WC_Payment_Tokens::get_customer_tokens( $customer->ID , $this->gateway->id );
+        $set_token = wc_clean( $resource->card->id );
+        $set_last4 = wc_clean( $resource->card->last4 );
+        $set_expiry_year =  wc_clean( $resource->card->exp_year ) ;
+        $set_expiry_month = zeroise( (int) wc_clean( $resource->card->exp_month ), 2 ) ;
+        $set_card_type =  \strtolower( wc_clean( $resource->card->brand ) ) ;
+        if(!empty($existing_tokens)) {
+            foreach($existing_tokens as $token_id => $existing_token) {
+                $current_data = $existing_token->get_data();
+                if( $current_data['token'] === $set_token &&
+                    $current_data['last4'] === $set_last4 && 
+                    $current_data['expiry_year'] === $set_expiry_year && 
+                    $current_data['expiry_month'] === $set_expiry_month && 
+                    $current_data['card_type'] === $set_card_type) {
+                    $token->set_id($current_data['id']);
+                }
+            }
+        }
+        
+		$token->set_token( $set_token );
 		$token->set_gateway_id( 'payplug' );
-		$token->set_last4( wc_clean( $resource->card->last4 ) );
-		$token->set_expiry_year( wc_clean( $resource->card->exp_year ) );
-		$token->set_expiry_month( zeroise( (int) wc_clean( $resource->card->exp_month ), 2 ) );
-		$token->set_card_type( \strtolower( wc_clean( $resource->card->brand ) ) );
+		$token->set_last4( $set_last4 );
+		$token->set_expiry_year( $set_expiry_year );
+		$token->set_expiry_month( $set_expiry_month );
+		$token->set_card_type( $set_card_type );
 		$token->set_user_id( $customer->ID );
 		$token->add_meta_data( 'mode', $resource->is_live ? 'live' : 'test', true );
 		$token->add_meta_data( 'payplug_account', \wc_clean( $merchant_id ), true );

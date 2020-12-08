@@ -423,12 +423,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
         wp_enqueue_style('payplug-checkout');
 
-
-        // Register scripts for embedded payment form.
-        if ('embedded' !== $this->payment_method) {
-            return;
-        }
-
         wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
         wp_register_script('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [
             'jquery',
@@ -439,6 +433,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             'nonce'    => [
                 'checkout' => wp_create_nonce('woocommerce-process_checkout'),
             ],
+            'is_embedded' => 'redirect' !== $this->payment_method
         ]);
         wp_enqueue_script('payplug-checkout');
     }
@@ -883,8 +878,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'amount'           => $amount,
                 'currency'         => get_woocommerce_currency(),
                 'payment_method'   => $payment_token->get_token(),
+                'allow_save_card'  => false,
                 'billing'          => $address_data->get_billing(),
                 'shipping'         => $address_data->get_shipping(),
+                'initiator'        => 'PAYER',
+                'hosted_payment'   => [
+                    'return_url' => esc_url_raw($order->get_checkout_order_received_url()),
+                    'cancel_url' => esc_url_raw($order->get_cancel_order_url_raw()),
+                ],
                 'notification_url' => esc_url_raw(WC()->api_request_url('PayplugGateway')),
                 'metadata'         => [
                     'order_id'    => $order_id,
@@ -905,8 +906,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             PayplugGateway::log(sprintf('Payment process complete for order #%s', $order_id));
 
             return [
-                'result'   => 'success',
-                'redirect' => $order->get_checkout_order_received_url(),
+                'result'   => 'success',                
+                'redirect' => $payment->__get('hosted_payment')->payment_url,
             ];
         } catch (HttpException $e) {
             PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
