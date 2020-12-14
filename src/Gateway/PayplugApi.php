@@ -36,10 +36,14 @@ class PayplugApi {
 	 * Configure PayPlug client.
 	 */
 	public function init() {
-		$current_mode = $this->gateway->get_current_mode();
+		$current_mode = $this->gateway->get_current_mode(); 
 		$key          = $this->gateway->get_api_key( $current_mode );
 
-		Payplug::setSecretKey( $key );
+        Payplug::setSecretKey( $key );
+        Payplug::init(array(
+            'secretKey' => $key,
+            'apiVersion' => "2019-08-06",
+        ));
 		HttpClient::addDefaultUserAgentProduct(
 			'PayPlug-WooCommerce',
 			PAYPLUG_GATEWAY_VERSION,

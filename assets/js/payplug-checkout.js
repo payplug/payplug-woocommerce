@@ -24,7 +24,7 @@
             // Use standard checkout process if a payment token has been
             // choose by a user.
             if (payplug_checkout.isPaymentTokenSelected()) {
-                $("#place_order").prop('disabled', true);
+                payplug_checkout.$form.block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
                 //Prevent submit and stop all other listeners from being triggered.
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -32,8 +32,18 @@
                     payplug_checkout_params.ajax_url,
                     payplug_checkout.$form.serialize()
                 ).done(function (response) {
-                    $("#place_order").prop('disabled', false);
-                    Payplug.showPayment(response.redirect, true);
+                    if (response.result === "failure") {
+                        payplug_checkout.$form.unblock();
+                        var error_messages = response.messages || '';
+                        payplug_checkout.submit_error(error_messages);
+                        return;
+                    } 
+                    
+                    if(response.is_paid) {
+                        document.location.href = response.redirect;
+                    } else {
+                        Payplug.showPayment(response.redirect, true);
+                    }
                 });
                 return;
             }

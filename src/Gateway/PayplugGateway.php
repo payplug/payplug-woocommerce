@@ -182,7 +182,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return;
         }
 
-        $order = wc_get_order($order_id);
+        $order = wc_get_order($order_id); 
         if (!$order instanceof \WC_Order) {
             return;
         }
@@ -423,7 +423,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
         wp_enqueue_style('payplug-checkout');
 
-        wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
+        wp_register_script('payplug', 'https://api-qa.payplug.com/js/1/form.latest.js', [], null, true);
         wp_register_script('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [
             'jquery',
             'payplug'
@@ -907,7 +907,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
             return [
                 'result'   => 'success',                
-                'redirect' => $payment->__get('hosted_payment')->payment_url,
+                'is_paid'  => $payment->__get('is_paid'), // Use for path redirect before DSP2
+                'redirect' => ($payment->__get('is_paid')) ? $order->get_checkout_order_received_url() : $payment->__get('hosted_payment')->payment_url 
             ];
         } catch (HttpException $e) {
             PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
