@@ -41,9 +41,9 @@
                     
                     if(response.is_paid) {
                         document.location.href = response.redirect;
-                    } else {
-                        Payplug.showPayment(response.redirect, true);
+                        return;
                     }
+                    Payplug.showPayment(response.redirect, true);
                 });
                 return;
             }
