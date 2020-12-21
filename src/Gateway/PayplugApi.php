@@ -39,7 +39,6 @@ class PayplugApi {
 		$current_mode = $this->gateway->get_current_mode(); 
 		$key          = $this->gateway->get_api_key( $current_mode );
 
-        Payplug::setSecretKey( $key );
         Payplug::init(array(
             'secretKey' => $key,
             'apiVersion' => "2019-08-06",
