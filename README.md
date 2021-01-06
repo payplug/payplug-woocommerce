@@ -3,8 +3,6 @@
 PlayPlug is a French payment solution allowing small and medium e-commerce companies to accept online payments from Visa, MasterCard and CB cards. 
 
 ### What this product does for you ?
-PayPlug’s primary goal is to meet the specific needs of small and medium e-commerce companies :
-
 * Simple set up and management
 * Safety
 * Optimized conversion
@@ -26,7 +24,7 @@ PayPlug’s primary goal is to meet the specific needs of small and medium e-com
 * Real time updates on your transactions and possibility to send payment demands via SMS or email to recover sales
 * Transaction history and accounting records with one click, using the management interface
 * Personalized support, in your preferred language
-* Discover our [features](https://portal.payplug.com/features)
+* Discover our [features](https://payplug.com/features)
 * PayPlug offer several [plans](https://www.payplug.com/pricing) to suit your needs and business requirements. No set-up fees and no commitment ; you can change your offer whenever you want.
 
 ## Installation
