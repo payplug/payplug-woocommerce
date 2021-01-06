@@ -25,7 +25,7 @@ PlayPlug is a French payment solution allowing small and medium e-commerce compa
 * Transaction history and accounting records with one click, using the management interface
 * Personalized support, in your preferred language
 * Discover our [features](https://payplug.com/features)
-* PayPlug offer several [plans](https://www.payplug.com/pricing) to suit your needs and business requirements. No set-up fees and no commitment ; you can change your offer whenever you want.
+* PayPlug offer several [plans](https://www.payplug.com/pricing) to suit your needs and business requirements. No set-up fees and no commitment; you can change your offer whenever you want
 
 ## Installation
 
