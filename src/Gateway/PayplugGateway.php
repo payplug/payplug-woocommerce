@@ -383,6 +383,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             ]
         ];
         
+
         
         if ($this->user_logged_in()) {
             if ($this->permissions->has_permissions(PayplugPermissions::SAVE_CARD)) {
