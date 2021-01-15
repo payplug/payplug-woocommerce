@@ -129,6 +129,21 @@
 .payplug-lds-roller div:nth-child(7):after {top: 63px;left: 17px;}
 .payplug-lds-roller div:nth-child(8) {animation-delay: -0.288s;}
 .payplug-lds-roller div:nth-child(8):after {top: 56px;left: 12px;}
-@keyframes payplug-lds-roller {0% {transform: rotate(0deg);}100% {transform: rotate(360deg);}}
+@keyframes payplug-lds-roller {
+    0% {
+        -moz-transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        -ms-transform:rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -moz-transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        -ms-transform:rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
   
 
