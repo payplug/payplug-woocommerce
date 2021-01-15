@@ -3,8 +3,8 @@
 namespace Payplug\PayplugWoocommerce\Gateway;
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+if (!defined('ABSPATH')) {
+    exit;
 }
 
 use Payplug\Exception\NotFoundException;

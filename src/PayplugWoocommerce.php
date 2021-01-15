@@ -11,6 +11,7 @@ use Payplug\PayplugWoocommerce\Admin\Ajax;
 use Payplug\PayplugWoocommerce\Admin\Metabox;
 use Payplug\PayplugWoocommerce\Admin\Notices;
 use Payplug\PayplugWoocommerce\Admin\WoocommerceActions;
+use Payplug\PayplugWoocommerce\Front\PayplugOneyDetail;
 
 class PayplugWoocommerce {
 
@@ -104,6 +105,7 @@ class PayplugWoocommerce {
 		$this->actions  = new WoocommerceActions();
 		$this->requests = new PayplugWoocommerceRequest();
 		$this->ajax     = new Ajax();
+		new PayplugOneyDetail();
 
 		add_action( 'woocommerce_payment_gateways', [ $this, 'register_payplug_gateway' ] );
 		add_filter( 'plugin_action_links_' . PAYPLUG_GATEWAY_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
@@ -118,6 +120,8 @@ class PayplugWoocommerce {
 	 */
 	public function register_payplug_gateway( $methods ) {
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGateway';
+		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3x';
+		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4x';
 
 		return $methods;
 	}
