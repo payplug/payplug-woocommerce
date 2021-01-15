@@ -19,12 +19,12 @@ if (!defined('ABSPATH')) {
 class PayplugGatewayOney3x extends PayplugGateway
 {
 
-    const MIN_ONEY_PRICE = 100;
-    const MAX_ONEY_PRICE = 3000;
-    const ALLOWED_COUNTRY_CODES = ['FR', 'IT', 'GP', 'MQ', 'GF', 'RE', 'YT'];
     const MAX_PRODUCT_CART = 1000;
 
     protected $oney_response;
+    protected $min_oney_price;
+    protected $max_oney_price;
+    protected $allowed_country_codes;
 
     public function __construct()
     {
@@ -40,6 +40,12 @@ class PayplugGatewayOney3x extends PayplugGateway
         }
 
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'oney_refund_text']);
+
+        $http_response = Authentication::getAccount();
+        $oney_configuration = $http_response['httpResponse']['configuration']['oney'];
+        $this->min_oney_price = $oney_configuration['min_amounts']['EUR'];
+        $this->max_oney_price = $oney_configuration['max_amounts']['EUR'];
+        $this->allowed_country_codes = $oney_configuration['allowed_countries'];
     }
 
     /**
@@ -100,14 +106,14 @@ HTML;
         $total_price = floatval($cart->cart_contents_total);
         // Min and max
 
-        if ($total_price < self::MIN_ONEY_PRICE || $total_price > self::MAX_ONEY_PRICE) {
+        if ($total_price < $this->min_oney_price || $total_price > $this->max_oney_price) {
             $this->description = sprintf(__('Payments for this amount (%s) are not authorised with this payment gateway.', 'payplug'), $total_price);
             return false;
         }
 
         $nb_product = $cart->cart_contents_count;
         // Cart check
-        if ($nb_product > self::MAX_PRODUCT_CART) {
+        if (!in_array($country_code, $this->allowed_country_codes)) {
             $this->description = __('Cart size cannot be greater than 1000 with this payment gateway.', 'payplug');
             return false;
         }
@@ -133,7 +139,7 @@ HTML;
      */
     public function validate_order_amount($amount)
     {
-        if ($amount / 100 < self::MIN_ONEY_PRICE || $amount / 100 > self::MAX_ONEY_PRICE) {
+        if ($amount / 100 < $this->min_oney_price || $amount / 100 > $this->max_oney_price) {
             return new \WP_Error(
                 'invalid order amount',
                 sprintf(__('Payments for this amount (%s) are not authorised with this payment gateway.', 'payplug'), \wc_price($amount / 100))
@@ -267,7 +273,7 @@ HTML;
 
 
     /**
-     * Check if the gatteway is allowed for the order amount
+     * Check if the gatteway is allowed for the order amount 
      *
      * @param array
      * @return array
