@@ -103,6 +103,19 @@ class Ajax {
 		wp_send_json_success(
 			array(
 				'message' => __( 'Your API keys has successfully been updated.', 'payplug' )
+<<<<<<< HEAD
+=======
+			)
+		);
+	}
+
+	public function check_live_permissions() {
+		$account = Authentication::getAccount(new Payplug($_POST['livekey']));
+		$permissions = $account['httpResponse']['permissions'];
+		wp_send_json_success(
+			array(
+				'can_use_oney' => $permissions[PayplugPermissions::USE_ONEY]
+>>>>>>> 6904453... Commt évolution Oney
 			)
 		);
 	}

@@ -70,9 +70,12 @@ Based on a recent survey, 91% of merchants using PlayPlug would recommend the so
 
 == Changelog ==
 
+<<<<<<< HEAD
 = 1.1.0 =
 One click payments with 3D Secure validation to be compatible with new DSP2 requirements
 
+=======
+>>>>>>> 6904453... Commt évolution Oney
 = 1.0.22 =
 Update dependencies
 Tested up to WordPress 5.4
