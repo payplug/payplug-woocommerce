@@ -20,7 +20,8 @@
 }
 //Checkup list
 .success,
-.failed {
+.failed,
+.failed-oney {
     @include smoothText;
     position: relative;
     padding-left: 26px;
@@ -47,6 +48,13 @@
     &:before {
         content: "\f335";
         background-color: $textcolor;
+    }
+}
+.failed-oney {
+    color: $errorcolor;
+    &:before {
+        content: "\f335";
+        background-color: $errorcolor;
     }
 }
 //Radio Custom
