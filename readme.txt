@@ -50,7 +50,7 @@ PayPlug is the first online payment solution made specifically for small busines
 
 
 "Before contacting you, we were looking for simplicity, efficiency and speed in order to have secured payments. Now it's done!" - Guillaume Lombard, founder of Apiculture.net.
-"PayPlug is a convenient and very easy-to-use solution. Customer service is efficient and allows a privileged relationship with a highly available account manager.” - Ariane Phoumilay, founder of AyaNature
+"PayPlug is a convenient and very easy-to-use solution. Customer service is efficient and allows a privileged relationship with a highly available account manager." - Ariane Phoumilay, founder of AyaNature
 "We chose PayPlug because it is a simple solution created by a French start-up. Since we started using their solution, we've seen a 7% improvement in the conversion rate." - Jan Schutte, founder of Le Chemiseur
 “We especially value the simplicity of installation, the integrated payment page and the extremely intuitive interface” - Xavier Poitau, founder of Trenta-Axome.
 Based on a recent survey, 91% of merchants using PlayPlug would recommend the solution to another e-commerce website.
