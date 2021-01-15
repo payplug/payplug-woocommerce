@@ -15,11 +15,8 @@ class PayplugPermissions {
 	const OPTION_NAME = 'payplug_permission';
 	const LIVE_MODE = 'use_live_mode';
 	const SAVE_CARD = 'can_save_cards';
+	const USE_ONEY = 'can_use_oney';
 
-	/**
-	 * @var PayplugGateway
-	 */
-	private $gateway;
 
 	/**
 	 * The current mode for the gateway.
@@ -38,8 +35,7 @@ class PayplugPermissions {
 	 *
 	 * @param PayplugGateway $gateway
 	 */
-	public function __construct( PayplugGateway $gateway ) {
-		$this->gateway      = $gateway;
+	public function __construct( PayplugGateway $gateway) {
 		$this->gateway_mode = $gateway->get_current_mode();
 		$this->load_permissions();
 	}
@@ -81,7 +77,6 @@ class PayplugPermissions {
 	 * Load permissions for the current mode.
 	 */
 	protected function load_permissions() {
-
 		$payplug_permissions = get_transient( $this->get_key() );
 		if ( ! empty( $payplug_permissions ) ) {
 			$this->permissions = $payplug_permissions;
