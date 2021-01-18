@@ -3,6 +3,7 @@
 namespace Payplug\PayplugWoocommerce\Gateway;
 
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\Authentication;
 use libphonenumber\PhoneNumberType;
 use libphonenumber\PhoneNumberUtil;
 
