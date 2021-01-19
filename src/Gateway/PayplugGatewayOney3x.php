@@ -118,14 +118,14 @@ HTML;
 
         $nb_product = $cart->cart_contents_count;
         // Cart check
-        if (!in_array($country_code, $this->allowed_country_codes)) {
+        if ($nb_product > self::MAX_PRODUCT_CART) { 
             $this->description = __('Cart size cannot be greater than 1000 with this payment gateway.', 'payplug');
             return false;
         }
 
         // Country check
         $country_code = WC()->customer->get_shipping_country();
-        if (!in_array($country_code, self::ALLOWED_COUNTRY_CODES)) {
+        if (!in_array($country_code, $this->allowed_country_codes)) {
             $this->description = sprintf(__('Payments for this country (%s) are not authorised with this payment gateway.', 'payplug'), $country_code);
             return false;
         }
