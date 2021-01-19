@@ -111,6 +111,37 @@ class PayplugApi {
 	public function refund_create( $transaction_id, $data ) {
 		return $this->do_request_with_fallback( '\Payplug\Refund::create', [ $transaction_id, $data ] );
 	}
+	
+	/**
+     * Simulate a oney payment
+     *
+     * @return array
+     */
+    public function simulate_oney_payment($price)
+    {
+        $country = wc_get_base_location();
+        $response =  $this->do_request('\Payplug\OneySimulation::getSimulations', [[
+            "amount" => (int) $price * 100,
+            "country" => $country['country'],
+            "operations" => ["x3_with_fees", "x4_with_fees"]
+        ]]);
+
+
+        if (array_key_exists('x3_with_fees', $response)) {
+            $response['x3_with_fees']['down_payment_amount'] = floatval($response['x3_with_fees']['down_payment_amount']) / 100;
+            foreach ($response['x3_with_fees']['installments'] as $key => $value) {
+                $response['x3_with_fees']['installments'][$key]['amount'] = floatval($value['amount']) / 100;
+            }
+        }
+        if (array_key_exists('x4_with_fees', $response)) {
+            $response['x4_with_fees']['down_payment_amount'] = floatval($response['x4_with_fees']['down_payment_amount']) / 100;
+            foreach ($response['x4_with_fees']['installments'] as $key => $value) {
+                $response['x4_with_fees']['installments'][$key]['amount'] = floatval($value['amount']) / 100;
+            }
+        }
+
+        return $response;
+    }
 
 	/**
 	 * Invoke PayPlug API. If it fail it switch to the other mode and retry the same request.
