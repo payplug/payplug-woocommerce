@@ -42,11 +42,15 @@ class PayplugGatewayOney3x extends PayplugGateway
 
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'oney_refund_text']);
 
-        $http_response = Authentication::getAccount();
-        $oney_configuration = $http_response['httpResponse']['configuration']['oney'];
-        $this->min_oney_price = $oney_configuration['min_amounts']['EUR'];
-        $this->max_oney_price = $oney_configuration['max_amounts']['EUR'];
-        $this->allowed_country_codes = $oney_configuration['allowed_countries'];
+        try {
+            $http_response = Authentication::getAccount();
+            $oney_configuration = $http_response['httpResponse']['configuration']['oney'];
+            $this->min_oney_price = $oney_configuration['min_amounts']['EUR'];
+            $this->max_oney_price = $oney_configuration['max_amounts']['EUR'];
+            $this->allowed_country_codes = $oney_configuration['allowed_countries'];
+        } catch ( \Payplug\Exception\UnauthorizedException $e ) {
+        } catch ( \Payplug\Exception\ConfigurationNotSetException $e ) {
+        }
     }
 
     /**
