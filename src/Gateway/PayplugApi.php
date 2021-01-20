@@ -10,6 +10,7 @@ if (!defined('ABSPATH')) {
 use Payplug\Exception\NotFoundException;
 use Payplug\Payplug;
 use Payplug\Core\HttpClient;
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 /**
  * Handle calls to PayPlug PHP client.
@@ -103,7 +104,7 @@ class PayplugApi {
 	 *
 	 * @param string $transaction_id
 	 * @param array $data
-	 *
+	 * 
 	 * @return null|\Payplug\Resource\Refund
 	 * @throws \Payplug\Exception\ConfigurationException
 	 * @author Clément Boirie
@@ -120,26 +121,13 @@ class PayplugApi {
     public function simulate_oney_payment($price)
     {
         $country = wc_get_base_location();
+        $oney_fees = ["x3_with_fees", "x4_with_fees"];
         $response =  $this->do_request('\Payplug\OneySimulation::getSimulations', [[
             "amount" => (int) $price * 100,
             "country" => $country['country'],
-            "operations" => ["x3_with_fees", "x4_with_fees"]
+            "operations" => $oney_fees
         ]]);
-
-
-        if (array_key_exists('x3_with_fees', $response)) {
-            $response['x3_with_fees']['down_payment_amount'] = floatval($response['x3_with_fees']['down_payment_amount']) / 100;
-            foreach ($response['x3_with_fees']['installments'] as $key => $value) {
-                $response['x3_with_fees']['installments'][$key]['amount'] = floatval($value['amount']) / 100;
-            }
-        }
-        if (array_key_exists('x4_with_fees', $response)) {
-            $response['x4_with_fees']['down_payment_amount'] = floatval($response['x4_with_fees']['down_payment_amount']) / 100;
-            foreach ($response['x4_with_fees']['installments'] as $key => $value) {
-                $response['x4_with_fees']['installments'][$key]['amount'] = floatval($value['amount']) / 100;
-            }
-        }
-
+        PayplugWoocommerceHelper::oney_simulation_values($oney_fees, $response);
         return $response;
     }
 

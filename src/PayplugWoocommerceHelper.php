@@ -468,4 +468,20 @@ class PayplugWoocommerceHelper {
 		$account = self::get_account_data_from_options();
 		return ($account['httpResponse'] && $account['httpResponse']['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oney'] === "yes" && $account['oneycgv'] === "yes");
 	}
+
+	/**
+	 * Check and update value for oney simulation
+	 *
+	 * @return void
+	 */
+    public static function oney_simulation_values ($keys_array, &$array) {
+        foreach($keys_array as $key) {
+            if (array_key_exists($key, $array)) {
+                $array[$key]['down_payment_amount'] = floatval($array[$key]['down_payment_amount']) / 100;
+                foreach ($array[$key]['installments'] as $k => $value) {
+                    $array[$key]['installments'][$k]['amount'] = floatval($value['amount']) / 100;
+                }
+            }
+        }
+    }
 }
