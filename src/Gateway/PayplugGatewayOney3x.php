@@ -45,8 +45,8 @@ class PayplugGatewayOney3x extends PayplugGateway
         try {
             $http_response = Authentication::getAccount();
             $oney_configuration = $http_response['httpResponse']['configuration']['oney'];
-            $this->min_oney_price = $oney_configuration['min_amounts']['EUR'];
-            $this->max_oney_price = $oney_configuration['max_amounts']['EUR'];
+            $this->min_oney_price = $oney_configuration['min_amounts']['EUR']/100;
+            $this->max_oney_price = $oney_configuration['max_amounts']['EUR']/100;
             $this->allowed_country_codes = $oney_configuration['allowed_countries'];
         } catch ( \Payplug\Exception\UnauthorizedException $e ) {
         } catch ( \Payplug\Exception\ConfigurationNotSetException $e ) {
@@ -118,14 +118,14 @@ HTML;
 
         $nb_product = $cart->cart_contents_count;
         // Cart check
-        if (!in_array($country_code, $this->allowed_country_codes)) {
+        if ($nb_product > self::MAX_PRODUCT_CART) { 
             $this->description = __('Cart size cannot be greater than 1000 with this payment gateway.', 'payplug');
             return false;
         }
 
         // Country check
         $country_code = WC()->customer->get_shipping_country();
-        if (!in_array($country_code, self::ALLOWED_COUNTRY_CODES)) {
+        if (!in_array($country_code, $this->allowed_country_codes)) {
             $this->description = sprintf(__('Payments for this country (%s) are not authorised with this payment gateway.', 'payplug'), $country_code);
             return false;
         }
@@ -196,7 +196,7 @@ HTML;
                 $cart_items[] = [
                     'delivery_label' => 'storepickup',
                     'delivery_type' => 'storepickup',
-                    'brand' => '',
+                    'brand' => 'Woocommerce',
                     'merchant_item_id' => 'cart-'.$data['id'].'-'.$data['product_id'],
                     'name' => $data['name'],
                     'expected_delivery_date' => date('Y-m-d'),
