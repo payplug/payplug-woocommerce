@@ -196,7 +196,7 @@ HTML;
                 $cart_items[] = [
                     'delivery_label' => 'storepickup',
                     'delivery_type' => 'storepickup',
-                    'brand' => '',
+                    'brand' => 'Woocommerce',
                     'merchant_item_id' => 'cart-'.$data['id'].'-'.$data['product_id'],
                     'name' => $data['name'],
                     'expected_delivery_date' => date('Y-m-d'),
