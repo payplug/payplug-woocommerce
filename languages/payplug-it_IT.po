@@ -456,66 +456,74 @@ msgstr "https://www.payplug.com/"
 
 #. Payment Oney
 msgid "OR PAY IN"
-msgstr ""
+msgstr "O PAGARE IN"
 
 msgid "OR"
-msgstr ""
+msgstr "O"
 
 msgid "PAYMENT"
-msgstr ""
+msgstr "PAGAMENTO"
 
 msgid "BY CREDIT CARD"
-msgstr ""
+msgstr "CON CARTA DI CREDITO"
 
 msgid "Bring"
-msgstr ""
+msgstr "Apporto"
 
 msgid "monthly payment of"
-msgstr ""
+msgstr "mensilitàs"
 
 msgid "Of which financing cost"
-msgstr ""
+msgstr "Di cui costo di finanziamento"
 
 msgid "TAEG"
-msgstr ""
+msgstr "TAEG"
 
 msgid "PayPlug Oney 3x"
-msgstr ""
+msgstr "PayPlug Oney 3x"
+
+msgid "PayPlug Oney 4x"
+msgstr "PayPlug Oney 4x"
 
 msgid "Enable PayPlug Oney 3x for your customers."
-msgstr ""
+msgstr "Attiva PayPlug Oney 3x per i tuoi clienti."
+
+msgid "Enable PayPlug Oney 4x for your customers."
+msgstr "Attiva PayPlug Oney 4x per i tuoi clienti."
 
 msgid "Pay by card in 3x with Oney"
-msgstr ""
+msgstr "Paga con la carta in 3x con Oney"
 
 msgid "Pay by card in 4x with Oney"
-msgstr ""
+msgstr "Paga con la carta in 4x con Oney"
 
 msgid "1st monthly payment"
-msgstr ""
+msgstr "1° mensilità"
 
 msgid "2nd monthly payment"
-msgstr ""
+msgstr "2° mensilità"
 
-msgid "Cart size cannot be greater than 1000 with this payment gateway."
-msgstr ""
+msgid "3rd monthly payment"
+msgstr "3° mensilità"
+
+msgid "Cart size cannot be greater than 1000 with Oney."
+msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
 
 msgid ""
 "Refund will be possible 48 hours after the last payment or refund "
 "transaction."
 msgstr ""
+"Il rimborso sarà possibile 48 ore dopo l'ultima transazione di pagamento o "
+"rimborso."
 
-msgid "PayPlug Oney 4x"
-msgstr ""
+msgid "Payments for this country (%s) are not authorised with Oney."
+msgstr "I pagamenti per questo paese (%s) non sono autorizzati con Oney."
 
-msgid "Enable PayPlug Oney 4x for your customers."
-msgstr ""
+msgid "Mobile telephone number fullfilled is invalid. Please retry."
+msgstr "Il numero di cellulare inserito non è corretto. Riprova."
 
-msgid "Oney 4x"
-msgstr ""
-
-msgid "3rd monthly payment"
-msgstr ""
+msgid "Caracter '+' is invalid. Please change your email address."
+msgstr "Il carattere '+' non è valido. Per favore cambia il tuo indirizzo e-mail."
 
 msgid ""
 "Offre de financement avec apport obligatoire, réservée aux particuliers et "
