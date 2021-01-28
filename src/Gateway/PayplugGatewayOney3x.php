@@ -118,8 +118,8 @@ HTML;
 
         $nb_product = $cart->cart_contents_count;
         // Cart check
-        if ($nb_product > self::MAX_PRODUCT_CART) { 
-            $this->description = __('Cart size cannot be greater than 1000 with this payment gateway.', 'payplug');
+        if ($nb_product > self::MAX_PRODUCT_CART) {
+            $this->description = __('Cart size cannot be greater than 1000 with Oney.', 'payplug');
             return false;
         }
 
@@ -178,11 +178,11 @@ HTML;
             $phone_number_util = PhoneNumberUtil::getInstance();
             $phone_number      = $phone_number_util->parse( $phone, $country );
             if ( PhoneNumberType::MOBILE !== $phone_number_util->getNumberType( $phone_number ) ) {
-                throw new \Exception(__('Telephone number must be a mobile number. Please retry.', 'payplug'));
+                throw new \Exception(__('Mobile telephone number fullfilled is invalid. Please retry.', 'payplug'));
             }
             
             if (!filter_var($billing_email, FILTER_VALIDATE_EMAIL) || strpos($billing_email,'+') !== false) {
-                throw new \Exception(__('Invalid email address. Please retry.', 'payplug'));
+                throw new \Exception(__("Caracter '+' is invalid. Please change your email address.", 'payplug'));
             }
 
 
