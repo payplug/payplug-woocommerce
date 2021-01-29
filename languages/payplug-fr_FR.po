@@ -428,10 +428,6 @@ msgstr "PayPlug nécessite que WooCommerce soit installé pour fonctionner."
 msgid "Empty cart"
 msgstr "Votre panier est vide"
 
-#. Plugin Name of the plugin/theme
-msgid "PayPlug for WooCommerce (Official)"
-msgstr "PayPlug pour WooCommerce (Officiel)"
-
 #. Plugin URI of the plugin/theme
 msgid "https://www.payplug.com/modules/woocommerce"
 msgstr "https://www.payplug.com/fr/modules/woocommerce"
