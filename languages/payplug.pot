@@ -448,10 +448,6 @@ msgstr ""
 msgid "Empty cart"
 msgstr ""
 
-#. Plugin Name of the plugin/theme
-msgid "PayPlug pour WooCommerce (Officiel)"
-msgstr ""
-
 #. Plugin URI of the plugin/theme
 msgid "https://www.payplug.com/modules/woocommerce"
 msgstr ""
