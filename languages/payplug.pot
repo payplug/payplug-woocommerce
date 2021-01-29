@@ -465,3 +465,78 @@ msgstr ""
 #. Author URI of the plugin/theme
 msgid "https://www.payplug.com/"
 msgstr ""
+
+#. Payment Oney
+msgid "OR PAY IN"
+msgstr ""
+
+msgid "OR"
+msgstr ""
+
+msgid "PAYMENT"
+msgstr ""
+
+msgid "BY CREDIT CARD"
+msgstr ""
+
+msgid "Bring"
+msgstr ""
+
+msgid "monthly payment of"
+msgstr ""
+
+msgid "Of which financing cost"
+msgstr ""
+
+msgid "TAEG"
+msgstr ""
+
+msgid "PayPlug Oney 3x"
+msgstr ""
+
+msgid "PayPlug Oney 4x"
+msgstr ""
+
+msgid "Enable PayPlug Oney 3x for your customers."
+msgstr ""
+
+msgid "Enable PayPlug Oney 4x for your customers."
+msgstr ""
+
+msgid "Pay by card in 3x with Oney"
+msgstr ""
+
+msgid "Pay by card in 4x with Oney"
+msgstr ""
+
+msgid "1st monthly payment"
+msgstr ""
+
+msgid "2nd monthly payment"
+msgstr ""
+
+msgid "3rd monthly payment"
+msgstr ""
+
+msgid "Cart size cannot be greater than 1000 with Oney."
+msgstr ""
+
+msgid "Refund will be possible 48 hours after the last payment or refund transaction."
+msgstr ""
+
+msgid "Payments for this country (%s) are not authorised with Oney."
+msgstr ""
+
+msgid "Mobile telephone number fullfilled is invalid. Please retry."
+msgstr ""
+
+msgid "Caracter '+' is invalid. Please change your email address."
+msgstr ""
+
+msgid ""
+"Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout "
+"achat de %s€ à %s€. Sous réserve d'acceptation par Oney Bank. Vous disposez d'un délai de 14 "
+"jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de "
+"Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr "
+"Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr"
+msgstr ""
