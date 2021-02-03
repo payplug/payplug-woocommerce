@@ -289,11 +289,11 @@ msgstr "Password"
 
 #: src/Gateway/PayplugGateway.php:527
 msgid "Successfully logged out."
-msgstr "Sei disconnesso"
+msgstr "Sei disconnesso."
 
 #: src/Gateway/PayplugGateway.php:588
 msgid "Successfully logged in."
-msgstr "Connessione effettuata"
+msgstr "Connessione effettuata."
 
 #: src/Gateway/PayplugGateway.php:599
 msgid ""
@@ -316,15 +316,15 @@ msgstr ""
 msgid "Payment processing failed. Please retry."
 msgstr ""
 "Il tentativo di pagamento non è andato a buon fine. La invitiamo a provare "
-"nuovamente"
+"nuovamente."
 
 #: src/Gateway/PayplugGateway.php:758
 msgid "Invalid payment method."
-msgstr "Il metodo di pagamento non è valido"
+msgstr "Il metodo di pagamento non è valido."
 
 #: src/Gateway/PayplugGateway.php:831
 msgid "The order %s does not exist."
-msgstr "L'ordine %s non esiste"
+msgstr "L'ordine %s non esiste."
 
 #: src/Gateway/PayplugGateway.php:838
 msgid ""
@@ -429,10 +429,6 @@ msgstr "PayPlug per funzionare necessita l'installazione di WooCommerce"
 #: src/PayplugWoocommerceRequest.php:62
 msgid "Empty cart"
 msgstr "Il tuo carrello è vuoto"
-
-#. Plugin Name of the plugin/theme
-msgid "PayPlug pour WooCommerce (Officiel)"
-msgstr ""
 
 #. Plugin URI of the plugin/theme
 msgid "https://www.payplug.com/modules/woocommerce"

@@ -422,15 +422,11 @@ msgstr "PayPlug IPN OK | Transaction %s échouée : %s"
 
 #: src/PayplugWoocommerce.php:82
 msgid "PayPlug requires an active version of WooCommerce"
-msgstr "PayPlug nécessite que WooCommerce soit installé pour fonctionner."
+msgstr "PayPlug nécessite que WooCommerce soit installé pour fonctionner"
 
 #: src/PayplugWoocommerceRequest.php:62
 msgid "Empty cart"
 msgstr "Votre panier est vide"
-
-#. Plugin Name of the plugin/theme
-msgid "PayPlug for WooCommerce (Official)"
-msgstr "PayPlug pour WooCommerce (Officiel)"
 
 #. Plugin URI of the plugin/theme
 msgid "https://www.payplug.com/modules/woocommerce"
