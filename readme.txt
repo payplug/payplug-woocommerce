@@ -21,6 +21,8 @@ PayPlug’s primary goal is to meet the specific needs of small and medium e-com
 - Support
 
 
+
+
 Features
 
 Accept payments
