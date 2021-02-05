@@ -22,6 +22,8 @@ class PayplugGatewayOney3x extends PayplugGateway
 
     const MAX_PRODUCT_CART = 1000;
 
+    const ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED = 1;
+
     protected $oney_response;
     protected $min_oney_price;
     protected $max_oney_price;
@@ -127,7 +129,7 @@ HTML;
         $country_code = WC()->customer->get_shipping_country();
         if (!in_array($country_code, $this->allowed_country_codes)) {
             $this->description = sprintf(__('Payments for this country (%s) are not authorised with this payment gateway.', 'payplug'), $country_code);
-            return false;
+            return self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED;
         }
 
 
@@ -170,6 +172,9 @@ HTML;
         try {
             if (!$this->check_oney_is_available()) {
                 throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+            } elseif ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED) {
+                $country_code = WC()->customer->get_shipping_country();
+                throw new \Exception(sprintf(__('Payments for this country (%s) are not authorised with this payment gateway.', 'payplug'), $country_code));
             }
 
             $country = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();
