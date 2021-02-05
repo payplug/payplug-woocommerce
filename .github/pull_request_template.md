@@ -1,3 +1,1 @@
-- [ ] Finish my changes
-- [ ] Push my commits to GitHub
-- [ ] Open a pull request
+- [ ] Create a zip and test it
