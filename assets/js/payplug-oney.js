@@ -21,7 +21,7 @@
         showarrow = function () {
             var arrow = $("#oney-popup-arrow")
             arrow.position({
-                my: "left top-45",
+                my: "left top-30",
                 at: "right+10 bottom",
                 of: showpopup,
             })
