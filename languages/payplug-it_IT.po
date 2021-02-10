@@ -289,11 +289,11 @@ msgstr "Password"
 
 #: src/Gateway/PayplugGateway.php:527
 msgid "Successfully logged out."
-msgstr "Sei disconnesso"
+msgstr "Sei disconnesso."
 
 #: src/Gateway/PayplugGateway.php:588
 msgid "Successfully logged in."
-msgstr "Connessione effettuata"
+msgstr "Connessione effettuata."
 
 #: src/Gateway/PayplugGateway.php:599
 msgid ""
@@ -316,15 +316,15 @@ msgstr ""
 msgid "Payment processing failed. Please retry."
 msgstr ""
 "Il tentativo di pagamento non è andato a buon fine. La invitiamo a provare "
-"nuovamente"
+"nuovamente."
 
 #: src/Gateway/PayplugGateway.php:758
 msgid "Invalid payment method."
-msgstr "Il metodo di pagamento non è valido"
+msgstr "Il metodo di pagamento non è valido."
 
 #: src/Gateway/PayplugGateway.php:831
 msgid "The order %s does not exist."
-msgstr "L'ordine %s non esiste"
+msgstr "L'ordine %s non esiste."
 
 #: src/Gateway/PayplugGateway.php:838
 msgid ""
@@ -430,10 +430,6 @@ msgstr "PayPlug per funzionare necessita l'installazione di WooCommerce"
 msgid "Empty cart"
 msgstr "Il tuo carrello è vuoto"
 
-#. Plugin Name of the plugin/theme
-msgid "PayPlug pour WooCommerce (Officiel)"
-msgstr ""
-
 #. Plugin URI of the plugin/theme
 msgid "https://www.payplug.com/modules/woocommerce"
 msgstr "https://www.payplug.com/it/modules/woocommerce"
@@ -453,3 +449,89 @@ msgstr "PayPlug"
 #. Author URI of the plugin/theme
 msgid "https://www.payplug.com/"
 msgstr "https://www.payplug.com/"
+
+#. Payment Oney
+msgid "OR PAY IN"
+msgstr "O PAGARE IN"
+
+msgid "OR"
+msgstr "O"
+
+msgid "PAYMENT"
+msgstr "PAGAMENTO"
+
+msgid "BY CREDIT CARD"
+msgstr "CON CARTA DI CREDITO"
+
+msgid "Bring"
+msgstr "Apporto"
+
+msgid "monthly payment of"
+msgstr "mensilitàs"
+
+msgid "Of which financing cost"
+msgstr "Di cui costo di finanziamento"
+
+msgid "TAEG"
+msgstr "TAEG"
+
+msgid "PayPlug Oney 3x"
+msgstr "PayPlug Oney 3x"
+
+msgid "PayPlug Oney 4x"
+msgstr "PayPlug Oney 4x"
+
+msgid "Enable PayPlug Oney 3x for your customers."
+msgstr "Attiva PayPlug Oney 3x per i tuoi clienti."
+
+msgid "Enable PayPlug Oney 4x for your customers."
+msgstr "Attiva PayPlug Oney 4x per i tuoi clienti."
+
+msgid "Pay by card in 3x with Oney"
+msgstr "Paga con la carta in 3x con Oney"
+
+msgid "Pay by card in 4x with Oney"
+msgstr "Paga con la carta in 4x con Oney"
+
+msgid "1st monthly payment"
+msgstr "1° mensilità"
+
+msgid "2nd monthly payment"
+msgstr "2° mensilità"
+
+msgid "3rd monthly payment"
+msgstr "3° mensilità"
+
+msgid "Cart size cannot be greater than 1000 with Oney."
+msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
+
+msgid ""
+"Refund will be possible 48 hours after the last payment or refund "
+"transaction."
+msgstr ""
+"Il rimborso sarà possibile 48 ore dopo l'ultima transazione di pagamento o "
+"rimborso."
+
+msgid "Payments for this country (%s) are not authorised with Oney."
+msgstr "I pagamenti per questo paese (%s) non sono autorizzati con Oney."
+
+msgid "Mobile telephone number fullfilled is invalid. Please retry."
+msgstr "Il numero di cellulare inserito non è corretto. Riprova."
+
+msgid "Caracter '+' is invalid. Please change your email address."
+msgstr "Il carattere '+' non è valido. Per favore cambia il tuo indirizzo e-mail."
+
+msgid ""
+"Offre de financement avec apport obligatoire, réservée aux particuliers et "
+"valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par Oney "
+"Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre crédit. "
+"Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix -"
+" 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr "
+"Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr"
+msgstr ""
+"Offre de financement avec apport obligatoire, réservée aux particuliers et "
+"valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par Oney "
+"Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre crédit. "
+"Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix -"
+" 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr "
+"Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr"

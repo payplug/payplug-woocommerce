@@ -3,13 +3,14 @@
 namespace Payplug\PayplugWoocommerce\Gateway;
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+if (!defined('ABSPATH')) {
+    exit;
 }
 
 use Payplug\Exception\NotFoundException;
 use Payplug\Payplug;
 use Payplug\Core\HttpClient;
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 /**
  * Handle calls to PayPlug PHP client.
@@ -103,7 +104,7 @@ class PayplugApi {
 	 *
 	 * @param string $transaction_id
 	 * @param array $data
-	 *
+	 * 
 	 * @return null|\Payplug\Resource\Refund
 	 * @throws \Payplug\Exception\ConfigurationException
 	 * @author Clément Boirie
@@ -111,6 +112,24 @@ class PayplugApi {
 	public function refund_create( $transaction_id, $data ) {
 		return $this->do_request_with_fallback( '\Payplug\Refund::create', [ $transaction_id, $data ] );
 	}
+	
+	/**
+     * Simulate a oney payment
+     *
+     * @return array
+     */
+    public function simulate_oney_payment($price)
+    {
+        $country = wc_get_base_location();
+        $oney_fees = ["x3_with_fees", "x4_with_fees"];
+        $response =  $this->do_request('\Payplug\OneySimulation::getSimulations', [[
+            "amount" => (int) $price * 100,
+            "country" => $country['country'],
+            "operations" => $oney_fees
+        ]]);
+        PayplugWoocommerceHelper::oney_simulation_values($oney_fees, $response);
+        return $response;
+    }
 
 	/**
 	 * Invoke PayPlug API. If it fail it switch to the other mode and retry the same request.

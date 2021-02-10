@@ -13,6 +13,7 @@
  * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
  */
 
+
 namespace Payplug\PayplugWoocommerce;
 
 // Exit if accessed directly

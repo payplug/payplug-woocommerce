@@ -6,7 +6,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
 "woocommerce\n"
 "POT-Creation-Date: 2018-09-20 09:20:17+00:00\n"
-"PO-Revision-Date: 2020-09-24 12:45+0000\n"
+"PO-Revision-Date: 2020-11-09 09:08+0000\n"
 "Last-Translator: \n"
 "Language-Team: Français\n"
 "Language: fr_FR\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Loco https://localise.biz/\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Loco-Version: 2.4.3; wp-5.5.1"
+"X-Loco-Version: 2.4.4; wp-5.5.3"
 
 #: src/Admin/Metabox.php:51
 msgid "PayPlug payment details"
@@ -422,15 +422,11 @@ msgstr "PayPlug IPN OK | Transaction %s échouée : %s"
 
 #: src/PayplugWoocommerce.php:82
 msgid "PayPlug requires an active version of WooCommerce"
-msgstr "PayPlug nécessite que WooCommerce soit installé pour fonctionner."
+msgstr "PayPlug nécessite que WooCommerce soit installé pour fonctionner"
 
 #: src/PayplugWoocommerceRequest.php:62
 msgid "Empty cart"
 msgstr "Votre panier est vide"
-
-#. Plugin Name of the plugin/theme
-msgid "PayPlug pour WooCommerce (Officiel)"
-msgstr ""
 
 #. Plugin URI of the plugin/theme
 msgid "https://www.payplug.com/modules/woocommerce"
@@ -451,3 +447,88 @@ msgstr "PayPlug"
 #. Author URI of the plugin/theme
 msgid "https://www.payplug.com/"
 msgstr "https://www.payplug.com/"
+
+#. Payment Oney
+msgid "OR PAY IN"
+msgstr "OU PAYER EN"
+
+msgid "OR"
+msgstr "OU"
+
+msgid "PAYMENT"
+msgstr "PAIEMENT"
+
+msgid "BY CREDIT CARD"
+msgstr "PAR CARTE BANCAIRE"
+
+msgid "Bring"
+msgstr "Apport"
+
+msgid "monthly payment of"
+msgstr "mensualités de"
+
+msgid "Of which financing cost"
+msgstr "Dont coût de financement"
+
+msgid "TAEG"
+msgstr "TAEG"
+
+msgid "PayPlug Oney 3x"
+msgstr "PayPlug Oney 3x"
+
+msgid "PayPlug Oney 4x"
+msgstr "PayPlug Oney 4x"
+
+msgid "Enable PayPlug Oney 3x for your customers."
+msgstr "Activer PayPlug Oney 3x pour vos clients."
+
+msgid "Enable PayPlug Oney 4x for your customers."
+msgstr "Activer PayPlug Oney 4x pour vos clients."
+
+msgid "Pay by card in 3x with Oney"
+msgstr "Payer en 3x par carte bancaire avec Oney"
+
+msgid "Pay by card in 4x with Oney"
+msgstr "Payer en 4x par carte bancaire avec Oney"
+
+msgid "1st monthly payment"
+msgstr "1ère mensualité"
+
+msgid "2nd monthly payment"
+msgstr "2ème mensualité"
+
+msgid "3rd monthly payment"
+msgstr "3ème mensualité"
+
+msgid "Cart size cannot be greater than 1000 with Oney."
+msgstr "Votre panier ne peut contenir plus de 1000 articles avec Oney."
+
+msgid ""
+"Refund will be possible 48 hours after the last payment or refund "
+"transaction."
+msgstr "Le remboursement sera possible 48 heures après la dernière transaction de paiement ou de "
+"remboursement."
+
+msgid "Payments for this country (%s) are not authorised with Oney."
+msgstr "Les paiements pour ce pays (%s) ne sont pas autorisés avec Oney."
+
+msgid "Mobile telephone number fullfilled is invalid. Please retry."
+msgstr "Le numéro de téléphone mobile renseigné est incorrect. Veuillez réessayer."
+
+msgid "Caracter '+' is invalid. Please change your email address."
+msgstr "Le caractère '+' n'est pas valide. Merci de modifier votre adresse e-mail."
+
+msgid ""
+"Offre de financement avec apport obligatoire, réservée aux particuliers et "
+"valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par Oney "
+"Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre crédit. "
+"Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix -"
+" 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr "
+"Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr"
+msgstr ""
+"Offre de financement avec apport obligatoire, réservée aux particuliers et "
+"valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par Oney "
+"Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre crédit. "
+"Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix -"
+" 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr "
+"Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr"
