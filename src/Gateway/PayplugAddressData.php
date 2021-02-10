@@ -160,6 +160,9 @@ class PayplugAddressData {
 		$billing_city       = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_city : $order->get_billing_city();
 		$billing_country    = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();
         $billing_company    = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_company : $order->get_billing_company();
+		if (empty($billing_company)) {
+			$billing_company = $billing_first_name .' '. $billing_last_name;
+		}
 		if ( ! PayplugWoocommerceHelper::is_country_supported( $billing_country ) ) {
 			$billing_country = PayplugWoocommerceHelper::get_default_country();
 		}
