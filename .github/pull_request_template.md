@@ -1,1 +1,6 @@
-- [ ] Create a zip and test it
+- [ ] Generate payplug_woocommerce.zip
+- [ ] Install payplug_woocommerce.zip on your Woocommerce environment
+- [ ] Login to your newly installed PayPlug plugin
+- [ ] Validate a simple payment with PayPlug
+- [ ] Validate a refund partial/total with PayPlug
+
