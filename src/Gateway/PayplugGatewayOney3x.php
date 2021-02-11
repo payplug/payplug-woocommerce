@@ -19,21 +19,19 @@ if (!defined('ABSPATH')) {
  */
 class PayplugGatewayOney3x extends PayplugGateway
 {
-
-    const MAX_PRODUCT_CART = 1000;
-
-    const ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED = 1;
-    const ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH = 2;
+    const ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED = 2;
+    const ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH = 3;
 
     protected $oney_response;
     protected $min_oney_price;
     protected $max_oney_price;
     protected $allowed_country_codes;
+	protected $max_oney_qty;
 
     public function __construct()
     {
         parent::__construct();
-        $this->id                 = 'oney_x3_with_fees';
+        $this->id                 = ($this->check_oney_is_available === true)? 'oney_x3_with_fees ':'oney_x3_with_fees_disabled';
         $this->method_title       = _x('PayPlug Oney 3x', 'Gateway method title', 'payplug');
         $this->method_description = __('Enable PayPlug Oney 3x for your customers.', 'payplug');
         $this->title              = __('Pay by card in 3x with Oney', 'payplug');
@@ -51,6 +49,7 @@ class PayplugGatewayOney3x extends PayplugGateway
             $this->min_oney_price = $oney_configuration['min_amounts']['EUR']/100;
             $this->max_oney_price = $oney_configuration['max_amounts']['EUR']/100;
             $this->allowed_country_codes = $oney_configuration['allowed_countries'];
+			$this->max_oney_qty = PayplugWoocommerceHelper::get_max_qty_oney();
         } catch ( \Payplug\Exception\UnauthorizedException $e ) {
         } catch ( \Payplug\Exception\ConfigurationNotSetException $e ) {
         }
@@ -64,7 +63,7 @@ class PayplugGatewayOney3x extends PayplugGateway
     public function get_icon()
     {
 
-        if ($this->check_oney_is_available()) {
+        if ($this->check_oney_is_available() === true) {
             $total_price = floatval(WC()->cart->cart_contents_total);
             $this->oney_response = $this->api->simulate_oney_payment($total_price);
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
@@ -112,28 +111,26 @@ HTML;
 
         $cart = WC()->cart;
         $total_price = floatval($cart->cart_contents_total);
-        // Min and max
-
+		$products_qty = (int) $cart->cart_contents_count;
+        
+		// Min and max
         if ($total_price < $this->min_oney_price || $total_price > $this->max_oney_price) {
-            $this->description = sprintf(__('Payments for this amount (%s) are not authorised with this payment gateway.', 'payplug'), $total_price);
+            $this->description = sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->min_oney_price, $this->max_oney_price);
             return false;
         }
 
-        $nb_product = $cart->cart_contents_count;
         // Cart check
-        if ($nb_product > self::MAX_PRODUCT_CART) {
-            $this->description = __('Cart size cannot be greater than 1000 with Oney.', 'payplug');
+        if ($products_qty > $this->max_oney_qty) {
+            $this->description = __('The payment with Oney is unavailable because you have more than 1000 items in your cart.', 'payplug');
             return self::ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH;
         }
 
         // Country check
         $country_code = WC()->customer->get_shipping_country();
         if (!in_array($country_code, $this->allowed_country_codes)) {
-            $this->description = sprintf(__('Payments for this country (%s) are not authorised with this payment gateway.', 'payplug'), $country_code);
+            $this->description = __('Unavailable for the specified country.', 'payplug');
             return self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED;
         }
-
-
 
         return true;
     }
@@ -150,7 +147,7 @@ HTML;
         if ($amount / 100 < $this->min_oney_price || $amount / 100 > $this->max_oney_price) {
             return new \WP_Error(
                 'invalid order amount',
-                sprintf(__('Payments for this amount (%s) are not authorised with this payment gateway.', 'payplug'), \wc_price($amount / 100))
+                sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->min_oney_price, $this->max_oney_price)
             );
         }
 
@@ -167,17 +164,14 @@ HTML;
      */
     public function process_standard_payment($order, $amount, $customer_id)
     {
-
         $order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
-        //$order->get_items();
         try {
             if (!$this->check_oney_is_available()) {
                 throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
             } elseif ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED) {
                 $country_code = WC()->customer->get_shipping_country();
-                throw new \Exception(sprintf(__('Payments for this country (%s) are not authorised with this payment gateway.', 'payplug'), $country_code));
+                throw new \Exception(__('Unavailable for the specified country');
             } elseif ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH) {
-                $country_code = WC()->customer->get_shipping_country();
                 throw new \Exception(__('Cart size cannot be greater than 1000 with Oney.', 'payplug'));
             }
 
@@ -187,13 +181,12 @@ HTML;
             $phone_number_util = PhoneNumberUtil::getInstance();
             $phone_number      = $phone_number_util->parse( $phone, $country );
             if ( PhoneNumberType::MOBILE !== $phone_number_util->getNumberType( $phone_number ) ) {
-                throw new \Exception(__('Mobile telephone number fullfilled is invalid. Please retry.', 'payplug'));
+                throw new \Exception(__('Mobile phone number fullfilled is invalid. Please retry.', 'payplug'));
             }
             
             if (!filter_var($billing_email, FILTER_VALIDATE_EMAIL) || strpos($billing_email,'+') !== false) {
-                throw new \Exception(__("Caracter '+' is invalid. Please change your email address.", 'payplug'));
+                throw new \Exception(__("Character '+' is invalid. Please update your email address for another one (100 characters maximum).", 'payplug'));
             }
-
 
             $address_data = PayplugAddressData::from_order($order);
 
