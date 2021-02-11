@@ -458,6 +458,16 @@ class PayplugWoocommerceHelper {
 			'max' => floatval($account['httpResponse']['configuration']['oney']['max_amounts']['EUR'])/100
 		];
 	}
+	
+	/**
+	 * Get max qty allowed for oney payment
+	 *
+	 * @return array
+	 */
+	public static function get_max_qty_oney() {
+		$account = self::get_account_data_from_options();
+		return 1000;
+	}
 
 	/**
 	 * Check if oney is available with current settings

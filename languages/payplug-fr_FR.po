@@ -5,8 +5,8 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
 "woocommerce\n"
-"POT-Creation-Date: 2018-09-20 09:20:17+00:00\n"
-"PO-Revision-Date: 2020-11-09 09:08+0000\n"
+"POT-Creation-Date: 2021-02-11 08:06+0000\n"
+"PO-Revision-Date: 2021-02-11 08:07+0000\n"
 "Last-Translator: \n"
 "Language-Team: Français\n"
 "Language: fr_FR\n"
@@ -15,7 +15,54 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Loco https://localise.biz/\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Loco-Version: 2.4.4; wp-5.5.3"
+"X-Loco-Version: 2.4.3; wp-5.5.3"
+
+#: src/PayplugWoocommerce.php:91
+msgid "PayPlug requires an active version of WooCommerce"
+msgstr "PayPlug nécessite que WooCommerce soit installé pour fonctionner"
+
+#: src/PayplugWoocommerce.php:138 src/Gateway/PayplugGateway.php:331
+msgid "Settings"
+msgstr "Réglages"
+
+#: src/PayplugWoocommerceRequest.php:62
+msgid "Empty cart"
+msgstr "Votre panier est vide"
+
+#: src/Admin/Ajax.php:40
+msgid "Invalid request."
+msgstr ""
+
+#: src/Admin/Ajax.php:49
+msgid "Invalid nonce."
+msgstr ""
+
+#: src/Admin/Ajax.php:60 src/Admin/Ajax.php:69
+#: src/Admin/WoocommerceActions.php:74
+msgid ""
+"An error occured with PayPlug gateway. Please make sure PayPlug settings are "
+"correct."
+msgstr ""
+"Une erreur est survenue avec PayPlug. Veuillez-vous assurer que le portail "
+"PayPlug est bien configuré."
+
+#: src/Admin/Ajax.php:90 src/Gateway/PayplugGateway.php:765
+msgid ""
+"Your account does not support LIVE mode at the moment, it must be validated "
+"first. If your account has already been validated, please log out and log in "
+"again."
+msgstr ""
+"Votre compte ne supporte pas le mode LIVE actuellement, il doit d'abord être "
+"validé. Si votre compte a déjà été validé, veuillez vous déconnecter et vous "
+"connecter à nouveau."
+
+#: src/Admin/Ajax.php:98
+msgid "Something went wrong."
+msgstr ""
+
+#: src/Admin/Ajax.php:105
+msgid "Your API keys has successfully been updated."
+msgstr ""
 
 #: src/Admin/Metabox.php:51
 msgid "PayPlug payment details"
@@ -57,7 +104,7 @@ msgstr "Montant"
 msgid "Paid at"
 msgstr "Payé le"
 
-#: src/Admin/Metabox.php:91
+#: src/Admin/Metabox.php:91 src/Gateway/PayplugGateway.php:164
 msgid "Credit card"
 msgstr "Carte de paiement"
 
@@ -81,7 +128,7 @@ msgstr "Non"
 msgid "Expiration date"
 msgstr "Date d'expiration"
 
-#: src/Admin/Metabox.php:103 src/Gateway/PayplugGateway.php:238
+#: src/Admin/Metabox.php:103 src/Gateway/PayplugGateway.php:317
 msgid "Mode"
 msgstr "Mode"
 
@@ -93,23 +140,43 @@ msgstr "Live"
 msgid "Test"
 msgstr "Test"
 
-#: src/Admin/Notices.php:147
+#: src/Admin/WoocommerceActions.php:40
+msgid "Update PayPlug transaction data"
+msgstr "Mettre à jour les informations de la transaction PayPlug"
+
+#: src/Admin/WoocommerceActions.php:63
+msgid "No transaction ID was found for this order."
+msgstr "Aucun ID de transaction ne correspond à cette commande."
+
+#: src/Admin/WoocommerceActions.php:89
+msgid "An error occurred while collecting payment information from PayPlug."
+msgstr ""
+"Une erreur est survenue lors de la récupération des données de paiement "
+"depuis PayPlug."
+
+#: src/Admin/WoocommerceActions.php:109
+msgid "An error occurred while collecting refund information from PayPlug."
+msgstr ""
+"Une erreur est survenue lors de la récupération des données de remboursement "
+"depuis PayPlug."
+
+#: src/Admin/Notices.php:90
 msgid "Thank you for installing PayPlug as your online payment solution."
 msgstr "Merci d'avoir installé PayPlug, votre solution de paiement en ligne."
 
-#: src/Admin/Notices.php:149
+#: src/Admin/Notices.php:92
 msgid "Only one step left to activate the plugin on your site !"
 msgstr "Il reste un pas pour activer le module sur votre site !"
 
-#: src/Admin/Notices.php:152 src/Gateway/PayplugGateway.php:493
+#: src/Admin/Notices.php:95 src/Gateway/PayplugGateway.php:639
 msgid "Login"
 msgstr "Connectez-vous"
 
-#: src/Admin/Notices.php:163
+#: src/Admin/Notices.php:106
 msgid "PayPlug is in TEST mode"
 msgstr "PayPlug est en mode TEST"
 
-#: src/Admin/Notices.php:164
+#: src/Admin/Notices.php:107
 msgid ""
 "Once your PayPlug account has been validated, please log out and log in "
 "again from the configuration page in order to activate LIVE mode."
@@ -118,7 +185,7 @@ msgstr ""
 "connecter à nouveau depuis la page de configuration afin de pouvoir activer "
 "le mode LIVE."
 
-#: src/Admin/Notices.php:170
+#: src/Admin/Notices.php:113
 msgid ""
 "Payments in TEST mode will be simulations and will not generate real "
 "transactions."
@@ -126,52 +193,127 @@ msgstr ""
 "En mode TEST, tous les paiements sont des simulations et ne génèreront pas "
 "de transactions réelles."
 
-#: src/Admin/WoocommerceActions.php:49
-msgid "Update PayPlug transaction data"
-msgstr "Mettre à jour les informations de la transaction PayPlug"
+#: src/Gateway/PayplugGatewayRequirements.php:71
+msgid "The PHP cURL extension is installed and activated on your server."
+msgstr "L'extension PHP cURL est installée et activée."
 
-#: src/Admin/WoocommerceActions.php:77
-msgid "No transaction ID was found for this order."
-msgstr "Aucun ID de transaction ne correspond à cette commande."
+#: src/Gateway/PayplugGatewayRequirements.php:72
+msgid "The PHP cURL extension must be installed and activated on your server."
+msgstr "L'extension PHP cURL doit être installée et activée."
 
-#: src/Admin/WoocommerceActions.php:91
+#: src/Gateway/PayplugGatewayRequirements.php:80
+msgid "The PHP version on your server is valid."
+msgstr "La version PHP de votre serveur est compatible avec l'extension."
+
+#. %s: minimum required PHP version
+#: src/Gateway/PayplugGatewayRequirements.php:82
+#, php-format
 msgid ""
-"An error occured with PayPlug gateway. Please make sure PayPlug settings are "
-"correct."
+"The PHP version on your server is not supported. Your server must run PHP %s "
+"or greater."
 msgstr ""
-"Une erreur est survenue avec PayPlug. Veuillez-vous assurer que le portail "
-"PayPlug est bien configuré."
+"La version PHP de votre serveur n'est pas compatible avec l'extension. Votre "
+"serveur doit utiliser PHP %s ou supérieur."
 
-#: src/Admin/WoocommerceActions.php:112
-msgid "An error occurred while collecting payment information from PayPlug."
+#: src/Gateway/PayplugGatewayRequirements.php:90
+msgid "OpenSSL is up to date."
+msgstr "OpenSSL est à jour."
+
+#. %s: minimum required OpenSSL version
+#: src/Gateway/PayplugGatewayRequirements.php:92
+#, php-format
+msgid "OpenSSL is not up to date. Please update to OpenSSL %s or later."
 msgstr ""
-"Une erreur est survenue lors de la récupération des données de paiement "
-"depuis PayPlug."
+"OpenSSL n'est pas à jour. Vous devez le mettre à jour avec la version %s ou "
+"supérieure."
 
-#: src/Admin/WoocommerceActions.php:140
-msgid "An error occurred while collecting refund information from PayPlug."
+#: src/Gateway/PayplugGatewayRequirements.php:100
+msgid "Your shop currency has been set up with Euro."
+msgstr "Votre boutique utilise l'euro comme monnaie de paiement."
+
+#: src/Gateway/PayplugGatewayRequirements.php:101
+msgid "Your shop currency must be set up with Euro."
+msgstr "Votre boutique doit utiliser l'euro comme monnaie de paiement."
+
+#: src/Gateway/PayplugGatewayRequirements.php:109
+msgid "You are logged in with your PayPlug account."
+msgstr "Votre compte PayPlug est connecté."
+
+#: src/Gateway/PayplugGatewayRequirements.php:110
+msgid "You must be logged in with your PayPlug account."
+msgstr "Votre compte PayPlug doit-être connecté."
+
+#: src/Gateway/PayplugGatewayRequirements.php:118
+msgid "Oney is active on your store."
 msgstr ""
-"Une erreur est survenue lors de la récupération des données de remboursement "
-"depuis PayPlug."
 
-#: src/Gateway/PayplugGateway.php:77
+#: src/Gateway/PayplugGatewayRequirements.php:119
+msgid "Please fill in the GCSs relating to oney."
+msgstr ""
+
+#: src/Gateway/PayplugGatewayOney4x.php:22
+#, fuzzy
+msgctxt "Gateway method title"
+msgid "PayPlug Oney 4x"
+msgstr "PayPlug Oney 4x"
+
+#: src/Gateway/PayplugGatewayOney4x.php:23
+msgid "Enable PayPlug Oney 4x for your customers."
+msgstr "Activer PayPlug Oney 4x pour vos clients."
+
+#: src/Gateway/PayplugGatewayOney4x.php:24
+msgid "Pay by card in 4x with Oney"
+msgstr "Payer en 4x par carte bancaire avec Oney"
+
+#: src/Gateway/PayplugGatewayOney4x.php:43
+#: src/Gateway/PayplugGatewayOney3x.php:76 src/Front/PayplugOneyDetail.php:96
+#: src/Front/PayplugOneyDetail.php:106
+msgid "Bring"
+msgstr "Apport"
+
+#: src/Gateway/PayplugGatewayOney4x.php:47
+#: src/Gateway/PayplugGatewayOney3x.php:80
+msgid "1st monthly payment"
+msgstr "1ère mensualité"
+
+#: src/Gateway/PayplugGatewayOney4x.php:51
+#: src/Gateway/PayplugGatewayOney3x.php:84
+msgid "2nd monthly payment"
+msgstr "2ème mensualité"
+
+#: src/Gateway/PayplugGatewayOney4x.php:55
+msgid "3rd monthly payment"
+msgstr "3ème mensualité"
+
+#: src/Gateway/PayplugResponse.php:75
+#, php-format
+msgid "PayPlug IPN OK | Transaction %s"
+msgstr "PayPlug IPN OK | Transaction %s"
+
+#: src/Gateway/PayplugResponse.php:97
+#, php-format
+msgid "PayPlug IPN OK | Transaction %s failed : %s"
+msgstr "PayPlug IPN OK | Transaction %s échouée : %s"
+
+#: src/Gateway/PayplugResponse.php:177 src/Gateway/PayplugGateway.php:1046
+#, php-format
+msgid "Refund %s : Refunded %s"
+msgstr "Remboursement %s : Montant remboursé %s"
+
+#: src/Gateway/PayplugGateway.php:97
 msgctxt "Gateway method title"
 msgid "PayPlug"
 msgstr "PayPlug"
 
-#: src/Gateway/PayplugGateway.php:78
+#: src/Gateway/PayplugGateway.php:98
 msgid "Enable PayPlug for your customers."
 msgstr "Permettez à vos clients de payer avec PayPlug."
 
-#: src/Gateway/PayplugGateway.php:84
+#: src/Gateway/PayplugGateway.php:104
 msgid "Pay with another credit card"
 msgstr "Payer avec une autre carte de credit"
 
-#: src/Gateway/PayplugGateway.php:93
-msgid "Credit card checkout"
-msgstr "Payer par carte bancaire"
-
-#: src/Gateway/PayplugGateway.php:105
+#: src/Gateway/PayplugGateway.php:133
 msgid ""
 "You are in TEST MODE. In test mode you can use the card 4242424242424242 "
 "with any valid expiration date and CVC."
@@ -179,25 +321,47 @@ msgstr ""
 "Vous êtes en mode TEST. En mode test, vous pouvez utiliser la carte "
 "4242424242424242 avec une date d'expiration et un CVV de votre choix."
 
-#: src/Gateway/PayplugGateway.php:207
+#: src/Gateway/PayplugGateway.php:272
 msgid "Enable/Disable"
 msgstr "Activer/Désactiver"
 
-#: src/Gateway/PayplugGateway.php:209
+#: src/Gateway/PayplugGateway.php:274
 msgid "Enable PayPlug"
 msgstr "Activer PayPlug"
 
-#: src/Gateway/PayplugGateway.php:210
+#: src/Gateway/PayplugGateway.php:275
 msgid "Only Euro payments can be processed with PayPlug."
 msgstr ""
 "La passerelle de paiement PayPlug ne peut être activée que pour des "
 "paiements en euros."
 
-#: src/Gateway/PayplugGateway.php:214 src/Gateway/PayplugGateway.php:463
+#: src/Gateway/PayplugGateway.php:279
+msgid "Title"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:281
+msgid "The payment solution title displayed during checkout."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:282
+#, fuzzy
+msgctxt "Default gateway title"
+msgid "Credit card checkout"
+msgstr "Payer par carte bancaire"
+
+#: src/Gateway/PayplugGateway.php:286
+msgid "Description"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:288
+msgid "The payment solution description displayed during checkout."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:293 src/Gateway/PayplugGateway.php:611
 msgid "Connection"
 msgstr "Connexion"
 
-#: src/Gateway/PayplugGateway.php:247
+#: src/Gateway/PayplugGateway.php:326
 msgid ""
 "In TEST mode, all payments will be simulations and will not generate real "
 "transactions."
@@ -205,15 +369,11 @@ msgstr ""
 "En mode TEST, tous les paiements sont des simulations et ne génèreront pas "
 "de transactions réelles."
 
-#: src/Gateway/PayplugGateway.php:252 src/PayplugWoocommerce.php:121
-msgid "Settings"
-msgstr "Réglages"
-
-#: src/Gateway/PayplugGateway.php:256
+#: src/Gateway/PayplugGateway.php:335
 msgid "Payment page"
 msgstr "Page de paiement"
 
-#: src/Gateway/PayplugGateway.php:258
+#: src/Gateway/PayplugGateway.php:337
 msgid ""
 "Customers will be redirected to a PayPlug payment page to finalize the "
 "transaction, or payments will be performed in an embeddable payment form on "
@@ -223,19 +383,19 @@ msgstr ""
 "ou pourrons effectuer le paiement dans un formulaire intégré dans votre "
 "boutique."
 
-#: src/Gateway/PayplugGateway.php:262
+#: src/Gateway/PayplugGateway.php:341
 msgid "Redirect"
 msgstr "Redirigée"
 
-#: src/Gateway/PayplugGateway.php:263
+#: src/Gateway/PayplugGateway.php:342
 msgid "Integrated"
 msgstr "Intégrée"
 
-#: src/Gateway/PayplugGateway.php:267
+#: src/Gateway/PayplugGateway.php:346
 msgid "Debug"
 msgstr "Debug"
 
-#: src/Gateway/PayplugGateway.php:269
+#: src/Gateway/PayplugGateway.php:348
 msgid ""
 "Debug mode saves additional information on your server for each operation "
 "done via the PayPlug plugin (Developer setting)."
@@ -244,33 +404,30 @@ msgstr ""
 "votre serveur pour chaque opération effectuée via le module PayPlug (Option "
 "pour développeur)."
 
-#: src/Gateway/PayplugGateway.php:270
+#: src/Gateway/PayplugGateway.php:349
 msgid "Activate debug mode"
 msgstr "Activer le mode debug"
 
-#: src/Gateway/PayplugGateway.php:275
+#: src/Gateway/PayplugGateway.php:354
 msgid "Advanced Settings"
 msgstr "Réglages avancés"
 
-#: src/Gateway/PayplugGateway.php:276
+#: src/Gateway/PayplugGateway.php:355
 msgid ""
 "Your current offer does not allow this option. Try it on TEST mode. More "
 "information <a href=\"https://www.payplug.com/pricing\" target=\"_blank\">"
 "here.</a>"
 msgstr ""
-"Votre offre actuelle ne vous permet pas d’utiliser cette option. Essayez-la "
-"en mode TEST. Plus d’information <a href=\"https://www.payplug."
-"com/fr/tarifs\" target=\"blank\">ici</a>"
 
-#: src/Gateway/PayplugGateway.php:281
+#: src/Gateway/PayplugGateway.php:362
 msgid "One Click Payment"
 msgstr "Paiement en un clic"
 
-#: src/Gateway/PayplugGateway.php:283
+#: src/Gateway/PayplugGateway.php:364 src/Gateway/PayplugGateway.php:372
 msgid "Activate"
 msgstr "Activer"
 
-#: src/Gateway/PayplugGateway.php:284
+#: src/Gateway/PayplugGateway.php:365 src/Gateway/PayplugGateway.php:374
 msgid ""
 "Allow your customers to save their credit card information for later "
 "purchases."
@@ -278,56 +435,98 @@ msgstr ""
 "Permettez à vos clients d'enregistrer leurs coordonnées de carte de paiement "
 "pour effectuer ultérieurement d'autres transactions."
 
-#: src/Gateway/PayplugGateway.php:468 src/Gateway/PayplugGateway.php:472
+#: src/Gateway/PayplugGateway.php:370
+msgid "Split Oney Payment"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:380
+msgid " I have integrated the Oney legal notices into the GCSs of my site"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:556 src/Gateway/PayplugGateway.php:570
+msgctxt "modal"
+msgid "Ok"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:557
+msgctxt "modal"
+msgid "Cancel"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:558
+msgctxt "modal"
+msgid "Something went wrong. Please refresh the page and retry."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:576 src/Gateway/PayplugGateway.php:649
+msgctxt "modal"
+msgid "Mode LIVE"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:579
+msgctxt "modal"
+msgid "Please enter your PayPlug account password"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:580
+msgctxt "modal"
+msgid "Enter your PayPlug account password"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:616 src/Gateway/PayplugGateway.php:620
 msgid "Email"
 msgstr "Adresse mail"
 
-#: src/Gateway/PayplugGateway.php:474
+#: src/Gateway/PayplugGateway.php:621
 msgid "your@email.com"
 msgstr "votre@email.com"
 
-#: src/Gateway/PayplugGateway.php:480 src/Gateway/PayplugGateway.php:484
+#: src/Gateway/PayplugGateway.php:627 src/Gateway/PayplugGateway.php:631
 msgid "Password"
 msgstr "Mot de passe"
 
-#: src/Gateway/PayplugGateway.php:527
+#: src/Gateway/PayplugGateway.php:651
+msgctxt "modal"
+msgid ""
+"Attention, pour utiliser la méthode de paiement Oney en mode LIVE merci de "
+"nous contacter à"
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:691
 msgid "Successfully logged out."
 msgstr "Vous avez été déconnecté."
 
-#: src/Gateway/PayplugGateway.php:588
+#: src/Gateway/PayplugGateway.php:754
 msgid "Successfully logged in."
 msgstr "Vous êtes connecté."
 
-#: src/Gateway/PayplugGateway.php:599
-msgid ""
-"Your account does not support LIVE mode at the moment, it must be validated "
-"first. If your account has already been validated, please log out and log in "
-"again."
-msgstr ""
-"Votre compte ne supporte pas le mode LIVE actuellement, il doit d'abord être "
-"validé. Si votre compte a déjà été validé, veuillez vous déconnecter et vous "
-"connecter à nouveau."
-
-#: src/Gateway/PayplugGateway.php:610
+#: src/Gateway/PayplugGateway.php:777
 msgid "Only PREMIUM accounts can enable the One Click option in LIVE mode."
 msgstr ""
 "Seuls les comptes PREMIUM peuvent utiliser la fonctionnalité One Click en "
 "mode LIVE."
 
-#: src/Gateway/PayplugGateway.php:735 src/Gateway/PayplugGateway.php:738
-#: src/Gateway/PayplugGateway.php:807 src/Gateway/PayplugGateway.php:810
+#: src/Gateway/PayplugGateway.php:892 src/Gateway/PayplugGateway.php:895
+#: src/Gateway/PayplugGateway.php:959 src/Gateway/PayplugGateway.php:962
+#: src/Gateway/PayplugGatewayOney3x.php:170
 msgid "Payment processing failed. Please retry."
 msgstr "Le traitement du paiement a échoué. Merci de réessayer."
 
-#: src/Gateway/PayplugGateway.php:758
+#: src/Gateway/PayplugGateway.php:915
 msgid "Invalid payment method."
 msgstr "Méthode de paiement invalide."
 
-#: src/Gateway/PayplugGateway.php:831
+#: src/Gateway/PayplugGateway.php:983
+#, php-format
 msgid "The order %s does not exist."
 msgstr "La commande %s n'existe pas."
 
-#: src/Gateway/PayplugGateway.php:838
+#: src/Gateway/PayplugGateway.php:989
+#, php-format
+msgid "The order %s cannot be refund."
+msgstr ""
+
+#: src/Gateway/PayplugGateway.php:996
 msgid ""
 "No PayPlug transaction was found for this order. The refund could not be "
 "processed."
@@ -335,104 +534,146 @@ msgstr ""
 "Aucune transaction PayPlug ne correspond à cette commande. Aucun "
 "remboursement n'a été effectué."
 
-#: src/Gateway/PayplugGateway.php:887 src/Gateway/PayplugResponse.php:158
-msgid "Refund %s : Refunded %s"
-msgstr "Remboursement %s : Montant remboursé %s"
-
-#: src/Gateway/PayplugGateway.php:906 src/Gateway/PayplugGateway.php:910
+#: src/Gateway/PayplugGateway.php:1065 src/Gateway/PayplugGateway.php:1069
 msgid "The transaction could not be refunded. Please try again."
 msgstr "Le remboursement a échoué. Veuillez réessayer ultérieurement."
 
-#: src/Gateway/PayplugGateway.php:946
+#: src/Gateway/PayplugGateway.php:1088 src/Front/PayplugOneyDetail.php:116
+#, php-format
 msgid ""
 "Payments for this amount (%s) are not authorised with this payment gateway."
 msgstr "Le montant total (%s) n'entre pas dans l'intervalle autorisé."
 
-#: src/Gateway/PayplugGateway.php:975
+#: src/Gateway/PayplugGateway.php:1119
 msgid "Please fill all login fields"
 msgstr "Merci de remplir tous les champs de connexion"
 
-#: src/Gateway/PayplugGateway.php:981 src/Gateway/PayplugGateway.php:986
+#: src/Gateway/PayplugGateway.php:1125 src/Gateway/PayplugGateway.php:1130
 msgid "Invalid credentials."
 msgstr "Vos identifiants sont invalides."
 
-#: src/Gateway/PayplugGateway.php:1207
+#: src/Gateway/PayplugGateway.php:1332
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: src/Gateway/PayplugGateway.php:1211
+#: src/Gateway/PayplugGateway.php:1336
 msgid "Go to your PayPlug Portal"
 msgstr "Accéder à mon portail PayPlug"
 
-#: src/Gateway/PayplugGatewayRequirements.php:53
-msgid "The PHP cURL extension is installed and activated on your server."
-msgstr "L'extension PHP cURL est installée et activée."
+#: src/Gateway/PayplugGatewayOney3x.php:35
+#, fuzzy
+msgctxt "Gateway method title"
+msgid "PayPlug Oney 3x"
+msgstr "PayPlug Oney 3x"
 
-#: src/Gateway/PayplugGatewayRequirements.php:54
-msgid "The PHP cURL extension must be installed and activated on your server."
-msgstr "L'extension PHP cURL doit être installée et activée."
+#: src/Gateway/PayplugGatewayOney3x.php:36
+msgid "Enable PayPlug Oney 3x for your customers."
+msgstr "Activer PayPlug Oney 3x pour vos clients."
 
-#: src/Gateway/PayplugGatewayRequirements.php:62
-msgid "The PHP version on your server is valid."
-msgstr "La version PHP de votre serveur est compatible avec l'extension."
+#: src/Gateway/PayplugGatewayOney3x.php:37
+msgid "Pay by card in 3x with Oney"
+msgstr "Payer en 3x par carte bancaire avec Oney"
 
-#. translators: %s: minimum required PHP version
-#: src/Gateway/PayplugGatewayRequirements.php:64
+#: src/Gateway/PayplugGatewayOney3x.php:118
+#: src/Gateway/PayplugGatewayOney3x.php:150
+#, php-format
 msgid ""
-"The PHP version on your server is not supported. Your server must run PHP %s "
-"or greater."
+"The total amount of your order should be between %s€ and %s€ to pay with "
+"Oney."
 msgstr ""
-"La version PHP de votre serveur n'est pas compatible avec l'extension. Votre "
-"serveur doit utiliser PHP %s ou supérieur."
+"Le montant total de votre commande doit être compris entre %s€ et %s€ pour "
+"payer avec Oney."
 
-#: src/Gateway/PayplugGatewayRequirements.php:72
-msgid "OpenSSL is up to date."
-msgstr "OpenSSL est à jour."
-
-#. translators: %s: minimum required OpenSSL version
-#: src/Gateway/PayplugGatewayRequirements.php:74
-msgid "OpenSSL is not up to date. Please update to OpenSSL %s or later."
+#: src/Gateway/PayplugGatewayOney3x.php:124
+msgid ""
+"The payment with Oney is unavailable because you have more than 1000 items "
+"in your cart."
 msgstr ""
-"OpenSSL n'est pas à jour. Vous devez le mettre à jour avec la version %s ou "
-"supérieure."
+"Paiement avec Oney indisponible car vous avez plus de 1000 produits dans "
+"votre panier."
 
-#: src/Gateway/PayplugGatewayRequirements.php:82
-msgid "Your shop currency has been set up with Euro."
-msgstr "Votre boutique utilise l'euro comme monnaie de paiement."
+#: src/Gateway/PayplugGatewayOney3x.php:131
+msgid "Unavailable for the specified country."
+msgstr "Indisponible pour le pays spécifié"
 
-#: src/Gateway/PayplugGatewayRequirements.php:83
-msgid "Your shop currency must be set up with Euro."
-msgstr "Votre boutique doit utiliser l'euro comme monnaie de paiement."
+#: src/Gateway/PayplugGatewayOney3x.php:175
+msgid "Cart size cannot be greater than 1000 with Oney."
+msgstr "Votre panier ne peut contenir plus de 1000 articles avec Oney."
 
-#: src/Gateway/PayplugGatewayRequirements.php:91
-msgid "You are logged in with your PayPlug account."
-msgstr "Votre compte PayPlug est connecté."
+#: src/Gateway/PayplugGatewayOney3x.php:184
+msgid "Mobile phone number fullfilled is invalid. Please retry."
+msgstr "Le numéro de téléphone mobile est invalide, veuillez le changer"
 
-#: src/Gateway/PayplugGatewayRequirements.php:92
-msgid "You must be logged in with your PayPlug account."
-msgstr "Votre compte PayPlug doit-être connecté."
+#: src/Gateway/PayplugGatewayOney3x.php:188
+msgid ""
+"The “+” character is not valid. Please change your email address (100 "
+"characters max)"
+msgstr ""
+"Le caractère “+” n’est pas valide, merci de nous transmettre une autre "
+"adresse email (100 caractères max)"
 
-#: src/Gateway/PayplugResponse.php:79
-msgid "PayPlug IPN OK | Transaction %s"
-msgstr "PayPlug IPN OK | Transaction %s"
+#: src/Gateway/PayplugGatewayOney3x.php:311
+msgid ""
+"Refund will be possible 48 hours after the last payment or refund "
+"transaction."
+msgstr ""
+"Le remboursement sera possible 48 heures après la dernière transaction de "
+"paiement ou de remboursement."
 
-#: src/Gateway/PayplugResponse.php:101
-msgid "PayPlug IPN OK | Transaction %s failed : %s"
-msgstr "PayPlug IPN OK | Transaction %s échouée : %s"
+#: src/Front/PayplugOneyDetail.php:79
+#, fuzzy, php-format
+#| "Offre de financement avec apport obligatoire, réservée aux particuliers "
+#| "et valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par "
+#| "Oney Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre "
+#| "crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre "
+#| "59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www."
+#| "orias.fr Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr"
+msgid ""
+"Offre de financement avec apport obligatoire, \n"
+"        réservée aux particuliers et valable pour tout achat de %s€ à %s€. \n"
+"        Sous réserve d'acceptation par Oney Bank. Vous disposez d'un délai "
+"de 14 jours pour renoncer à votre crédit. \n"
+"        Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre "
+"59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www."
+"orias.fr \n"
+"        Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr"
+msgstr ""
+"Offre de financement avec apport obligatoire, réservée aux particuliers et "
+"valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par Oney "
+"Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre crédit. "
+"Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix -"
+" 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr "
+"Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr"
 
-#: src/PayplugWoocommerce.php:82
-msgid "PayPlug requires an active version of WooCommerce"
-msgstr "PayPlug nécessite que WooCommerce soit installé pour fonctionner"
+#: src/Front/PayplugOneyDetail.php:90
+msgid "PAYMENT"
+msgstr "PAIEMENT"
 
-#: src/PayplugWoocommerceRequest.php:62
-msgid "Empty cart"
-msgstr "Votre panier est vide"
+#: src/Front/PayplugOneyDetail.php:91
+msgid "BY CREDIT CARD"
+msgstr "PAR CARTE BANCAIRE"
 
-#. Plugin URI of the plugin/theme
-msgid "https://www.payplug.com/modules/woocommerce"
-msgstr "https://www.payplug.com/fr/modules/woocommerce"
+#: src/Front/PayplugOneyDetail.php:97 src/Front/PayplugOneyDetail.php:107
+msgid "monthly payment of"
+msgstr "mensualités de"
 
-#. Description of the plugin/theme
+#: src/Front/PayplugOneyDetail.php:98 src/Front/PayplugOneyDetail.php:108
+msgid "Of which financing cost"
+msgstr "Dont coût de financement"
+
+#: src/Front/PayplugOneyDetail.php:99 src/Front/PayplugOneyDetail.php:109
+msgid "TAEG"
+msgstr "TAEG"
+
+#: src/Front/PayplugOneyDetail.php:155
+msgid "OR PAY IN"
+msgstr "OU PAYER EN"
+
+#. Name of the plugin
+msgid "PayPlug pour WooCommerce (Officiel)"
+msgstr ""
+
+#. Description of the plugin
 msgid ""
 "The online payment solution combining simplicity and first-rate support to "
 "boost your sales."
@@ -440,96 +681,14 @@ msgstr ""
 "La solution de paiement en ligne qui combine simplicité et accompagnement "
 "pour booster vos ventes."
 
-#. Author of the plugin/theme
+#. URI of the plugin
+msgid "https://www.payplug.com/modules/woocommerce"
+msgstr "https://www.payplug.com/fr/modules/woocommerce"
+
+#. Author of the plugin
 msgid "PayPlug"
 msgstr "PayPlug"
 
-#. Author URI of the plugin/theme
+#. Author URI of the plugin
 msgid "https://www.payplug.com/"
 msgstr "https://www.payplug.com/"
-
-#. Payment Oney
-msgid "OR PAY IN"
-msgstr "OU PAYER EN"
-
-msgid "OR"
-msgstr "OU"
-
-msgid "PAYMENT"
-msgstr "PAIEMENT"
-
-msgid "BY CREDIT CARD"
-msgstr "PAR CARTE BANCAIRE"
-
-msgid "Bring"
-msgstr "Apport"
-
-msgid "monthly payment of"
-msgstr "mensualités de"
-
-msgid "Of which financing cost"
-msgstr "Dont coût de financement"
-
-msgid "TAEG"
-msgstr "TAEG"
-
-msgid "PayPlug Oney 3x"
-msgstr "PayPlug Oney 3x"
-
-msgid "PayPlug Oney 4x"
-msgstr "PayPlug Oney 4x"
-
-msgid "Enable PayPlug Oney 3x for your customers."
-msgstr "Activer PayPlug Oney 3x pour vos clients."
-
-msgid "Enable PayPlug Oney 4x for your customers."
-msgstr "Activer PayPlug Oney 4x pour vos clients."
-
-msgid "Pay by card in 3x with Oney"
-msgstr "Payer en 3x par carte bancaire avec Oney"
-
-msgid "Pay by card in 4x with Oney"
-msgstr "Payer en 4x par carte bancaire avec Oney"
-
-msgid "1st monthly payment"
-msgstr "1ère mensualité"
-
-msgid "2nd monthly payment"
-msgstr "2ème mensualité"
-
-msgid "3rd monthly payment"
-msgstr "3ème mensualité"
-
-#: src/Gateway/PayplugGatewayOney3x.php:181
-msgid "Cart size cannot be greater than 1000 with Oney."
-msgstr "Votre panier ne peut contenir plus de 1000 articles avec Oney."
-
-msgid ""
-"Refund will be possible 48 hours after the last payment or refund "
-"transaction."
-msgstr "Le remboursement sera possible 48 heures après la dernière transaction de paiement ou de "
-"remboursement."
-
-msgid "Payments for this country (%s) are not authorised with Oney."
-msgstr "Les paiements pour ce pays (%s) ne sont pas autorisés avec Oney."
-
-msgid "Mobile telephone number fullfilled is invalid. Please retry."
-msgstr "Le numéro de téléphone mobile renseigné est incorrect. Veuillez réessayer."
-
-msgid "Caracter '+' is invalid. Please change your email address."
-msgstr "Le caractère '+' n'est pas valide. Merci de modifier votre adresse e-mail."
-
-msgid ""
-"Offre de financement avec apport obligatoire, réservée aux particuliers et "
-"valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par Oney "
-"Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre crédit. "
-"Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix -"
-" 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr "
-"Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr"
-msgstr ""
-"Offre de financement avec apport obligatoire, réservée aux particuliers et "
-"valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par Oney "
-"Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre crédit. "
-"Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix -"
-" 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr "
-"Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr"
