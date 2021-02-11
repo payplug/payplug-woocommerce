@@ -170,7 +170,7 @@ HTML;
                 throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
             } elseif ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED) {
                 $country_code = WC()->customer->get_shipping_country();
-                throw new \Exception(__('Unavailable for the specified country');
+                throw new \Exception(__('Unavailable for the specified country'));
             } elseif ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH) {
                 throw new \Exception(__('Cart size cannot be greater than 1000 with Oney.', 'payplug'));
             }

@@ -3,6 +3,7 @@
     align-items: center;
     font-family: Arial, sans-serif;
 	font-size: 15px;
+	cursor: pointer;
 }
 .payplug-oney .oney-img {
     height: 3rem;
@@ -53,9 +54,6 @@
     border-color: #ababab;
 }
 
-.payplug-oney:not(.disabled):hover {
-    cursor: pointer;
-}
 .payplug-oney#oney-popup  {
     display: none;
     max-width: 25rem;

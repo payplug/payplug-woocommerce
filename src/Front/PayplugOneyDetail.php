@@ -113,12 +113,11 @@ class PayplugOneyDetail
                 {$cgv}
             </div>";
         } else {            
-            $description = ($oney_response === null) ? "" : sprintf(__('Payments for this amount (%s) are not authorised with this payment gateway.', 'payplug'), $_POST['price']);
+            $description = ($oney_response === null) ? "" : sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->min_amount, $this->max_amount);
             $popup = "
             $description
             <div id='oney-popup-arrow' class='triangle-left'></div>
             <div class='oney-content oney-cgv-content'>
-                {$cgv}
             </div>";
         }
 
@@ -140,11 +139,9 @@ class PayplugOneyDetail
 
         global $product;
         $total_price = (is_cart()) ? floatval(WC()->cart->cart_contents_total) : (int) ($product->get_price());
-		$total_qty = (is_cart()) ? (int) (WC()->cart->cart_contents_count) : (int) ($product->get_min_purchase_quantity());
         $oney_range = PayplugWoocommerceHelper::get_min_max_oney();
         $this->min_amount = $oney_range['min'];
         $this->max_amount = $oney_range['max'];
-		$this->max_qty = PayplugWoocommerceHelper::get_max_qty_oney();
         $disabled = "";
         if ($total_price < $this->min_amount || $total_price > $this->max_amount) {
             $disabled = "disabled";
