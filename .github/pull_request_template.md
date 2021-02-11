@@ -3,3 +3,4 @@
 - [ ] Login to your newly installed PayPlug plugin
 - [ ] Validate a simple payment with PayPlug
 - [ ] Validate a refund partial/total with PayPlug
+

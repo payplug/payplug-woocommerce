@@ -500,6 +500,7 @@ msgstr "2ème mensualité"
 msgid "3rd monthly payment"
 msgstr "3ème mensualité"
 
+#: src/Gateway/PayplugGatewayOney3x.php:181
 msgid "Cart size cannot be greater than 1000 with Oney."
 msgstr "Votre panier ne peut contenir plus de 1000 articles avec Oney."
 
