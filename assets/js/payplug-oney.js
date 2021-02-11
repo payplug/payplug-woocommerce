@@ -3,14 +3,20 @@
     var popupIsLoading = false
     var initevent = function () {
         var showpopup = $("#oney-show-popup")
-        var showpopuponey = $("#oney-show-popup").closest('.payplug-oney:not(.disabled)')
+        var showpopuponey = $("#oney-show-popup").closest('.payplug-oney')
+        var disabled = showpopuponey.hasClass('disabled');
         var popup = $("#oney-popup")
         var showpopupF = function () {
             popup.show(0, function () {
                 if (!$.browser.mobile) {
+					if (disabled) {
+                        var top = 50
+                    } else {
+                        var top = 110
+                    }
                     popup.css('position', 'fixed')
                     popup.position({
-                        my: popupLoaded ? "left top-110" : "left top-75",
+                        my: popupLoaded ? "left top-" + top : "left top-75",
                         at: popupLoaded ? "right+40 bottom" : "right bottom",
                         of: showpopup,
                     })
