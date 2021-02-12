@@ -6,7 +6,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
 "woocommerce\n"
 "POT-Creation-Date: 2021-02-11 08:06+0000\n"
-"PO-Revision-Date: 2021-02-11 08:07+0000\n"
+"PO-Revision-Date: 2021-02-11 17:23+0000\n"
 "Last-Translator: \n"
 "Language-Team: Français\n"
 "Language: fr_FR\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Loco https://localise.biz/\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Loco-Version: 2.4.3; wp-5.5.3"
+"X-Loco-Version: 2.4.4; wp-5.5.3"
 
 #: src/PayplugWoocommerce.php:91
 msgid "PayPlug requires an active version of WooCommerce"
@@ -31,11 +31,11 @@ msgstr "Votre panier est vide"
 
 #: src/Admin/Ajax.php:40
 msgid "Invalid request."
-msgstr ""
+msgstr "Requête non valide."
 
 #: src/Admin/Ajax.php:49
 msgid "Invalid nonce."
-msgstr ""
+msgstr "Valeur non valide."
 
 #: src/Admin/Ajax.php:60 src/Admin/Ajax.php:69
 #: src/Admin/WoocommerceActions.php:74
@@ -58,11 +58,11 @@ msgstr ""
 
 #: src/Admin/Ajax.php:98
 msgid "Something went wrong."
-msgstr ""
+msgstr "Une erreur s’est produite."
 
 #: src/Admin/Ajax.php:105
 msgid "Your API keys has successfully been updated."
-msgstr ""
+msgstr "La mise à jour de vos clés API a bien été effectuée."
 
 #: src/Admin/Metabox.php:51
 msgid "PayPlug payment details"
@@ -245,14 +245,13 @@ msgstr "Votre compte PayPlug doit-être connecté."
 
 #: src/Gateway/PayplugGatewayRequirements.php:118
 msgid "Oney is active on your store."
-msgstr ""
+msgstr "Oney est actif sur votre boutique."
 
 #: src/Gateway/PayplugGatewayRequirements.php:119
 msgid "Please fill in the GCSs relating to oney."
-msgstr ""
+msgstr "Veuillez remplir les CGV relatives à oney."
 
 #: src/Gateway/PayplugGatewayOney4x.php:22
-#, fuzzy
 msgctxt "Gateway method title"
 msgid "PayPlug Oney 4x"
 msgstr "PayPlug Oney 4x"
@@ -337,25 +336,28 @@ msgstr ""
 
 #: src/Gateway/PayplugGateway.php:279
 msgid "Title"
-msgstr ""
+msgstr "Titre"
 
 #: src/Gateway/PayplugGateway.php:281
 msgid "The payment solution title displayed during checkout."
 msgstr ""
+"Personnalisez le nom de la passerelle de paiement affiché lors de la "
+"commande."
 
 #: src/Gateway/PayplugGateway.php:282
-#, fuzzy
 msgctxt "Default gateway title"
 msgid "Credit card checkout"
 msgstr "Payer par carte bancaire"
 
 #: src/Gateway/PayplugGateway.php:286
 msgid "Description"
-msgstr ""
+msgstr "Description"
 
 #: src/Gateway/PayplugGateway.php:288
 msgid "The payment solution description displayed during checkout."
 msgstr ""
+"Personnalisez la description de la passerelle de paiement affichée lors de "
+"la commande."
 
 #: src/Gateway/PayplugGateway.php:293 src/Gateway/PayplugGateway.php:611
 msgid "Connection"
@@ -418,6 +420,9 @@ msgid ""
 "information <a href=\"https://www.payplug.com/pricing\" target=\"_blank\">"
 "here.</a>"
 msgstr ""
+"Votre offre actuelle ne permet pas cette option. Essayez-le en mode TEST. "
+"Plus d'informations <a href=\"https://www.payplug.com/pricing\" "
+"target=\"_blank\">ici.</a>"
 
 #: src/Gateway/PayplugGateway.php:362
 msgid "One Click Payment"
@@ -437,41 +442,42 @@ msgstr ""
 
 #: src/Gateway/PayplugGateway.php:370
 msgid "Split Oney Payment"
-msgstr ""
+msgstr "Paiement fractionné Oney"
 
 #: src/Gateway/PayplugGateway.php:380
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
-msgstr ""
+msgstr "J'ai intégré les mentions légales Oney aux CGVs de mon site"
 
 #: src/Gateway/PayplugGateway.php:556 src/Gateway/PayplugGateway.php:570
 msgctxt "modal"
 msgid "Ok"
-msgstr ""
+msgstr "Ok"
 
 #: src/Gateway/PayplugGateway.php:557
 msgctxt "modal"
 msgid "Cancel"
-msgstr ""
+msgstr "Cancel"
 
 #: src/Gateway/PayplugGateway.php:558
 msgctxt "modal"
 msgid "Something went wrong. Please refresh the page and retry."
 msgstr ""
+"Une erreur s’est produite. Veuillez rafraîchir la page et essayer de nouveau."
 
 #: src/Gateway/PayplugGateway.php:576 src/Gateway/PayplugGateway.php:649
 msgctxt "modal"
 msgid "Mode LIVE"
-msgstr ""
+msgstr "Mode LIVE"
 
 #: src/Gateway/PayplugGateway.php:579
 msgctxt "modal"
 msgid "Please enter your PayPlug account password"
-msgstr ""
+msgstr "Veuillez entrer le mot de passe de votre compte PayPlug"
 
 #: src/Gateway/PayplugGateway.php:580
 msgctxt "modal"
 msgid "Enter your PayPlug account password"
-msgstr ""
+msgstr "Entrez le mot de passe de votre compte PayPlug"
 
 #: src/Gateway/PayplugGateway.php:616 src/Gateway/PayplugGateway.php:620
 msgid "Email"
@@ -487,10 +493,10 @@ msgstr "Mot de passe"
 
 #: src/Gateway/PayplugGateway.php:651
 msgctxt "modal"
-msgid ""
+msgid "To use the Oney payment method in LIVE mode, please contact us at"
+msgstr ""
 "Attention, pour utiliser la méthode de paiement Oney en mode LIVE merci de "
 "nous contacter à"
-msgstr ""
 
 #: src/Gateway/PayplugGateway.php:691
 msgid "Successfully logged out."
@@ -524,7 +530,7 @@ msgstr "La commande %s n'existe pas."
 #: src/Gateway/PayplugGateway.php:989
 #, php-format
 msgid "The order %s cannot be refund."
-msgstr ""
+msgstr "La commande %s ne peut être remboursé"
 
 #: src/Gateway/PayplugGateway.php:996
 msgid ""
@@ -561,7 +567,6 @@ msgid "Go to your PayPlug Portal"
 msgstr "Accéder à mon portail PayPlug"
 
 #: src/Gateway/PayplugGatewayOney3x.php:35
-#, fuzzy
 msgctxt "Gateway method title"
 msgid "PayPlug Oney 3x"
 msgstr "PayPlug Oney 3x"
@@ -621,13 +626,7 @@ msgstr ""
 "paiement ou de remboursement."
 
 #: src/Front/PayplugOneyDetail.php:79
-#, fuzzy, php-format
-#| "Offre de financement avec apport obligatoire, réservée aux particuliers "
-#| "et valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par "
-#| "Oney Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre "
-#| "crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre "
-#| "59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www."
-#| "orias.fr Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr"
+#, php-format
 msgid ""
 "Offre de financement avec apport obligatoire, \n"
 "        réservée aux particuliers et valable pour tout achat de %s€ à %s€. \n"
@@ -671,7 +670,7 @@ msgstr "OU PAYER EN"
 
 #. Name of the plugin
 msgid "PayPlug pour WooCommerce (Officiel)"
-msgstr ""
+msgstr "PayPlug pour WooCommerce (Officiel)"
 
 #. Description of the plugin
 msgid ""
