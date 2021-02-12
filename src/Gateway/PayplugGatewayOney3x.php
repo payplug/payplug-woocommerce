@@ -31,7 +31,7 @@ class PayplugGatewayOney3x extends PayplugGateway
     public function __construct()
     {
         parent::__construct();
-        $this->id                 = ($this->check_oney_is_available === true)? 'oney_x3_with_fees ':'oney_x3_with_fees_disabled';
+        $this->id                 = 'oney_x3_with_fees';
         $this->method_title       = _x('PayPlug Oney 3x', 'Gateway method title', 'payplug');
         $this->method_description = __('Enable PayPlug Oney 3x for your customers.', 'payplug');
         $this->title              = __('Pay by card in 3x with Oney', 'payplug');
@@ -115,20 +115,20 @@ HTML;
         
 		// Min and max
         if ($total_price < $this->min_oney_price || $total_price > $this->max_oney_price) {
-            $this->description = sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->min_oney_price, $this->max_oney_price);
+            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->min_oney_price, $this->max_oney_price).'</div>'
             return false;
         }
 
         // Cart check
         if ($products_qty > $this->max_oney_qty) {
-            $this->description = __('The payment with Oney is unavailable because you have more than 1000 items in your cart.', 'payplug');
+            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.__('The payment with Oney is unavailable because you have more than 1000 items in your cart.', 'payplug').'</div>';
             return self::ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH;
         }
 
         // Country check
         $country_code = WC()->customer->get_shipping_country();
         if (!in_array($country_code, $this->allowed_country_codes)) {
-            $this->description = __('Unavailable for the specified country.', 'payplug');
+            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.__('Unavailable for the specified country.', 'payplug').'</div>'
             return self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED;
         }
 

@@ -18,7 +18,7 @@ class PayplugGatewayOney4x extends PayplugGatewayOney3x
     public function __construct()
     {
         parent::__construct();
-        $this->id                 = ($this->check_oney_is_available === true)? 'oney_x4_with_fees ':'oney_x4_with_fees_disabled';
+        $this->id                 = 'oney_x4_with_fees';
         $this->method_title       = _x('PayPlug Oney 4x', 'Gateway method title', 'payplug');
         $this->method_description = __('Enable PayPlug Oney 4x for your customers.', 'payplug');
         $this->title              = __('Pay by card in 4x with Oney', 'payplug');
