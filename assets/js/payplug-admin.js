@@ -55,8 +55,10 @@
             }
         },
         onClick: function (event) {
-            const live = payplug_admin.$payplug_mode.filter('#woocommerce_payplug_mode-yes');
-            if (!live.prop('checked')) {
+            payplug_admin.$payplug_oneclick.prop('disabled', true)
+            payplug_admin.oneclickPermissionsCheck()
+
+            if ('0' === event.currentTarget.value || payplug_admin_config.has_live_key) {
                 // ignore event if user choose TEST mode or already has LIVE keys
                 return;
             }
