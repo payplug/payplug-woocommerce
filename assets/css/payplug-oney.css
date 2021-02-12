@@ -59,12 +59,12 @@
     max-width: 25rem;
     padding: 1rem;
     margin-top: 1rem;
-    background: white;
     text-align: center;
     z-index: 100000;
 }
 .payplug-oney#oney-popup.loaded {
     text-align: inherit;
+    background: white;
     border: 3px solid #86bd28;
 	font-size: 14px;
 }
@@ -114,6 +114,7 @@ div.payment_method_oney_x3_with_fees_disabled, div.payment_method_oney_x4_with_f
     color: #980000;
 }
 
+.payplug-oney#oney-popup.loaded .payplug-lds-roller { display :none; }
 .payplug-lds-roller {display: inline-block;position: relative;width: 80px;height: 80px; }
 .payplug-lds-roller div {animation: payplug-lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;transform-origin: 40px 40px;}
 .payplug-lds-roller div:after {content: " ";display: block;position: absolute;width: 7px;height: 7px;border-radius: 50%;background: #ababab;margin: -4px 0 0 -4px;}
