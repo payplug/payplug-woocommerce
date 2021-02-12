@@ -7,6 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+
+use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\Exception\PayplugException;
 
@@ -25,6 +27,13 @@ class PayplugPermissions {
 	 */
 	private $gateway_mode;
 
+    /**
+     * The current key for account permissions.
+     *
+     * @var string
+     */
+    private $current_key;
+    
 	/**
 	 * @var array
 	 */
@@ -37,6 +46,8 @@ class PayplugPermissions {
 	 */
 	public function __construct( PayplugGateway $gateway) {
 		$this->gateway_mode = $gateway->get_current_mode();
+		$this->current_key = "live" === $this->gateway_mode ?
+			$gateway->settings['payplug_live_key'] : $gateway->settings['payplug_test_key'];
 		$this->load_permissions();
 	}
 
@@ -85,7 +96,7 @@ class PayplugPermissions {
 		}
 
 		try {
-			$response          = Authentication::getPermissions();
+			$response          = Authentication::getPermissions(new Payplug($this->current_key));
 			$this->permissions = ! empty( $response ) ? $response : [];
 			set_transient( $this->get_key(), $this->permissions, DAY_IN_SECONDS );
 
