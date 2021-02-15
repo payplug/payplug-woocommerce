@@ -115,7 +115,7 @@ HTML;
         
 		// Min and max
         if ($total_price < $this->min_oney_price || $total_price > $this->max_oney_price) {
-            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->min_oney_price, $this->max_oney_price).'</div>'
+            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->min_oney_price, $this->max_oney_price).'</div>';
             return false;
         }
 
@@ -128,7 +128,7 @@ HTML;
         // Country check
         $country_code = WC()->customer->get_shipping_country();
         if (!in_array($country_code, $this->allowed_country_codes)) {
-            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.__('Unavailable for the specified country.', 'payplug').'</div>'
+            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.__('Unavailable for the specified country.', 'payplug').'</div>';
             return self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED;
         }
 
