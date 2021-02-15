@@ -12,11 +12,7 @@
             popup.show(0, function () {
                 if (!$.browser.mobile) {
                     checkOneyError()
-                    if (showpopuponey.hasClass('disabled')) {
-                        var top = 50
-                    } else {
-                        var top = 110
-                    }
+                    var top = showpopuponey.hasClass('disabled') ? 50 : 110
                     popup.css('position', 'fixed')
                     popup.position({
                         my: popupLoaded ? "left top-" + top : "left top-75",
