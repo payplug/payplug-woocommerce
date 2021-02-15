@@ -462,10 +462,9 @@ class PayplugWoocommerceHelper {
 	/**
 	 * Get max qty allowed for oney payment
 	 *
-	 * @return array
+	 * @return int
 	 */
 	public static function get_max_qty_oney() {
-		$account = self::get_account_data_from_options();
 		return 1000;
 	}
 
