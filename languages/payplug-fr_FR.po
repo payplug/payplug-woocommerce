@@ -611,11 +611,9 @@ msgstr "Le numéro de téléphone mobile est invalide, veuillez le changer"
 
 #: src/Gateway/PayplugGatewayOney3x.php:188
 msgid ""
-"The “+” character is not valid. Please change your email address (100 "
-"characters max)"
+"Your email address is too long and the + character is not valid, please change it to another address (max 100 characters)."
 msgstr ""
-"Le caractère “+” n’est pas valide, merci de nous transmettre une autre "
-"adresse email (100 caractères max)"
+"Votre adresse e-mail est trop longue et le caractère + n’est pas autorisé, veuillez en saisir une autre qui ne dépasse pas 100 caractères."
 
 #: src/Gateway/PayplugGatewayOney3x.php:311
 msgid ""

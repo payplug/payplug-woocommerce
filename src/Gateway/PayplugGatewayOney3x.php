@@ -185,7 +185,7 @@ HTML;
             }
             
             if (!filter_var($billing_email, FILTER_VALIDATE_EMAIL) || strpos($billing_email,'+') !== false) {
-                throw new \Exception(__("Character '+' is invalid. Please update your email address for another one (100 characters maximum).", 'payplug'));
+                throw new \Exception(__("Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).", 'payplug'));
             }
 
             $address_data = PayplugAddressData::from_order($order);
