@@ -2,6 +2,8 @@
     display: flex;
     align-items: center;
     font-family: Arial, sans-serif;
+	font-size: 15px;
+	cursor: pointer;
 }
 .payplug-oney .oney-img {
     height: 3rem;
@@ -29,8 +31,8 @@
 .payplug-oney .line-120 { line-height: 120%;}
 .payplug-oney .oney-3x { background-image: url(../images/lg-3xoney.png); }
 .payplug-oney .oney-4x { background-image: url(../images/lg-4xoney.png); }
-.payplug-oney .oney-3x4x { background-image: url(../images/lg-3x4xoney.png); min-width: 13em; margin-bottom: -.2em;}
-.payplug-oney .oney-logo { background-image: url(../images/lg-oney.png);  width: auto; }
+.payplug-oney .oney-3x4x { background-image: url(../images/lg-3x4xoney.png); min-width: 8em; margin-bottom: -.2em;}
+.payplug-oney .oney-logo { background-image: url(../images/lg-oney.png);  width: 50px; }
 .payplug-oney .oney-step1 {  margin-left: 13% !important; background-image: url(../images/lg-step1-oney.png); }
 .payplug-oney .oney-step2 { background-image: url(../images/lg-step2-oney.png); }
 .payplug-oney .oney-step3 { background-image: url(../images/lg-step3-oney.png); }
@@ -52,21 +54,19 @@
     border-color: #ababab;
 }
 
-.payplug-oney:not(.disabled):hover {
-    cursor: pointer;
-}
 .payplug-oney#oney-popup  {
     display: none;
     max-width: 25rem;
     padding: 1rem;
     margin-top: 1rem;
-    background: white;
     text-align: center;
     z-index: 100000;
 }
 .payplug-oney#oney-popup.loaded {
     text-align: inherit;
+    background: white;
     border: 3px solid #86bd28;
+	font-size: 14px;
 }
 .payplug-oney.disabled#oney-popup.loaded {
     border-color: #ababab;
@@ -107,10 +107,14 @@
 }
 
 #payment .payment_methods li[class*=oney_x] img.payplug-payment-icon {
-    min-width: 144px;
+    width: 110px;
     max-height: 40px;
 }
+div.payment_method_oney_x3_with_fees_disabled, div.payment_method_oney_x4_with_fees_disabled {
+    color: #980000;
+}
 
+.payplug-oney#oney-popup.loaded .payplug-lds-roller { display :none; }
 .payplug-lds-roller {display: inline-block;position: relative;width: 80px;height: 80px; }
 .payplug-lds-roller div {animation: payplug-lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;transform-origin: 40px 40px;}
 .payplug-lds-roller div:after {content: " ";display: block;position: absolute;width: 7px;height: 7px;border-radius: 50%;background: #ababab;margin: -4px 0 0 -4px;}

@@ -58,7 +58,7 @@ class PayplugGatewayOney4x extends PayplugGatewayOney3x
             </p>
 HTML;
 
-        $available_img = ($this->check_oney_is_available()) ? 'lg-4xoney-checkout.png' : 'lg-4xoney-checkout-disabled.png';
+        $available_img = ($this->check_oney_is_available() === true) ? 'lg-4xoney-checkout.png' : 'lg-4xoney-checkout-disabled.png';
         $icons = apply_filters('payplug_payment_icons', [
             'payplug' => sprintf('<img src="%s" alt="Oney 3x" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/' . $available_img)),
         ]);

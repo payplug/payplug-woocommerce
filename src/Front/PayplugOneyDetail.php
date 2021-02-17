@@ -12,7 +12,6 @@ if (!defined('ABSPATH')) {
 class PayplugOneyDetail
 {
 
-    private $account;
     private $min_amount = "XXX";
     private $max_amount = "XXX";
 
@@ -82,6 +81,7 @@ class PayplugOneyDetail
         Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr 
         Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr", "payplug"), $this->min_amount, $this->max_amount);
         $f = function($fn) { return $fn; }; 
+
         if($oney_response) {
             $popup = "
             <div id='oney-popup-arrow' class='triangle-left'></div>
@@ -113,12 +113,9 @@ class PayplugOneyDetail
                 {$cgv}
             </div>";
         } else {            
-            $description = ($oney_response === null) ? "" : sprintf(__('Payments for this amount (%s) are not authorised with this payment gateway.', 'payplug'), $_POST['price']);
             $popup = "
-            $description
             <div id='oney-popup-arrow' class='triangle-left'></div>
             <div class='oney-content oney-cgv-content'>
-                {$cgv}
             </div>";
         }
 
@@ -149,13 +146,22 @@ class PayplugOneyDetail
         }
         
 ?>
-        <div class="payplug-oney <?php echo $disabled; ?>" data-price="<?php echo $total_price ?>">
+        <div class="payplug-oney <?php echo $disabled; ?>" data-price="<?php echo $total_price ?>" data-min-oney="<?php echo $this->min_amount; ?>" data-max-oney="<?php echo $this->max_amount; ?>">
             <?php echo __('OR PAY IN', 'payplug'); ?>
             <div class="oney-img oney-3x4x"></div>
             <div id="oney-show-popup" class="bold oney-color">?</div>
         </div>
         <div class="payplug-oney <?php echo $disabled; ?>" id="oney-popup">
+            <div id='oney-popup-arrow' class='triangle-left'></div>
             <div class="payplug-lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+            <div id="oney-popup-error">
+                <div class="oney-error range">
+                    <?php echo sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->min_amount, $this->max_amount);?>
+                </div>
+                <div class="oney-error qty">
+                    <?php echo __('The payment with Oney is unavailable because you have more than 1000 items in your cart.', 'payplug');?>
+                </div>
+            </div>
         </div>
     <?php
     }

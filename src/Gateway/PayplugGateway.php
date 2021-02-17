@@ -760,7 +760,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $mode_fieldkey     = $this->get_field_key('mode');
         $live_key_fieldkey = $this->get_field_key('payplug_live_key');
         if (isset($data[$mode_fieldkey]) && '1' === $data[$mode_fieldkey] && empty($data[$live_key_fieldkey])) {
-            $data[$mode_fieldkey] = '0';
+            $data[$mode_fieldkey] = null;
             $this->set_post_data($data);
             \WC_Admin_Settings::add_error(__('Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug'));
         }
@@ -770,13 +770,15 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         if (
             isset($data[$oneclick_fieldkey])
             && '1' === $data[$oneclick_fieldkey]
+            && '1' === $data[$mode_fieldkey]
             && (!$this->user_logged_in()
                 || false === $this->permissions->has_permissions(PayplugPermissions::SAVE_CARD))
         ) {
-            $data[$oneclick_fieldkey] = '0';
+            $data[$oneclick_fieldkey] = null;
             \WC_Admin_Settings::add_error(__('Only PREMIUM accounts can enable the One Click option in LIVE mode.', 'payplug'));
         }
 
+        $this->data = $data;
         parent::process_admin_options();
     }
 
