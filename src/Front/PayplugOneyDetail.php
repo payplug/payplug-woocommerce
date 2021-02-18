@@ -27,6 +27,11 @@ class PayplugOneyDetail
                     'jquery',
                     'jquery-ui-position'
                 ], PAYPLUG_GATEWAY_VERSION, true);
+                wp_localize_script('payplug-oney', 'payplug_config', array(
+                    'ajax_url'      => admin_url('admin-ajax.php'),
+                    'ajax_action'   => 'simulate_oney_payment',
+                    'is_cart'       => is_cart()
+                ));
                 // Product page
                 add_action('woocommerce_single_product_summary', [$this, 'oney_simulate_payment_detail']);
     
@@ -129,11 +134,6 @@ class PayplugOneyDetail
      */
     public function oney_simulate_payment_detail()
     {
-        wp_localize_script('payplug-oney', 'payplug_config', array(
-            'ajax_url'      => admin_url('admin-ajax.php'),
-            'ajax_action'   => 'simulate_oney_payment',
-            'is_cart'       => is_cart()
-        ));
 
         global $product;
         $total_price = (is_cart()) ? floatval(WC()->cart->cart_contents_total) : (int) ($product->get_price());
