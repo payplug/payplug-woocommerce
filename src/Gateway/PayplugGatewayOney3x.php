@@ -172,7 +172,7 @@ HTML;
                 $country_code = WC()->customer->get_shipping_country();
                 throw new \Exception(__('Unavailable for the specified country'));
             } elseif ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH) {
-                throw new \Exception(__('Cart size cannot be greater than 1000 with Oney.', 'payplug'));
+                throw new \Exception(__('The payment with Oney is unavailable because you have more than 1000 items in your cart.', 'payplug'));
             }
 
             $country = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();
