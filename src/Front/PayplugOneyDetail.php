@@ -29,8 +29,7 @@ class PayplugOneyDetail
                 ], PAYPLUG_GATEWAY_VERSION, true);
                 wp_localize_script('payplug-oney', 'payplug_config', array(
                     'ajax_url'      => admin_url('admin-ajax.php'),
-                    'ajax_action'   => 'simulate_oney_payment',
-                    'is_cart'       => is_cart()
+                    'ajax_action'   => 'simulate_oney_payment'
                 ));
                 // Product page
                 add_action('woocommerce_single_product_summary', [$this, 'oney_simulate_payment_detail']);
@@ -137,6 +136,13 @@ class PayplugOneyDetail
 
         global $product;
         $total_price = (is_cart()) ? floatval(WC()->cart->cart_contents_total) : (int) ($product->get_price());
+        $total_products = 0;
+        if(is_cart()) {
+            foreach(WC()->cart->cart_contents as $product) {
+                $total_products += $product['quantity'];
+            }
+        }
+
         $oney_range = PayplugWoocommerceHelper::get_min_max_oney();
         $this->min_amount = $oney_range['min'];
         $this->max_amount = $oney_range['max'];
@@ -146,7 +152,12 @@ class PayplugOneyDetail
         }
         
 ?>
-        <div class="payplug-oney <?php echo $disabled; ?>" data-price="<?php echo $total_price ?>" data-min-oney="<?php echo $this->min_amount; ?>" data-max-oney="<?php echo $this->max_amount; ?>">
+        <div class="payplug-oney <?php echo $disabled; ?>" 
+            data-is-cart="<?php echo is_cart() ? 1 : 0; ?>" 
+            data-total-products="<?php echo $total_products; ?>" 
+            data-price="<?php echo $total_price ?>" 
+            data-min-oney="<?php echo $this->min_amount; ?>" 
+            data-max-oney="<?php echo $this->max_amount; ?>">
             <?php echo __('OR PAY IN', 'payplug'); ?>
             <div class="oney-img oney-3x4x"></div>
             <div id="oney-show-popup" class="bold oney-color">?</div>
