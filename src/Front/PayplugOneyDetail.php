@@ -147,7 +147,7 @@ class PayplugOneyDetail
         $this->min_amount = $oney_range['min'];
         $this->max_amount = $oney_range['max'];
         $disabled = "";
-        if ($total_price < $this->min_amount || $total_price > $this->max_amount) {
+        if ($total_price < $this->min_amount || $total_price > $this->max_amount || $total_products > PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM) {
             $disabled = "disabled";
         }
         
@@ -156,6 +156,7 @@ class PayplugOneyDetail
             data-is-cart="<?php echo is_cart() ? 1 : 0; ?>" 
             data-total-products="<?php echo $total_products; ?>" 
             data-price="<?php echo $total_price ?>" 
+			data-max-oney-qty="<?php echo PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM; ?>" 
             data-min-oney="<?php echo $this->min_amount; ?>" 
             data-max-oney="<?php echo $this->max_amount; ?>">
             <?php echo __('OR PAY IN', 'payplug'); ?>
