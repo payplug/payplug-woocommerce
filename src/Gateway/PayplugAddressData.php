@@ -163,7 +163,7 @@ class PayplugAddressData {
 		if (empty($billing_company)) { 
 			$billing_company = $billing_first_name .' '. $billing_last_name;
 		} else {
-            $billing_company += ' (optional)';
+            $billing_company .= ' (optional)';
         }
 
 		if ( ! PayplugWoocommerceHelper::is_country_supported( $billing_country ) ) {
@@ -207,7 +207,7 @@ class PayplugAddressData {
                 if (empty($shipping_company)) {
                     $shipping_company = $shipping_first_name .' '. $shipping_last_name;
                 } else {
-                    $shipping_company += ' (optional)';
+                    $shipping_company .= ' (optional)';
                 }
 
 				if ( ! PayplugWoocommerceHelper::is_country_supported( $shipping_country ) ) {
