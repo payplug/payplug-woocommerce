@@ -10,6 +10,7 @@
         var loading = popup.find('.payplug-lds-roller')
         var oneyError = popup.find('#oney-popup-error')
         var totalsProduct = showpopuponey.data('total-products')
+		var maxOneyQty = showpopuponey.data('max-oney-qty')
         is_cart = showpopuponey.data('is-cart')
         var showpopupF = function (show) {
             if(!showpopuponey.hasClass('disabled') && !popupLoaded && !show) {
@@ -60,7 +61,7 @@
                 popup.addClass('loaded')
                 popup.find('.payplug-lds-roller').hide()
                 popup.find('#oney-popup-error .oney-error').hide()
-                totalsProduct >= 1000 ?
+                totalsProduct >= maxOneyQty ?
                     popup.find('#oney-popup-error .oney-error.qty').show() :
                     popup.find('#oney-popup-error .oney-error.range').show()
             } else {
@@ -71,7 +72,7 @@
         qtyInput.on('change', function () {
             totalsProduct = $(this).val()
             popupLoaded = false
-            if (isInOneyRange()) {
+            if (isInOneyRange() && totalsProduct <= maxOneyQty) {
                 showpopuponey.removeClass('disabled')
                 popup.removeClass('disabled').removeClass('loaded')
                 popup.html('').append($(arrow))
@@ -85,7 +86,7 @@
         showpopuponey.unbind()
         showpopuponey.on('click', function () {
             showpopupF(true)
-            if (isInOneyRange() && totalsProduct < 1000) {
+            if (isInOneyRange() && totalsProduct <= maxOneyQty) {
                 if (popupLoaded) {
                     return
                 }

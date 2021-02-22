@@ -465,7 +465,7 @@ class PayplugWoocommerceHelper {
 	 * @return int
 	 */
 	public static function get_max_qty_oney() {
-		return 1000;
+		return 999;
 	}
 
 	/**
