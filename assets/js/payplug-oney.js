@@ -57,7 +57,7 @@
                 popup.addClass('loaded')
                 popup.find('.payplug-lds-roller').hide()
                 popup.find('#oney-popup-error .oney-error').hide()
-                totalsProduct > maxOneyQty ?
+                totalsProduct >= maxOneyQty ?
                     popup.find('#oney-popup-error .oney-error.qty').show() :
                     popup.find('#oney-popup-error .oney-error.range').show()
             } else {
