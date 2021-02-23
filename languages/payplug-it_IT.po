@@ -514,8 +514,8 @@ msgid "The total amount of your order should be between %s€ and %s€ to pay w
 msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ e %s€ per pagare tramite Oney"
 
 #: src/Gateway/PayplugGatewayOney3x.php:124
-msgid "The payment with Oney is unavailable because you have more than 1000 items in your cart."
-msgstr "Il pagamento tramite Oney non è disponibile perché hai più di 1000 prodotti nel tuo carrello."
+msgid "The payment with Oney is unavailable because you have more than %s items in your cart."
+msgstr "Il pagamento tramite Oney non è disponibile perché hai più di %s prodotti nel tuo carrello."
 
 #: src/Gateway/PayplugGatewayOney3x.php:131
 msgid "Unavailable for the specified country."

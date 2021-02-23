@@ -147,7 +147,7 @@ class PayplugOneyDetail
         $this->min_amount = $oney_range['min'];
         $this->max_amount = $oney_range['max'];
         $disabled = "";
-        if ($total_price < $this->min_amount || $total_price > $this->max_amount || $total_products > PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM) {
+        if ($total_price < $this->min_amount || $total_price > $this->max_amount || $total_products >= PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM) {
             $disabled = "disabled";
         }
         
@@ -171,7 +171,7 @@ class PayplugOneyDetail
                     <?php echo sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->min_amount, $this->max_amount);?>
                 </div>
                 <div class="oney-error qty">
-                    <?php echo __('The payment with Oney is unavailable because you have more than 1000 items in your cart.', 'payplug');?>
+                    <?php echo sprintf(__('The payment with Oney is unavailable because you have more than %s items in your cart.', 'payplug'), PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM);?>
                 </div>
             </div>
         </div>
