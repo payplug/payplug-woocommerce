@@ -545,7 +545,7 @@ msgstr ""
 
 #: src/Gateway/PayplugGatewayOney3x.php:124
 msgid ""
-"The payment with Oney is unavailable because you have more than 1000 items "
+"The payment with Oney is unavailable because you have more than %s items "
 "in your cart."
 msgstr ""
 
