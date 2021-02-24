@@ -8,7 +8,7 @@
 .payplug-oney .oney-img {
     height: 3rem;
     width: 3rem;
-    margin: .5rem;
+    margin: 0 .5rem;
     background-size: contain;
     background-repeat: no-repeat;
 }
@@ -31,8 +31,8 @@
 .payplug-oney .line-120 { line-height: 120%;}
 .payplug-oney .oney-3x { background-image: url(../images/lg-3xoney.png); }
 .payplug-oney .oney-4x { background-image: url(../images/lg-4xoney.png); }
-.payplug-oney .oney-3x4x { background-image: url(../images/lg-3x4xoney.png); min-width: 8em; margin-bottom: -.2em;}
-.payplug-oney .oney-logo { background-image: url(../images/lg-oney.png);  width: 50px; }
+.payplug-oney .oney-3x4x { background-image: url(../images/lg-3x4xoney.png); min-width: 8em; margin-bottom: -.2em; background-position: center center;}
+.payplug-oney .oney-logo { background-image: url(../images/lg-oney.png);  width: auto; height: 30px; }
 .payplug-oney .oney-step1 {  margin-left: 13% !important; background-image: url(../images/lg-step1-oney.png); }
 .payplug-oney .oney-step2 { background-image: url(../images/lg-step2-oney.png); }
 .payplug-oney .oney-step3 { background-image: url(../images/lg-step3-oney.png); }
@@ -66,7 +66,12 @@
     text-align: inherit;
     background: white;
     border: 3px solid #86bd28;
-	font-size: 14px;
+	font-size: 13px;
+}
+.payplug-oney#oney-popup .oney-title{
+    font-size: 17px;
+    line-height: 17px;
+    margin-top: 5px;
 }
 .payplug-oney.disabled#oney-popup.loaded {
     border-color: #ababab;
@@ -104,11 +109,15 @@
 }
 .payplug-oney#oney-popup .oney-cgv-content {
     text-align: justify;
+	font-size: 10px;
+    border-top: 1px solid lightgrey;
+    padding-top: 10px;
 }
 
 #payment .payment_methods li[class*=oney_x] img.payplug-payment-icon {
-    width: 110px;
-    max-height: 40px;
+    width: auto;
+    max-height: 30px;
+    padding-right: 5px;
 }
 div.payment_method_oney_x3_with_fees_disabled, div.payment_method_oney_x4_with_fees_disabled {
     color: #980000;

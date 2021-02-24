@@ -21,12 +21,12 @@ class PayplugGatewayOney3x extends PayplugGateway
 {
     const ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED = 2;
     const ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH = 3;
+	const ONEY_PRODUCT_QUANTITY_MAXIMUM = 1000;
 
     protected $oney_response;
     protected $min_oney_price;
     protected $max_oney_price;
     protected $allowed_country_codes;
-	protected $max_oney_qty;
 
     public function __construct()
     {
@@ -49,7 +49,6 @@ class PayplugGatewayOney3x extends PayplugGateway
             $this->min_oney_price = $oney_configuration['min_amounts']['EUR']/100;
             $this->max_oney_price = $oney_configuration['max_amounts']['EUR']/100;
             $this->allowed_country_codes = $oney_configuration['allowed_countries'];
-			$this->max_oney_qty = PayplugWoocommerceHelper::get_max_qty_oney();
         } catch ( \Payplug\Exception\UnauthorizedException $e ) {
         } catch ( \Payplug\Exception\ConfigurationNotSetException $e ) {
         }
@@ -120,8 +119,8 @@ HTML;
         }
 
         // Cart check
-        if ($products_qty > $this->max_oney_qty) {
-            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.__('The payment with Oney is unavailable because you have more than 1000 items in your cart.', 'payplug').'</div>';
+        if ($products_qty >= self::ONEY_PRODUCT_QUANTITY_MAXIMUM) {
+            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.sprintf(__('The payment with Oney is unavailable because you have more than %s items in your cart.', 'payplug'), self::ONEY_PRODUCT_QUANTITY_MAXIMUM).'</div>';
             return self::ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH;
         }
 
@@ -172,7 +171,7 @@ HTML;
                 $country_code = WC()->customer->get_shipping_country();
                 throw new \Exception(__('Unavailable for the specified country'));
             } elseif ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH) {
-                throw new \Exception(__('Cart size cannot be greater than 1000 with Oney.', 'payplug'));
+                throw new \Exception(sprintf(__('The payment with Oney is unavailable because you have more than %s items in your cart.', 'payplug'), self::ONEY_PRODUCT_QUANTITY_MAXIMUM));
             }
 
             $country = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();

@@ -1,4 +1,5 @@
 (function ($) {
+    var is_cart = false
     var popupLoaded = false
     var initevent = function () {
         var showpopup = $("#oney-show-popup")
@@ -8,7 +9,13 @@
         var popup = $("#oney-popup")
         var loading = popup.find('.payplug-lds-roller')
         var oneyError = popup.find('#oney-popup-error')
-        var showpopupF = function () {
+        var totalsProduct = showpopuponey.data('total-products')
+		var maxOneyQty = showpopuponey.data('max-oney-qty')
+        is_cart = showpopuponey.data('is-cart')
+        var showpopupF = function (show) {
+            if(!showpopuponey.hasClass('disabled') && !popupLoaded && !show) {
+                return
+            }
             popup.show(0, function () {
                 if (!$.browser.mobile) {
                     checkOneyError()
@@ -25,7 +32,6 @@
                 }
             })
         }
-
         showarrow = function () {
             arrow.show()
             arrow.position({
@@ -34,20 +40,16 @@
                 of: showpopup,
             })
         }
-
         calculTotals = function () {
-            var qty = qtyInput.val()
             var price = showpopuponey.data('price')
-            return qty * price
+            return qtyInput.length ? totalsProduct * price : price
         }
-
         isInOneyRange = function () {
             var totalPrice = calculTotals()
             var minOney = showpopuponey.data('min-oney')
             var maxOney = showpopuponey.data('max-oney')
             return (totalPrice >= minOney && totalPrice <= maxOney)
         }
-
         checkOneyError = function () {
             if(showpopuponey.hasClass('disabled')) {
                 popupLoaded = true
@@ -55,18 +57,18 @@
                 popup.addClass('loaded')
                 popup.find('.payplug-lds-roller').hide()
                 popup.find('#oney-popup-error .oney-error').hide()
-                qtyInput.val() >= 1000 ?
+                totalsProduct >= maxOneyQty ?
                     popup.find('#oney-popup-error .oney-error.qty').show() :
                     popup.find('#oney-popup-error .oney-error.range').show()
             } else {
                 arrow.hide()
             }
         }
-
         qtyInput.unbind()
         qtyInput.on('change', function () {
+            totalsProduct = $(this).val()
             popupLoaded = false
-            if (isInOneyRange()) {
+            if (isInOneyRange() && totalsProduct < maxOneyQty) {
                 showpopuponey.removeClass('disabled')
                 popup.removeClass('disabled').removeClass('loaded')
                 popup.html('').append($(arrow))
@@ -77,10 +79,10 @@
                 popup.addClass('disabled')
             }
         })
-
         showpopuponey.unbind()
         showpopuponey.on('click', function () {
-            if (isInOneyRange() && qtyInput.val() < 1000) {
+            showpopupF(true)
+            if (isInOneyRange() && totalsProduct < maxOneyQty) {
                 if (popupLoaded) {
                     return
                 }
@@ -103,33 +105,28 @@
                 checkOneyError()
             }
         })
-
-
         showpopuponey.on('mouseenter', function () {
             showpopupF()
         })
         showpopuponey.on('mouseleave', function () {
             popup.hide()
         })
-
         $(document).on('scroll', function () {
             if (!$.browser.mobile) {
                 popup.hide()
             }
         })
     }
-
     $(document).on('ready', function () {
         initevent()
+        if (is_cart) {
+            $(document).ajaxSuccess(function (event, request, settings) {
+                if (settings.data.includes(payplug_config.ajax_action)) {
+                    return
+                }
+                initevent()
+                popupLoaded = false
+            })
+        }
     })
-
-    if (payplug_config.is_cart) {
-        $(document).ajaxSuccess(function (event, request, settings) {
-            if (settings.data.includes(payplug_config.ajax_action)) {
-                return
-            }
-            initevent()
-            popupLoaded = false
-        })
-    }
 })(jQuery)
