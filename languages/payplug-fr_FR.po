@@ -6,7 +6,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
 "woocommerce\n"
 "POT-Creation-Date: 2021-02-11 08:06+0000\n"
-"PO-Revision-Date: 2021-02-24 09:56+0000\n"
+"PO-Revision-Date: 2021-02-24 14:28+0000\n"
 "Last-Translator: \n"
 "Language-Team: Français\n"
 "Language: fr_FR\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Loco https://localise.biz/\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Loco-Version: 2.4.4; wp-5.5.3"
+"X-Loco-Version: 2.5.0; wp-5.6.2"
 
 #: src/Gateway/PayplugGateway.php:380
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
-msgstr "J'ai intégré les mentions légales Oney aux CGVs de mon site"
+msgstr "J'ai intégré les mentions légales Oney aux CGVs de mon site."
 
 #: src/Gateway/PayplugGatewayOney4x.php:47
 #: src/Gateway/PayplugGatewayOney3x.php:79
