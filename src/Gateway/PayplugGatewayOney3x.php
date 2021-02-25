@@ -63,7 +63,7 @@ class PayplugGatewayOney3x extends PayplugGateway
     {
 
         if ($this->check_oney_is_available() === true) {
-            $total_price = floatval(WC()->cart->cart_contents_total);
+            $total_price = floatval(WC()->cart->total);
             $this->oney_response = $this->api->simulate_oney_payment($total_price);
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
             $f = function ($fn) {
@@ -109,7 +109,7 @@ HTML;
     {
 
         $cart = WC()->cart;
-        $total_price = floatval($cart->cart_contents_total);
+        $total_price = floatval($cart->total);
 		$products_qty = (int) $cart->cart_contents_count;
         
 		// Min and max
@@ -125,8 +125,9 @@ HTML;
         }
 
         // Country check
-        $country_code = WC()->customer->get_shipping_country();
-        if (!in_array($country_code, $this->allowed_country_codes)) {
+        $country_code_shipping = WC()->customer->get_shipping_country();
+        $country_code_billing = WC()->customer->get_billing_country();
+        if (!in_array($country_code_billing, $this->allowed_country_codes) || !in_array($country_code_shipping, $this->allowed_country_codes)) {
             $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.__('Unavailable for the specified country.', 'payplug').'</div>';
             return self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED;
         }
@@ -169,7 +170,7 @@ HTML;
                 throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
             } elseif ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED) {
                 $country_code = WC()->customer->get_shipping_country();
-                throw new \Exception(__('Unavailable for the specified country'));
+                throw new \Exception(__('Unavailable for the specified country.'));
             } elseif ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH) {
                 throw new \Exception(sprintf(__('The payment with Oney is unavailable because you have more than %s items in your cart.', 'payplug'), self::ONEY_PRODUCT_QUANTITY_MAXIMUM));
             }
@@ -193,7 +194,7 @@ HTML;
             $items = $order->get_items();
             foreach($items as $item) {
                 $data = $item->get_data();
-                $total = floatval($data['total']) * 100;
+                $total = floatval(round($data['total'], 2)) * 100;
                 $cart_items[] = [
                     'delivery_label' => 'storepickup',
                     'delivery_type' => 'storepickup',
