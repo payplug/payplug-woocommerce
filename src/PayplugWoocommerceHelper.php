@@ -440,6 +440,9 @@ class PayplugWoocommerceHelper {
 		$options          = get_option( 'woocommerce_payplug_settings', [] );
 		$payplug_test_key = ! empty( $options['payplug_test_key'] ) ? $options['payplug_test_key'] : '';
 		$payplug_live_key = ! empty( $options['payplug_live_key'] ) ? $options['payplug_live_key'] : '';
+		if(empty($payplug_test_key) && empty($payplug_live_key)) {
+			return array();
+		}
 		$account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
 		$account['oney'] = $options['oney'];
 		$account['oneycgv'] = $options['oneycgv'];
@@ -466,6 +469,9 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function is_oney_available() {
 		$account = self::get_account_data_from_options();
+		if (empty($account)) {
+			return false;
+		}
 		return ($account['httpResponse'] && $account['httpResponse']['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oney'] === "yes" && $account['oneycgv'] === "yes");
 	}
 

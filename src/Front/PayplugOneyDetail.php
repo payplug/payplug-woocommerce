@@ -21,23 +21,56 @@ class PayplugOneyDetail
         add_action( 'wp_ajax_nopriv_simulate_oney_payment', [ $this, 'simulate_oney_payment' ]);
         if (!is_admin()) {
             if(PayplugWoocommerceHelper::is_oney_available()) {
-                wp_enqueue_style('payplug-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-oney.css', [], PAYPLUG_GATEWAY_VERSION);
-                wp_enqueue_script('payplug-oney-mobile', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-detect-mobile.js', [], PAYPLUG_GATEWAY_VERSION, true);
-                wp_enqueue_script('payplug-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-oney.js', [
-                    'jquery',
-                    'jquery-ui-position'
-                ], PAYPLUG_GATEWAY_VERSION, true);
-                wp_localize_script('payplug-oney', 'payplug_config', array(
-                    'ajax_url'      => admin_url('admin-ajax.php'),
-                    'ajax_action'   => 'simulate_oney_payment'
-                ));
                 // Product page
                 add_action('woocommerce_single_product_summary', [$this, 'oney_simulate_payment_detail']);
     
                 // Total cart
                 add_action('woocommerce_cart_totals_after_order_total', [$this, 'oney_simulate_payment_detail']);
+				
+				// Add Js
+                add_action( 'wp_enqueue_scripts', [$this, 'add_oney_js'] );
+
+                // Add CSS
+                add_action( 'wp_enqueue_scripts', [$this, 'add_oney_css'] );
+
+                // Add Scripts
+                add_action( 'wp_localize_script', [$this, 'add_oney_script'] );
             }
         }
+    }
+	
+	/**
+     * Add CSS
+     * 
+     * @return void
+     */
+    public function add_oney_script() {
+        wp_localize_script('payplug-oney', 'payplug_config', array(
+            'ajax_url'      => admin_url('admin-ajax.php'),
+            'ajax_action'   => 'simulate_oney_payment'
+        ));
+    }
+
+    /**
+     * Add CSS
+     * 
+     * @return void
+     */
+    public function add_oney_css() {
+        wp_enqueue_style('payplug-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-oney.css', [], PAYPLUG_GATEWAY_VERSION);
+    }
+
+    /**
+     * Add JS
+     * 
+     * @return void
+     */
+    public function add_oney_js() {
+        wp_enqueue_script('payplug-oney-mobile', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-detect-mobile.js', [], PAYPLUG_GATEWAY_VERSION, true);
+        wp_enqueue_script('payplug-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-oney.js', [
+            'jquery',
+            'jquery-ui-position'
+        ], PAYPLUG_GATEWAY_VERSION, true);
     }
 
     /**
