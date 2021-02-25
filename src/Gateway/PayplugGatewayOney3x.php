@@ -63,7 +63,7 @@ class PayplugGatewayOney3x extends PayplugGateway
     {
 
         if ($this->check_oney_is_available() === true) {
-            $total_price = floatval(WC()->cart->cart_contents_total);
+            $total_price = floatval(WC()->cart->total);
             $this->oney_response = $this->api->simulate_oney_payment($total_price);
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
             $f = function ($fn) {
@@ -109,7 +109,7 @@ HTML;
     {
 
         $cart = WC()->cart;
-        $total_price = floatval($cart->cart_contents_total);
+        $total_price = floatval($cart->total);
 		$products_qty = (int) $cart->cart_contents_count;
         
 		// Min and max
@@ -193,7 +193,7 @@ HTML;
             $items = $order->get_items();
             foreach($items as $item) {
                 $data = $item->get_data();
-                $total = floatval($data['total']) * 100;
+                $total = floatval(round($data['total'], 2)) * 100;
                 $cart_items[] = [
                     'delivery_label' => 'storepickup',
                     'delivery_type' => 'storepickup',
