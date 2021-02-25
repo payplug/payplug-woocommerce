@@ -159,8 +159,10 @@ class PayplugOneyDetail
             data-min-oney="<?php echo $this->min_amount; ?>" 
             data-max-oney="<?php echo $this->max_amount; ?>">
             <?php echo __('OR PAY IN', 'payplug'); ?>
-            <div class="oney-img oney-3x4x"></div>
-            <div id="oney-show-popup" class="bold oney-color">?</div>
+			<div class="payplug-oney-popup">
+				<div class="oney-img oney-3x4x"></div>
+				<div id="oney-show-popup" class="bold oney-color">?</div>
+			</div>
         </div>
         <div class="payplug-oney <?php echo $disabled; ?>" id="oney-popup">
             <div id='oney-popup-arrow' class='triangle-left'></div>
