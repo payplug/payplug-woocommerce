@@ -133,9 +133,8 @@ class PayplugOneyDetail
      */
     public function oney_simulate_payment_detail()
     {
-
         global $product;
-        $total_price = (is_cart()) ? floatval(WC()->cart->cart_contents_total) : (int) ($product->get_price());
+        $total_price = (is_cart()) ? floatval(WC()->cart->total) : (float) ($product->get_price());
         $total_products = 0;
         if(is_cart()) {
             foreach(WC()->cart->cart_contents as $product) {
