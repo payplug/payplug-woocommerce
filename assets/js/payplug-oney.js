@@ -10,7 +10,7 @@
         var popup = $("#oney-popup")
         var loading = popup.find('.payplug-lds-roller')
         var oneyError = popup.find('#oney-popup-error')
-        var totalsProduct = showpopuponey.data('total-products')
+        var totalsProduct = oneyData.data('total-products')
 		var maxOneyQty = oneyData.data('max-oney-qty')
         is_cart = oneyData.data('is-cart')
         var showpopupF = function (show) {
