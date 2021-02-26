@@ -456,6 +456,9 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function get_min_max_oney() {
 		$account = self::get_account_data_from_options();
+		if (empty($account)) {
+			return array();
+		}
 		return [
 			'min' => floatval($account['httpResponse']['configuration']['oney']['min_amounts']['EUR'])/100,
 			'max' => floatval($account['httpResponse']['configuration']['oney']['max_amounts']['EUR'])/100
