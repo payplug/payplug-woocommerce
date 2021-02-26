@@ -8,13 +8,13 @@ Stable tag: 1.1.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-PlayPlug is a French payment solution allowing small and medium e-commerce companies to accept online payments from Visa, MasterCard and CB cards. 
+PlayPlug is a French payment solution allowing small and medium e-commerce companies to accept online payments from Visa, MasterCard and CB cards.
 
 == Description ==
 
 What this product does for you
 
-PayPlug’s primary goal is to meet the specific needs of small and medium e-commerce companies :
+PayPlug's primary goal is to meet the specific needs of small and medium e-commerce companies :
 - Simple set up and management
 - Safety
 - Optimized conversion
