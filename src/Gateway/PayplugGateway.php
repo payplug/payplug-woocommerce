@@ -266,7 +266,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function init_form_fields()
     {
-
+		$oney_range = PayplugWoocommerceHelper::get_min_max_oney();
+        $min_oney_price = (isset($oney_range['min'])) ? $oney_range['min'] : 100;
+        $max_oney_price = (isset($oney_range['max'])) ? $oney_range['max'] : 3000;
+		
         $fields = [
             'enabled'                 => [
                 'title'       => __('Enable/Disable', 'payplug'),
@@ -371,7 +374,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'type'        => 'checkbox',
                 'label'       => __('Activate', 'payplug'),
                 // TRAD
-                'description' => __('Allow your customers to save their credit card information for later purchases.', 'payplug'),
+                'description' => sprintf(__('Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€.', 'payplug'), $min_oney_price, $max_oney_price),
                 'default'     => 'no',
                 'desc_tip'    => true
             ],
