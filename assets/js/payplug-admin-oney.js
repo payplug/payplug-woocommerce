@@ -7,6 +7,7 @@
 			pao.$dialogoney = $('#payplug-oney-modal').dialog({
 				autoOpen: false,
 				modal: true,
+				closeText : "",
 				draggable: false,
 				buttons: [
 					{

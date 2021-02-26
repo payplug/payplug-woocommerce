@@ -121,7 +121,6 @@ class PayplugOneyDetail
 
         if($oney_response) {
             $popup = "
-            <div id='oney-popup-arrow' class='triangle-left'></div>
             <div class='oney-img oney-logo no-margin'></div>
             <div class='oney-title'>
                 <p class='no-margin oney-color'>{$f(__('PAYMENT', 'payplug'))}  </p>
