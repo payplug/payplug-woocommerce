@@ -182,6 +182,9 @@ class PayplugGatewayRequirements {
 	 * @return bool
 	 */
 	public function valid_oney_check() {
+		if (!isset($this->settings['mode']) || !isset($this->settings['oney'])) {
+			return false;
+		}
 		return ("yes" === $this->settings['mode'] && "yes" === $this->settings['oney'] && $this->permissions->has_permissions(PayplugPermissions::USE_ONEY));
 	}
 
@@ -191,6 +194,9 @@ class PayplugGatewayRequirements {
 	 * @return bool
 	 */
 	public function valid_oney() {
+		if (!isset($this->settings['oneycgv'])) {
+			return false;
+		}
 		return ("yes" === $this->settings['oneycgv']);
 	}
 }

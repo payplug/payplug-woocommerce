@@ -46,8 +46,12 @@ class PayplugPermissions {
 	 */
 	public function __construct( PayplugGateway $gateway) {
 		$this->gateway_mode = $gateway->get_current_mode();
-		$this->current_key = "live" === $this->gateway_mode ?
-			$gateway->settings['payplug_live_key'] : $gateway->settings['payplug_test_key'];
+		if (!isset($gateway->settings['payplug_live_key']) || !isset($gateway->settings['payplug_test_key'])) {
+			$this->current_key = '';
+		} else {
+			$this->current_key = "live" === $this->gateway_mode ?
+				$gateway->settings['payplug_live_key'] : $gateway->settings['payplug_test_key'];
+		}
 		$this->load_permissions();
 	}
 

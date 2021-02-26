@@ -440,6 +440,9 @@ class PayplugWoocommerceHelper {
 		$options          = get_option( 'woocommerce_payplug_settings', [] );
 		$payplug_test_key = ! empty( $options['payplug_test_key'] ) ? $options['payplug_test_key'] : '';
 		$payplug_live_key = ! empty( $options['payplug_live_key'] ) ? $options['payplug_live_key'] : '';
+		if(empty($payplug_test_key) && empty($payplug_live_key)) {
+			return array();
+		}
 		$account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
 		$account['oney'] = $options['oney'];
 		$account['oneycgv'] = $options['oneycgv'];
@@ -453,6 +456,9 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function get_min_max_oney() {
 		$account = self::get_account_data_from_options();
+		if (empty($account)) {
+			return array();
+		}
 		return [
 			'min' => floatval($account['httpResponse']['configuration']['oney']['min_amounts']['EUR'])/100,
 			'max' => floatval($account['httpResponse']['configuration']['oney']['max_amounts']['EUR'])/100
@@ -466,6 +472,9 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function is_oney_available() {
 		$account = self::get_account_data_from_options();
+		if (empty($account)) {
+			return false;
+		}
 		return ($account['httpResponse'] && $account['httpResponse']['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oney'] === "yes" && $account['oneycgv'] === "yes");
 	}
 
@@ -484,4 +493,24 @@ class PayplugWoocommerceHelper {
             }
         }
     }
+
+	/**
+	 * Load translations from plugin languages folder.
+	 *
+	 * @param string $plugin_rel_path
+	 *
+	 * @return bool
+	 */
+	public static function load_plugin_textdomain( $plugin_rel_path ) {
+
+		$domain = 'payplug';
+
+		$locale = apply_filters( 'plugin_locale', is_admin() ? get_user_locale() : get_locale(), $domain );
+
+		$mofile = $domain . '-' . $locale . '.mo';
+
+		$path = WP_PLUGIN_DIR . '/' . trim( $plugin_rel_path, '/' );
+
+		return load_textdomain( $domain, $path . '/' . $mofile );
+	}
 }

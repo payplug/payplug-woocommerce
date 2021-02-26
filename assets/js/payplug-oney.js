@@ -3,23 +3,24 @@
     var popupLoaded = false
     var initevent = function () {
         var showpopup = $("#oney-show-popup")
-        var showpopuponey = $("#oney-show-popup").closest('.payplug-oney')
+        var oneyData = $("#oney-show-popup").closest('.payplug-oney')
+        var showpopuponey = $("#oney-show-popup").closest('.payplug-oney-popup')
         var arrow = $("#oney-popup-arrow")
         var qtyInput = $('input[name=quantity]')
         var popup = $("#oney-popup")
         var loading = popup.find('.payplug-lds-roller')
         var oneyError = popup.find('#oney-popup-error')
-        var totalsProduct = showpopuponey.data('total-products')
-		var maxOneyQty = showpopuponey.data('max-oney-qty')
-        is_cart = showpopuponey.data('is-cart')
+        var totalsProduct = oneyData.data('total-products')
+		var maxOneyQty = oneyData.data('max-oney-qty')
+        is_cart = oneyData.data('is-cart')
         var showpopupF = function (show) {
-            if(!showpopuponey.hasClass('disabled') && !popupLoaded && !show) {
+            if(!oneyData.hasClass('disabled') && !popupLoaded && !show) {
                 return
             }
             popup.show(0, function () {
                 if (!$.browser.mobile) {
                     checkOneyError()
-                    var top = showpopuponey.hasClass('disabled') ? 50 : 110
+                    var top = oneyData.hasClass('disabled') ? 50 : 110
                     popup.css('position', 'fixed')
                     popup.position({
                         my: popupLoaded ? "left top-" + top : "left top-75",
@@ -41,17 +42,17 @@
             })
         }
         calculTotals = function () {
-            var price = showpopuponey.data('price')
+            var price = oneyData.data('price')
             return qtyInput.length ? totalsProduct * price : price
         }
         isInOneyRange = function () {
             var totalPrice = calculTotals()
-            var minOney = showpopuponey.data('min-oney')
-            var maxOney = showpopuponey.data('max-oney')
+            var minOney = oneyData.data('min-oney')
+            var maxOney = oneyData.data('max-oney')
             return (totalPrice >= minOney && totalPrice <= maxOney)
         }
         checkOneyError = function () {
-            if(showpopuponey.hasClass('disabled')) {
+            if(oneyData.hasClass('disabled')) {
                 popupLoaded = true
                 popup.html('').append($(oneyError)).append($(arrow))
                 popup.addClass('loaded')
@@ -69,13 +70,13 @@
             totalsProduct = $(this).val()
             popupLoaded = false
             if (isInOneyRange() && totalsProduct < maxOneyQty) {
-                showpopuponey.removeClass('disabled')
+                oneyData.removeClass('disabled')
                 popup.removeClass('disabled').removeClass('loaded')
                 popup.html('').append($(arrow))
                 arrow.hide()
             } else {
                 checkOneyError()
-                showpopuponey.addClass('disabled')
+                oneyData.addClass('disabled')
                 popup.addClass('disabled')
             }
         })
