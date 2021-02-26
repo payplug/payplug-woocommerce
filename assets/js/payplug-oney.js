@@ -110,7 +110,9 @@
             showpopupF()
         })
         showpopuponey.on('mouseleave', function () {
-            popup.hide()
+            if (popupLoaded) {
+                popup.hide()
+            }
         })
         $(document).on('scroll', function () {
             if (!$.browser.mobile) {
