@@ -27,14 +27,14 @@ class PayplugOneyDetail
                 // Total cart
                 add_action('woocommerce_cart_totals_after_order_total', [$this, 'oney_simulate_payment_detail']);
 				
-				// Add Js
-                add_action( 'wp_enqueue_scripts', [$this, 'add_oney_js'] );
-
-                // Add CSS
+				// Add CSS
                 add_action( 'wp_enqueue_scripts', [$this, 'add_oney_css'] );
 
+                // Add Js
+                add_action( 'wp_enqueue_scripts', [$this, 'add_oney_js'] );
+
                 // Add Scripts
-                add_action( 'wp_localize_script', [$this, 'add_oney_script'] );
+                add_action( 'wp_enqueue_scripts', [$this, 'add_oney_script'] );
             }
         }
     }
