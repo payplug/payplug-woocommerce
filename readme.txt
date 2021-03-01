@@ -20,6 +20,7 @@ PayPlug's primary goal is to meet the specific needs of small and medium e-comme
 - Optimized conversion
 - Support
 
+NEW : Oney is now available ! Your customers will be able to pay in 3 or 4 times and you will get paid in 48 hours. Frauds and unpaid transactions will be managed by Oney.
 
 Features
 
