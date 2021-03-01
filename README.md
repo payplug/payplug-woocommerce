@@ -1,6 +1,6 @@
 # PayPlug for WooCommerce (Official)
 ## Description
-PlayPlug is a French payment solution allowing small and medium e-commerce companies to accept online payments from Visa, MasterCard and CB cards. 
+PlayPlug is a French payment solution allowing small and medium e-commerce companies to accept online payments from Visa, MasterCard and CB cards.
 
 ### What this product does for you ?
 * Simple set up and management
@@ -11,6 +11,7 @@ PlayPlug is a French payment solution allowing small and medium e-commerce compa
 ## Features
 
 ### Accept payments
+* NEW: Guaranteed installment payments, set up in a few clicks only
 * Fastest set up on the market, with no technical skills required
 * Plugin developed by PayPlug, configurable with just a few clicks
 * Reception of online credit card payments from CB, Visa, Mastercard, without needing an extra merchant account

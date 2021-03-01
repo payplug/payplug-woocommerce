@@ -1,10 +1,10 @@
 === PayPlug for WooCommerce (Official) ===
 Contributors: PayPlug
-Tags: payplug, woocommerce, gateway, payment, credit card, carte de crÃ©dit, carte bancaire, paiement, one click, paiement en ligne
+Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, carte bancaire, paiement, one click, paiement en ligne, oney
 Requires at least: 4.4
 Tested up to: 5.4
 Requires PHP: 5.6
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -20,6 +20,7 @@ PayPlug's primary goal is to meet the specific needs of small and medium e-comme
 - Optimized conversion
 - Support
 
+NEW: Oney is now available! Your customers will be able to pay in 3 or 4 times and you will get paid in 48 hours. Frauds and unpaid transactions will be managed by Oney.
 
 Features
 
@@ -29,6 +30,7 @@ Accept payments
 - Reception of online credit card payments from CB, Visa, Mastercard, without needing an extra merchant account
 
 Boost your sales
+- NEW: Guaranteed installment payments, set up in a few clicks only
 - Customizable payment page, optimized for mobile devices, integrated or redirected
 - One-click payment with secure card information storage
 - Customizable or predictive 3-D Secure tool (Smart 3-D Secure)
@@ -69,6 +71,9 @@ Based on a recent survey, 91% of merchants using PlayPlug would recommend the so
 2. Display on a WordPress website
 
 == Changelog ==
+
+= 1.2.0 =
+Guaranteed installment payments by Oney
 
 = 1.1.0 =
 One click payments with 3D Secure validation to be compatible with new DSP2 requirements
