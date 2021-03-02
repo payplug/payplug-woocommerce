@@ -8,6 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Payplug\Resource\APIResource;
+use Payplug\Payplug;
+use Payplug\Authentication;
+use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 
 /**
  * Helper class.
@@ -426,5 +429,88 @@ class PayplugWoocommerceHelper {
 				$order->save();
 			}
 		}
+	}
+
+	/**
+	 * Get current option from payplug settings
+	 *
+	 * @return array
+	 */
+	public static function get_account_data_from_options() {
+		$options          = get_option( 'woocommerce_payplug_settings', [] );
+		$payplug_test_key = ! empty( $options['payplug_test_key'] ) ? $options['payplug_test_key'] : '';
+		$payplug_live_key = ! empty( $options['payplug_live_key'] ) ? $options['payplug_live_key'] : '';
+		if(empty($payplug_test_key) && empty($payplug_live_key)) {
+			return array();
+		}
+		$account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
+		$account['oney'] = $options['oney'];
+		$account['oneycgv'] = $options['oneycgv'];
+		return $account;
+	}
+
+	/**
+	 * Get min and max for oney payment
+	 *
+	 * @return array
+	 */
+	public static function get_min_max_oney() {
+		$account = self::get_account_data_from_options();
+		if (empty($account)) {
+			return array();
+		}
+		return [
+			'min' => floatval($account['httpResponse']['configuration']['oney']['min_amounts']['EUR'])/100,
+			'max' => floatval($account['httpResponse']['configuration']['oney']['max_amounts']['EUR'])/100
+		];
+	}
+
+	/**
+	 * Check if oney is available with current settings
+	 *
+	 * @return boolean
+	 */
+	public static function is_oney_available() {
+		$account = self::get_account_data_from_options();
+		if (empty($account)) {
+			return false;
+		}
+		return ($account['httpResponse'] && $account['httpResponse']['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oney'] === "yes" && $account['oneycgv'] === "yes");
+	}
+
+	/**
+	 * Check and update value for oney simulation
+	 *
+	 * @return void
+	 */
+    public static function oney_simulation_values ($keys_array, &$array) {
+        foreach($keys_array as $key) {
+            if (array_key_exists($key, $array)) {
+                $array[$key]['down_payment_amount'] = floatval($array[$key]['down_payment_amount']) / 100;
+                foreach ($array[$key]['installments'] as $k => $value) {
+                    $array[$key]['installments'][$k]['amount'] = floatval($value['amount']) / 100;
+                }
+            }
+        }
+    }
+
+	/**
+	 * Load translations from plugin languages folder.
+	 *
+	 * @param string $plugin_rel_path
+	 *
+	 * @return bool
+	 */
+	public static function load_plugin_textdomain( $plugin_rel_path ) {
+
+		$domain = 'payplug';
+
+		$locale = apply_filters( 'plugin_locale', is_admin() ? get_user_locale() : get_locale(), $domain );
+
+		$mofile = $domain . '-' . $locale . '.mo';
+
+		$path = WP_PLUGIN_DIR . '/' . trim( $plugin_rel_path, '/' );
+
+		return load_textdomain( $domain, $path . '/' . $mofile );
 	}
 }

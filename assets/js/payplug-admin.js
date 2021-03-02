@@ -1,5 +1,4 @@
 /* global jQuery */
-
 (function ($, undefined) {
 
     if (undefined === payplug_admin_config) {
@@ -63,7 +62,6 @@
                 // ignore event if user choose TEST mode or already has LIVE keys
                 return;
             }
-
             payplug_admin.$dialog.dialog('open');
         },
         onCancelClick: function () {
@@ -81,8 +79,7 @@
 
             var live = payplug_admin.$payplug_mode.filter('#woocommerce_payplug_mode-yes');
             var test = payplug_admin.$payplug_mode.filter('#woocommerce_payplug_mode-no');
-
-            if (!payplug_admin_config.has_live_key && live.prop('checked')) {
+            if (payplug_admin_config.has_live_key && live.prop('checked') && !payplug_admin.is_oney_refresh) {
                 test.prop('checked', 'checked');
             }
         },
@@ -113,11 +110,7 @@
                         action: 'check_live_permissions',
                         livekey: $('#woocommerce_payplug_payplug_live_key').length ? $('#woocommerce_payplug_payplug_live_key').val() : ''
                     }
-                ).done((res) => {
-                    callback(res)
-                })
-                .fail((res) => {
-                })
+                ).done((res) => { callback(res) })
         },
         refreshKeys: function () {
             payplug_admin._clearMessage();
@@ -141,7 +134,13 @@
                         payplug_admin._displayError(res.data.message);
                     } else {
                         payplug_admin._displaySuccess(res.data.message);
-                        window.location.reload();
+                        if (false === res.data.can_use_oney) {
+                            payplug_admin.is_oney_refresh = true;
+                            payplug_admin.$dialog.dialog('close');
+                            payplug_admin.$dialogoney.dialog('open');
+                        } else {
+                            window.location.reload();
+                        }
                     }
                 })
                 .fail(function (res) {
@@ -180,4 +179,5 @@
     };
 
     payplug_admin.init();
+
 })(jQuery);

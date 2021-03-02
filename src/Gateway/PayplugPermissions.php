@@ -7,6 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+
+use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\Exception\PayplugException;
 
@@ -15,11 +17,8 @@ class PayplugPermissions {
 	const OPTION_NAME = 'payplug_permission';
 	const LIVE_MODE = 'use_live_mode';
 	const SAVE_CARD = 'can_save_cards';
+	const USE_ONEY = 'can_use_oney';
 
-	/**
-	 * @var PayplugGateway
-	 */
-	private $gateway;
 
 	/**
 	 * The current mode for the gateway.
@@ -28,6 +27,13 @@ class PayplugPermissions {
 	 */
 	private $gateway_mode;
 
+    /**
+     * The current key for account permissions.
+     *
+     * @var string
+     */
+    private $current_key;
+    
 	/**
 	 * @var array
 	 */
@@ -38,9 +44,14 @@ class PayplugPermissions {
 	 *
 	 * @param PayplugGateway $gateway
 	 */
-	public function __construct( PayplugGateway $gateway ) {
-		$this->gateway      = $gateway;
+	public function __construct( PayplugGateway $gateway) {
 		$this->gateway_mode = $gateway->get_current_mode();
+		if (!isset($gateway->settings['payplug_live_key']) || !isset($gateway->settings['payplug_test_key'])) {
+			$this->current_key = '';
+		} else {
+			$this->current_key = "live" === $this->gateway_mode ?
+				$gateway->settings['payplug_live_key'] : $gateway->settings['payplug_test_key'];
+		}
 		$this->load_permissions();
 	}
 
@@ -81,7 +92,6 @@ class PayplugPermissions {
 	 * Load permissions for the current mode.
 	 */
 	protected function load_permissions() {
-
 		$payplug_permissions = get_transient( $this->get_key() );
 		if ( ! empty( $payplug_permissions ) ) {
 			$this->permissions = $payplug_permissions;
@@ -90,7 +100,7 @@ class PayplugPermissions {
 		}
 
 		try {
-			$response          = Authentication::getPermissions();
+			$response          = Authentication::getPermissions(new Payplug($this->current_key));
 			$this->permissions = ! empty( $response ) ? $response : [];
 			set_transient( $this->get_key(), $this->permissions, DAY_IN_SECONDS );
 
