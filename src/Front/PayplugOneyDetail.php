@@ -19,7 +19,16 @@ class PayplugOneyDetail
     {
         add_action( 'wp_ajax_simulate_oney_payment', [ $this, 'simulate_oney_payment' ]);
         add_action( 'wp_ajax_nopriv_simulate_oney_payment', [ $this, 'simulate_oney_payment' ]);
-        if (!is_admin()) {
+        add_action( 'template_redirect', [ $this, 'check_oney_frontend' ] );        
+    }
+	
+    /**
+     * Check if Oney can add JS & CSS in Shop
+     * 
+     * @return void
+    */
+    public function check_oney_frontend() {
+        if ( is_cart() || is_product() || is_checkout()) {
             if(PayplugWoocommerceHelper::is_oney_available()) {
                 // Product page
                 add_action('woocommerce_single_product_summary', [$this, 'oney_simulate_payment_detail']);
@@ -29,16 +38,14 @@ class PayplugOneyDetail
 				
 				// Add CSS
                 add_action( 'wp_enqueue_scripts', [$this, 'add_oney_css'] );
-
                 // Add Js
                 add_action( 'wp_enqueue_scripts', [$this, 'add_oney_js'] );
-
                 // Add Scripts
                 add_action( 'wp_enqueue_scripts', [$this, 'add_oney_script'] );
             }
         }
     }
-	
+
 	/**
      * Add CSS
      * 
