@@ -19,6 +19,7 @@ if (!defined('ABSPATH')) {
  */
 class PayplugGatewayOney3x extends PayplugGateway
 {
+    const OPTION_NAME = "payplug_oney_config";
     const ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED = 2;
     const ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH = 3;
 	const ONEY_PRODUCT_QUANTITY_MAXIMUM = 1000;
@@ -43,15 +44,11 @@ class PayplugGatewayOney3x extends PayplugGateway
 
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'oney_refund_text']);
 
-        try {
-            $http_response = Authentication::getAccount();
-            $oney_configuration = $http_response['httpResponse']['configuration']['oney'];
-            $this->min_oney_price = $oney_configuration['min_amounts']['EUR']/100;
-            $this->max_oney_price = $oney_configuration['max_amounts']['EUR']/100;
-            $this->allowed_country_codes = $oney_configuration['allowed_countries'];
-        } catch ( \Payplug\Exception\UnauthorizedException $e ) {
-        } catch ( \Payplug\Exception\ConfigurationNotSetException $e ) {
-        }
+        $account = PayplugWoocommerceHelper::get_account_data_from_options();
+        $oney_configuration = $account['configuration']['oney'];
+        $this->min_oney_price = $oney_configuration['min_amounts']['EUR'] / 100;
+        $this->max_oney_price = $oney_configuration['max_amounts']['EUR'] / 100;
+        $this->allowed_country_codes = $oney_configuration['allowed_countries'];
     }
 
     /**
@@ -321,4 +318,13 @@ HTML;
         }
     }
 
+    /**
+     * Build the key to retrieve the permissions.
+     *
+     * @return string
+     */
+    protected function get_key()
+    {
+        return self::OPTION_NAME . '_' . $this->mode;
+    }
 }
