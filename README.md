@@ -13,6 +13,7 @@ PayPlug primary goal is to give you the tools you need to sell to your clients, 
 * Optimized conversion
 
 * Support
+Test
 
 ## Our main features
 
