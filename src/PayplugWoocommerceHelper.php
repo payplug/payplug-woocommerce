@@ -451,7 +451,7 @@ class PayplugWoocommerceHelper {
             $account = $payplug_oney_config;
         } else {
             try {
-                $account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
+                $parameters_account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
                 set_transient($transient_key, $account['httpResponse']);
             } catch (\Payplug\Exception\UnauthorizedException $e) {
             } catch (\Payplug\Exception\ConfigurationNotSetException $e) {
