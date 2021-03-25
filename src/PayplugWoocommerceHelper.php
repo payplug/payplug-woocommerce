@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Payplug\Resource\APIResource;
 use Payplug\Payplug;
 use Payplug\Authentication;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 
 /**
@@ -437,15 +438,26 @@ class PayplugWoocommerceHelper {
 	 * @return array
 	 */
 	public static function get_account_data_from_options() {
-		$options          = get_option( 'woocommerce_payplug_settings', [] );
-		$payplug_test_key = ! empty( $options['payplug_test_key'] ) ? $options['payplug_test_key'] : '';
-		$payplug_live_key = ! empty( $options['payplug_live_key'] ) ? $options['payplug_live_key'] : '';
-		if(empty($payplug_test_key) && empty($payplug_live_key)) {
+		$options          = get_option('woocommerce_payplug_settings', []);
+		$payplug_test_key = !empty($options['payplug_test_key']) ? $options['payplug_test_key'] : '';
+		$payplug_live_key = !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : '';
+		if (empty($payplug_test_key) && empty($payplug_live_key)) {
 			return array();
 		}
-		$account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
-		$account['oney'] = $options['oney'];
-		$account['oneycgv'] = $options['oneycgv'];
+		$transient_key = PayplugGatewayOney3x::OPTION_NAME . ($options['mode'] === 'yes' ? "_live" : "_test");
+		$payplug_oney_config = get_transient($transient_key);
+		if ($payplug_oney_config) {
+			$account = $payplug_oney_config;
+		} else {
+			try {
+				$account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
+				set_transient($transient_key, $account['httpResponse']);
+			} catch (\Payplug\Exception\UnauthorizedException $e) {
+			} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
+			}
+		}
+		$account['oneyEnabled'] = $options['oney'];
+		$account['oneyCgvEnabled'] = $options['oneycgv'];
 		return $account;
 	}
 
@@ -460,8 +472,8 @@ class PayplugWoocommerceHelper {
 			return array();
 		}
 		return [
-			'min' => floatval($account['httpResponse']['configuration']['oney']['min_amounts']['EUR'])/100,
-			'max' => floatval($account['httpResponse']['configuration']['oney']['max_amounts']['EUR'])/100
+			'min' => floatval($account['configuration']['oney']['min_amounts']['EUR'])/100,
+			'max' => floatval($account['configuration']['oney']['max_amounts']['EUR'])/100
 		];
 	}
 
@@ -475,7 +487,7 @@ class PayplugWoocommerceHelper {
 		if (empty($account)) {
 			return false;
 		}
-		return ($account['httpResponse'] && $account['httpResponse']['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oney'] === "yes" && $account['oneycgv'] === "yes");
+		return ($account && $account['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oneyEnabled'] === "yes" && $account['oneyCgvEnabled'] === "yes");
 	}
 
 	/**
