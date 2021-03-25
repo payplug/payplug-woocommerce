@@ -452,7 +452,8 @@ class PayplugWoocommerceHelper {
         } else {
             try {
                 $parameters_account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
-                set_transient($transient_key, $account['httpResponse']);
+                set_transient($transient_key, $parameters_account['httpResponse']);
+                $account = get_transient($transient_key);
             } catch (\Payplug\Exception\UnauthorizedException $e) {
             } catch (\Payplug\Exception\ConfigurationNotSetException $e) {
             }
