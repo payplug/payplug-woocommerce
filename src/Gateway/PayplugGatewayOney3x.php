@@ -318,13 +318,4 @@ HTML;
         }
     }
 
-    /**
-     * Build the key to retrieve the permissions.
-     *
-     * @return string
-     */
-    protected function get_key()
-    {
-        return self::OPTION_NAME . '_' . $this->mode;
-    }
 }
