@@ -2,7 +2,7 @@
 Contributors: PayPlug
 Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, carte bancaire, paiement, one click, paiement en ligne, oney
 Requires at least: 4.4
-Tested up to: 5.6
+Tested up to: 5.7
 Requires PHP: 5.6
 Stable tag: 1.2.2
 License: GPLv3 or later
