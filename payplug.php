@@ -7,7 +7,7 @@
  * Author URI:      https://www.payplug.com/
  * Text Domain:     payplug
  * Domain Path:     /languages
- * Version:         1.2.2
+ * Version:         1.2.2.1
  * WC tested up to: 4.0
  * License:         GPLv3 or later
  * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
@@ -20,8 +20,7 @@ namespace Payplug\PayplugWoocommerce;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-define( 'PAYPLUG_GATEWAY_VERSION', '1.2.2' );
+define( 'PAYPLUG_GATEWAY_VERSION', '1.2.2.1' );
 define( 'PAYPLUG_GATEWAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );

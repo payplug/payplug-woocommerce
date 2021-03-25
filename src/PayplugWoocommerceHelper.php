@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Payplug\Resource\APIResource;
 use Payplug\Payplug;
 use Payplug\Authentication;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 
 /**
@@ -436,17 +437,31 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return array
 	 */
-	public static function get_account_data_from_options() {
-		$options          = get_option( 'woocommerce_payplug_settings', [] );
-		$payplug_test_key = ! empty( $options['payplug_test_key'] ) ? $options['payplug_test_key'] : '';
-		$payplug_live_key = ! empty( $options['payplug_live_key'] ) ? $options['payplug_live_key'] : '';
-		if(empty($payplug_test_key) && empty($payplug_live_key)) {
-			return array();
-		}
-		$account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
-		$account['oney'] = $options['oney'];
-		$account['oneycgv'] = $options['oneycgv'];
-		return $account;
+	public static function get_account_data_from_options($force_update = false) {
+        $options          = get_option('woocommerce_payplug_settings', []);
+        $payplug_test_key = !empty($options['payplug_test_key']) ? $options['payplug_test_key'] : '';
+        $payplug_live_key = !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : '';
+        if (empty($payplug_test_key) && empty($payplug_live_key)) {
+            return array();
+        }
+
+        $transient_key = PayplugGatewayOney3x::OPTION_NAME . ($options['mode'] === 'yes' ? "_live" : "_test");
+        $payplug_oney_config = get_transient($transient_key);
+        if ($payplug_oney_config && !$force_update) {
+            $account = $payplug_oney_config;
+        } else {
+            try {
+                $parameters_account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
+                set_transient($transient_key, $parameters_account['httpResponse']);
+                $account = get_transient($transient_key);
+            } catch (\Payplug\Exception\UnauthorizedException $e) {
+            } catch (\Payplug\Exception\ConfigurationNotSetException $e) {
+            }
+        }
+        $account['oneyEnabled'] = $options['oney'];
+        $account['oneyCgvEnabled'] = $options['oneycgv'];
+        return $account;
+
 	}
 
 	/**
@@ -460,8 +475,8 @@ class PayplugWoocommerceHelper {
 			return array();
 		}
 		return [
-			'min' => floatval($account['httpResponse']['configuration']['oney']['min_amounts']['EUR'])/100,
-			'max' => floatval($account['httpResponse']['configuration']['oney']['max_amounts']['EUR'])/100
+			'min' => floatval($account['configuration']['oney']['min_amounts']['EUR'])/100,
+			'max' => floatval($account['configuration']['oney']['max_amounts']['EUR'])/100
 		];
 	}
 
@@ -475,26 +490,10 @@ class PayplugWoocommerceHelper {
 		if (empty($account)) {
 			return false;
 		}
-		return ($account['httpResponse'] && $account['httpResponse']['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oney'] === "yes" && $account['oneycgv'] === "yes");
+		return ($account && $account['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oneyEnabled'] === "yes" && $account['oneyCgvEnabled'] === "yes");
 	}
 
-	/**
-	 * Check and update value for oney simulation
-	 *
-	 * @return void
-	 */
-    public static function oney_simulation_values ($keys_array, &$array) {
-        foreach($keys_array as $key) {
-            if (array_key_exists($key, $array)) {
-                $array[$key]['down_payment_amount'] = floatval($array[$key]['down_payment_amount']) / 100;
-                foreach ($array[$key]['installments'] as $k => $value) {
-                    $array[$key]['installments'][$k]['amount'] = floatval($value['amount']) / 100;
-                }
-            }
-        }
-    }
-
-	/**
+  	/**
 	 * Load translations from plugin languages folder.
 	 *
 	 * @param string $plugin_rel_path
@@ -513,4 +512,20 @@ class PayplugWoocommerceHelper {
 
 		return load_textdomain( $domain, $path . '/' . $mofile );
 	}
+  
+	/**
+	 * Check and update value for oney simulation
+	 *
+	 * @return void
+	 */
+    public static function oney_simulation_values ($keys_array, &$array) {
+        foreach($keys_array as $key) {
+            if (array_key_exists($key, $array)) {
+                $array[$key]['down_payment_amount'] = floatval($array[$key]['down_payment_amount']) / 100;
+                foreach ($array[$key]['installments'] as $k => $value) {
+                    $array[$key]['installments'][$k]['amount'] = floatval($value['amount']) / 100;
+                }
+            }
+        }
+    }
 }
