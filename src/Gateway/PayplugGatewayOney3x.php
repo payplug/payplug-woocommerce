@@ -45,7 +45,7 @@ class PayplugGatewayOney3x extends PayplugGateway
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'oney_refund_text']);
 
         if (is_checkout()) {
-            $account = PayplugWoocommerceHelper::get_account_data_from_options();
+            $account = PayplugWoocommerceHelper::get_account_data_from_options(true);
             $oney_configuration = $account['configuration']['oney'];
             $this->min_oney_price = $oney_configuration['min_amounts']['EUR'] / 100;
             $this->max_oney_price = $oney_configuration['max_amounts']['EUR'] / 100;
