@@ -127,6 +127,8 @@ class PayplugOneyDetail
         $f = function($fn) { return $fn; }; 
 
         if($oney_response) {
+            $financing_cost_3x = intval($oney_response['x3_with_fees']['total_cost']) / 100;
+            $financing_cost_4x = intval($oney_response['x4_with_fees']['total_cost']) / 100;
             $popup = "
             <div class='oney-img oney-logo no-margin'></div>
             <div class='oney-title'>
@@ -138,7 +140,7 @@ class PayplugOneyDetail
                 <div class='oney-details'>
                     <p class='bold no-margin'> {$f(__('Bring', 'payplug'))} : {$oney_response['x3_with_fees']['down_payment_amount']}  €</p>
                     <p class='bold no-margin'>+2  {$f(__('monthly payment of', 'payplug'))} : {$oney_response['x3_with_fees']['installments'][0]['amount']} € </p>
-                    <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))} : {$oney_response['x3_with_fees']['total_cost']} € </p>
+                    <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))} : {$financing_cost_3x} € </p>
                     <p class='no-margin'> {$f(__('TAEG', 'payplug'))} : {$oney_response['x3_with_fees']['effective_annual_percentage_rate']}  % </p>
                 </div>
             </div>
@@ -148,7 +150,7 @@ class PayplugOneyDetail
                 <div class='oney-details'>
                     <p class='bold no-margin'> {$f(__('Bring', 'payplug'))} : {$oney_response['x4_with_fees']['down_payment_amount']}  €</p>
                     <p class='bold no-margin'>+3  {$f(__('monthly payment of', 'payplug'))} : {$oney_response['x4_with_fees']['installments'][0]['amount']}  € </p>
-                    <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))} : {$oney_response['x4_with_fees']['total_cost']} € </p>
+                    <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))} : {$financing_cost_4x} € </p>
                     <p class='no-margin'> {$f(__('TAEG', 'payplug'))} : {$oney_response['x4_with_fees']['effective_annual_percentage_rate']}  % </p>
                 </div>
             </div>
