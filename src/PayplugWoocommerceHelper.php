@@ -458,8 +458,8 @@ class PayplugWoocommerceHelper {
             } catch (\Payplug\Exception\ConfigurationNotSetException $e) {
             }
         }
-        $account['oneyEnabled'] = $options['oney'];
-        $account['oneyCgvEnabled'] = $options['oneycgv'];
+        $account['oneyEnabled'] = $options['oney'] ? $options['oney'] : '';
+        $account['oneyCgvEnabled'] = $options['oneycgv'] ? $options['oneycgv'] : '';
         return $account;
 
 	}
