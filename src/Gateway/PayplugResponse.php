@@ -62,6 +62,16 @@ class PayplugResponse {
 		}
 
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata( $resource );
+		$order_metadata = $order->get_meta('_payplug_metadata', true);
+		if (strpos($order->get_payment_method(), "oney_") >= 0) {
+			$metadata['is_oney_transaction'] = true;
+		}
+
+		if (is_array($order_metadata) && $order_metadata['is_oney_transaction']) {
+			PayplugGateway::log(sprintf('Order #%s : Order Oney IPN already in progress. Ignoring IPN', $order_id));
+			return;
+		}
+
 		PayplugWoocommerceHelper::save_transaction_metadata( $order, $metadata );
 
 		if ( $resource->is_paid ) {
