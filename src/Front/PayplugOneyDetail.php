@@ -176,8 +176,9 @@ class PayplugOneyDetail
     {
         global $product;
         $total_price = (is_cart()) ? floatval(WC()->cart->total) : (float) ($product->get_price());
-        $total_products = 0;
+        $total_products = 1;
         if(is_cart()) {
+            $total_products = 0;
             foreach(WC()->cart->cart_contents as $product) {
                 $total_products += $product['quantity'];
             }
