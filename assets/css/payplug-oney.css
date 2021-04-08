@@ -1,8 +1,30 @@
+#oney-popup-close {
+    float: right;
+    margin-right: 5px;
+    margin-top: -5px;
+    cursor: pointer;
+}
+.oney-popup-close-mdiv {
+    height: 25px;
+    width: 2px;
+    margin-left: 12px;
+    background-color: #86bd28;
+    transform: rotate(45deg);
+    Z-index: 1;
+}
+.oney-popup-close-md {
+    height: 25px;
+    width: 2px;
+    background-color: #86bd28;
+    transform: rotate(90deg);
+    Z-index: 2;
+}
+
 .payplug-oney {
     display: flex;
     align-items: center;
     font-family: Arial, sans-serif;
-	font-size: 15px;
+    font-size: 15px;
 }
 .payplug-oney .oney-img {
     height: 3rem;

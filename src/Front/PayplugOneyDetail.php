@@ -21,7 +21,7 @@ class PayplugOneyDetail
         add_action( 'wp_ajax_nopriv_simulate_oney_payment', [ $this, 'simulate_oney_payment' ]);
         add_action( 'template_redirect', [ $this, 'check_oney_frontend' ] );        
     }
-	
+    
     /**
      * Check if Oney can add JS & CSS in Shop
      * 
@@ -35,8 +35,8 @@ class PayplugOneyDetail
     
                 // Total cart
                 add_action('woocommerce_cart_totals_after_order_total', [$this, 'oney_simulate_payment_detail']);
-				
-				// Add CSS
+                
+                // Add CSS
                 add_action( 'wp_enqueue_scripts', [$this, 'add_oney_css'] );
                 // Add Js
                 add_action( 'wp_enqueue_scripts', [$this, 'add_oney_js'] );
@@ -46,7 +46,7 @@ class PayplugOneyDetail
         }
     }
 
-	/**
+    /**
      * Add CSS
      * 
      * @return void
@@ -104,9 +104,9 @@ class PayplugOneyDetail
         }
         $result = $this->get_simulate_oney_payment_popup($oney_response);
         wp_send_json_success(
-			array(
-				'popup' => $result
-			)
+            array(
+                'popup' => $result
+            )
         );
         wp_die();
     }
@@ -128,6 +128,11 @@ class PayplugOneyDetail
 
         if($oney_response) {
             $popup = "
+            <div id='oney-popup-close'>
+              <div class='oney-popup-close-mdiv'>
+                <div class='oney-popup-close-md'></div>
+              </div>
+            </div>
             <div class='oney-img oney-logo no-margin'></div>
             <div class='oney-title'>
                 <p class='no-margin oney-color'>{$f(__('PAYMENT', 'payplug'))}  </p>
@@ -194,14 +199,14 @@ class PayplugOneyDetail
             data-is-cart="<?php echo is_cart() ? 1 : 0; ?>" 
             data-total-products="<?php echo $total_products; ?>" 
             data-price="<?php echo $total_price ?>" 
-			data-max-oney-qty="<?php echo PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM; ?>" 
+            data-max-oney-qty="<?php echo PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM; ?>" 
             data-min-oney="<?php echo $this->min_amount; ?>" 
             data-max-oney="<?php echo $this->max_amount; ?>">
             <?php echo __('OR PAY IN', 'payplug'); ?>
-			<div class="payplug-oney-popup">
-				<div class="oney-img oney-3x4x"></div>
-				<div id="oney-show-popup" class="bold oney-color">?</div>
-			</div>
+            <div class="payplug-oney-popup">
+                <div class="oney-img oney-3x4x"></div>
+                <div id="oney-show-popup" class="bold oney-color">?</div>
+            </div>
         </div>
         <div class="payplug-oney <?php echo $disabled; ?>" id="oney-popup">
             <div id='oney-popup-arrow' class='triangle-left'></div>
