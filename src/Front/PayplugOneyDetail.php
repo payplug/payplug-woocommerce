@@ -19,27 +19,29 @@ class PayplugOneyDetail
     {
         add_action( 'wp_ajax_simulate_oney_payment', [ $this, 'simulate_oney_payment' ]);
         add_action( 'wp_ajax_nopriv_simulate_oney_payment', [ $this, 'simulate_oney_payment' ]);
-        add_action( 'template_redirect', [ $this, 'check_oney_frontend' ] );        
+        add_action( 'template_redirect', [ $this, 'check_oney_frontend' ] );
     }
     
     /**
      * Check if Oney can add JS & CSS in Shop
      * 
      * @return void
-    */
+     */
     public function check_oney_frontend() {
         if ( is_cart() || is_product() || is_checkout()) {
             if(PayplugWoocommerceHelper::is_oney_available()) {
                 // Product page
                 add_action('woocommerce_single_product_summary', [$this, 'oney_simulate_payment_detail']);
-    
+                
                 // Total cart
                 add_action('woocommerce_cart_totals_after_order_total', [$this, 'oney_simulate_payment_detail']);
-                
+				
                 // Add CSS
                 add_action( 'wp_enqueue_scripts', [$this, 'add_oney_css'] );
+                
                 // Add Js
                 add_action( 'wp_enqueue_scripts', [$this, 'add_oney_js'] );
+                
                 // Add Scripts
                 add_action( 'wp_enqueue_scripts', [$this, 'add_oney_script'] );
             }
@@ -104,9 +106,9 @@ class PayplugOneyDetail
         }
         $result = $this->get_simulate_oney_payment_popup($oney_response);
         wp_send_json_success(
-            array(
-                'popup' => $result
-            )
+			array(
+				'popup' => $result
+			)
         );
         wp_die();
     }
@@ -126,15 +128,15 @@ class PayplugOneyDetail
         Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr", "payplug"), $this->min_amount, $this->max_amount);
         $f = function($fn) { return $fn; }; 
 
-        if($oney_response) {
+        if($oney_response) {            
             $financing_cost_3x = intval($oney_response['x3_with_fees']['total_cost']) / 100;
             $financing_cost_4x = intval($oney_response['x4_with_fees']['total_cost']) / 100;
             $popup = "
             <div id='oney-popup-close'>
-              <div class='oney-popup-close-mdiv'>
-                <div class='oney-popup-close-md'></div>
-              </div>
-            </div>
+			  <div class='oney-popup-close-mdiv'>
+			    <div class='oney-popup-close-md'></div>
+			  </div>
+			</div>
             <div class='oney-img oney-logo no-margin'></div>
             <div class='oney-title'>
                 <p class='no-margin oney-color'>{$f(__('PAYMENT', 'payplug'))}  </p>
@@ -162,7 +164,7 @@ class PayplugOneyDetail
             <div class='oney-content oney-cgv-content'>
                 {$cgv}
             </div>";
-        } else {            
+        } else {
             $popup = "
             <div id='oney-popup-arrow' class='triangle-left'></div>
             <div class='oney-content oney-cgv-content'>
@@ -181,6 +183,7 @@ class PayplugOneyDetail
     {
         global $product;
         $total_price = (is_cart()) ? floatval(WC()->cart->total) : (float) ($product->get_price());
+
         $total_products = 1;
         if(is_cart()) {
             $total_products = 0;
@@ -193,10 +196,10 @@ class PayplugOneyDetail
         $this->min_amount = $oney_range['min'];
         $this->max_amount = $oney_range['max'];
         $disabled = "";
+
         if ($total_price < $this->min_amount || $total_price > $this->max_amount || $total_products >= PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM) {
             $disabled = "disabled";
         }
-        
 ?>
         <div class="payplug-oney <?php echo $disabled; ?>" 
             data-is-cart="<?php echo is_cart() ? 1 : 0; ?>" 
@@ -211,7 +214,7 @@ class PayplugOneyDetail
                 <div id="oney-show-popup" class="bold oney-color">?</div>
             </div>
         </div>
-        <div class="payplug-oney <?php echo $disabled; ?>" id="oney-popup">
+        <div class="payplug-oney <?php echo $disabled; ?>" id="oney-popup">X
             <div id='oney-popup-arrow' class='triangle-left'></div>
             <div class="payplug-lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
             <div id="oney-popup-error">
