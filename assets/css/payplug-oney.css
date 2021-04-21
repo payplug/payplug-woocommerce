@@ -1,30 +1,30 @@
 #oney-popup-close {
-    float: right;
-    margin-right: 5px;
-    margin-top: -5px;
-    cursor: pointer;
+	float: right;
+	margin-right: 5px;
+	margin-top: -5px;
+	cursor: pointer;
 }
 .oney-popup-close-mdiv {
-    height: 25px;
-    width: 2px;
-    margin-left: 12px;
-    background-color: #86bd28;
-    transform: rotate(45deg);
-    Z-index: 1;
+  height: 25px;
+  width: 2px;
+  margin-left: 12px;
+  background-color: #86bd28;
+  transform: rotate(45deg);
+  Z-index: 1;
 }
 .oney-popup-close-md {
-    height: 25px;
-    width: 2px;
-    background-color: #86bd28;
-    transform: rotate(90deg);
-    Z-index: 2;
+  height: 25px;
+  width: 2px;
+  background-color: #86bd28;
+  transform: rotate(90deg);
+  Z-index: 2;
 }
 
 .payplug-oney {
     display: flex;
     align-items: center;
     font-family: Arial, sans-serif;
-    font-size: 15px;
+	font-size: 15px;
 }
 .payplug-oney .oney-img {
     height: 3rem;
@@ -54,6 +54,7 @@
 .payplug-oney .oney-4x { background-image: url(../images/lg-4xoney.png); }
 .payplug-oney .oney-3x4x { background-image: url(../images/lg-3x4xoney.png); min-width: 8em; margin-bottom: -.2em; background-position: center center; float: left;}
 .payplug-oney .oney-logo { background-image: url(../images/lg-oney.png);  width: auto; height: 30px; }
+
 .payplug-oney .oney-step1 {  margin-left: 13% !important; background-image: url(../images/lg-step1-oney.png); }
 .payplug-oney .oney-step2 { background-image: url(../images/lg-step2-oney.png); }
 .payplug-oney .oney-step3 { background-image: url(../images/lg-step3-oney.png); }
@@ -61,11 +62,9 @@
 .payplug-oney.disabled .oney-3x { background-image: url(../images/lg-3xoney-disabled.png); }
 .payplug-oney.disabled .oney-4x { background-image: url(../images/lg-4xoney-disabled.png); }
 .payplug-oney.disabled .oney-3x4x { background-image: url(../images/lg-3x4xoney-disabled.png); }
-
 .payplug-oney-popup {
     cursor: pointer;
 }
-
 .payplug-oney #oney-show-popup {
     width: 1.5rem;
     height: 1.5rem;
@@ -73,7 +72,7 @@
     text-align: center;
     border: 3px solid #86bd28;
     border-radius: 1rem;
-	margin-top: 9px;
+    margin-top: 9px;
     float: right;
 }
 .payplug-oney.disabled #oney-show-popup {
@@ -136,7 +135,7 @@
 }
 .payplug-oney#oney-popup .oney-cgv-content {
     text-align: justify;
-	font-size: 10px;
+    font-size: 10px;
     border-top: 1px solid lightgrey;
     padding-top: 10px;
 }
