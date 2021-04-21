@@ -85,7 +85,6 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 * Tested up to Wordpress 5.7
 * Tested up to Woocommerce 5.1.0
 
-== Changelog ==
 = 1.2.2 =
 * Tested up to Wordpress 5.6
 
