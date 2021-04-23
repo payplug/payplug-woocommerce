@@ -20,7 +20,7 @@ namespace Payplug\PayplugWoocommerce;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-define( 'PAYPLUG_GATEWAY_VERSION', '1.2.3.2' );
+define( 'PAYPLUG_GATEWAY_VERSION', '1.2.3.3' );
 define( 'PAYPLUG_GATEWAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
