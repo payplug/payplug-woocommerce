@@ -1,8 +1,8 @@
 <?php
 
-use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
-
 namespace Payplug\PayplugWoocommerce\Gateway;
+
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 // Exit if accessed directly
 use const OPENSSL_VERSION_TEXT;
