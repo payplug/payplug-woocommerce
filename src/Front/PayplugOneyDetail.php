@@ -28,10 +28,11 @@ class PayplugOneyDetail
      * @return void
      */
     public function check_oney_frontend() {
-        if ( is_cart() || is_product() || is_checkout()) {
+        //if ( is_cart() || is_product() || is_checkout()) {
+        if ( is_cart() || is_checkout()) {
             if(PayplugWoocommerceHelper::is_oney_available()) {
                 // Product page
-                add_action('woocommerce_single_product_summary', [$this, 'oney_simulate_payment_detail']);
+                //add_action('woocommerce_single_product_summary', [$this, 'oney_simulate_payment_detail']);
                 
                 // Total cart
                 add_action('woocommerce_cart_totals_after_order_total', [$this, 'oney_simulate_payment_detail']);
