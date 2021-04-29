@@ -34,9 +34,9 @@ class WoocommerceActions {
 		$order_id       = PayplugWoocommerceHelper::is_pre_30() ? $theorder->id : $theorder->get_id();
 		$transaction_id = PayplugWoocommerceHelper::is_pre_30() ? get_post_meta( $order_id, '_transaction_id', true ) : $theorder->get_transaction_id();
 		$payment_method = PayplugWoocommerceHelper::is_pre_30() ? $theorder->payment_method : $theorder->get_payment_method();
-		if ( 'payplug' !== $payment_method || empty( $transaction_id ) ) {
+		if (!in_array($payment_method, ['oney_x3_with_fees', 'oney_x4_with_fees', 'payplug']) || empty($transaction_id)) {
 			return $actions;
-		}
+		} 
 		$actions[ self::WC_PAYPLUG_RETRIEVE_ACTION ] = __( 'Update PayPlug transaction data', 'payplug' );
 		return $actions;
 	}
@@ -53,7 +53,7 @@ class WoocommerceActions {
 	public function handle_payment_retrieve_action( $order ) {
 		$order_id       = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 		$payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-		if ( 'payplug' !== $payment_method ) {
+		if (!in_array($payment_method, ['oney_x3_with_fees', 'oney_x4_with_fees', 'payplug'])) {
 			return;
 		}
 		PayplugGateway::log( sprintf( 'Order #%s : Starting retrieve action process.', $order_id ), 'info' );
