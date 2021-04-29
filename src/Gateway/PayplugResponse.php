@@ -69,11 +69,8 @@ class PayplugResponse {
 			return;
 		}
 
-		$metadata['transaction_in_progress'] = true;
-		PayplugWoocommerceHelper::save_transaction_metadata( $order, $metadata );
-
 		if ( $resource->is_paid ) {
-
+			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
 			if ( ! $is_payment_with_token ) {
 				$this->maybe_save_card( $resource );
 			}
@@ -93,13 +90,14 @@ class PayplugResponse {
 			 * @param PaymentResource $resource Payment resource
 			 */
 			\do_action( 'payplug_gateway_payment_response_processed', $order_id, $resource );
-
+			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
 			PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed.', $order_id, $resource->id ) );
 
 			return;
 		}
 
 		if ( ! empty( $resource->failure ) ) {
+			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
 			$order->update_status(
 				'failed',
 				sprintf( __( 'PayPlug IPN OK | Transaction %s failed : %s', 'payplug' ), $resource->id, wc_clean( $resource->failure->message ) )
@@ -107,7 +105,7 @@ class PayplugResponse {
 
 			/** This action is documented in src/Gateway/PayplugResponse */
 			\do_action( 'payplug_gateway_payment_response_processed', $order_id, $resource );
-
+			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
 			PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed.', $order_id, $resource->id ) );
 
 			return;
