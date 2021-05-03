@@ -433,6 +433,20 @@ class PayplugWoocommerceHelper {
 	}
 
 	/**
+	 * Set flag ipn ( in progress / over ) on order
+	 *
+	 * @param \WC_Order $order
+	 * @param array $metadata
+	 * @param boolean $flag
+	 *
+	 * @return void
+	 */
+	public static function set_flag_ipn_order ( $order, $metadata, $flag) {
+		$metadata['transaction_in_progress'] = $flag;
+		PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
+	}
+
+	/**
 	 * Get current option from payplug settings
 	 *
 	 * @return array
@@ -458,8 +472,8 @@ class PayplugWoocommerceHelper {
             } catch (\Payplug\Exception\ConfigurationNotSetException $e) {
             }
         }
-        $account['oneyEnabled'] = $options['oney'];
-        $account['oneyCgvEnabled'] = $options['oneycgv'];
+        $account['oneyEnabled'] = $options['oney'] ? $options['oney'] : '';
+        $account['oneyCgvEnabled'] = $options['oneycgv'] ? $options['oneycgv'] : '';
         return $account;
 
 	}

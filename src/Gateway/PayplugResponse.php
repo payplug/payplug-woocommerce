@@ -62,10 +62,15 @@ class PayplugResponse {
 		}
 
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata( $resource );
-		PayplugWoocommerceHelper::save_transaction_metadata( $order, $metadata );
+		$order_metadata = $order->get_meta('_payplug_metadata', true);
+
+		if (is_array($order_metadata) && $order_metadata['transaction_in_progress']) {
+			PayplugGateway::log(sprintf('Order #%s : Order Oney IPN already in progress. Ignoring IPN', $order_id));
+			return;
+		}
 
 		if ( $resource->is_paid ) {
-
+			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
 			if ( ! $is_payment_with_token ) {
 				$this->maybe_save_card( $resource );
 			}
@@ -85,13 +90,14 @@ class PayplugResponse {
 			 * @param PaymentResource $resource Payment resource
 			 */
 			\do_action( 'payplug_gateway_payment_response_processed', $order_id, $resource );
-
+			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
 			PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed.', $order_id, $resource->id ) );
 
 			return;
 		}
 
 		if ( ! empty( $resource->failure ) ) {
+			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
 			$order->update_status(
 				'failed',
 				sprintf( __( 'PayPlug IPN OK | Transaction %s failed : %s', 'payplug' ), $resource->id, wc_clean( $resource->failure->message ) )
@@ -99,7 +105,7 @@ class PayplugResponse {
 
 			/** This action is documented in src/Gateway/PayplugResponse */
 			\do_action( 'payplug_gateway_payment_response_processed', $order_id, $resource );
-
+			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
 			PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed.', $order_id, $resource->id ) );
 
 			return;
