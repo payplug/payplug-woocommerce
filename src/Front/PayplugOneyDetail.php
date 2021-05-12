@@ -133,11 +133,11 @@ class PayplugOneyDetail
             if(is_array($oney_response)) {
                 $financing_cost_3x = intval($oney_response['x3_with_fees']['total_cost']) / 100;
                 $financing_cost_4x = intval($oney_response['x4_with_fees']['total_cost']) / 100;
-                $popup_content = "
+                $popup_content = "                
                 <div id='oney-popup-close'>
-                  <div class='oney-popup-close-mdiv'>
-                    <div class='oney-popup-close-md'></div>
-                  </div>
+                    <div class='oney-popup-close-mdiv'>
+                        <div class='oney-popup-close-md'></div>
+                    </div>
                 </div>
                 <div class='oney-img oney-logo no-margin'></div>
                 <div class='oney-title'>
@@ -176,7 +176,6 @@ HTML;
 
         } else {
             $popup = "
-            <div id='oney-popup-arrow' class='triangle-left'></div>
             <div class='oney-content oney-cgv-content'>
             </div>";
         }
@@ -224,8 +223,8 @@ HTML;
                 <div id="oney-show-popup" class="bold oney-color">?</div>
             </div>
         </div>
-        <div class="payplug-oney <?php echo $disabled; ?>" id="oney-popup">X
-            <div id='oney-popup-arrow' class='triangle-left'></div>
+        <div id='oney-popup-arrow' class='triangle-left <?php echo $disabled; ?>'></div>
+        <div class="payplug-oney <?php echo $disabled; ?>" id="oney-popup">
             <div class="payplug-lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
             <div id="oney-popup-error">
                 <div class="oney-error range">

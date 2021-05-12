@@ -102,7 +102,7 @@
 .payplug-oney.disabled#oney-popup.loaded {
     border-color: #ababab;
 }
-.payplug-oney#oney-popup .triangle-left {
+#oney-popup-arrow.triangle-left {
     display: inline-block;
     width: 0;
     height: 0;
@@ -117,7 +117,7 @@
     top: 4rem;
 } 
 
-.payplug-oney.disabled#oney-popup .triangle-left {
+#oney-popup-arrow.triangle-left.disabled {
     border-color: transparent #ababab transparent transparent;
 }
 .payplug-oney#oney-popup .oney-content {

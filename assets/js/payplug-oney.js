@@ -1,7 +1,7 @@
 (function ($) {
     var is_cart = false
     var popupLoaded = false
-    var initevent = function () {
+    var _initevent = function () {
         var showpopup = $("#oney-show-popup")
         var oneyData = $("#oney-show-popup").closest('.payplug-oney')
         var showpopuponey = $("#oney-show-popup").closest('.payplug-oney-popup')
@@ -13,13 +13,14 @@
         var totalsProduct = oneyData.data('total-products')
         var maxOneyQty = oneyData.data('max-oney-qty')
         is_cart = oneyData.data('is-cart')
-        showpopupF = function (show) {
+
+        function _showPopup(show) {
             if (!oneyData.hasClass('disabled') && !popupLoaded && !show) {
                 return
             }
             popup.show(0, function () {
                 if (!$.browser.mobile) {
-                    checkOneyError()
+                    _checkOneyError()
                     var top = oneyData.hasClass('disabled') ? 50 : 110
                     popup.css('position', 'fixed')
                     popup.position({
@@ -28,12 +29,18 @@
                         of: showpopup,
                     })
                     if (popupLoaded) {
-                        showarrow()
+                        _showArrow()
                     }
                 }
             })
         }
-        showarrow = function () {
+
+        function _hidePopup() {
+            popup.hide();
+            arrow.hide();
+        }
+
+        function _showArrow() {
             arrow.show()
             arrow.position({
                 my: "left top-43",
@@ -41,18 +48,20 @@
                 of: showpopup,
             })
         }
-        calculTotals = function () {
+
+        function _calculTotals() {
             var price = oneyData.data('price')
             return qtyInput.length ? totalsProduct * price : price
         }
-        isInOneyRange = function () {
-            var totalPrice = calculTotals();
+
+        function _isInOneyRange() {
+            var totalPrice = _calculTotals();
             var minOney = oneyData.data('min-oney');
             var maxOney = oneyData.data('max-oney');
             return (totalPrice >= minOney && totalPrice <= maxOney);
         };
-        checkOneyError = function () {
 
+        function _checkOneyError() {
             if (oneyData.hasClass('disabled')) {
                 popupLoaded = true
                 popup.html('').append($(oneyError)).append($(arrow))
@@ -66,40 +75,42 @@
                 arrow.hide()
             }
         };
-        bindCloseOneyPopup = function () {
+
+        function _bindCloseOneyPopup() {
             $(document).unbind('mouseup')
             $(document).mouseup(function (e) {
                 // if the target of the click isn't the container nor a descendant of the container
                 if (!popup.is(e.target) && popup.has(e.target).length === 0) {
-                    popup.hide();
+                    _hidePopup();
                 }
             });
 
             $('#oney-popup-close').unbind();
             $('#oney-popup-close').on('click', function () {
-                popup.hide();
+                _hidePopup();
             });
         }
-        bindCloseOneyPopup();
+        
+        _bindCloseOneyPopup();
         qtyInput.unbind()
         qtyInput.on('change', function () {
             totalsProduct = $(this).val()
             popupLoaded = false
-            if (isInOneyRange() && totalsProduct < maxOneyQty) {
+            if (_isInOneyRange() && totalsProduct < maxOneyQty) {
                 oneyData.removeClass('disabled')
                 popup.removeClass('disabled').removeClass('loaded')
                 popup.html('').append($(arrow))
                 arrow.hide()
             } else {
-                checkOneyError()
+                _checkOneyError()
                 oneyData.addClass('disabled')
                 popup.addClass('disabled')
             }
         })
         showpopuponey.unbind();
         showpopuponey.on('click', function () {
-            showpopupF(true);
-            if (isInOneyRange() && totalsProduct < maxOneyQty) {
+            _showPopup(true);
+            if (_isInOneyRange() && totalsProduct < maxOneyQty) {
                 if (popupLoaded) {
                     return
                 }
@@ -108,31 +119,37 @@
                     payplug_config.ajax_url,
                     {
                         'action': payplug_config.ajax_action,
-                        'price': calculTotals()
+                        'price': _calculTotals()
                     }, function (response) {
                         if (response.data.popup) {
                             popupLoaded = true;
                             popup.addClass('loaded');
                             popup.html(response.data.popup);
-                            showpopupF();
-                            bindCloseOneyPopup()
+                            _showPopup();
+                            _bindCloseOneyPopup()
                         }
                     }
                 );
             } else {
-                checkOneyError()
+                _checkOneyError()
             }
         });
+
+        $(window).on('scroll', function () {
+            if(popup.is(':visible')) {
+                _showPopup()
+            }
+        })
     };
-    
+
     $(document).on('ready', function () {
-        initevent();
+        _initevent();
         if (is_cart) {
             $(document).ajaxSuccess(function (event, request, settings) {
                 if (settings.data.includes(payplug_config.ajax_action)) {
                     return;
                 }
-                initevent();
+                _initevent();
                 popupLoaded = false;
             });
         }
