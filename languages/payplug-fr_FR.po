@@ -702,3 +702,7 @@ msgstr "Votre boutique doit utiliser l'euro comme monnaie de paiement."
 #: src/Gateway/PayplugGateway.php:624
 msgid "your@email.com"
 msgstr "votre@email.com"
+
+#: src/Gateway/PayplugApi.php:133
+msgid "Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage."
+msgstr "La simulation de votre échéancier est temporairement indisponible. Vous retrouverez cette information à l'étape du paiement."

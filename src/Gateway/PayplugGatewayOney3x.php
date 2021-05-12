@@ -68,7 +68,8 @@ class PayplugGatewayOney3x extends PayplugGateway
             $f = function ($fn) {
                 return $fn;
             };
-            $this->description = <<<HTML
+            if(is_array($this->oney_response)) {
+                $this->description = <<<HTML
                 <p>
                     <div class="payplug-oney-flex">
                         <div>{$f(__('Bring', 'payplug'))} :</div>
@@ -84,6 +85,10 @@ class PayplugGatewayOney3x extends PayplugGateway
                     </div>
                 </p>
 HTML;
+            } else {
+                $this->description = $this->oney_response;
+            }
+
             $available_img = 'lg-3xoney-checkout.png';
         } else {
             $available_img = 'lg-3xoney-checkout-disabled.png';
@@ -319,4 +324,5 @@ HTML;
             echo wpautop(wptexturize($description));
         }
     }
+
 }
