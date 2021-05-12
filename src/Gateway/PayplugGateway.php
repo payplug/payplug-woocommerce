@@ -639,7 +639,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                     </tr>
                     <tr valign="top">
                         <td class="forminp">
-                            <input class="button" type="submit" value="<?php _e('Login', 'payplug'); ?>">
+                            <input id="payplug-login" class="button" type="submit" value="<?php _e('Login', 'payplug'); ?>">
                             <input type="hidden" name="save" value="login">
                             <?php wp_nonce_field('payplug_user_login', '_loginaction'); ?>
                         </td>
@@ -1338,7 +1338,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             <td class="forminp">
                 <p><?php echo $this->get_option('email'); ?></p>
                 <p>
-                    <input type="submit" name="submit_logout" value="<?php _e('Logout', 'payplug'); ?>">
+                    <input id="payplug-logout" type="submit" name="submit_logout" value="<?php _e('Logout', 'payplug'); ?>">
                     <input type="hidden" name="save" value="logout">
                     <?php wp_nonce_field('payplug_user_logout', '_logoutaction'); ?>
                     |
