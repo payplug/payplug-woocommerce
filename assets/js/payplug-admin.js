@@ -7,6 +7,10 @@
 
     var payplug_admin = {
         init: function () {
+            $("#payplug-login, #payplug-logout").on('click', function(e) {
+                window.onbeforeunload = null;
+            })
+
             payplug_admin.xhr = false;
 
             // setup modal

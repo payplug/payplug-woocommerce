@@ -122,12 +122,16 @@ class PayplugApi {
     {
         $country = wc_get_base_location();
         $oney_fees = ["x3_with_fees", "x4_with_fees"];
-        $response =  $this->do_request('\Payplug\OneySimulation::getSimulations', [[
-            "amount" => (int) $price * 100,
-            "country" => $country['country'],
-            "operations" => $oney_fees
-        ]]);
-        PayplugWoocommerceHelper::oney_simulation_values($oney_fees, $response);
+        try {
+            $response =  $this->do_request('\Payplug\OneySimulation::getSimulations', [[
+                "amount" => (int) $price * 100,
+                "country" => $country['country'],
+                "operations" => $oney_fees
+            ]]);
+            PayplugWoocommerceHelper::oney_simulation_values($oney_fees, $response);
+        } catch (\Payplug\Exception\PayplugServerException $e) {
+            $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
+        } 
         return $response;
     }
 
@@ -170,7 +174,7 @@ class PayplugApi {
 		if ( ! is_array( $params ) ) {
 			$params = [ $params ];
 		}
-
+        
 		return call_user_func_array( $callback, $params );
 	}
 
