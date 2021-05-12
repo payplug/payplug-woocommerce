@@ -1,18 +1,6 @@
-#payment .payment_methods li label[for*=payment_method_payplug],
-#payment .payment_methods li label[for*=oney_x] {
-    display: flex;
-}
-#payment .payment_methods li label[for*=oney_x] img {
-    max-height: 37px;
-}
 #payment .payment_methods li .payplug-oney-flex {
     display:flex;
 }
 #payment .payment_methods li .payplug-oney-flex div:first-child {
     width: 75%;
-}
-#payment .payment_methods li img.payplug-payment-icon {
-    margin-left: 5px;
-    max-width: 144px;
-    max-height: 25px;
 }
