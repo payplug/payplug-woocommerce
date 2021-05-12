@@ -13,8 +13,8 @@
         var totalsProduct = oneyData.data('total-products')
         var maxOneyQty = oneyData.data('max-oney-qty')
         is_cart = oneyData.data('is-cart')
-        var showpopupF = function (show) {
-            if(!oneyData.hasClass('disabled') && !popupLoaded && !show) {
+        showpopupF = function (show) {
+            if (!oneyData.hasClass('disabled') && !popupLoaded && !show) {
                 return
             }
             popup.show(0, function () {
@@ -27,7 +27,7 @@
                         at: popupLoaded ? "right+40 bottom" : "right bottom",
                         of: showpopup,
                     })
-                    if(popupLoaded) {
+                    if (popupLoaded) {
                         showarrow()
                     }
                 }
@@ -53,7 +53,7 @@
         };
         checkOneyError = function () {
 
-            if(oneyData.hasClass('disabled')) {
+            if (oneyData.hasClass('disabled')) {
                 popupLoaded = true
                 popup.html('').append($(oneyError)).append($(arrow))
                 popup.addClass('loaded')
@@ -66,6 +66,21 @@
                 arrow.hide()
             }
         };
+        bindCloseOneyPopup = function () {
+            $(document).unbind('mouseup')
+            $(document).mouseup(function (e) {
+                // if the target of the click isn't the container nor a descendant of the container
+                if (!popup.is(e.target) && popup.has(e.target).length === 0) {
+                    popup.hide();
+                }
+            });
+
+            $('#oney-popup-close').unbind();
+            $('#oney-popup-close').on('click', function () {
+                popup.hide();
+            });
+        }
+        bindCloseOneyPopup();
         qtyInput.unbind()
         qtyInput.on('change', function () {
             totalsProduct = $(this).val()
@@ -100,18 +115,7 @@
                             popup.addClass('loaded');
                             popup.html(response.data.popup);
                             showpopupF();
-							
-							var closepopup = $('#oney-popup-close');
-							closepopup.on('click', function () {
-								popup.hide();
-							});
-							
-							$(document).mouseup(function(e) {
-								// if the target of the click isn't the container nor a descendant of the container
-								if (!popup.is(e.target) && popup.has(e.target).length === 0) {
-									popup.hide();
-								}
-							});
+                            bindCloseOneyPopup()
                         }
                     }
                 );
@@ -133,6 +137,4 @@
             });
         }
     });
-	
-	
 })(jQuery);
