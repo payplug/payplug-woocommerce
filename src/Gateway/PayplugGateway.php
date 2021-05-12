@@ -691,8 +691,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 $this->get_option_key(),
                 apply_filters('woocommerce_settings_api_sanitized_fields_' . $this->id, $data)
             );
-            \WC_Admin_Settings::add_message(__('Successfully logged out.', 'payplug'));
-
+            if("payplug" === $this->id) {
+                \WC_Admin_Settings::add_message(__('Successfully logged out.', 'payplug'));
+            }
+            
             return true;
         }
 
@@ -754,7 +756,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 $this->get_option_key(),
                 apply_filters('woocommerce_settings_api_sanitized_fields_' . $this->id, $data)
             );
-            \WC_Admin_Settings::add_message(__('Successfully logged in.', 'payplug'));
+            if("payplug" === $this->id) {
+                \WC_Admin_Settings::add_message(__('Successfully logged in.', 'payplug'));
+            }
 
             return true;
         }
