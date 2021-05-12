@@ -28,8 +28,8 @@ class PayplugOneyDetail
      * @return void
      */
     public function check_oney_frontend() {
-        //if ( is_cart() || is_product() || is_checkout()) {
         if ( is_cart() || is_checkout()) {
+        //if ( is_cart() || is_product() || is_checkout()) {
             if(PayplugWoocommerceHelper::is_oney_available()) {
                 // Product page
                 //add_action('woocommerce_single_product_summary', [$this, 'oney_simulate_payment_detail']);
@@ -130,41 +130,50 @@ class PayplugOneyDetail
         $f = function($fn) { return $fn; }; 
 
         if($oney_response) {            
-            $financing_cost_3x = intval($oney_response['x3_with_fees']['total_cost']) / 100;
-            $financing_cost_4x = intval($oney_response['x4_with_fees']['total_cost']) / 100;
-            $popup = "
-            <div id='oney-popup-close'>
-			  <div class='oney-popup-close-mdiv'>
-			    <div class='oney-popup-close-md'></div>
-			  </div>
-			</div>
-            <div class='oney-img oney-logo no-margin'></div>
-            <div class='oney-title'>
-                <p class='no-margin oney-color'>{$f(__('PAYMENT', 'payplug'))}  </p>
-                <p class='no-margin bold oney-color'>{$f(__('BY CREDIT CARD', 'payplug'))}</p>
-            </div>
-            <div class='oney-content oney-3x-content'>
-                <div class='oney-img oney-3x no-margin'></div>
-                <div class='oney-details'>
-                    <p class='bold no-margin'> {$f(__('Bring', 'payplug'))} : {$oney_response['x3_with_fees']['down_payment_amount']}  €</p>
-                    <p class='bold no-margin'>+2  {$f(__('monthly payment of', 'payplug'))} : {$oney_response['x3_with_fees']['installments'][0]['amount']} € </p>
-                    <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))} : {$financing_cost_3x} € </p>
-                    <p class='no-margin'> {$f(__('TAEG', 'payplug'))} : {$oney_response['x3_with_fees']['effective_annual_percentage_rate']}  % </p>
+            if(is_array($oney_response)) {
+                $financing_cost_3x = intval($oney_response['x3_with_fees']['total_cost']) / 100;
+                $financing_cost_4x = intval($oney_response['x4_with_fees']['total_cost']) / 100;
+                $popup_content = "
+                <div id='oney-popup-close'>
+                  <div class='oney-popup-close-mdiv'>
+                    <div class='oney-popup-close-md'></div>
+                  </div>
                 </div>
-            </div>
-            <div class='oney-separator'></div>
-            <div class='oney-content oney-4x-content'>
-                <div class='oney-img oney-4x no-margin'></div>
-                <div class='oney-details'>
-                    <p class='bold no-margin'> {$f(__('Bring', 'payplug'))} : {$oney_response['x4_with_fees']['down_payment_amount']}  €</p>
-                    <p class='bold no-margin'>+3  {$f(__('monthly payment of', 'payplug'))} : {$oney_response['x4_with_fees']['installments'][0]['amount']}  € </p>
-                    <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))} : {$financing_cost_4x} € </p>
-                    <p class='no-margin'> {$f(__('TAEG', 'payplug'))} : {$oney_response['x4_with_fees']['effective_annual_percentage_rate']}  % </p>
+                <div class='oney-img oney-logo no-margin'></div>
+                <div class='oney-title'>
+                    <p class='no-margin oney-color'>{$f(__('PAYMENT', 'payplug'))}  </p>
+                    <p class='no-margin bold oney-color'>{$f(__('BY CREDIT CARD', 'payplug'))}</p>
                 </div>
-            </div>
-            <div class='oney-content oney-cgv-content'>
-                {$cgv}
-            </div>";
+                <div class='oney-content oney-3x-content'>
+                    <div class='oney-img oney-3x no-margin'></div>
+                    <div class='oney-details'>
+                        <p class='bold no-margin'> {$f(__('Bring', 'payplug'))} : {$oney_response['x3_with_fees']['down_payment_amount']}  €</p>
+                        <p class='bold no-margin'>+2  {$f(__('monthly payment of', 'payplug'))} : {$oney_response['x3_with_fees']['installments'][0]['amount']} € </p>
+                        <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))} : {$financing_cost_3x} € </p>
+                        <p class='no-margin'> {$f(__('TAEG', 'payplug'))} : {$oney_response['x3_with_fees']['effective_annual_percentage_rate']}  % </p>
+                    </div>
+                </div>
+                <div class='oney-separator'></div>
+                <div class='oney-content oney-4x-content'>
+                    <div class='oney-img oney-4x no-margin'></div>
+                    <div class='oney-details'>
+                        <p class='bold no-margin'> {$f(__('Bring', 'payplug'))} : {$oney_response['x4_with_fees']['down_payment_amount']}  €</p>
+                        <p class='bold no-margin'>+3  {$f(__('monthly payment of', 'payplug'))} : {$oney_response['x4_with_fees']['installments'][0]['amount']}  € </p>
+                        <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))} : {$financing_cost_4x} € </p>
+                        <p class='no-margin'> {$f(__('TAEG', 'payplug'))} : {$oney_response['x4_with_fees']['effective_annual_percentage_rate']}  % </p>
+                    </div>
+                </div>";
+            } else {
+                $popup_content = $oney_response;
+            }
+
+            $popup = <<<HTML
+                $popup_content
+                <div class='oney-content oney-cgv-content'>
+                    $cgv
+                </div>
+HTML;
+
         } else {
             $popup = "
             <div id='oney-popup-arrow' class='triangle-left'></div>
