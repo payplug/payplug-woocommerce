@@ -5,7 +5,6 @@
         var showpopup = $("#oney-show-popup")
         var oneyData = $("#oney-show-popup").closest('.payplug-oney')
         var showpopuponey = $("#oney-show-popup").closest('.payplug-oney-popup')
-        var arrow = $("#oney-popup-arrow")
         var qtyInput = $('input[name=quantity]')
         var popup = $("#oney-popup")
         var loading = popup.find('.payplug-lds-roller')
@@ -28,25 +27,12 @@
                         at: popupLoaded ? "right+40 bottom" : "right bottom",
                         of: showpopup,
                     })
-                    if (popupLoaded) {
-                        _showArrow()
-                    }
                 }
             })
         }
 
         function _hidePopup() {
             popup.hide();
-            arrow.hide();
-        }
-
-        function _showArrow() {
-            arrow.show()
-            arrow.position({
-                my: "left top-43",
-                at: "right+10 bottom",
-                of: showpopup,
-            })
         }
 
         function _calculTotals() {
@@ -64,16 +50,14 @@
         function _checkOneyError() {
             if (oneyData.hasClass('disabled')) {
                 popupLoaded = true
-                popup.html('').append($(oneyError)).append($(arrow))
+                popup.html('').append($(oneyError))
                 popup.addClass('loaded')
                 popup.find('.payplug-lds-roller').hide()
                 popup.find('#oney-popup-error .oney-error').hide()
                 totalsProduct >= maxOneyQty ?
                     popup.find('#oney-popup-error .oney-error.qty').show() :
                     popup.find('#oney-popup-error .oney-error.range').show()
-            } else {
-                arrow.hide()
-            }
+            } 
         };
 
         function _bindCloseOneyPopup() {
@@ -99,8 +83,7 @@
             if (_isInOneyRange() && totalsProduct < maxOneyQty) {
                 oneyData.removeClass('disabled')
                 popup.removeClass('disabled').removeClass('loaded')
-                popup.html('').append($(arrow))
-                arrow.hide()
+                popup.html('')
             } else {
                 _checkOneyError()
                 oneyData.addClass('disabled')
