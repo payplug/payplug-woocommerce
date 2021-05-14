@@ -102,24 +102,6 @@
 .payplug-oney.disabled#oney-popup.loaded {
     border-color: #ababab;
 }
-#oney-popup-arrow.triangle-left {
-    display: inline-block;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 2rem 2rem 2rem 0;
-    border-color: transparent #86bd28 transparent transparent;
-    line-height: 0;
-    _border-color: #000000 #86bd28 #000000 #000000;
-    _filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
-    position: absolute;
-    left: -2rem;
-    top: 4rem;
-} 
-
-#oney-popup-arrow.triangle-left.disabled {
-    border-color: transparent #ababab transparent transparent;
-}
 .payplug-oney#oney-popup .oney-content {
     display: flex;
     margin-top: 1rem;
