@@ -223,7 +223,6 @@ HTML;
                 <div id="oney-show-popup" class="bold oney-color">?</div>
             </div>
         </div>
-        <div id='oney-popup-arrow' class='triangle-left <?php echo $disabled; ?>'></div>
         <div class="payplug-oney <?php echo $disabled; ?>" id="oney-popup">
             <div class="payplug-lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
             <div id="oney-popup-error">
