@@ -1,11 +1,10 @@
 (function ($) {
     var is_cart = false
     var popupLoaded = false
-    var initevent = function () {
+    var _initevent = function () {
         var showpopup = $("#oney-show-popup")
         var oneyData = $("#oney-show-popup").closest('.payplug-oney')
         var showpopuponey = $("#oney-show-popup").closest('.payplug-oney-popup')
-        var arrow = $("#oney-popup-arrow")
         var qtyInput = $('input[name=quantity]')
         var popup = $("#oney-popup")
         var loading = popup.find('.payplug-lds-roller')
@@ -13,13 +12,14 @@
         var totalsProduct = oneyData.data('total-products')
         var maxOneyQty = oneyData.data('max-oney-qty')
         is_cart = oneyData.data('is-cart')
-        var showpopupF = function (show) {
-            if(!oneyData.hasClass('disabled') && !popupLoaded && !show) {
+
+        function _showPopup(show) {
+            if (!oneyData.hasClass('disabled') && !popupLoaded && !show) {
                 return
             }
             popup.show(0, function () {
                 if (!$.browser.mobile) {
-                    checkOneyError()
+                    _checkOneyError()
                     var top = oneyData.hasClass('disabled') ? 50 : 110
                     popup.css('position', 'fixed')
                     popup.position({
@@ -27,64 +27,73 @@
                         at: popupLoaded ? "right+40 bottom" : "right bottom",
                         of: showpopup,
                     })
-                    if(popupLoaded) {
-                        showarrow()
-                    }
                 }
             })
         }
-        showarrow = function () {
-            arrow.show()
-            arrow.position({
-                my: "left top-43",
-                at: "right+10 bottom",
-                of: showpopup,
-            })
+
+        function _hidePopup() {
+            popup.hide();
         }
-        calculTotals = function () {
+
+        function _calculTotals() {
             var price = oneyData.data('price')
             return qtyInput.length ? totalsProduct * price : price
         }
-        isInOneyRange = function () {
-            var totalPrice = calculTotals();
+
+        function _isInOneyRange() {
+            var totalPrice = _calculTotals();
             var minOney = oneyData.data('min-oney');
             var maxOney = oneyData.data('max-oney');
             return (totalPrice >= minOney && totalPrice <= maxOney);
         };
-        checkOneyError = function () {
 
-            if(oneyData.hasClass('disabled')) {
+        function _checkOneyError() {
+            if (oneyData.hasClass('disabled')) {
                 popupLoaded = true
-                popup.html('').append($(oneyError)).append($(arrow))
+                popup.html('').append($(oneyError))
                 popup.addClass('loaded')
                 popup.find('.payplug-lds-roller').hide()
                 popup.find('#oney-popup-error .oney-error').hide()
                 totalsProduct >= maxOneyQty ?
                     popup.find('#oney-popup-error .oney-error.qty').show() :
                     popup.find('#oney-popup-error .oney-error.range').show()
-            } else {
-                arrow.hide()
-            }
+            } 
         };
+
+        function _bindCloseOneyPopup() {
+            $(document).unbind('mouseup')
+            $(document).mouseup(function (e) {
+                // if the target of the click isn't the container nor a descendant of the container
+                if (!popup.is(e.target) && popup.has(e.target).length === 0) {
+                    _hidePopup();
+                }
+            });
+
+            $('#oney-popup-close').unbind();
+            $('#oney-popup-close').on('click', function () {
+                _hidePopup();
+            });
+        }
+        
+        _bindCloseOneyPopup();
         qtyInput.unbind()
         qtyInput.on('change', function () {
             totalsProduct = $(this).val()
             popupLoaded = false
-            if (isInOneyRange() && totalsProduct < maxOneyQty) {
+            if (_isInOneyRange() && totalsProduct < maxOneyQty) {
                 oneyData.removeClass('disabled')
                 popup.removeClass('disabled').removeClass('loaded')
-                popup.html('').append($(arrow))
-                arrow.hide()
+                popup.html('')
             } else {
-                checkOneyError()
+                _checkOneyError()
                 oneyData.addClass('disabled')
                 popup.addClass('disabled')
             }
         })
         showpopuponey.unbind();
         showpopuponey.on('click', function () {
-            showpopupF(true);
-            if (isInOneyRange() && totalsProduct < maxOneyQty) {
+            _showPopup(true);
+            if (_isInOneyRange() && totalsProduct < maxOneyQty) {
                 if (popupLoaded) {
                     return
                 }
@@ -93,46 +102,39 @@
                     payplug_config.ajax_url,
                     {
                         'action': payplug_config.ajax_action,
-                        'price': calculTotals()
+                        'price': _calculTotals()
                     }, function (response) {
                         if (response.data.popup) {
                             popupLoaded = true;
                             popup.addClass('loaded');
                             popup.html(response.data.popup);
-                            showpopupF();
-							
-							var closepopup = $('#oney-popup-close');
-							closepopup.on('click', function () {
-								popup.hide();
-							});
-							
-							$(document).mouseup(function(e) {
-								// if the target of the click isn't the container nor a descendant of the container
-								if (!popup.is(e.target) && popup.has(e.target).length === 0) {
-									popup.hide();
-								}
-							});
+                            _showPopup();
+                            _bindCloseOneyPopup()
                         }
                     }
                 );
             } else {
-                checkOneyError()
+                _checkOneyError()
             }
         });
+
+        $(window).on('scroll', function () {
+            if(popup.is(':visible')) {
+                _showPopup()
+            }
+        })
     };
-    
+
     $(document).on('ready', function () {
-        initevent();
+        _initevent();
         if (is_cart) {
             $(document).ajaxSuccess(function (event, request, settings) {
                 if (settings.data.includes(payplug_config.ajax_action)) {
                     return;
                 }
-                initevent();
+                _initevent();
                 popupLoaded = false;
             });
         }
     });
-	
-	
 })(jQuery);
