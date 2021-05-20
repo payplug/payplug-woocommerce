@@ -1130,13 +1130,15 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
         try {
             $response = Authentication::getKeysByLogin($email, $password);
-            if (empty($response) || !isset($response['httpResponse'])) {
+            if (empty($response) || !isset($response['httpResponse']) && "payplug" === $this->id) {
                 return new \WP_Error('invalid_credentials', __('Invalid credentials.', 'payplug'));
             }
 
             return $response['httpResponse']['secret_keys'];
         } catch (HttpException $e) {
-            return new \WP_Error('invalid_credentials', __('Invalid credentials.', 'payplug'));
+            if("payplug" === $this->id) {
+                return new \WP_Error('invalid_credentials', __('Invalid credentials.', 'payplug'));
+            }
         }
     }
 

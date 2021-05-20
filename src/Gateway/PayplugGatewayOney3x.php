@@ -306,7 +306,7 @@ HTML;
      */
     public function oney_refund_text($order)
     {
-        if ($this->id === $order->get_payment_method() && parent::can_refund_order($order) && $order->get_status() !== "refunded") {
+        if ($this->id === $order->get_payment_method() && parent::can_refund_order($order) && $order->get_status() !== "refunded" && $this->api) {
             $order_metadata = $order->get_meta('_payplug_metadata');
             $payment  = $this->api->payment_retrieve($order_metadata['transaction_id']);
             $today = current_time('Y-m-d H:i:s');
