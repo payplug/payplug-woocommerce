@@ -10,6 +10,14 @@
             $("#payplug-login, #payplug-logout").on('click', function(e) {
                 window.onbeforeunload = null;
             })
+            
+            var email_input = $("#payplug_email")
+            if (email_input.length) {
+                email_input.focus()
+                $("html").animate({
+                    scrollTop: email_input.offset().top
+                }, 800)
+            }
 
             payplug_admin.xhr = false;
 
