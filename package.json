@@ -4,9 +4,12 @@
   "description": "PayPLug CSS assets management",
   "license": "GPL-3.0-or-later",
   "author": "PayPlug",
+  "scripts": {
+    "build:css-app": "node-sass --include-path scss assets/scss/app.scss assets/css/app.css --source-map-embed true --output-style compressed",
+    "build:css-notice": "node-sass --include-path scss assets/scss/notice.scss assets/css/notice.css --source-map-embed true --output-style compressed",
+    "build:css": "npm run build:css-app && npm run build:css-notice"
+  },
   "devDependencies": {
-    "gulp": "^4.0.2",
-    "gulp-sass": "^4.1.0",
-    "gulp-sourcemaps": "^2.6.5"
+    "node-sass": "^6.0.0"
   }
 }

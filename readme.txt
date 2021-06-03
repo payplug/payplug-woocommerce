@@ -82,7 +82,7 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 == Changelog ==
 = 1.2.7 =
 * Minor fixes
-* Security fixes in dependencies
+* Update npm dev-dependencies
 
 = 1.2.6 =
 * Tested up to Woocommerce 5.3.0
