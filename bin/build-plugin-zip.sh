@@ -65,7 +65,6 @@ zip -r payplug-woocommerce.zip \
 	--exclude=payplug-woocommerce/.gitignore \
 	--exclude=payplug-woocommerce/.travis.yml \
 	--exclude=payplug-woocommerce/composer.* \
-	--exclude=payplug-woocommerce/gulpfile.js \
 	--exclude=payplug-woocommerce/package.json \
 	--exclude=payplug-woocommerce/package-lock.json \
 	--exclude=payplug-woocommerce/phpcs.xml.dist \
