@@ -64,7 +64,7 @@ class PayplugResponse {
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata( $resource );
 		$order_metadata = $order->get_meta('_payplug_metadata', true);
 
-		if (is_array($order_metadata) && $order_metadata['transaction_in_progress']) {
+		if (is_array($order_metadata) && array_key_exists('transaction_in_progress', $order_metadata)) {
 			PayplugGateway::log(sprintf('Order #%s : Order Oney IPN already in progress. Ignoring IPN', $order_id));
 			return;
 		}
