@@ -4,7 +4,7 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 4.4
 Tested up to: 5.7
 Requires PHP: 5.6
-Stable tag: 1.2.7
+Stable tag: 1.2.8
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -42,7 +42,7 @@ PayPlug primary goal is to give you the tools you need to sell to your clients, 
 
 * One-click payment with secure card information storage
 
-* NEW: Installment payments with Oney. Main benefits: immediately receive the complete amount of the order to enjoy a serene cash flow; Potential frauds and unpaid transactions will be managed by Oney
+* Installment payments with Oney. Main benefits: immediately receive the complete amount of the order to enjoy a serene cash flow; Potential frauds and unpaid transactions will be managed by Oney
 
 
 = Monitor your performances =
@@ -80,6 +80,10 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 1.2.8 =
+* Minor fixes
+* Update npm dependencies
+
 = 1.2.7 =
 * Minor fixes
 * Update npm dev-dependencies
