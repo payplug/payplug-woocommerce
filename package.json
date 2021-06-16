@@ -5,11 +5,17 @@
   "license": "GPL-3.0-or-later",
   "author": "PayPlug",
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "build:css-app": "node-sass --include-path scss assets/scss/app.scss assets/css/app.css --source-map-embed true --output-style compressed",
     "build:css-notice": "node-sass --include-path scss assets/scss/notice.scss assets/css/notice.css --source-map-embed true --output-style compressed",
     "build:css": "npm run build:css-app && npm run build:css-notice"
   },
-  "devDependencies": {
-    "node-sass": "^6.0.0"
+  "devDependencies": {},
+  "dependencies": {
+    "node-sass": "^6.0.0",
+    "trim-newlines": "^3.0.1"
+  },
+  "resolutions": {
+    "trim-newlines": "^3.0.1"
   }
 }
