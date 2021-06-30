@@ -473,7 +473,6 @@ class PayplugWoocommerceHelper {
             }
         }
         $account['oneyEnabled'] = $options['oney'] ? $options['oney'] : '';
-        $account['oneyCgvEnabled'] = $options['oneycgv'] ? $options['oneycgv'] : '';
         return $account;
 
 	}
@@ -504,7 +503,7 @@ class PayplugWoocommerceHelper {
 		if (empty($account)) {
 			return false;
 		}
-		return ($account && $account['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oneyEnabled'] === "yes" && $account['oneyCgvEnabled'] === "yes");
+		return ($account && $account['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oneyEnabled'] === "yes");
 	}
 
   	/**
