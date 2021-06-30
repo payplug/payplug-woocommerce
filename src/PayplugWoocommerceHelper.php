@@ -472,7 +472,7 @@ class PayplugWoocommerceHelper {
             } catch (\Payplug\Exception\ConfigurationNotSetException $e) {
             }
         }
-        $account['oneyEnabled'] = $options['oney'] ? $options['oney'] : '';
+        $account['oneyEnabled'] = (!isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
         return $account;
 
 	}
