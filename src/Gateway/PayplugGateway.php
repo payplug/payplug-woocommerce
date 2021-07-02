@@ -378,14 +378,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'default'     => 'no',
                 'desc_tip'    => true
             ],
-            'oneycgv'                => [
-                'type'        => 'checkbox',
-                'label'       => __(' I have integrated the Oney legal notices into the GCSs of my site', 'payplug'),
-                // TRAD
-                'default'     => 'no'
-            ]
         ];
-        
         
         if ($this->user_logged_in()) {
             if ($this->permissions->has_permissions(PayplugPermissions::SAVE_CARD)) {
