@@ -198,7 +198,7 @@ HTML;
             $items = $order->get_items();
             foreach($items as $item) {
                 $data = $item->get_data();
-                $total_tax = (isset($data['total_tax'])) ? $data['total'] : 0;
+                $total_tax = (isset($data['total_tax'])) ? $data['total_tax'] : 0;
                 $total = floatval(round($data['total'] + $total_tax, 2)) * 100;
                 $cart_items[] = [
                     'delivery_label' => 'storepickup',
