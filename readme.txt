@@ -2,9 +2,9 @@
 Contributors: PayPlug
 Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, carte bancaire, paiement, one click, paiement en ligne, oney
 Requires at least: 4.4
-Tested up to: 5.7
-Requires PHP: 5.6
-Stable tag: 1.2.8
+Tested up to: 5.8
+Requires PHP: 5.6 to 7.4
+Stable tag: 1.2.9
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -80,6 +80,10 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 1.2.9 =
+* Minor fixes
+* Tested up to Wordpress 5.8
+
 = 1.2.8 =
 * Minor fixes
 * Update npm dependencies

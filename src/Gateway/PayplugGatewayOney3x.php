@@ -206,7 +206,7 @@ HTML;
                     'merchant_item_id' => 'cart-'.$data['id'].'-'.$data['product_id'],
                     'name' => $data['name'],
                     'expected_delivery_date' => date('Y-m-d'),
-                    'total_amount' => $total,
+                    'total_amount' => (int) $total,
                     'price' =>  round($total / $data['quantity']),
                     'quantity' =>  $data['quantity']
                 ];
