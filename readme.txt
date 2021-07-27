@@ -51,7 +51,7 @@ PayPlug primary goal is to give you the tools you need to sell to your clients, 
 
 * Personalized support, in your preferred language
 
-Do you want to know more about our features? Visit <https://www.payplug.com/features>
+Do you want to know more about our features? Visit <https://www.payplug.com/online-payment>
 
 
 
