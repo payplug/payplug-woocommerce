@@ -377,15 +377,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'description' => sprintf(__('Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€.', 'payplug'), $min_oney_price, $max_oney_price),
                 'default'     => 'no',
                 'desc_tip'    => true
-            ],
-            'oneycgv'                => [
-                'type'        => 'checkbox',
-                'label'       => __(' I have integrated the Oney legal notices into the GCSs of my site', 'payplug'),
-                // TRAD
-                'default'     => 'no'
             ]
         ];
-        
         
         if ($this->user_logged_in()) {
             if ($this->permissions->has_permissions(PayplugPermissions::SAVE_CARD)) {
