@@ -44,7 +44,7 @@ class PayplugApi {
             'secretKey' => $key,
             'apiVersion' => "2019-08-06",
         ));
-		HttpClient::setDefaultUserAgentProduct(
+		HttpClient::addDefaultUserAgentProduct(
 			'PayPlug-WooCommerce',
 			PAYPLUG_GATEWAY_VERSION,
 			sprintf( 'WooCommerce/%s', WC()->version )
