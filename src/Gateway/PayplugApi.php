@@ -37,14 +37,14 @@ class PayplugApi {
 	 * Configure PayPlug client.
 	 */
 	public function init() {
-		$current_mode = $this->gateway->get_current_mode(); 
+		$current_mode = $this->gateway->get_current_mode();
 		$key          = $this->gateway->get_api_key( $current_mode );
 
         Payplug::init(array(
             'secretKey' => $key,
             'apiVersion' => "2019-08-06",
         ));
-		HttpClient::addDefaultUserAgentProduct(
+		HttpClient::setDefaultUserAgentProduct(
 			'PayPlug-WooCommerce',
 			PAYPLUG_GATEWAY_VERSION,
 			sprintf( 'WooCommerce/%s', WC()->version )
@@ -104,7 +104,7 @@ class PayplugApi {
 	 *
 	 * @param string $transaction_id
 	 * @param array $data
-	 * 
+	 *
 	 * @return null|\Payplug\Resource\Refund
 	 * @throws \Payplug\Exception\ConfigurationException
 	 * @author Clément Boirie
@@ -112,7 +112,7 @@ class PayplugApi {
 	public function refund_create( $transaction_id, $data ) {
 		return $this->do_request_with_fallback( '\Payplug\Refund::create', [ $transaction_id, $data ] );
 	}
-	
+
 	/**
      * Simulate a oney payment
      *
@@ -131,7 +131,7 @@ class PayplugApi {
             PayplugWoocommerceHelper::oney_simulation_values($oney_fees, $response);
         } catch (\Payplug\Exception\PayplugServerException $e) {
             $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
-        } 
+        }
         return $response;
     }
 
@@ -174,7 +174,7 @@ class PayplugApi {
 		if ( ! is_array( $params ) ) {
 			$params = [ $params ];
 		}
-        
+
 		return call_user_func_array( $callback, $params );
 	}
 
