@@ -64,6 +64,21 @@ class PayplugResponse {
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata( $resource );
 		$order_metadata = $order->get_meta('_payplug_metadata', true);
 
+		if ( ! empty( $resource->failure ) ) {
+			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
+			$order->update_status(
+				'failed',
+				sprintf( __( 'PayPlug IPN OK | Transaction %s failed : %s', 'payplug' ), $resource->id, wc_clean( $resource->failure->message ) )
+			);
+
+			/** This action is documented in src/Gateway/PayplugResponse */
+			\do_action( 'payplug_gateway_payment_response_processed', $order_id, $resource );
+			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
+			PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed.', $order_id, $resource->id ) );
+
+			return;
+		}
+
         if ( isset( $resource->payment_method ) && is_array( $resource->payment_method ) ) {
             if ( in_array( $resource->payment_method['type'], array( 'oney_x3_with_fees', 'oney_x4_with_fees' ) ) ) {
                 if ( is_array( $order_metadata ) && array_key_exists( 'transaction_in_progress', $order_metadata ) ) {
@@ -93,21 +108,6 @@ class PayplugResponse {
 			 * @param int             $order_id Order ID
 			 * @param PaymentResource $resource Payment resource
 			 */
-			\do_action( 'payplug_gateway_payment_response_processed', $order_id, $resource );
-			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
-			PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed.', $order_id, $resource->id ) );
-
-			return;
-		}
-
-		if ( ! empty( $resource->failure ) ) {
-			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
-			$order->update_status(
-				'failed',
-				sprintf( __( 'PayPlug IPN OK | Transaction %s failed : %s', 'payplug' ), $resource->id, wc_clean( $resource->failure->message ) )
-			);
-
-			/** This action is documented in src/Gateway/PayplugResponse */
 			\do_action( 'payplug_gateway_payment_response_processed', $order_id, $resource );
 			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
 			PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed.', $order_id, $resource->id ) );
