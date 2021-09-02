@@ -183,7 +183,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         }
 
         $order = wc_get_order($order_id); 
-        if (!$order instanceof \WC_Order) {
+        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees'])) {
             return;
         }
 
