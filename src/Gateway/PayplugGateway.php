@@ -182,15 +182,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return;
         }
 
-        $order = wc_get_order($order_id); 
-        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees'])) {
+        $order = wc_get_order($order_id);
+        if (!$order instanceof \WC_Order) {
             return;
         }
 
         $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-        if ('payplug' !== $payment_method) {
+        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees'])) {
             return;
         }
+
 
         $transaction_id = PayplugWoocommerceHelper::is_pre_30() ? get_post_meta($order_id, '_transaction_id', true) : $order->get_transaction_id();
         if (empty($transaction_id)) {
