@@ -114,10 +114,9 @@ class PayplugGatewayRequirements {
 	 * @return string
 	 */
 	public function oney_requirement() {
-		return ($this->valid_oney_check()) ? ($this->valid_oney() )
+		return ($this->valid_oney_check())
 			? '<p class="success">' . __( 'Oney is active on your store.', 'payplug' ) . '</p>'
-			: '<p class="failed-oney">' . __( 'Please fill in the GCSs relating to oney.', 'payplug' ) . '</p>' :
-			'';
+			: '';
 	}
 
 	/**
@@ -186,17 +185,5 @@ class PayplugGatewayRequirements {
 			return false;
 		}
 		return ("yes" === $this->settings['mode'] && "yes" === $this->settings['oney'] && $this->permissions->has_permissions(PayplugPermissions::USE_ONEY));
-	}
-
-	/**
-	 * Check if CGV checkbox is check
-	 *
-	 * @return bool
-	 */
-	public function valid_oney() {
-		if (!isset($this->settings['oneycgv'])) {
-			return false;
-		}
-		return ("yes" === $this->settings['oneycgv']);
 	}
 }

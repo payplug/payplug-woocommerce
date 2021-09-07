@@ -21,7 +21,6 @@
 			})
 			if ($("#woocommerce_payplug_oney").length) {
 				pao.$payplug_oney = $("#woocommerce_payplug_oney")
-				pao.$payplug_oneycgv = $("#woocommerce_payplug_oneycgv").parent()
 			}
 			if ($('input[name=woocommerce_payplug_mode]').length) {
 				pao.$payplug_mode = $('input[name=woocommerce_payplug_mode]:checked').val()
@@ -31,19 +30,11 @@
 				)
 			}
 
-			if (pao.$payplug_mode && !pao.$payplug_oney.prop('checked')) {
-				pao.$payplug_oneycgv.hide()
-			}
-
 			pao.$payplug_oney.on('change', function()  {
 				if (pao.$payplug_oney.prop('checked')) {
 					if (1 == pao.$payplug_mode) {
 						pao.verifyOney()
-					} else {
-						pao.$payplug_oneycgv.show()
 					}
-				} else {
-					pao.$payplug_oneycgv.hide()
 				}
 			})
 		},
@@ -63,10 +54,8 @@
 					if (false === res.data.can_use_oney) {
 						pao.$dialogoney.dialog('open')
 						pao.$payplug_oney.prop('checked', false)
-						pao.$payplug_oneycgv.hide()
 					} else {
 						pao.$payplug_oney.prop('checked', true)
-						pao.$payplug_oneycgv.show()
 					}
 				})
 				.fail((res) => {
@@ -77,8 +66,6 @@
 			pao.$payplug_mode = $('input[name=woocommerce_payplug_mode]:checked').val()
 			if (pao.$payplug_oney.prop('checked')) {
 				pao.verifyOney()
-			} else {
-				pao.$payplug_oneycgv.hide()
 			}
 		},
 		onDialogOneyClose: function()  {

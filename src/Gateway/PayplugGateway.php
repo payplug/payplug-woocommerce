@@ -182,15 +182,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return;
         }
 
-        $order = wc_get_order($order_id); 
+        $order = wc_get_order($order_id);
         if (!$order instanceof \WC_Order) {
             return;
         }
 
         $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-        if ('payplug' !== $payment_method) {
+        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees'])) {
             return;
         }
+
 
         $transaction_id = PayplugWoocommerceHelper::is_pre_30() ? get_post_meta($order_id, '_transaction_id', true) : $order->get_transaction_id();
         if (empty($transaction_id)) {
@@ -377,15 +378,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'description' => sprintf(__('Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€.', 'payplug'), $min_oney_price, $max_oney_price),
                 'default'     => 'no',
                 'desc_tip'    => true
-            ],
-            'oneycgv'                => [
-                'type'        => 'checkbox',
-                'label'       => __(' I have integrated the Oney legal notices into the GCSs of my site', 'payplug'),
-                // TRAD
-                'default'     => 'no'
             ]
         ];
-        
         
         if ($this->user_logged_in()) {
             if ($this->permissions->has_permissions(PayplugPermissions::SAVE_CARD)) {
