@@ -291,9 +291,27 @@ HTML;
      */
     public function check_gateway($gateways)
     {
+        $ordered_gateways = [];
         if (isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id) {
-            if(!PayplugWoocommerceHelper::is_oney_available()) {
+            if (!PayplugWoocommerceHelper::is_oney_available()) {
                 unset($gateways[$this->id]);
+            } else {
+                foreach ($gateways as $id => $gateway) {
+                    switch ($id) {
+                        case 'payplug':
+                            $ordered_gateways[$id] = $gateway;
+                            $ordered_gateways['oney_x3_with_fees'] = $gateways['oney_x3_with_fees'];
+                            $ordered_gateways['oney_x4_with_fees'] = $gateways['oney_x4_with_fees'];
+                            break;
+                        case 'oney_x3_with_fees':
+                        case 'oney_x4_with_fees':
+                            break;
+                        default:
+                            $ordered_gateways[$id] = $gateway;
+                            break;
+                    }
+                }
+                $gateways = $ordered_gateways;
             }
         }
         return $gateways;
