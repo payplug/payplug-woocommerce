@@ -82,7 +82,8 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 == Changelog ==
 = 1.2.11 =
 * Minor fixes
-* Remove Oney legal notices validation in Woocommerce BO 
+* Remove Oney legal notices validation from PayPlug configuration in Woocommerce backoffice
+
 
 = 1.2.10 =
 * Minor fixes
