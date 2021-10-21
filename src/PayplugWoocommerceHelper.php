@@ -462,8 +462,9 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return array
 	 */
-	public static function get_account_data_from_options($options)
+	public static function get_account_data_from_options()
 	{
+		$options = get_option('woocommerce_payplug_settings', []);
 		$transient_key = self::get_transient_key($options);
 		$account = get_transient($transient_key);
 		return $account;
@@ -500,8 +501,7 @@ class PayplugWoocommerceHelper {
 	 * @return array
 	 */
 	public static function get_min_max_oney() {
-		$options = get_option('woocommerce_payplug_settings', []);
-		$account = self::get_account_data_from_options($options);
+		$account = self::get_account_data_from_options();
 		if (!$account) {
 			return array();
 		}
@@ -518,7 +518,7 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function is_oney_available() {
 		$options = get_option('woocommerce_payplug_settings', []);
-		$account = self::get_account_data_from_options($options);
+		$account = self::get_account_data_from_options();
 		if (!$account) {
 			return false;
 		}

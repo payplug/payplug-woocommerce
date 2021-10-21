@@ -59,8 +59,7 @@ class PayplugGatewayOney3x extends PayplugGateway
      */
     private function set_oney_configuration()
     {
-        $options = get_option('woocommerce_payplug_settings', []);
-        $account = PayplugWoocommerceHelper::get_account_data_from_options($options);
+        $account = PayplugWoocommerceHelper::get_account_data_from_options();
         if ($account) {
             $oney_configuration = $account['configuration']['oney'];
             $this->min_oney_price = $oney_configuration['min_amounts']['EUR'] / 100;
