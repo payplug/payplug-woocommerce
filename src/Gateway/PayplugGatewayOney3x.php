@@ -19,6 +19,7 @@ if (!defined('ABSPATH')) {
  */
 class PayplugGatewayOney3x extends PayplugGateway
 {
+
     const OPTION_NAME = "payplug_oney_config";
     const ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED = 2;
     const ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH = 3;
@@ -45,7 +46,22 @@ class PayplugGatewayOney3x extends PayplugGateway
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'oney_refund_text']);
 
         if (is_checkout()) {
-            $account = PayplugWoocommerceHelper::get_account_data_from_options(true);
+            PayplugWoocommerceHelper::set_account_data_from_options();
+        }
+
+        self::set_oney_configuration();
+    }
+
+    /**
+     * Set oney settings
+     *
+     * @return void
+     */
+    private function set_oney_configuration()
+    {
+        $options = get_option('woocommerce_payplug_settings', []);
+        $account = PayplugWoocommerceHelper::get_account_data_from_options($options);
+        if ($account) {
             $oney_configuration = $account['configuration']['oney'];
             $this->min_oney_price = $oney_configuration['min_amounts']['EUR'] / 100;
             $this->max_oney_price = $oney_configuration['max_amounts']['EUR'] / 100;
