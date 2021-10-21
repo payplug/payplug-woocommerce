@@ -517,7 +517,6 @@ class PayplugWoocommerceHelper {
 	 * @return boolean
 	 */
 	public static function is_oney_available() {
-		$options = get_option('woocommerce_payplug_settings', []);
 		$account = self::get_account_data_from_options();
 		if (!$account) {
 			return false;
