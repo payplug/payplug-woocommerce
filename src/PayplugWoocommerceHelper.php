@@ -447,7 +447,7 @@ class PayplugWoocommerceHelper {
 	}
 
 	/**
-	 * Get transient ket from payplug option
+	 * Get transient key from payplug option
 	 *
 	 * @return string
 	 */
@@ -455,6 +455,18 @@ class PayplugWoocommerceHelper {
 	{
 		$transient_key = PayplugGatewayOney3x::OPTION_NAME . (array_key_exists('mode', $options) && $options['mode'] === 'yes' ? "_live" : "_test");
 		return $transient_key;
+	}
+
+	/**
+	 * Set transient data for payplug account
+	 *
+	 * @return string
+	 */
+	public static function set_transient_data($data, $options = null) 
+	{
+		$options = $options ? $options : get_option('woocommerce_payplug_settings', []);
+		$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
+		set_transient($transient_key, isset($data['httpResponse']) ? $data['httpResponse'] : []);
 	}
 
 	/**
@@ -487,10 +499,9 @@ class PayplugWoocommerceHelper {
 			return array();
 		}
 
-		$transient_key = self::get_transient_key($options);
 		try {
 			$parameters_account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
-			set_transient($transient_key, $parameters_account['httpResponse']);
+			self::set_transient_data($parameters_account, $options);
 		} catch (\Payplug\Exception\UnauthorizedException $e) {
 		} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
 		}

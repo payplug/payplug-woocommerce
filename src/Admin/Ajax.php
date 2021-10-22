@@ -7,6 +7,7 @@ use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -107,9 +108,10 @@ class Ajax {
 		);
 	}
     
-    public function check_live_permissions() {
+    public function check_live_permissions() {		
 		$account = Authentication::getAccount(new Payplug($_POST['livekey']));
-        $permissions = $account['httpResponse']['permissions'];
+		PayplugWoocommerceHelper::set_transient_data($account);
+		$permissions = $account['httpResponse']['permissions'];
 		wp_send_json_success($permissions);
 	}
 
