@@ -246,6 +246,8 @@ HTML;
                     'order_id'    => $order_id,
                     'customer_id' => ((int) $customer_id > 0) ? $customer_id : 'guest',
                     'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
+                    'gateway_id'  => $this->id
+
                 ],
             ];
 
