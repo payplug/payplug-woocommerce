@@ -659,7 +659,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function process_admin_options()
     {
         $data = $this->get_post_data();
-		$settings = get_option( 'woocommerce_payplug_settings', [] );
         $oneclick_fieldkey = $this->get_field_key('oneclick');
 
         // Handle logout process
@@ -775,6 +774,18 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         ) {
             $data[$oneclick_fieldkey] = null;
             \WC_Admin_Settings::add_error(__('Only PREMIUM accounts can enable the One Click option in LIVE mode.', 'payplug'));
+        }
+
+        // Force getAccount to set transient data on live mode
+        if (
+            $mode_fieldkey === "woocommerce_payplug_mode" &&
+            "1" === $data[$mode_fieldkey] &&
+            !empty($data[$live_key_fieldkey])
+        ) {
+            $response = Authentication::getAccount(new Payplug($data[$live_key_fieldkey]));
+            PayplugWoocommerceHelper::set_transient_data($response, [
+                'mode' => 'yes'
+            ]);
         }
 
         $this->data = $data;
