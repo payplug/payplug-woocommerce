@@ -467,6 +467,7 @@ class PayplugWoocommerceHelper {
 		$options = get_option('woocommerce_payplug_settings', []);
 		$transient_key = self::get_transient_key($options);
 		$account = get_transient($transient_key);
+		$account['oneyEnabled'] = (isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
 		return $account;
 	}
 
@@ -487,8 +488,6 @@ class PayplugWoocommerceHelper {
 		$transient_key = self::get_transient_key($options);
 		try {
 			$parameters_account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
-			$http_reponse = $parameters_account['httpResponse'];
-			$http_reponse['oneyEnabled'] = (isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
 			set_transient($transient_key, $parameters_account['httpResponse']);
 		} catch (\Payplug\Exception\UnauthorizedException $e) {
 		} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
