@@ -1148,6 +1148,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
         try {
             $response    = !is_null($key) ? Authentication::getAccount(new Payplug($key)) : Authentication::getAccount();
+            PayplugWoocommerceHelper::set_transient_data($response);
             $merchant_id = isset($response['httpResponse']['id']) ? $response['httpResponse']['id'] : '';
         } catch (ConfigurationException $e) {
             PayplugGateway::log(sprintf('Missing API key for PayPlug client : %s', wc_print_r($e->getMessage(), true)), 'error');
