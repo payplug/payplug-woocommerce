@@ -447,33 +447,64 @@ class PayplugWoocommerceHelper {
 	}
 
 	/**
+	 * Get transient key from payplug option
+	 *
+	 * @return string
+	 */
+	public static function get_transient_key($options)
+	{
+		$transient_key = PayplugGatewayOney3x::OPTION_NAME . (array_key_exists('mode', $options) && $options['mode'] === 'yes' ? "_live" : "_test");
+		return $transient_key;
+	}
+
+	/**
+	 * Set transient data for payplug account
+	 *
+	 * @return string
+	 */
+	public static function set_transient_data($data, $options = null)
+	{
+		$options = $options ? $options : get_option('woocommerce_payplug_settings', []);
+		$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
+		set_transient($transient_key, isset($data['httpResponse']) ? $data['httpResponse'] : []);
+	}
+
+	/**
 	 * Get current option from payplug settings
 	 *
 	 * @return array
 	 */
-	public static function get_account_data_from_options($force_update = false) {
-        $options          = get_option('woocommerce_payplug_settings', []);
-        $payplug_test_key = !empty($options['payplug_test_key']) ? $options['payplug_test_key'] : '';
-        $payplug_live_key = !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : '';
-        if (empty($payplug_test_key) && empty($payplug_live_key)) {
-            return array();
-        }
+	public static function get_account_data_from_options()
+	{
+		$options = get_option('woocommerce_payplug_settings', []);
+		$transient_key = self::get_transient_key($options);
+		$account = get_transient($transient_key);
+		if (is_array($account)) {
+			$account['oneyEnabled'] = (isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
+		}
+		return $account;
+	}
 
-        $transient_key = PayplugGatewayOney3x::OPTION_NAME . ($options['mode'] === 'yes' ? "_live" : "_test");
-        $payplug_oney_config = get_transient($transient_key);
-        if ($payplug_oney_config && !$force_update) {
-            $account = $payplug_oney_config;
-        } else {
-            try {
-                $parameters_account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
-                set_transient($transient_key, $parameters_account['httpResponse']);
-                $account = get_transient($transient_key);
-            } catch (\Payplug\Exception\UnauthorizedException $e) {
-            } catch (\Payplug\Exception\ConfigurationNotSetException $e) {
-            }
-        }
-        $account['oneyEnabled'] = (isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
-        return $account;
+	/**
+	 * Set current option from payplug settings and api call
+	 *
+	 * @return void
+	 */
+	public static function set_account_data_from_options()
+	{
+		$options          = get_option('woocommerce_payplug_settings', []);
+		$payplug_test_key = !empty($options['payplug_test_key']) ? $options['payplug_test_key'] : '';
+		$payplug_live_key = !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : '';
+		if (empty($payplug_test_key) && empty($payplug_live_key)) {
+			return array();
+		}
+
+		try {
+			$parameters_account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
+			self::set_transient_data($parameters_account, $options);
+		} catch (\Payplug\Exception\UnauthorizedException $e) {
+		} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
+		}
 
 	}
 
@@ -484,7 +515,7 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function get_min_max_oney() {
 		$account = self::get_account_data_from_options();
-		if (empty($account)) {
+		if (!$account) {
 			return array();
 		}
 		return [
@@ -500,7 +531,7 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function is_oney_available() {
 		$account = self::get_account_data_from_options();
-		if (empty($account)) {
+		if (!$account) {
 			return false;
 		}
 		return ($account && $account['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oneyEnabled'] === "yes");

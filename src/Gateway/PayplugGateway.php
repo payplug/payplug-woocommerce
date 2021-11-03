@@ -18,7 +18,6 @@ use Payplug\Resource\Refund as RefundResource;
 use WC_Payment_Gateway_CC;
 use WC_Payment_Tokens;
 
-         
 /**
  * PayPlug WooCommerce Gateway.
  *
@@ -270,7 +269,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$oney_range = PayplugWoocommerceHelper::get_min_max_oney();
         $min_oney_price = (isset($oney_range['min'])) ? $oney_range['min'] : 100;
         $max_oney_price = (isset($oney_range['max'])) ? $oney_range['max'] : 3000;
-		
         $fields = [
             'enabled'                 => [
                 'title'       => __('Enable/Disable', 'payplug'),
@@ -284,14 +282,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'type'        => 'text',
                 'description' => __('The payment solution title displayed during checkout.', 'payplug'),
                 'default'     => _x('Credit card checkout', 'Default gateway title', 'payplug'),
-                'desc_tip'    => true,
+                'desc_tip'    => false,
             ],
             'description'             => [
                 'title'       => __('Description', 'payplug'),
                 'type'        => 'text',
                 'description' => __('The payment solution description displayed during checkout.', 'payplug'),
                 'default'     => '',
-                'desc_tip'    => true,
+                'desc_tip'    => false,
             ],
             'title_connexion'         => [
                 'title' => __('Connection', 'payplug'),
@@ -338,13 +336,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             'payment_method'          => [
                 'title'       => __('Payment page', 'payplug'),
                 'type'        => 'radio',
+				'options'     => array(
+					'redirect' => __('Redirect', 'payplug'),
+					'embedded' => __('Integrated', 'payplug'),
+				),
                 'description' => __('Customers will be redirected to a PayPlug payment page to finalize the transaction, or payments will be performed in an embeddable payment form on your website.', 'payplug'),
                 'default'     => 'redirect',
-                'desc_tip'    => true,
-                'options'     => array(
-                    'redirect' => __('Redirect', 'payplug'),
-                    'embedded' => __('Integrated', 'payplug'),
-                ),
+                'desc_tip'    => false
             ],
             'debug'                   => [
                 'title'       => __('Debug', 'payplug'),
@@ -352,7 +350,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'description' => __('Debug mode saves additional information on your server for each operation done via the PayPlug plugin (Developer setting).', 'payplug'),
                 'label'       => __('Activate debug mode', 'payplug'),
                 'default'     => 'yes',
-                'desc_tip'    => true,
+				'desc_tip'    => false
             ],
             'title_advanced_settings' => [
                 'title'       => __('Advanced Settings', 'payplug'),
@@ -368,7 +366,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'label'       => __('Activate', 'payplug'),
                 'description' => __('Allow your customers to save their credit card information for later purchases.', 'payplug'),
                 'default'     => 'no',
-                'desc_tip'    => true
+				'desc_tip'    => false
             ],
             'oney'                => [
                 'title'       => __('Split Oney Payment', 'payplug'),
@@ -377,16 +375,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 // TRAD
                 'description' => sprintf(__('Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€.', 'payplug'), $min_oney_price, $max_oney_price),
                 'default'     => 'no',
-                'desc_tip'    => true
+				'desc_tip'    => false
             ]
         ];
-        
+
         if ($this->user_logged_in()) {
             if ($this->permissions->has_permissions(PayplugPermissions::SAVE_CARD)) {
                 unset($fields['title_advanced_settings']);
             } else if  ('live' === $this->get_current_mode()){
                 $fields['oneclick']['disabled'] = true;
-            }            
+            }
         }
 
         /**
@@ -538,8 +536,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/app.css',
             [],
             PAYPLUG_GATEWAY_VERSION
-        );          
-        
+        );
+
         wp_enqueue_script(
             'payplug-gateway-admin',
             PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin.js',
@@ -661,13 +659,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function process_admin_options()
     {
         $data = $this->get_post_data();
-		$settings = get_option( 'woocommerce_payplug_settings', [] );
         $oneclick_fieldkey = $this->get_field_key('oneclick');
-        
+
         // Handle logout process
         if (
             isset($data['submit_logout'])
-            && false !== check_admin_referer('payplug_user_logout', '_logoutaction') 
+            && false !== check_admin_referer('payplug_user_logout', '_logoutaction')
         ) {
 
             if ($this->permissions) {
@@ -688,7 +685,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             if("payplug" === $this->id) {
                 \WC_Admin_Settings::add_message(__('Successfully logged out.', 'payplug'));
             }
-            
+
             return true;
         }
 
@@ -777,6 +774,18 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         ) {
             $data[$oneclick_fieldkey] = null;
             \WC_Admin_Settings::add_error(__('Only PREMIUM accounts can enable the One Click option in LIVE mode.', 'payplug'));
+        }
+
+        // Force getAccount to set transient data on live mode
+        if (
+            $mode_fieldkey === "woocommerce_payplug_mode" &&
+            "1" === $data[$mode_fieldkey] &&
+            !empty($data[$live_key_fieldkey])
+        ) {
+            $response = Authentication::getAccount(new Payplug($data[$live_key_fieldkey]));
+            PayplugWoocommerceHelper::set_transient_data($response, [
+                'mode' => 'yes'
+            ]);
         }
 
         $this->data = $data;
@@ -953,9 +962,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             PayplugGateway::log(sprintf('Payment process complete for order #%s', $order_id));
 
             return [
-                'result'   => 'success',                
+                'result'   => 'success',
                 'is_paid'  => $payment->__get('is_paid'), // Use for path redirect before DSP2
-                'redirect' => ($payment->__get('is_paid')) ? $order->get_checkout_order_received_url() : $payment->__get('hosted_payment')->payment_url 
+                'redirect' => ($payment->__get('is_paid')) ? $order->get_checkout_order_received_url() : $payment->__get('hosted_payment')->payment_url
             ];
         } catch (HttpException $e) {
             PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
@@ -1150,6 +1159,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
         try {
             $response    = !is_null($key) ? Authentication::getAccount(new Payplug($key)) : Authentication::getAccount();
+            PayplugWoocommerceHelper::set_transient_data($response);
             $merchant_id = isset($response['httpResponse']['id']) ? $response['httpResponse']['id'] : '';
         } catch (ConfigurationException $e) {
             PayplugGateway::log(sprintf('Missing API key for PayPlug client : %s', wc_print_r($e->getMessage(), true)), 'error');
@@ -1305,6 +1315,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                         <input class="radio <?php echo esc_attr($data['class']); ?>" type="radio" name="<?php echo esc_attr($field_key); ?>" id="<?php echo esc_attr($field_key); ?>-<?php echo esc_attr($option_key); ?>" value="<?php echo esc_attr($option_key); ?>" <?php checked($option_key, $this->get_option($key)); ?> <?php disabled($data['disabled'], true); ?> <?php echo $this->get_custom_attribute_html($data); ?>>
                         <label for="<?php echo esc_attr($field_key); ?>-<?php echo esc_attr($option_key); ?>"><?php echo esc_html($option_value); ?></label>
                     <?php endforeach; ?>
+					<?php echo $this->get_description_html($data); ?>
                 </fieldset>
             </td>
         </tr>

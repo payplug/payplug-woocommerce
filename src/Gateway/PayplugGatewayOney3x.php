@@ -45,7 +45,21 @@ class PayplugGatewayOney3x extends PayplugGateway
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'oney_refund_text']);
 
         if (is_checkout()) {
-            $account = PayplugWoocommerceHelper::get_account_data_from_options(true);
+            PayplugWoocommerceHelper::set_account_data_from_options();
+        }
+
+        self::set_oney_configuration();
+    }
+
+    /**
+     * Set oney settings
+     *
+     * @return void
+     */
+    private function set_oney_configuration()
+    {
+        $account = PayplugWoocommerceHelper::get_account_data_from_options();
+        if ($account) {
             $oney_configuration = $account['configuration']['oney'];
             $this->min_oney_price = $oney_configuration['min_amounts']['EUR'] / 100;
             $this->max_oney_price = $oney_configuration['max_amounts']['EUR'] / 100;
@@ -291,9 +305,27 @@ HTML;
      */
     public function check_gateway($gateways)
     {
+        $ordered_gateways = [];
         if (isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id) {
-            if(!PayplugWoocommerceHelper::is_oney_available()) {
+            if (!PayplugWoocommerceHelper::is_oney_available()) {
                 unset($gateways[$this->id]);
+            } else {
+                foreach ($gateways as $id => $gateway) {
+                    switch ($id) {
+                        case 'payplug':
+                            $ordered_gateways[$id] = $gateway;
+                            $ordered_gateways['oney_x3_with_fees'] = $gateways['oney_x3_with_fees'];
+                            $ordered_gateways['oney_x4_with_fees'] = $gateways['oney_x4_with_fees'];
+                            break;
+                        case 'oney_x3_with_fees':
+                        case 'oney_x4_with_fees':
+                            break;
+                        default:
+                            $ordered_gateways[$id] = $gateway;
+                            break;
+                    }
+                }
+                $gateways = $ordered_gateways;
             }
         }
         return $gateways;
