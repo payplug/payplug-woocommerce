@@ -71,7 +71,8 @@ class PayplugResponse {
 
 			return;
 		}
-
+		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($resource);
+		PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
 		if ( ! empty( $resource->failure ) ) {
 			$order->update_status(
 				'failed',
