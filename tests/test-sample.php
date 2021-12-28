@@ -18,3 +18,4 @@ class SampleTest extends WP_UnitTestCase {
 		$this->assertTrue( true );
 	}
 }
+
