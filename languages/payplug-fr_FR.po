@@ -5,17 +5,17 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
 "woocommerce\n"
-"POT-Creation-Date: 2021-02-11 08:06+0000\n"
-"PO-Revision-Date: 2021-02-26 14:03+0000\n"
+"POT-Creation-Date: 2021-02-26 14:03+0000\n"
+"PO-Revision-Date: 2021-12-31 10:48-0000\n"
 "Last-Translator: \n"
 "Language-Team: Français\n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Loco https://localise.biz/\n"
+"X-Generator: Poedit 1.5.7\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Loco-Version: 2.5.0; wp-5.6.2"
+"X-Loco-Version: 2.5.0; wp-5.6.2\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -53,15 +53,16 @@ msgstr "Réglages avancés"
 
 #: src/Gateway/PayplugGateway.php:377
 #, php-format
-#| msgid ""
-#| "Allow customers to spread out payments over 3 or 4 installments from %s € "
-#| "to %s €."
 msgid ""
 "Allow customers to spread out payments over 3 or 4 installments from %s€ to "
 "%s€."
 msgstr ""
-"Permettez à vos clients d’échelonner le paiement de leurs commandes en 3x, "
-"4x à partir de %s€ jusqu’à %s€."
+"d’échelonner le paiement de leurs commandes en 3x, 4x à partir de %s€ to %s€."
+
+#: src/Gateway/PayplugGateway.php:376
+#, php-format
+msgid "support.payplug.com//hc//en-gb"
+msgstr "support.payplug.com//hc//fr"
 
 #: src/Gateway/PayplugGateway.php:368
 msgid ""
@@ -129,6 +130,7 @@ msgstr ""
 "boutique."
 
 #: src/Gateway/PayplugGateway.php:349
+#, fuzzy
 msgid "Debug"
 msgstr "Debug"
 
@@ -344,8 +346,8 @@ msgstr ""
 "Offre de financement avec apport obligatoire, réservée aux particuliers et "
 "valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par Oney "
 "Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre crédit. "
-"Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix -"
-" 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr "
+"Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix "
+"- 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr "
 "Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr"
 
 #: src/Admin/Notices.php:107
@@ -583,7 +585,8 @@ msgstr ""
 "commande."
 
 #: src/Gateway/PayplugGatewayOney3x.php:122
-#: src/Gateway/PayplugGatewayOney3x.php:175 src/Front/PayplugOneyDetail.php:209
+#: src/Gateway/PayplugGatewayOney3x.php:175
+#: src/Front/PayplugOneyDetail.php:209
 msgid ""
 "The payment with Oney is unavailable because you have more than %s items in "
 "your cart."
@@ -614,7 +617,8 @@ msgid "The PHP version on your server is valid."
 msgstr "La version PHP de votre serveur est compatible avec l'extension."
 
 #: src/Gateway/PayplugGatewayOney3x.php:116
-#: src/Gateway/PayplugGatewayOney3x.php:150 src/Front/PayplugOneyDetail.php:206
+#: src/Gateway/PayplugGatewayOney3x.php:150
+#: src/Front/PayplugOneyDetail.php:206
 #, php-format
 msgid ""
 "The total amount of your order should be between %s€ and %s€ to pay with "
@@ -676,12 +680,12 @@ msgstr "La mise à jour de vos clés API a bien été effectuée."
 #: src/Gateway/PayplugGateway.php:358
 msgid ""
 "Your current offer does not allow this option. Try it on TEST mode. More "
-"information <a href=\"https://www.payplug.com/pricing\" target=\"_blank\">"
-"here.</a>"
+"information <a href=\"https://www.payplug.com/pricing\" target=\"_blank"
+"\">here.</a>"
 msgstr ""
 "Votre offre actuelle ne permet pas cette option. Essayez-le en mode TEST. "
-"Plus d'informations <a href=\"https://www.payplug.com/pricing\" "
-"target=\"_blank\">ici.</a>"
+"Plus d'informations <a href=\"https://www.payplug.com/pricing\" target="
+"\"_blank\">ici.</a>"
 
 #: src/Gateway/PayplugGatewayOney3x.php:188
 msgid ""
@@ -703,6 +707,22 @@ msgstr "Votre boutique doit utiliser l'euro comme monnaie de paiement."
 msgid "your@email.com"
 msgstr "votre@email.com"
 
-#: src/Gateway/PayplugApi.php:133
-msgid "Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage."
-msgstr "La simulation de votre échéancier est temporairement indisponible. Vous retrouverez cette information à l'étape du paiement."
+msgid "More informations"
+msgstr "Plus d'informations"
+
+msgid "support.payplug.com/hc/en-gb"
+msgstr "support.payplug.com/hc/fr"
+
+#, fuzzy
+#~ msgid "https://support.payplug.com/hc/en-gb"
+#~ msgstr "support.payplug.com//hc//fr"
+
+#~ msgid "info"
+#~ msgstr "En savoir plus"
+
+#~ msgid ""
+#~ "Your payment schedule simulation is temporarily unavailable. You will "
+#~ "find this information at the payment stage."
+#~ msgstr ""
+#~ "La simulation de votre échéancier est temporairement indisponible. Vous "
+#~ "retrouverez cette information à l'étape du paiement."

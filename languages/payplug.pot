@@ -58,6 +58,12 @@ msgid ""
 "%s€."
 msgstr ""
 
+#: src/Gateway/PayplugGateway.php:376
+#, php-format
+msgid ""
+"support.payplug.com//hc//en-gb"
+msgstr ""
+
 #: src/Gateway/PayplugGateway.php:368
 msgid ""
 "Allow your customers to save their credit card information for later "
@@ -634,4 +640,10 @@ msgstr ""
 
 #: src/Gateway/PayplugGateway.php:624
 msgid "your@email.com"
+msgstr ""
+
+msgid "More informations"
+msgstr ""
+
+msgid "support.payplug.com/hc/en-gb"
 msgstr ""
