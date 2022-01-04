@@ -27,7 +27,7 @@ class PayplugGatewayOney3x extends PayplugGateway
     protected $oney_response;
     protected $min_oney_price;
     protected $max_oney_price;
-    protected $allowed_country_codes;
+    protected $allowed_country_codes = [];
 
     public function __construct()
     {
@@ -356,5 +356,42 @@ HTML;
             echo wpautop(wptexturize($description));
         }
     }
+
+	/**
+	 *
+	 * Billing and shipping addresses should have the same country and allowed by Oney
+	 * https://payplug-prod.atlassian.net/browse/WOOC-227
+	 *
+	 * @param $order
+	 * @return bool
+	 *
+	 */
+	public function validate_shipping_billing_country( $order ): Bool
+	{
+
+		$billing_country    = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();
+		$shipping_country  = PayplugWoocommerceHelper::is_pre_30() ? $order->shipping_country : $order->get_shipping_country();
+
+		if($billing_country === $shipping_country)
+			return true;
+
+		return false;
+	}
+
+	/**
+	 * Country of billing or shipping at oney payments should be on the allowedCountry that comes from pauyplug-api /account
+	 *
+	 * @param string $country
+	 * @param array $allowed
+	 * @return bool
+	 */
+	public function allowed_country(string $country, array $allowed): Bool
+	{
+		if( in_array($country, $allowed))
+			return true;
+
+		return false;
+	}
+
 
 }
