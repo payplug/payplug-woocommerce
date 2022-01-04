@@ -409,11 +409,11 @@ msgstr "Password"
 
 #: src/Gateway/PayplugGatewayOney3x.php:37
 msgid "Pay by card in 3x with Oney"
-msgstr "Paga con la carta in 3x con Oney"
+msgstr "Paga con la carta in 3x con Oney (Eccetto prepagate)"
 
 #: src/Gateway/PayplugGatewayOney4x.php:24
 msgid "Pay by card in 4x with Oney"
-msgstr "Paga con la carta in 4x con Oney"
+msgstr "Paga con la carta in 4x con Oney (Eccetto prepagate)"
 
 #: src/Gateway/PayplugGateway.php:104
 msgid "Pay with another credit card"
