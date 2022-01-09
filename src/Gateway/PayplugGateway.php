@@ -152,7 +152,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function customize_gateway_title($total_rows, $order)
     {
-        $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
+
+		$get_payment_method = $this->id;
+		if( method_exists($order, "get_payment_method") ) {
+			$get_payment_method = $order->get_payment_method();
+		}
+
+		$payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $get_payment_method;
         if (
             $this->id !== $payment_method
             || !isset($total_rows['payment_method'])
