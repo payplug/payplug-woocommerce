@@ -647,3 +647,9 @@ msgstr ""
 
 msgid "support.payplug.com/hc/en-gb"
 msgstr ""
+
+msgid "info"
+msgstr ""
+
+msgid "Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage."
+msgstr ""
