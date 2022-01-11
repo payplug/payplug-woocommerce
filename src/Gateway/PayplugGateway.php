@@ -269,6 +269,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$oney_range = PayplugWoocommerceHelper::get_min_max_oney();
         $min_oney_price = (isset($oney_range['min'])) ? $oney_range['min'] : 100;
         $max_oney_price = (isset($oney_range['max'])) ? $oney_range['max'] : 3000;
+
+		$anchor = esc_html_x( __("More informations", 'payplug'), 'modal', 'payplug' );
+		$domain = __( 'support.payplug.com/hc/en-gb', 'payplug' );
+		$link   = sprintf(  ' <a href="https://%s" target="_blank">%s</a>', $domain, $anchor );
+
         $fields = [
             'enabled'                 => [
                 'title'       => __('Enable/Disable', 'payplug'),
@@ -373,7 +378,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'type'        => 'checkbox',
                 'label'       => __('Activate', 'payplug'),
                 // TRAD
-                'description' => sprintf(__('Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€.', 'payplug'), $min_oney_price, $max_oney_price),
+                'description' => sprintf(__('Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€.', 'payplug'), $min_oney_price, $max_oney_price) . $link,
                 'default'     => 'no',
 				'desc_tip'    => false
             ]
