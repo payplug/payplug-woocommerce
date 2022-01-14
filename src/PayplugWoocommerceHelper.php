@@ -537,6 +537,25 @@ class PayplugWoocommerceHelper {
 		return ($account && $account['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oneyEnabled'] === "yes");
 	}
 
+	/**
+	 * Hide popup for if country_code != payplug country
+	 * https://payplug-prod.atlassian.net/browse/WOOC-249
+	 *
+	 * @return bool
+	 */
+	public static function show_oney_popup() : bool
+	{
+		preg_match( '([a-z-]+)', get_locale(), $country );
+		$country = strtoupper($country[0]);
+
+		$account = self::get_account_data_from_options();
+		if( $account && $account['permissions'][PayplugPermissions::USE_ONEY] == true && $account["country"] == $country ){
+			return true;
+		}
+
+		return false;
+	}
+
   	/**
 	 * Load translations from plugin languages folder.
 	 *
@@ -556,7 +575,7 @@ class PayplugWoocommerceHelper {
 
 		return load_textdomain( $domain, $path . '/' . $mofile );
 	}
-  
+
 	/**
 	 * Check and update value for oney simulation
 	 *
