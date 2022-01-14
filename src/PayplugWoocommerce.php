@@ -105,7 +105,9 @@ class PayplugWoocommerce {
 		$this->actions  = new WoocommerceActions();
 		$this->requests = new PayplugWoocommerceRequest();
 		$this->ajax     = new Ajax();
-		new PayplugOneyDetail();
+
+		if( PayplugWoocommerceHelper::show_oney_popup() )
+			new PayplugOneyDetail();
 
 		add_action( 'woocommerce_payment_gateways', [ $this, 'register_payplug_gateway' ] );
 		add_filter( 'plugin_action_links_' . PAYPLUG_GATEWAY_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
