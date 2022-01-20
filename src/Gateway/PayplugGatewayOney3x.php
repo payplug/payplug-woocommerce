@@ -120,15 +120,23 @@ HTML;
 
     /**
      * Check if Oney is available
-     * 
+     *
      * @return void
      */
     public function check_oney_is_available()
     {
         $cart = WC()->cart;
+
+		//for backend orders
+		if( !empty(get_query_var('order-pay')) ){
+			$order = wc_get_order(get_query_var('order-pay'));
+			$items = $order->get_items();
+			$this->order_items_to_cart($cart, $items);
+		}
+
         $total_price = floatval($cart->total);
 		$products_qty = (int) $cart->cart_contents_count;
-        
+
 		// Min and max
         if ($total_price < $this->min_oney_price || $total_price > $this->max_oney_price) {
             $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->min_oney_price, $this->max_oney_price).'</div>';
@@ -391,6 +399,20 @@ HTML;
 			return true;
 
 		return false;
+	}
+
+	/**
+	 * Empty the cart and add all order_items
+	 *
+	 * @param $cart
+	 * @param $items
+	 * @return void
+	 */
+	private function order_items_to_cart($cart, $items){
+		$cart->empty_cart();
+		foreach ($items as $item){
+			$cart->add_to_cart($item->get_product_id(), $item->get_quantity());
+		}
 	}
 
 
