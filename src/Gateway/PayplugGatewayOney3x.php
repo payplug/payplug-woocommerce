@@ -128,7 +128,7 @@ HTML;
         $cart = WC()->cart;
 
 		//for backend orders
-		if( empty($cart->get_cart_contents()) && !empty(get_query_var('order-pay')) ){
+		if( !empty(get_query_var('order-pay')) ){
 			$order = wc_get_order(get_query_var('order-pay'));
 			$items = $order->get_items();
 			$this->order_items_to_cart($cart, $items);
@@ -402,13 +402,14 @@ HTML;
 	}
 
 	/**
-	 * Add order_items to cart
+	 * Empty the cart and add all order_items
 	 *
 	 * @param $cart
 	 * @param $items
 	 * @return void
 	 */
 	private function order_items_to_cart($cart, $items){
+		$cart->empty_cart();
 		foreach ($items as $item){
 			$cart->add_to_cart($item->get_product_id(), $item->get_quantity());
 		}
