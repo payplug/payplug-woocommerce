@@ -277,7 +277,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $max_oney_price = (isset($oney_range['max'])) ? $oney_range['max'] : 3000;
 
 		$anchor = esc_html_x( __("More informations", 'payplug'), 'modal', 'payplug' );
-		$domain = __( 'support.payplug.com/hc/en-gb', 'payplug' );
+		$domain = __( 'support.payplug.com/hc/fr/articles/4408142346002', 'payplug' );
 		$link   = sprintf(  ' <a href="https://%s" target="_blank">%s</a>', $domain, $anchor );
 
         $fields = [

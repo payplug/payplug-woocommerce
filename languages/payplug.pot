@@ -645,7 +645,7 @@ msgstr ""
 msgid "More informations"
 msgstr ""
 
-msgid "support.payplug.com/hc/en-gb"
+msgid "support.payplug.com/hc/fr/articles/4408142346002"
 msgstr ""
 
 msgid "info"
