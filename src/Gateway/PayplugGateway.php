@@ -821,17 +821,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total());
         $amount      = $this->validate_order_amount($amount);
 
-		if( method_exists($this, "validate_shipping_billing_country") ) {
-			if (
-				! $this->validate_shipping_billing_country($order)
-				|| ! $this->allowed_country(  PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country(), $this->allowed_country_codes)
-			)
-			{
-				PayplugGateway::log( __("Unavailable for the specified country") );
-				throw new \Exception(  __("Unavailable for the specified country") );
-			}
-		}
-
 		if (is_wp_error($amount)) {
             PayplugGateway::log(sprintf('Invalid amount %s for the order.', $order->get_total()), 'error');
             throw new \Exception($amount->get_error_message());

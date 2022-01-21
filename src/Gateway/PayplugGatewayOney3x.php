@@ -152,8 +152,11 @@ HTML;
         // Country check
         $country_code_shipping = WC()->customer->get_shipping_country();
         $country_code_billing = WC()->customer->get_billing_country();
-        
-        if (!in_array($country_code_billing, $this->allowed_country_codes) || !in_array($country_code_shipping, $this->allowed_country_codes)) {
+
+        if ( !$this->validate_shipping_billing_country() ||
+			!$this->allowed_country($country_code_billing, $this->allowed_country_codes) ||
+			!$this->allowed_country($country_code_shipping, $this->allowed_country_codes)
+		) {
             $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.__('Unavailable for the specified country.', 'payplug').'</div>';
             return self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED;
         }
@@ -374,11 +377,11 @@ HTML;
 	 * @return bool
 	 *
 	 */
-	public function validate_shipping_billing_country( $order ): Bool
+	public function validate_shipping_billing_country(): Bool
 	{
 
-		$billing_country    = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();
-		$shipping_country  = PayplugWoocommerceHelper::is_pre_30() ? $order->shipping_country : $order->get_shipping_country();
+		$billing_country    = WC()->customer->get_billing_country();
+		$shipping_country  = WC()->customer->get_shipping_country();
 
 		if($billing_country === $shipping_country)
 			return true;
