@@ -193,3 +193,6 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 
 = 0.1.2 =
 * Beta version
+
+
+TEST ISSAM
