@@ -43,7 +43,7 @@
 			pao.xhr = $
 				.post(
 					payplug_admin_config.ajax_url,
-					{ 
+					{
 						action: 'check_live_permissions',
 						livekey : $('#woocommerce_payplug_payplug_live_key').length ? $('#woocommerce_payplug_payplug_live_key').val() : ''
 					}
@@ -51,9 +51,13 @@
 					pao.is_oney_refresh = false
 					pao.$payplug_oney.prop('disabled', false)
 					pao.xhr = false
+					if (false === res.success) {
+						alert(res.data.error)
+						setTimeout(() => pao.$payplug_oney.prop('checked', false), 200)
+					}
 					if (false === res.data.can_use_oney) {
 						pao.$dialogoney.dialog('open')
-						pao.$payplug_oney.prop('checked', false)
+						setTimeout(() => pao.$payplug_oney.prop('checked', false), 200)
 					} else {
 						pao.$payplug_oney.prop('checked', true)
 					}
