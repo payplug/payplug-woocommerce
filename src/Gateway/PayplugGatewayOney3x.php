@@ -383,7 +383,7 @@ HTML;
 	 * @return bool
 	 *
 	 */
-	public function validate_shipping_billing_country($shipping_country, $billing_country): Bool
+	public function validate_shipping_billing_country($shipping_country, $billing_country)
 	{
 		if($billing_country === $shipping_country)
 			return true;
@@ -398,7 +398,7 @@ HTML;
 	 * @param array $allowed
 	 * @return bool
 	 */
-	public function allowed_country(string $country, array $allowed): Bool
+	public function allowed_country(string $country, array $allowed)
 	{
 		if( in_array($country, $allowed))
 			return true;

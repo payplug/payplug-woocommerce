@@ -543,7 +543,7 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return bool
 	 */
-	public static function show_oney_popup() : bool
+	public static function show_oney_popup()
 	{
 		preg_match( '([a-z-]+)', get_locale(), $country );
 		$country = strtoupper($country[0]);
