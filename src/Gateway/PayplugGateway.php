@@ -152,7 +152,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function customize_gateway_title($total_rows, $order)
     {
-        $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
+
+		$get_payment_method = $this->id;
+		if( method_exists($order, "get_payment_method") ) {
+			$get_payment_method = $order->get_payment_method();
+		}
+
+		$payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $get_payment_method;
         if (
             $this->id !== $payment_method
             || !isset($total_rows['payment_method'])
@@ -269,6 +275,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$oney_range = PayplugWoocommerceHelper::get_min_max_oney();
         $min_oney_price = (isset($oney_range['min'])) ? $oney_range['min'] : 100;
         $max_oney_price = (isset($oney_range['max'])) ? $oney_range['max'] : 3000;
+
+		$anchor = esc_html_x( __("More informations", 'payplug'), 'modal', 'payplug' );
+		$domain = __( 'support.payplug.com/hc/fr/articles/4408142346002', 'payplug' );
+		$link   = sprintf(  ' <a href="https://%s" target="_blank">%s</a>', $domain, $anchor );
+
         $fields = [
             'enabled'                 => [
                 'title'       => __('Enable/Disable', 'payplug'),
@@ -373,7 +384,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'type'        => 'checkbox',
                 'label'       => __('Activate', 'payplug'),
                 // TRAD
-                'description' => sprintf(__('Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€.', 'payplug'), $min_oney_price, $max_oney_price),
+                'description' => sprintf(__('Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€.', 'payplug'), $min_oney_price, $max_oney_price) . $link,
                 'default'     => 'no',
 				'desc_tip'    => false
             ]
@@ -724,10 +735,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                         $val = 'no';
                         break;
                     case 'payplug_test_key':
-                        $val = esc_attr($response['test']);
+                        $val = !empty($response['test']) ? esc_attr($response['test']) : null;
                         break;
                     case 'payplug_live_key':
-                        $val = esc_attr($response['live']);
+                        $val = !empty($response['live']) ? esc_attr($response['live']) : null;
                         break;
                     case 'payplug_merchant_id':
                         $val = esc_attr($merchant_id);
@@ -809,7 +820,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
         $amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total());
         $amount      = $this->validate_order_amount($amount);
-        if (is_wp_error($amount)) {
+
+		if (is_wp_error($amount)) {
             PayplugGateway::log(sprintf('Invalid amount %s for the order.', $order->get_total()), 'error');
             throw new \Exception($amount->get_error_message());
         }
@@ -1478,7 +1490,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function check_gateway($gateways)
     {
-        if (isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id) {
+        if ( !empty( WC()->cart ) && isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id) {
             $order_amount = $this->get_order_total();
             if ($order_amount < self::MIN_AMOUNT || $order_amount > self::MAX_AMOUNT) {
                 unset($gateways[$this->id]);

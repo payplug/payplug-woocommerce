@@ -27,7 +27,7 @@ class PayplugGatewayOney3x extends PayplugGateway
     protected $oney_response;
     protected $min_oney_price;
     protected $max_oney_price;
-    protected $allowed_country_codes;
+    protected $allowed_country_codes = [];
 
     public function __construct()
     {
@@ -120,15 +120,27 @@ HTML;
 
     /**
      * Check if Oney is available
-     * 
+     *
      * @return void
      */
     public function check_oney_is_available()
     {
         $cart = WC()->cart;
+
+		//for backend orders
+		if( !empty(get_query_var('order-pay')) ){
+			$order = wc_get_order(get_query_var('order-pay'));
+			$items = $order->get_items();
+
+			$country_code_shipping = $order->get_shipping_country();
+			$country_code_billing = $order->get_billing_country();
+
+			$this->order_items_to_cart($cart, $items);
+		}
+
         $total_price = floatval($cart->total);
 		$products_qty = (int) $cart->cart_contents_count;
-        
+
 		// Min and max
         if ($total_price < $this->min_oney_price || $total_price > $this->max_oney_price) {
             $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->min_oney_price, $this->max_oney_price).'</div>';
@@ -142,14 +154,19 @@ HTML;
         }
 
         // Country check
-        $country_code_shipping = WC()->customer->get_shipping_country();
-        $country_code_billing = WC()->customer->get_billing_country();
-        
-        if (!in_array($country_code_billing, $this->allowed_country_codes) || !in_array($country_code_shipping, $this->allowed_country_codes)) {
+		if( empty($country_code_shipping) || empty($country_code_shipping) ){
+			$country_code_shipping = WC()->customer->get_shipping_country();
+			$country_code_billing = WC()->customer->get_billing_country();
+		}
+
+        if ( !$this->validate_shipping_billing_country($country_code_shipping, $country_code_billing) ||
+			!$this->allowed_country($country_code_billing, $this->allowed_country_codes) ||
+			!$this->allowed_country($country_code_shipping, $this->allowed_country_codes)
+		) {
             $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.__('Unavailable for the specified country.', 'payplug').'</div>';
             return self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED;
         }
-        
+
         return true;
     }
 
@@ -356,5 +373,52 @@ HTML;
             echo wpautop(wptexturize($description));
         }
     }
+
+	/**
+	 *
+	 * Billing and shipping addresses should have the same country and allowed by Oney
+	 * https://payplug-prod.atlassian.net/browse/WOOC-227
+	 *
+	 * @param $order
+	 * @return bool
+	 *
+	 */
+	public function validate_shipping_billing_country($shipping_country, $billing_country)
+	{
+		if($billing_country === $shipping_country)
+			return true;
+
+		return false;
+	}
+
+	/**
+	 * Country of billing or shipping at oney payments should be on the allowedCountry that comes from pauyplug-api /account
+	 *
+	 * @param string $country
+	 * @param array $allowed
+	 * @return bool
+	 */
+	public function allowed_country(string $country, array $allowed)
+	{
+		if( in_array($country, $allowed))
+			return true;
+
+		return false;
+	}
+
+	/**
+	 * Empty the cart and add all order_items
+	 *
+	 * @param $cart
+	 * @param $items
+	 * @return void
+	 */
+	private function order_items_to_cart($cart, $items){
+		$cart->empty_cart();
+		foreach ($items as $item){
+			$cart->add_to_cart($item->get_product_id(), $item->get_quantity());
+		}
+	}
+
 
 }
