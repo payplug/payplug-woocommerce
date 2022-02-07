@@ -710,3 +710,15 @@ msgstr "support.payplug.com/hc/fr/articles/4408142346002"
 
 #~ msgid "Cart size cannot be greater than 1000 with Oney."
 #~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
+
+msgid "Oney with fees"
+msgstr "Oney con spese"
+
+msgid "The fees are split between you and your customers"
+msgstr "Le spese sono ripartite tra te e i tuoi clienti"
+
+msgid "Oney without fees"
+msgstr "Oney senza spese"
+
+msgid "You pay the fees"
+msgstr "Le spese sono a tuo carico"

@@ -653,3 +653,15 @@ msgstr ""
 
 msgid "Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage."
 msgstr ""
+
+msgid "Oney with fees"
+msgstr ""
+
+msgid "The fees are split between you and your customers"
+msgstr ""
+
+msgid "Oney without fees"
+msgstr ""
+
+msgid "You pay the fees"
+msgstr ""
