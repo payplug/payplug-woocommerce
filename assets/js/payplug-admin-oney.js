@@ -69,7 +69,8 @@
 		toggleMode: (event) => {
 			pao.$payplug_mode = $('input[name=woocommerce_payplug_mode]:checked').val()
 			if (pao.$payplug_oney.prop('checked')) {
-				pao.verifyOney()
+				if(payplug_admin_config.has_live_key)
+					pao.verifyOney()
 			}
 		},
 		onDialogOneyClose: function()  {

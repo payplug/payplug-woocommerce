@@ -575,6 +575,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         wp_localize_script('payplug-gateway-admin-oney', 'payplug_admin_config', array(
             'ajax_url'      => admin_url('admin-ajax.php'),
             'btn_ok'        => _x('Ok', 'modal', 'payplug'),
+			'has_live_key'  => (false === $this->has_api_key('live')) ? false : true,
         ));
         if ($this->user_logged_in() && false === $this->has_api_key('live')) {
             add_action('admin_footer', function () {

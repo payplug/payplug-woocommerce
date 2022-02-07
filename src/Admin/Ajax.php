@@ -8,7 +8,7 @@ use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
-use Payplug\Exception\ForbiddenException;
+use Payplug\Exception\PayplugException;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -112,7 +112,7 @@ class Ajax {
     public function check_live_permissions() {
 		try{
 			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
-		}  catch (ForbiddenException $e){
+		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
 			wp_send_json_error(["error" => $e->getMessage()]);
 			return false;
