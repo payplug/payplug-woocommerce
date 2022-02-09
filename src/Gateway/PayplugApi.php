@@ -121,7 +121,7 @@ class PayplugApi {
     public function simulate_oney_payment($price)
     {
         $country = wc_get_base_location();
-        $oney_fees = ["x3_with_fees", "x4_with_fees"];
+        $oney_fees = ["x3_with_fees", "x4_with_fees", "x3_without_fees", "x4_without_fees"];
         try {
             $response =  $this->do_request('\Payplug\OneySimulation::getSimulations', [[
                 "amount" => (int) $price * 100,

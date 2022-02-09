@@ -116,6 +116,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $this->email          = $this->get_option('email');
         $this->payment_method = $this->get_option('payment_method');
         $this->oneclick       = 'yes' === $this->get_option('oneclick', 'no');
+		$this->oney_type      = $this->get_option('oney_type', 'with_fees');
 
         add_filter('woocommerce_get_customer_payment_tokens', [$this, 'filter_tokens'], 10, 3);
 
@@ -1583,6 +1584,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 unset($gateways[$this->id]);
             }
         }
+		if($this->oney_type == 'with_fees'){
+			unset($gateways['oney_x3_without_fees']);
+			unset($gateways['oney_x4_without_fees']);
+		} else{
+			unset($gateways['oney_x3_with_fees']);
+			unset($gateways['oney_x4_with_fees']);
+		}
         return $gateways;
     }
 

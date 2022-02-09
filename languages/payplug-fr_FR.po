@@ -660,3 +660,9 @@ msgstr "Oney sans frais"
 
 msgid "You pay the fees"
 msgstr "Les frais sont à votre charge"
+
+msgid "Pay by credit card in 3x installments without fees with Oney"
+msgstr "Payer en 3x sans frais par carte avec Oney"
+
+msgid "Pay by credit card in 4x installments without fees with Oney"
+msgstr "Payer en 4x sans frais par carte avec Oney"

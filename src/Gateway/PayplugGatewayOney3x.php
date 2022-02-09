@@ -331,11 +331,18 @@ HTML;
                     switch ($id) {
                         case 'payplug':
                             $ordered_gateways[$id] = $gateway;
-                            $ordered_gateways['oney_x3_with_fees'] = $gateways['oney_x3_with_fees'];
-                            $ordered_gateways['oney_x4_with_fees'] = $gateways['oney_x4_with_fees'];
+	                        if($this->oney_type == 'with_fees'){
+		                        $ordered_gateways['oney_x3_with_fees'] = $gateways['oney_x3_with_fees'];
+		                        $ordered_gateways['oney_x4_with_fees'] = $gateways['oney_x4_with_fees'];
+	                        } else{
+		                        $ordered_gateways['oney_x3_without_fees'] = $gateways['oney_x3_without_fees'];
+		                        $ordered_gateways['oney_x4_without_fees'] = $gateways['oney_x4_without_fees'];
+	                        }
                             break;
-                        case 'oney_x3_with_fees':
-                        case 'oney_x4_with_fees':
+	                    case 'oney_x3_with_fees':
+	                    case 'oney_x4_with_fees':
+	                    case 'oney_x3_without_fees':
+	                    case 'oney_x4_without_fees':
                             break;
                         default:
                             $ordered_gateways[$id] = $gateway;
