@@ -648,3 +648,15 @@ msgid ""
 msgstr ""
 "La simulation de votre échéancier est temporairement indisponible. Vous retrouverez cette information à "
 "l'étape du paiement."
+
+msgid "Oney with fees"
+msgstr "Oney avec frais"
+
+msgid "The fees are split between you and your customers"
+msgstr "Les frais sont répartis entre vous et vos clients"
+
+msgid "Oney without fees"
+msgstr "Oney sans frais"
+
+msgid "You pay the fees"
+msgstr "Les frais sont à votre charge"
