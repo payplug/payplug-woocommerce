@@ -545,11 +545,8 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function show_oney_popup()
 	{
-		preg_match( '([a-z-]+)', get_locale(), $country );
-		$country = strtoupper($country[0]);
-
 		$account = self::get_account_data_from_options();
-		if( $account && $account['permissions'][PayplugPermissions::USE_ONEY] == true && $account["country"] == $country ){
+		if( $account && $account['permissions'][PayplugPermissions::USE_ONEY] == true && $account["country"] == self::getISOCountryCode() ){
 			return true;
 		}
 
@@ -591,4 +588,11 @@ class PayplugWoocommerceHelper {
             }
         }
     }
+
+	public static function getISOCountryCode()
+	{
+		preg_match( '([a-z-]+)', get_locale(), $country );
+		return strtoupper($country[0]);
+	}
+
 }
