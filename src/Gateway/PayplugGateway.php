@@ -10,6 +10,7 @@ if (!defined('ABSPATH')) {
 use Payplug\Authentication;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\HttpException;
+use Payplug\Exception\ForbiddenException;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Admin\Ajax;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
@@ -590,6 +591,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         wp_localize_script('payplug-gateway-admin-oney', 'payplug_admin_config', array(
             'ajax_url'      => admin_url('admin-ajax.php'),
             'btn_ok'        => _x('Ok', 'modal', 'payplug'),
+			'has_live_key'  => (false === $this->has_api_key('live')) ? false : true,
         ));
         if ($this->user_logged_in() && false === $this->has_api_key('live')) {
             add_action('admin_footer', function () {
@@ -809,7 +811,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             "1" === $data[$mode_fieldkey] &&
             !empty($data[$live_key_fieldkey])
         ) {
-            $response = Authentication::getAccount(new Payplug($data[$live_key_fieldkey]));
+			try{
+				$response = Authentication::getAccount(new Payplug($data[$live_key_fieldkey]));
+			}  catch (ForbiddenException $e){
+				PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
+				\WC_Admin_Settings::add_error($e->getMessage());
+				return false;
+			}
             PayplugWoocommerceHelper::set_transient_data($response, [
                 'mode' => 'yes'
             ]);

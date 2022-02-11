@@ -61,9 +61,13 @@
 					pao.is_oney_refresh = false
 					pao.$payplug_oney.prop('disabled', false)
 					pao.xhr = false
+					if (false === res.success) {
+						alert(res.data.error)
+						setTimeout(() => pao.$payplug_oney.prop('checked', false), 200)
+					}
 					if (false === res.data.can_use_oney) {
 						pao.$dialogoney.dialog('open')
-						pao.$payplug_oney.prop('checked', false)
+						setTimeout(() => pao.$payplug_oney.prop('checked', false), 200)
 						pao.$payplug_oney_type.css('display', 'none')
 					} else {
 						pao.$payplug_oney.prop('checked', true)
@@ -78,7 +82,8 @@
 		toggleMode: (event) => {
 			pao.$payplug_mode = $('input[name=woocommerce_payplug_mode]:checked').val()
 			if (pao.$payplug_oney.prop('checked')) {
-				pao.verifyOney()
+				if(payplug_admin_config.has_live_key)
+					pao.verifyOney()
 			}
 		},
 		onDialogOneyClose: function()  {
