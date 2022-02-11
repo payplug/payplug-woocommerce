@@ -124,6 +124,8 @@ class PayplugWoocommerce {
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGateway';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3x';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4x';
+		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3xWithoutFees';
+		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4xWithoutFees';
 
 		return $methods;
 	}

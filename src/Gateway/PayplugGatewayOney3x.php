@@ -74,10 +74,9 @@ class PayplugGatewayOney3x extends PayplugGateway
      */
     public function get_icon()
     {
-
         if ($this->check_oney_is_available() === true) {
             $total_price = floatval(WC()->cart->total);
-            $this->oney_response = $this->api->simulate_oney_payment($total_price);
+            $this->oney_response = $this->api->simulate_oney_payment($total_price, 'with_fees');
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
             $f = function ($fn) {
                 return $fn;
@@ -331,11 +330,18 @@ HTML;
                     switch ($id) {
                         case 'payplug':
                             $ordered_gateways[$id] = $gateway;
-                            $ordered_gateways['oney_x3_with_fees'] = $gateways['oney_x3_with_fees'];
-                            $ordered_gateways['oney_x4_with_fees'] = $gateways['oney_x4_with_fees'];
+	                        if($this->oney_type == 'with_fees'){
+		                        $ordered_gateways['oney_x3_with_fees'] = $gateways['oney_x3_with_fees'];
+		                        $ordered_gateways['oney_x4_with_fees'] = $gateways['oney_x4_with_fees'];
+	                        } else{
+		                        $ordered_gateways['oney_x3_without_fees'] = $gateways['oney_x3_without_fees'];
+		                        $ordered_gateways['oney_x4_without_fees'] = $gateways['oney_x4_without_fees'];
+	                        }
                             break;
-                        case 'oney_x3_with_fees':
-                        case 'oney_x4_with_fees':
+	                    case 'oney_x3_with_fees':
+	                    case 'oney_x4_with_fees':
+	                    case 'oney_x3_without_fees':
+	                    case 'oney_x4_without_fees':
                             break;
                         default:
                             $ordered_gateways[$id] = $gateway;
@@ -383,7 +389,7 @@ HTML;
 	 * @return bool
 	 *
 	 */
-	public function validate_shipping_billing_country($shipping_country, $billing_country): Bool
+	public function validate_shipping_billing_country($shipping_country, $billing_country)
 	{
 		if($billing_country === $shipping_country)
 			return true;
@@ -398,7 +404,7 @@ HTML;
 	 * @param array $allowed
 	 * @return bool
 	 */
-	public function allowed_country(string $country, array $allowed): Bool
+	public function allowed_country(string $country, array $allowed)
 	{
 		if( in_array($country, $allowed))
 			return true;

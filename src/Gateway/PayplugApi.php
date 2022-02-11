@@ -112,16 +112,16 @@ class PayplugApi {
 	public function refund_create( $transaction_id, $data ) {
 		return $this->do_request_with_fallback( '\Payplug\Refund::create', [ $transaction_id, $data ] );
 	}
-	
+
 	/**
      * Simulate a oney payment
      *
      * @return array
      */
-    public function simulate_oney_payment($price)
+    public function simulate_oney_payment($price, $oney_type = 'with_fees')
     {
         $country = wc_get_base_location();
-        $oney_fees = ["x3_with_fees", "x4_with_fees"];
+        $oney_fees = ["x3_" . $oney_type, "x4_" . $oney_type];
         try {
             $response =  $this->do_request('\Payplug\OneySimulation::getSimulations', [[
                 "amount" => (int) $price * 100,
@@ -174,7 +174,7 @@ class PayplugApi {
 		if ( ! is_array( $params ) ) {
 			$params = [ $params ];
 		}
-        
+
 		return call_user_func_array( $callback, $params );
 	}
 
