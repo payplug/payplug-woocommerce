@@ -671,3 +671,6 @@ msgstr ""
 
 msgid "Pay by credit card in 4x installments without fees with Oney"
 msgstr ""
+
+msgid "WITHOUT FEES"
+msgstr ""

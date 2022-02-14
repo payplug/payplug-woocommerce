@@ -12,6 +12,8 @@ use Payplug\PayplugWoocommerce\Admin\Metabox;
 use Payplug\PayplugWoocommerce\Admin\Notices;
 use Payplug\PayplugWoocommerce\Admin\WoocommerceActions;
 use Payplug\PayplugWoocommerce\Front\PayplugOneyDetail;
+use Payplug\PayplugWoocommerce\Front\PayplugOneyWithFees;
+use Payplug\PayplugWoocommerce\Front\PayplugOneyWithoutFees;
 
 class PayplugWoocommerce {
 
@@ -106,8 +108,9 @@ class PayplugWoocommerce {
 		$this->requests = new PayplugWoocommerceRequest();
 		$this->ajax     = new Ajax();
 
-		if( PayplugWoocommerceHelper::show_oney_popup() )
-			new PayplugOneyDetail();
+		if( PayplugWoocommerceHelper::show_oney_popup() ) {
+			$this->animationHandlers();
+		}
 
 		add_action( 'woocommerce_payment_gateways', [ $this, 'register_payplug_gateway' ] );
 		add_filter( 'plugin_action_links_' . PAYPLUG_GATEWAY_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
@@ -143,5 +146,15 @@ class PayplugWoocommerce {
 		];
 
 		return array_merge( $plugin_links, $links );
+	}
+
+	public function animationHandlers()
+	{
+		$options = get_option('woocommerce_payplug_settings', []);
+
+		Switch($options['oney_type']){
+			case "without_fees" : new PayplugOneyWithoutFees();break;
+			default: new PayplugOneyWithFees();break;
+		}
 	}
 }
