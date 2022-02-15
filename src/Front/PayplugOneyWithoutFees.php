@@ -64,12 +64,14 @@ HTML;
 		$f = function($fn) { return $fn; };
 
 		$footer = <<<HTML
- 			<div class='oney-content oney-cgv-content'>
- 				{$f(sprintf(__("Offre de financement sans assurance avec apport obligatoire,
-				réservée aux particuliers et valable pour tout achat de %s€ à %s€.
-				Sous réserve d’acceptation par Oney Bank. Vous disposez d’un délai de 14 jours pour renoncer à votre crédit.
-				Oney Bank - SA au capital de 51286585€ - 34 Avenue de Flandre 59 170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07023 261
-				http://www.orias.fr  .  Correspondance : CS 60 006 - 59895 Lille Cedex - http://www.oney.fr  ", "payplug"), $this->get_min_amount(), $this->get_max_amount()))}
+ 			<div class='oney-cgv-content oney-cgv-footer'>
+ 				{$f(sprintf(
+					esc_html__("Offre de financement sans assurance avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s€ à %s€. Sous réserve d’acceptation par Oney Bank. Vous disposez d’un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51286585€ - 34 Avenue de Flandre 59 170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07023 261 %s .  Correspondance : CS 60 006 - 59895 Lille Cedex - %s", "payplug"),
+					$this->get_min_amount(),
+					$this->get_max_amount(),
+					__("<a href='https://www.orias.fr' target='_empty' > www.orias.fr </a>"),
+					__("<a href=\"https://www.oney.fr\" target=\"_empty\" > www.oney.fr </a>")
+				))}
 			</div>
 HTML;
 
