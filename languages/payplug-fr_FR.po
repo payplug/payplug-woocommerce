@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2021-02-26 14:03+0000\n"
-"PO-Revision-Date: 2022-02-10 13:33+0000\n"
+"PO-Revision-Date: 2022-02-15 11:45+0000\n"
 "Last-Translator: \n"
 "Language-Team: Français\n"
 "Language: fr_FR\n"
@@ -529,7 +529,7 @@ msgstr "Personnalisez le nom de la passerelle de paiement affiché lors de la co
 #: src/Gateway/PayplugGatewayOney3x.php:122 src/Gateway/PayplugGatewayOney3x.php:175
 #: src/Front/PayplugOneyDetail.php:209
 msgid "The payment with Oney is unavailable because you have more than %s items in your cart."
-msgstr "Paiement avec Oney indisponible car vous avez plus de %s produits dans votre panier."
+msgstr "Votre panier doit contenir moins de %s articles pour pouvoir payer avec Oney."
 
 #: src/Gateway/PayplugGatewayRequirements.php:71
 msgid "The PHP cURL extension is installed and activated on your server."
@@ -555,7 +555,7 @@ msgstr "La version PHP de votre serveur est compatible avec l'extension."
 #: src/Front/PayplugOneyDetail.php:206
 #, php-format
 msgid "The total amount of your order should be between %s€ and %s€ to pay with Oney."
-msgstr "Le montant total de votre commande doit être compris entre %s€ et %s€ pour payer avec Oney."
+msgstr "Le montant total de votre panier doit être compris entre %s€ et %s€ pour payer avec Oney."
 
 #: src/Gateway/PayplugGateway.php:1067 src/Gateway/PayplugGateway.php:1071
 msgid "The transaction could not be refunded. Please try again."
