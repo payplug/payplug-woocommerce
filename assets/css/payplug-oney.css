@@ -125,6 +125,7 @@
     border-top: 1px solid lightgrey;
     padding-top: 10px;
 }
+.oney-cgv-content.oney-cgv-footer{display: block;margin-top: 1rem;}
 
 #payment .payment_methods li[class*=oney_x] img.payplug-payment-icon {
     width: auto;
