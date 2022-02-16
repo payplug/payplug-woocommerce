@@ -1299,7 +1299,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                         <input class="radio radio-no <?php echo esc_attr($data['class']); ?>" type="radio" name="<?php echo esc_attr($field_key); ?>" id="<?php echo esc_attr($field_key); ?>-no" value="0" <?php checked('0', $checked); ?> <?php disabled($data['disabled'], true); ?> <?php echo $this->get_custom_attribute_html($data); ?>>
                         <label for="<?php echo esc_attr($field_key); ?>-no"><?php echo esc_html($data['no']); ?></label>
                     </div>
-                    <?php echo $this->get_description_html($data); ?>
+                    <div id="live-mode-test-p"><?php echo $this->get_description_html($data); ?></div>
                 </fieldset>
             </td>
         </tr>

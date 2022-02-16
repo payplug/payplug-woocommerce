@@ -19,6 +19,7 @@
 				show: true,
 				hide: 100
 			})
+			pao.$yes_no_description = $("#live-mode-test-p");
 			if ($("#woocommerce_payplug_oney").length) {
 				pao.$payplug_oney = $("#woocommerce_payplug_oney")
 				pao.$payplug_oney_type = $("#woocommerce_payplug_oney_type")
@@ -30,6 +31,7 @@
 			}
 			if ($('input[name=woocommerce_payplug_mode]').length) {
 				pao.$payplug_mode = $('input[name=woocommerce_payplug_mode]:checked').val()
+				pao.showHideDescription();
 				$('input[name=woocommerce_payplug_mode]').on(
 					'click',
 					pao.toggleMode
@@ -81,9 +83,18 @@
 		},
 		toggleMode: (event) => {
 			pao.$payplug_mode = $('input[name=woocommerce_payplug_mode]:checked').val()
+			pao.showHideDescription();
 			if (pao.$payplug_oney.prop('checked')) {
 				if(payplug_admin_config.has_live_key)
 					pao.verifyOney()
+			}
+		},
+		showHideDescription: function(){
+			pao.$payplug_mode = $('input[name=woocommerce_payplug_mode]:checked').val()
+			if(pao.$payplug_mode == 1){
+				pao.$yes_no_description.css('display', 'none');
+			}else{
+				pao.$yes_no_description.css('display', 'block');
 			}
 		},
 		onDialogOneyClose: function()  {
@@ -92,7 +103,6 @@
 				window.location.reload()
 			}
 		}
-
 	}
 	pao.init()
 })(jQuery)
