@@ -10,7 +10,7 @@
             $("#payplug-login, #payplug-logout").on('click', function(e) {
                 window.onbeforeunload = null;
             })
-            
+
             var email_input = $("#payplug_email")
             if (email_input.length) {
                 email_input.focus()
@@ -103,6 +103,10 @@
             }
 
             payplug_admin.checkLivePermissions((res) => {
+				if(false === res.success){
+					alert(res.data.error)
+					payplug_admin.$payplug_oneclick.prop('disabled', true)
+				}
                 const { can_save_cards } = res.data
                 if (can_save_cards) {
                     payplug_admin.$payplug_oneclick.prop('disabled', false)
