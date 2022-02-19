@@ -147,7 +147,6 @@ class PayplugResponse {
 		}
 	}
 
-	private function
 
 	/**
 	 * Process refund.
