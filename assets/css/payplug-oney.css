@@ -39,7 +39,7 @@
 .payplug-oney.float-left,
 .payplug-oney .float-left { float: left; }
 .payplug-oney .clear { clear: both; }
-.payplug-oney .no-margin { margin: 0 !important;} 
+.payplug-oney .no-margin { margin: 0 !important;}
 .payplug-oney .margin-auto { margin: auto; }
 .payplug-oney .margin-side { margin: 0 5px; }
 .payplug-oney .bold { font-weight: bold; }
@@ -53,6 +53,7 @@
 .payplug-oney .oney-3x { background-image: url(../images/lg-3xoney.png); }
 .payplug-oney .oney-4x { background-image: url(../images/lg-4xoney.png); }
 .payplug-oney .oney-3x4x { background-image: url(../images/lg-3x4xoney.png); min-width: 8em; margin-bottom: -.2em; background-position: center center; float: left;}
+.payplug-oney .oney-without-fees-3x4x { background-image: url(../images/Oneywithoutfees3x4x.png); min-width: 13em; margin-bottom: -.2em; background-position: center center; float: left;}
 .payplug-oney .oney-logo { background-image: url(../images/lg-oney.png);  width: auto; height: 30px; }
 
 .payplug-oney .oney-step1 {  margin-left: 13% !important; background-image: url(../images/lg-step1-oney.png); }
@@ -62,6 +63,8 @@
 .payplug-oney.disabled .oney-3x { background-image: url(../images/lg-3xoney-disabled.png); }
 .payplug-oney.disabled .oney-4x { background-image: url(../images/lg-4xoney-disabled.png); }
 .payplug-oney.disabled .oney-3x4x { background-image: url(../images/lg-3x4xoney-disabled.png); }
+.payplug-oney.disabled .oney-without-fees-3x4x { background-image: url(../images/Oneywithoutfees3x4x-disable.png); }
+.underline{text-decoration: underline;}
 .payplug-oney-popup {
     cursor: pointer;
 }
@@ -122,6 +125,7 @@
     border-top: 1px solid lightgrey;
     padding-top: 10px;
 }
+.oney-cgv-content.oney-cgv-footer{display: block;margin-top: 1rem;}
 
 #payment .payment_methods li[class*=oney_x] img.payplug-payment-icon {
     width: auto;
@@ -167,5 +171,5 @@ div.payment_method_oney_x3_with_fees_disabled, div.payment_method_oney_x4_with_f
         transform: rotate(360deg);
     }
 }
-  
+
 

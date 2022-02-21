@@ -8,6 +8,7 @@ use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\Exception\PayplugException;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -107,9 +108,15 @@ class Ajax {
 			)
 		);
 	}
-    
+
     public function check_live_permissions() {
-		$account = Authentication::getAccount(new Payplug($_POST['livekey']));
+		try{
+			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
+		}  catch (PayplugException $e){
+			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
+			wp_send_json_error(["error" => $e->getMessage()]);
+			return false;
+		}
 		PayplugWoocommerceHelper::set_transient_data($account);
         $permissions = $account['httpResponse']['permissions'];
 		wp_send_json_success($permissions);
@@ -118,7 +125,7 @@ class Ajax {
 	/**
 	 * Update PayPlug api keys
 	 *&
-	 
+
 	 * @param array $keys
 	 * @param PayplugGateway $payplug_gateway
 	 *
