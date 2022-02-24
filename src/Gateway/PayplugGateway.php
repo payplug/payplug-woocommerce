@@ -548,10 +548,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             echo wpautop(wptexturize($description));
         }
 
-        if ($this->oneclick_available()) {
-            $this->tokenization_script();
-            $this->saved_payment_methods();
-        }
+		if($this->id == 'payplug'){
+			if ($this->oneclick_available()) {
+				$this->tokenization_script();
+				$this->saved_payment_methods();
+			}
+		}
     }
 
     /**

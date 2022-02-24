@@ -10,7 +10,7 @@ class PayplugOneyWithFees extends PayplugPayWithOney
 		parent::__construct();
 
 		$this->setIcon('oney-3x4x');
-		$this->setSimulatedClass('Payplug\\PayplugWoocommerce\\Gateway\\PayplugGatewayOney3x');
+		$this->setSimulatedClass('Payplug\\PayplugWoocommerce\\Gateway\\OneyGateways\\Oney3x');
 		$this->setOneyType("with_fees");
 
 		add_action( 'wp_ajax_simulate_oney_payment', [ $this, 'simulate_oney_payment' ]);

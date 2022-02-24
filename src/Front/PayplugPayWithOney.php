@@ -2,7 +2,7 @@
 
 namespace Payplug\PayplugWoocommerce\Front;
 
-use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 class PayplugPayWithOney extends PayplugOney
@@ -42,7 +42,7 @@ class PayplugPayWithOney extends PayplugOney
 
 		$this->handleTotalProducts();
 
-		if ($this->getTotalPrice() < $this->get_min_amount() || $this->getTotalPrice() > $this->get_max_amount() || $this->getTotalProducts() >= PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM) {
+		if ($this->getTotalPrice() < $this->get_min_amount() || $this->getTotalPrice() > $this->get_max_amount() || $this->getTotalProducts() >= PayplugGatewayOney::ONEY_PRODUCT_QUANTITY_MAXIMUM) {
 			$this->setDisable(true);
 		}
 
@@ -94,7 +94,7 @@ class PayplugPayWithOney extends PayplugOney
 			<div class="payplug-lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 			<div id="oney-popup-error">
 				<div class="oney-error range"> ' . sprintf( __('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $oney->get_min_amount(), $oney->get_max_amount()) . '</div>
-				<div class="oney-error qty">' . sprintf(__('The payment with Oney is unavailable because you have more than %s items in your cart.', 'payplug'), PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM) . '</div>
+				<div class="oney-error qty">' . sprintf(__('The payment with Oney is unavailable because you have more than %s items in your cart.', 'payplug'), PayplugGatewayOney::ONEY_PRODUCT_QUANTITY_MAXIMUM) . '</div>
 			</div>
 		</div>';
 	}
@@ -110,7 +110,7 @@ class PayplugPayWithOney extends PayplugOney
 				 data-is-cart="' . (is_cart() ? 1 : 0) . '"
 				 data-total-products="' . $oney->getTotalProducts() . '"
 				 data-price="' .  $oney->getTotalPrice() .'"
-				 data-max-oney-qty="' .  PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM .'"
+				 data-max-oney-qty="' .  PayplugGatewayOney::ONEY_PRODUCT_QUANTITY_MAXIMUM .'"
 				 data-min-oney="' .  $oney->get_min_amount() . '"
 				 data-max-oney="' .  $oney->get_max_amount() . '">
 				' . __('OR PAY IN', 'payplug') . '

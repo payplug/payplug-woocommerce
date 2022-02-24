@@ -1,7 +1,7 @@
 <?php
 
 namespace Payplug\PayplugWoocommerce\Front;
-use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 // Exit if accessed directly
@@ -46,7 +46,7 @@ class PayplugOney
 			$simulation = $this->requestOneySimulation();
 
 		} catch (\Exception $e) {
-			PayplugGatewayOney3x::log("Simulate Oney Without Fees Payment, " . $e->getMessage() );
+			PayplugGatewayOney::log("Simulate Oney Without Fees Payment, " . $e->getMessage() );
 			return false;
 
 		}

@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Payplug\Resource\APIResource;
 use Payplug\Payplug;
 use Payplug\Authentication;
-use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 
 /**
@@ -453,7 +453,7 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function get_transient_key($options)
 	{
-		$transient_key = PayplugGatewayOney3x::OPTION_NAME . (array_key_exists('mode', $options) && $options['mode'] === 'yes' ? "_live" : "_test");
+		$transient_key = PayplugGatewayOney::OPTION_NAME . (array_key_exists('mode', $options) && $options['mode'] === 'yes' ? "_live" : "_test");
 		return $transient_key;
 	}
 

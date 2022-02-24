@@ -125,10 +125,10 @@ class PayplugWoocommerce {
 	 */
 	public function register_payplug_gateway( $methods ) {
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGateway';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3x';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4x';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3xWithoutFees';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4xWithoutFees';
+		$methods[] = __NAMESPACE__ . '\\Gateway\\OneyGateways\\Oney3x';
+		$methods[] = __NAMESPACE__ . '\\Gateway\\OneyGateways\\Oney4x';
+		$methods[] = __NAMESPACE__ . '\\Gateway\\OneyGateways\\Oney3xWF';
+		$methods[] = __NAMESPACE__ . '\\Gateway\\OneyGateways\\Oney4xWF';
 
 		return $methods;
 	}
