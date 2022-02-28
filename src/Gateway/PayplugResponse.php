@@ -47,10 +47,10 @@ class PayplugResponse {
 
 		PayplugGateway::log( sprintf( 'Order #%s : Begin processing payment IPN %s', $order_id, $resource->id ) );
 
+
 		// Ignore paid orders
 		if ( $order->is_paid() ) {
-			PayplugGateway::log( sprintf( 'Order #%s : Order is already complete. Ignoring IPN.', $order_id ) );
-
+			PayplugGateway::log(sprintf( 'Order #%s : 57 -> Order is already complete. Ignoring IPN.', $order_id ) );
 			return;
 		}
 
@@ -74,19 +74,12 @@ class PayplugResponse {
 			/** This action is documented in src/Gateway/PayplugResponse */
 			\do_action( 'payplug_gateway_payment_response_processed', $order_id, $resource );
 			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
-			PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed.', $order_id, $resource->id ) );
+			PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed but failed.', $order_id, $resource->id ) );
 
 			return;
 		}
 
-        if ( isset( $resource->payment_method ) && is_array( $resource->payment_method ) ) {
-            if ( in_array( $resource->payment_method['type'], array( 'oney_x3_with_fees', 'oney_x4_with_fees' ) ) ) {
-                if ( is_array( $order_metadata ) && array_key_exists( 'transaction_in_progress', $order_metadata ) ) {
-                    PayplugGateway::log( sprintf( 'Order #%s : Order Oney IPN already in progress. Ignoring IPN', $order_id ) );
-                    return;
-                }
-            }
-        }
+		$this->oney_ipn($resource);
 
 		if ( $resource->is_paid ) {
 			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
@@ -95,6 +88,8 @@ class PayplugResponse {
 			}
 
 			$this->maybe_save_address_hash( $resource );
+
+
 
 			$order->add_order_note( sprintf( __( 'PayPlug IPN OK | Transaction %s', 'payplug' ), wc_clean( $resource->id ) ) );
 			$order->payment_complete( wc_clean( $resource->id ) );
@@ -110,11 +105,48 @@ class PayplugResponse {
 			 */
 			\do_action( 'payplug_gateway_payment_response_processed', $order_id, $resource );
 			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
-			PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed.', $order_id, $resource->id ) );
+			PayplugGateway::log( sprintf( 'Order #%s : Payment IPN %s processing completed successfully.', $order_id, $resource->id ) );
 
 			return;
 		}
 	}
+
+	/**
+	 * Oney IPN
+	 *
+	 * @param $resource
+	 */
+
+	private function oney_ipn( $resource ) {
+
+		$order_id = wc_clean( $resource->metadata['order_id'] );
+		$order    = wc_get_order( $order_id );
+
+		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata( $resource );
+		$order_metadata = $order->get_meta('_payplug_metadata', true);
+
+		if ( isset( $resource->payment_method ) && is_array( $resource->payment_method ) ) {
+			if ( in_array( $resource->payment_method['type'], array( 'oney_x3_with_fees', 'oney_x4_with_fees' ) ) ) {
+				if ( is_array( $order_metadata ) && array_key_exists( 'transaction_in_progress', $order_metadata ) ) {
+					PayplugGateway::log( sprintf( 'Order #%s : Order Oney IPN already in progress. Ignoring IPN', $order_id ) );
+					return;
+				}
+				if (($resource->is_paid == true) && ($resource->failure == null))  {
+					$log = new \WC_Logger();
+					$log->log('INFO',sprintf( 'Order #%s : Oney payment SUCCESS', $order_id ));
+				}
+				if (($resource->is_paid == false) && ($resource->failure != null))  {
+					$log = new \WC_Logger();
+					$log->log('INFO',sprintf( 'Order #%s : Oney payment FAILED', $order_id ));
+				}
+				if (($resource->is_paid == false) && ($resource->failure == null) && ($resource->is_pending == true))  {
+					$log = new \WC_Logger();
+					$log->log('INFO',sprintf( 'Order #%s : Oney payment PENDING and checked by an Oney agent', $order_id ));
+				}
+			}
+		}
+	}
+
 
 	/**
 	 * Process refund.
@@ -307,15 +339,15 @@ class PayplugResponse {
             foreach($existing_tokens as $token_id => $existing_token) {
                 $current_data = $existing_token->get_data();
                 if( $current_data['token'] === $set_token &&
-                    $current_data['last4'] === $set_last4 && 
-                    $current_data['expiry_year'] === $set_expiry_year && 
-                    $current_data['expiry_month'] === $set_expiry_month && 
+                    $current_data['last4'] === $set_last4 &&
+                    $current_data['expiry_year'] === $set_expiry_year &&
+                    $current_data['expiry_month'] === $set_expiry_month &&
                     $current_data['card_type'] === $set_card_type) {
                     $token->set_id($current_data['id']);
                 }
             }
         }
-        
+
 		$token->set_token( $set_token );
 		$token->set_gateway_id( 'payplug' );
 		$token->set_last4( $set_last4 );
