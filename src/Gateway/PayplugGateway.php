@@ -195,7 +195,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         }
 
         $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees'])) {
+        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees'])) {
             return;
         }
 
@@ -532,7 +532,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 continue;
             }
 
-            if ($current_year === (int) $token->get_expiry_year() && $current_month >= (int) $token->get_expiry_month()) {
+            if ($current_year === (int) $token->get_expiry_year() && $current_month > (int) $token->get_expiry_month()) {
                 unset($tokens[$k]);
                 continue;
             }
