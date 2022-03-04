@@ -511,7 +511,7 @@ msgid "The payment with Oney is unavailable because you have more than %s items 
 msgstr "Il pagamento tramite Oney non è disponibile perché hai più di %s prodotti nel tuo carrello."
 
 #: src/Gateway/PayplugGatewayRequirements.php:71
-msgid "The PHP cURL extension is installed and activated on your server."
+msgid "payplug_PayplugGatewayRequirements_curl_requirement_curlinstalled"
 msgstr "L'estensione PHP cURL è installata e attivata."
 
 #: src/Gateway/PayplugGatewayRequirements.php:72

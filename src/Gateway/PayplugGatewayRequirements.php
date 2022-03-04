@@ -31,7 +31,7 @@ class PayplugGatewayRequirements {
      * @var PayplugPermissions
      */
 	private $permissions;
-	
+
 	/**
 	 * Gateway settings.
 	 *
@@ -68,7 +68,7 @@ class PayplugGatewayRequirements {
 	 */
 	public function curl_requirement() {
 		return ( $this->valid_curl() )
-			? '<p class="success">' . __( 'The PHP cURL extension is installed and activated on your server.', 'payplug' ) . '</p>'
+			? '<p class="success">' . __( 'payplug_PayplugGatewayRequirements_curl_requirement_curlinstalled', 'payplug' ) . '</p>'
 			: '<p class="failed">' . __( 'The PHP cURL extension must be installed and activated on your server.', 'payplug' ) . '</p>';
 	}
 
@@ -173,7 +173,7 @@ class PayplugGatewayRequirements {
 	public function valid_account() {
 		return $this->gateway->user_logged_in();
 	}
-	
+
 
 	/**
 	 * Check if the user is in live mode and has activated oney
