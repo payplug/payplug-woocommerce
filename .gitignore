@@ -33,3 +33,4 @@ vendor
 
 # Temporary files
 *~
+/cypress/
