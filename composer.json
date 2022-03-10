@@ -33,6 +33,11 @@
             "libphonenumber\\": "lib/libphonenumber"
         }
     },
+    "autoload-dev": {
+      "psr-4": {
+        "Automattic\\WooCommerce\\Testing\\Tools\\": "tests/Tools/"
+      }
+    },
     "config": {
         "allow-plugins": {
             "composer/installers": true,

@@ -117,7 +117,7 @@ class WC_Unit_Tests_Bootstrap {
 	 * @throws Exception Error when initializing one of the hacks.
 	 */
 	private function initialize_code_hacker() {
-		CodeHacker::initialize( array( __DIR__ . '/../../includes/' ) );
+		CodeHacker::initialize( array( $this->woocommerce_plugin_dir . '/includes/' ) );
 
 		$replaceable_functions = include_once __DIR__ . '/mockable-functions.php';
 		if ( ! empty( $replaceable_functions ) ) {
