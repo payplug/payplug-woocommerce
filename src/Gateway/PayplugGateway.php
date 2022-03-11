@@ -1024,6 +1024,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
         PayplugGateway::log(sprintf('Processing refund for order #%s', $order_id));
 
+		if( !$this->user_logged_in()){
+			PayplugGateway::log(__('You must be logged in with your PayPlug account.', 'payplug'), 'error');
+			return new \WP_Error('process_refund_error', __('You must be logged in with your PayPlug account.', 'payplug'));
+		}
+
         $order = wc_get_order($order_id);
         if (!$order instanceof \WC_Order) {
             PayplugGateway::log(sprintf('The order #%s does not exist.', $order_id), 'error');

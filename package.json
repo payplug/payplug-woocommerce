@@ -10,7 +10,9 @@
     "build:css-notice": "node-sass --include-path scss assets/scss/notice.scss assets/css/notice.css --source-map-embed true --output-style compressed",
     "build:css": "npm run build:css-app && npm run build:css-notice"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "cypress": "^9.5.1"
+  },
   "dependencies": {
     "node-sass": "^7.0.0",
     "trim-newlines": "^3.0.1"
