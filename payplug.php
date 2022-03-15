@@ -38,3 +38,18 @@ function init() {
 	PayplugWoocommerce::get_instance();
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
+
+function wpdocs_translate_text($msgstr, $msgid, $domain)
+{
+	$pattern = '/^payplug_.+/';
+
+	if (preg_match($pattern, $msgstr) === 1) {
+		$path = WP_PLUGIN_DIR . '/' . plugin_basename( dirname( __FILE__ ) ) . '/languages/payplug-en_US.mo';
+		$mo = new \MO();
+		$mo->import_from_file($path);
+		return @$mo->entries[$msgstr]->translations[0];
+	}
+
+	return $msgstr;
+}
+add_filter('gettext_payplug', __NAMESPACE__ . '\\wpdocs_translate_text', 10, 3);

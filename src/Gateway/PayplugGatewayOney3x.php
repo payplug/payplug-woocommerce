@@ -217,7 +217,7 @@ HTML;
             if ( PhoneNumberType::MOBILE !== $phone_number_util->getNumberType( $phone_number ) ) {
                 throw new \Exception(__('Mobile phone number fullfilled is invalid. Please retry.', 'payplug'));
             }
-            
+
             if (!filter_var($billing_email, FILTER_VALIDATE_EMAIL) || strpos($billing_email,'+') !== false) {
                 throw new \Exception(__("Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).", 'payplug'));
             }
@@ -314,7 +314,7 @@ HTML;
 
 
     /**
-     * Check if the gatteway is allowed for the order amount 
+     * Check if the gatteway is allowed for the order amount
      *
      * @param array
      * @return array
@@ -356,7 +356,7 @@ HTML;
 
     /**
      * Show Oney refund text
-     * 
+     *
      * @return void
      */
     public function oney_refund_text($order)
@@ -404,7 +404,7 @@ HTML;
 	 * @param array $allowed
 	 * @return bool
 	 */
-	public function allowed_country(string $country, array $allowed)
+	public function allowed_country($country, $allowed)
 	{
 		if( in_array($country, $allowed))
 			return true;

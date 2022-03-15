@@ -195,7 +195,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         }
 
         $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees'])) {
+        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees'])) {
             return;
         }
 
@@ -532,7 +532,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 continue;
             }
 
-            if ($current_year === (int) $token->get_expiry_year() && $current_month >= (int) $token->get_expiry_month()) {
+            if ($current_year === (int) $token->get_expiry_year() && $current_month > (int) $token->get_expiry_month()) {
                 unset($tokens[$k]);
                 continue;
             }
@@ -1023,6 +1023,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function process_refund($order_id, $amount = null, $reason = '')
     {
         PayplugGateway::log(sprintf('Processing refund for order #%s', $order_id));
+
+		if( !$this->user_logged_in()){
+			PayplugGateway::log(__('You must be logged in with your PayPlug account.', 'payplug'), 'error');
+			return new \WP_Error('process_refund_error', __('You must be logged in with your PayPlug account.', 'payplug'));
+		}
 
         $order = wc_get_order($order_id);
         if (!$order instanceof \WC_Order) {
