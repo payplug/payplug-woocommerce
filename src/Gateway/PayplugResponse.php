@@ -55,14 +55,12 @@ class PayplugResponse {
 		}
 
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata( $resource );
-		$order_metadata = $order->get_meta('_payplug_metadata', true);
 
 		if ( isset( $resource->payment_method ) && is_array( $resource->payment_method ) ) {
-			if ( in_array( $resource->payment_method['type'], array( 'oney_x3_with_fees', 'oney_x4_with_fees' ) ) ) {
+			if ( in_array( $resource->payment_method['type'], array( 'oney_x3_with_fees', 'oney_x4_with_fees',  'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees' ) ) ) {
 				if ($order->get_payment_method() == $this->gateway->id) {
 					if ( $order->is_paid() ) {
 						PayplugGateway::log( sprintf( 'Order #%s : Order is already complete. Ignoring IPN.', $order_id ) );
-
 						return;
 					}
 					if ( ! empty( $resource->failure ) ) {
@@ -114,8 +112,6 @@ class PayplugResponse {
 				}
 			}
 		} else if ($this->gateway->id == "payplug") {
-
-
 
 			// Ignore paid orders
 			if ( $order->is_paid() ) {
@@ -180,7 +176,6 @@ class PayplugResponse {
 
 	public function payplug_ipn($resource) {
 		$order_id = wc_clean( $resource->metadata['order_id'] );
-		$order    = wc_get_order( $order_id );
 		PayplugGateway::log( sprintf( 'Order #%s : Begin processing payment IPN %s', $order_id, $resource->id ) );
 	}
 
@@ -195,7 +190,6 @@ class PayplugResponse {
 		$order_id = wc_clean( $resource->metadata['order_id'] );
 		$order    = wc_get_order( $order_id );
 
-		$metadata       = PayplugWoocommerceHelper::extract_transaction_metadata( $resource );
 		$order_metadata = $order->get_meta( '_payplug_metadata', true );
 
 
