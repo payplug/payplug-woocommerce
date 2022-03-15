@@ -57,7 +57,7 @@ class PayplugResponse {
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata( $resource );
 
 		if ( isset( $resource->payment_method ) && is_array( $resource->payment_method ) ) {
-			if ( in_array( $resource->payment_method['type'], array( 'oney_x3_with_fees', 'oney_x4_with_fees',  'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees' ) ) ) {
+			if ( in_array( $resource->payment_method['type'], array( 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees' ) ) ) {
 				if ($order->get_payment_method() == $this->gateway->id) {
 					if ( $order->is_paid() ) {
 						PayplugGateway::log( sprintf( 'Order #%s : Order is already complete. Ignoring IPN.', $order_id ) );
