@@ -7,6 +7,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+use Payplug\Exception\BadRequestException;
 use Payplug\Exception\NotFoundException;
 use Payplug\Payplug;
 use Payplug\Core\HttpClient;
@@ -112,26 +113,34 @@ class PayplugApi {
 	public function refund_create( $transaction_id, $data ) {
 		return $this->do_request_with_fallback( '\Payplug\Refund::create', [ $transaction_id, $data ] );
 	}
-	
+
 	/**
      * Simulate a oney payment
      *
      * @return array
      */
-    public function simulate_oney_payment($price)
+    public function simulate_oney_payment($price, $oney_type = 'with_fees')
     {
         $country = wc_get_base_location();
-        $oney_fees = ["x3_with_fees", "x4_with_fees"];
-        try {
-            $response =  $this->do_request('\Payplug\OneySimulation::getSimulations', [[
-                "amount" => (int) $price * 100,
-                "country" => $country['country'],
-                "operations" => $oney_fees
-            ]]);
-            PayplugWoocommerceHelper::oney_simulation_values($oney_fees, $response);
-        } catch (\Payplug\Exception\PayplugServerException $e) {
-            $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
-        } 
+        $oney_fees = ["x3_" . $oney_type, "x4_" . $oney_type];
+
+		try{
+			try {
+				$response =  $this->do_request('\Payplug\OneySimulation::getSimulations', [[
+					"amount" => (int) $price * 100,
+					"country" => $country['country'],
+					"operations" => $oney_fees
+				]]);
+
+
+				PayplugWoocommerceHelper::oney_simulation_values($oney_fees, $response);
+			} catch (\Payplug\Exception\PayplugServerException $e) {
+				$response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
+			}
+		} catch( BadRequestException $e){
+			$response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
+		}
+
         return $response;
     }
 
@@ -174,7 +183,7 @@ class PayplugApi {
 		if ( ! is_array( $params ) ) {
 			$params = [ $params ];
 		}
-        
+
 		return call_user_func_array( $callback, $params );
 	}
 

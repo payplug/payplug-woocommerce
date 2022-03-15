@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "login": {
+      "failMessage": "No match for Username and/or Password"
+    },
+    "menu": {
+      "title": "Dashboard",
+      "extensions": "Plugins"
+    },
+    "extension": {
+      "activate": "Activate",
+      "settings": "Réglages",
+      "deactivate": "Désactiver"
+    }
+  },
+  "frontend": {
+    "catalog" : "Catalog"
+  }
+}

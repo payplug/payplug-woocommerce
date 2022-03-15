@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "login": {
+      "failMessage": "Erreur : ce mot de passe ne correspond pas à l’identifiant admin."
+    },
+    "menu": {
+      "title": "Tableau de bord",
+      "extensions": "Extensions"
+    },
+    "extension": {
+      "activate": "Activer",
+      "settings": "Réglages",
+      "deactivate": "Désactiver"
+    }
+  },
+  "frontend": {
+    "catalog" : "Boutique"
+  }
+}

@@ -74,10 +74,9 @@ class PayplugGatewayOney3x extends PayplugGateway
      */
     public function get_icon()
     {
-
         if ($this->check_oney_is_available() === true) {
             $total_price = floatval(WC()->cart->total);
-            $this->oney_response = $this->api->simulate_oney_payment($total_price);
+            $this->oney_response = $this->api->simulate_oney_payment($total_price, 'with_fees');
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
             $f = function ($fn) {
                 return $fn;
@@ -218,7 +217,7 @@ HTML;
             if ( PhoneNumberType::MOBILE !== $phone_number_util->getNumberType( $phone_number ) ) {
                 throw new \Exception(__('Mobile phone number fullfilled is invalid. Please retry.', 'payplug'));
             }
-            
+
             if (!filter_var($billing_email, FILTER_VALIDATE_EMAIL) || strpos($billing_email,'+') !== false) {
                 throw new \Exception(__("Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).", 'payplug'));
             }
@@ -315,7 +314,7 @@ HTML;
 
 
     /**
-     * Check if the gatteway is allowed for the order amount 
+     * Check if the gatteway is allowed for the order amount
      *
      * @param array
      * @return array
@@ -331,11 +330,18 @@ HTML;
                     switch ($id) {
                         case 'payplug':
                             $ordered_gateways[$id] = $gateway;
-                            $ordered_gateways['oney_x3_with_fees'] = $gateways['oney_x3_with_fees'];
-                            $ordered_gateways['oney_x4_with_fees'] = $gateways['oney_x4_with_fees'];
+	                        if($this->oney_type == 'with_fees'){
+		                        $ordered_gateways['oney_x3_with_fees'] = $gateways['oney_x3_with_fees'];
+		                        $ordered_gateways['oney_x4_with_fees'] = $gateways['oney_x4_with_fees'];
+	                        } else{
+		                        $ordered_gateways['oney_x3_without_fees'] = $gateways['oney_x3_without_fees'];
+		                        $ordered_gateways['oney_x4_without_fees'] = $gateways['oney_x4_without_fees'];
+	                        }
                             break;
-                        case 'oney_x3_with_fees':
-                        case 'oney_x4_with_fees':
+	                    case 'oney_x3_with_fees':
+	                    case 'oney_x4_with_fees':
+	                    case 'oney_x3_without_fees':
+	                    case 'oney_x4_without_fees':
                             break;
                         default:
                             $ordered_gateways[$id] = $gateway;
@@ -350,7 +356,7 @@ HTML;
 
     /**
      * Show Oney refund text
-     * 
+     *
      * @return void
      */
     public function oney_refund_text($order)
@@ -398,7 +404,7 @@ HTML;
 	 * @param array $allowed
 	 * @return bool
 	 */
-	public function allowed_country(string $country, array $allowed)
+	public function allowed_country($country, $allowed)
 	{
 		if( in_array($country, $allowed))
 			return true;

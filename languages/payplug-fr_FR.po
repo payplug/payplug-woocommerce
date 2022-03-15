@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2021-02-26 14:03+0000\n"
-"PO-Revision-Date: 2022-01-20 22:35+0000\n"
+"PO-Revision-Date: 2022-02-15 22:36+0000\n"
 "Last-Translator: \n"
 "Language-Team: Français\n"
 "Language: fr_FR\n"
@@ -51,8 +51,7 @@ msgstr "Réglages avancés"
 #: src/Gateway/PayplugGateway.php:377
 #, php-format
 msgid "Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€."
-msgstr ""
-"Permettez à vos clients d’échelonner le paiement de leurs commandes en 3x, 4x à partir de %s€ jusqu'à %s€."
+msgstr "Permettez à vos clients d’échelonner le paiement de leurs commandes en 3x, 4x à partir de %s€ jusqu'à %s€."
 
 #: src/Gateway/PayplugGateway.php:376
 #, php-format
@@ -61,9 +60,7 @@ msgstr "support.payplug.com//hc//fr"
 
 #: src/Gateway/PayplugGateway.php:368
 msgid "Allow your customers to save their credit card information for later purchases."
-msgstr ""
-"Permettez à vos clients d'enregistrer leurs coordonnées de carte de paiement pour effectuer "
-"ultérieurement d'autres transactions."
+msgstr "Permettez à vos clients d'enregistrer leurs coordonnées de carte de paiement pour effectuer ultérieurement d'autres transactions."
 
 #: src/Admin/Metabox.php:86
 msgid "Amount"
@@ -71,8 +68,7 @@ msgstr "Montant"
 
 #: src/Admin/WoocommerceActions.php:74 src/Admin/Ajax.php:61 src/Admin/Ajax.php:70
 msgid "An error occured with PayPlug gateway. Please make sure PayPlug settings are correct."
-msgstr ""
-"Une erreur est survenue avec PayPlug. Veuillez-vous assurer que le portail PayPlug est bien configuré."
+msgstr "Une erreur est survenue avec PayPlug. Veuillez-vous assurer que le portail PayPlug est bien configuré."
 
 #: src/Admin/WoocommerceActions.php:89
 msgid "An error occurred while collecting payment information from PayPlug."
@@ -82,8 +78,7 @@ msgstr "Une erreur est survenue lors de la récupération des données de paieme
 msgid "An error occurred while collecting refund information from PayPlug."
 msgstr "Une erreur est survenue lors de la récupération des données de remboursement depuis PayPlug."
 
-#: src/Gateway/PayplugGatewayOney4x.php:43 src/Gateway/PayplugGatewayOney3x.php:75
-#: src/Front/PayplugOneyDetail.php:133 src/Front/PayplugOneyDetail.php:143
+#: src/Gateway/PayplugGatewayOney4x.php:43 src/Gateway/PayplugGatewayOney3x.php:75 src/Front/PayplugOneyDetail.php:133 src/Front/PayplugOneyDetail.php:143
 msgid "Bring"
 msgstr "Apport"
 
@@ -104,12 +99,8 @@ msgid "Credit card"
 msgstr "Carte de paiement"
 
 #: src/Gateway/PayplugGateway.php:340
-msgid ""
-"Customers will be redirected to a PayPlug payment page to finalize the transaction, or payments will be "
-"performed in an embeddable payment form on your website."
-msgstr ""
-"Vos clients seront redirigés vers une page de paiement hébergée par PayPlug, ou pourrons effectuer le "
-"paiement dans un formulaire intégré dans votre boutique."
+msgid "Customers will be redirected to a PayPlug payment page to finalize the transaction, or payments will be performed in an embeddable payment form on your website."
+msgstr "Vos clients seront redirigés vers une page de paiement hébergée par PayPlug, ou pourrons effectuer le paiement dans un formulaire intégré dans votre boutique."
 
 #: src/Gateway/PayplugGateway.php:349
 #, fuzzy
@@ -117,12 +108,8 @@ msgid "Debug"
 msgstr "Debug"
 
 #: src/Gateway/PayplugGateway.php:351
-msgid ""
-"Debug mode saves additional information on your server for each operation done via the PayPlug plugin "
-"(Developer setting)."
-msgstr ""
-"Le mode debug permet de sauvegarder des informations complémentaires sur votre serveur pour chaque "
-"opération effectuée via le module PayPlug (Option pour développeur)."
+msgid "Debug mode saves additional information on your server for each operation done via the PayPlug plugin (Developer setting)."
+msgstr "Le mode debug permet de sauvegarder des informations complémentaires sur votre serveur pour chaque opération effectuée via le module PayPlug (Option pour développeur)."
 
 #: src/Gateway/PayplugGateway.php:285
 msgctxt "Default gateway title"
@@ -301,28 +288,21 @@ msgstr "Dont coût de financement"
 
 #: src/Front/PayplugOneyDetail.php:115
 #, php-format
-msgid ""
-"Offre de financement avec apport obligatoire, \n"
-"        réservée aux particuliers et valable pour tout achat de %s€ à %s€. \n"
-"        Sous réserve d'acceptation par Oney Bank. Vous disposez d'un délai de 14 jours pour renoncer à "
-"votre crédit. \n"
-"        Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS "
-"Lille Métropole - n° Orias 07 023 261 www.orias.fr \n"
-"        Correspondance : CS 60 006 - 59895 Lille Cedex - www.oney.fr"
-msgstr ""
-"Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s€ "
-"à %s€. Sous réserve d'acceptation par Oney Bank. Vous disposez d'un délai de 14 jours pour renoncer à "
-"votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 "
-"RCS Lille Métropole - n° Orias 07 023 261 www.orias.fr Correspondance : CS 60 006 - 59895 Lille Cedex - "
-"www.oney.fr"
+msgid "Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par Oney Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 %s Correspondance : CS 60 006 - 59895 Lille Cedex - %s"
+msgstr "Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par Oney Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 %s Correspondance : CS 60 006 - 59895 Lille Cedex - %s"
+
+msgid "Offre de financement sans assurance avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s€ à %s€. Sous réserve d’acceptation par Oney Bank. Vous disposez d’un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51286585€ - 34 Avenue de Flandre 59 170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07023 261 %s .  Correspondance : CS 60 006 - 59895 Lille Cedex - %s"
+msgstr "Offre de financement sans assurance avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s€ à %s€. Sous réserve d’acceptation par Oney Bank. Vous disposez d’un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51286585€ - 34 Avenue de Flandre 59 170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07023 261 %s .  Correspondance : CS 60 006 - 59895 Lille Cedex - %s"
+
+msgid "<a href='https://www.orias.fr' target='_empty' > www.orias.fr </a>"
+msgstr "<a href='https://www.orias.fr' target='_empty' > www.orias.fr </a>"
+
+msgid "<a href='https://www.oney.fr' target='_empty' > www.oney.fr </a>"
+msgstr "<a href='https://www.oney.fr' target='_empty' > www.oney.fr </a>"
 
 #: src/Admin/Notices.php:107
-msgid ""
-"Once your PayPlug account has been validated, please log out and log in again from the configuration page "
-"in order to activate LIVE mode."
-msgstr ""
-"Une fois votre compte PayPlug validé, veuillez vous déconnecter puis vous connecter à nouveau depuis la "
-"page de configuration afin de pouvoir activer le mode LIVE."
+msgid "Once your PayPlug account has been validated, please log out and log in again from the configuration page in order to activate LIVE mode."
+msgstr "Une fois votre compte PayPlug validé, veuillez vous déconnecter puis vous connecter à nouveau depuis la page de configuration afin de pouvoir activer le mode LIVE."
 
 #: src/Gateway/PayplugGateway.php:365
 msgid "One Click Payment"
@@ -394,8 +374,7 @@ msgstr "PAIEMENT"
 msgid "Payment page"
 msgstr "Page de paiement"
 
-#: src/Gateway/PayplugGatewayOney3x.php:170 src/Gateway/PayplugGateway.php:897
-#: src/Gateway/PayplugGateway.php:900 src/Gateway/PayplugGateway.php:961 src/Gateway/PayplugGateway.php:964
+#: src/Gateway/PayplugGatewayOney3x.php:170 src/Gateway/PayplugGateway.php:897 src/Gateway/PayplugGateway.php:900 src/Gateway/PayplugGateway.php:961 src/Gateway/PayplugGateway.php:964
 msgid "Payment processing failed. Please retry."
 msgstr "Le traitement du paiement a échoué. Merci de réessayer."
 
@@ -461,8 +440,7 @@ msgstr "Remboursement %s : Montant remboursé %s"
 
 #: src/Gateway/PayplugGatewayOney3x.php:311
 msgid "Refund will be possible 48 hours after the last payment or refund transaction."
-msgstr ""
-"Le remboursement sera possible 48 heures après la dernière transaction de paiement ou de remboursement."
+msgstr "Le remboursement sera possible 48 heures après la dernière transaction de paiement ou de remboursement."
 
 #: src/Admin/Metabox.php:80
 msgid "Refunded"
@@ -526,13 +504,12 @@ msgstr "Personnalisez la description de la passerelle de paiement affichée lors
 msgid "The payment solution title displayed during checkout."
 msgstr "Personnalisez le nom de la passerelle de paiement affiché lors de la commande."
 
-#: src/Gateway/PayplugGatewayOney3x.php:122 src/Gateway/PayplugGatewayOney3x.php:175
-#: src/Front/PayplugOneyDetail.php:209
+#: src/Gateway/PayplugGatewayOney3x.php:122 src/Gateway/PayplugGatewayOney3x.php:175 src/Front/PayplugOneyDetail.php:209
 msgid "The payment with Oney is unavailable because you have more than %s items in your cart."
-msgstr "Paiement avec Oney indisponible car vous avez plus de %s produits dans votre panier."
+msgstr "Votre panier doit contenir moins de %s articles pour pouvoir payer avec Oney."
 
 #: src/Gateway/PayplugGatewayRequirements.php:71
-msgid "The PHP cURL extension is installed and activated on your server."
+msgid "payplug_PayplugGatewayRequirements_curl_requirement_curlinstalled"
 msgstr "L'extension PHP cURL est installée et activée."
 
 #: src/Gateway/PayplugGatewayRequirements.php:72
@@ -543,19 +520,16 @@ msgstr "L'extension PHP cURL doit être installée et activée."
 #: src/Gateway/PayplugGatewayRequirements.php:82
 #, php-format
 msgid "The PHP version on your server is not supported. Your server must run PHP %s or greater."
-msgstr ""
-"La version PHP de votre serveur n'est pas compatible avec l'extension. Votre serveur doit utiliser PHP %s "
-"ou supérieur."
+msgstr "La version PHP de votre serveur n'est pas compatible avec l'extension. Votre serveur doit utiliser PHP %s ou supérieur."
 
 #: src/Gateway/PayplugGatewayRequirements.php:80
 msgid "The PHP version on your server is valid."
 msgstr "La version PHP de votre serveur est compatible avec l'extension."
 
-#: src/Gateway/PayplugGatewayOney3x.php:116 src/Gateway/PayplugGatewayOney3x.php:150
-#: src/Front/PayplugOneyDetail.php:206
+#: src/Gateway/PayplugGatewayOney3x.php:116 src/Gateway/PayplugGatewayOney3x.php:150 src/Front/PayplugOneyDetail.php:206
 #, php-format
 msgid "The total amount of your order should be between %s€ and %s€ to pay with Oney."
-msgstr "Le montant total de votre commande doit être compris entre %s€ et %s€ pour payer avec Oney."
+msgstr "Le montant total de votre panier doit être compris entre %s€ et %s€ pour payer avec Oney."
 
 #: src/Gateway/PayplugGateway.php:1067 src/Gateway/PayplugGateway.php:1071
 msgid "The transaction could not be refunded. Please try again."
@@ -578,12 +552,8 @@ msgid "Yes"
 msgstr "Oui"
 
 #: src/Gateway/PayplugGateway.php:133
-msgid ""
-"You are in TEST MODE. In test mode you can use the card 4242424242424242 with any valid expiration date "
-"and CVC."
-msgstr ""
-"Vous êtes en mode TEST. En mode test, vous pouvez utiliser la carte 4242424242424242 avec une date "
-"d'expiration et un CVV de votre choix."
+msgid "You are in TEST MODE. In test mode you can use the card 4242424242424242 with any valid expiration date and CVC."
+msgstr "Vous êtes en mode TEST. En mode test, vous pouvez utiliser la carte 4242424242424242 avec une date d'expiration et un CVV de votre choix."
 
 #: src/Gateway/PayplugGatewayRequirements.php:109
 msgid "You are logged in with your PayPlug account."
@@ -594,32 +564,20 @@ msgid "You must be logged in with your PayPlug account."
 msgstr "Votre compte PayPlug doit-être connecté."
 
 #: src/Gateway/PayplugGateway.php:768 src/Admin/Ajax.php:91
-msgid ""
-"Your account does not support LIVE mode at the moment, it must be validated first. If your account has "
-"already been validated, please log out and log in again."
-msgstr ""
-"Votre compte ne supporte pas le mode LIVE actuellement, il doit d'abord être validé. Si votre compte a "
-"déjà été validé, veuillez vous déconnecter et vous connecter à nouveau."
+msgid "Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again."
+msgstr "Votre compte ne supporte pas le mode LIVE actuellement, il doit d'abord être validé. Si votre compte a déjà été validé, veuillez vous déconnecter et vous connecter à nouveau."
 
 #: src/Admin/Ajax.php:106
 msgid "Your API keys has successfully been updated."
 msgstr "La mise à jour de vos clés API a bien été effectuée."
 
 #: src/Gateway/PayplugGateway.php:358
-msgid ""
-"Your current offer does not allow this option. Try it on TEST mode. More information <a href=\"https://"
-"www.payplug.com/pricing\" target=\"_blank\">here.</a>"
-msgstr ""
-"Votre offre actuelle ne permet pas cette option. Essayez-le en mode TEST. Plus d'informations <a href="
-"\"https://www.payplug.com/pricing\" target=\"_blank\">ici.</a>"
+msgid "Your current offer does not allow this option. Try it on TEST mode. More information <a href=\"https://www.payplug.com/pricing\" target=\"_blank\">here.</a>"
+msgstr "Votre offre actuelle ne permet pas cette option. Essayez-le en mode TEST. Plus d'informations <a href=\"https://www.payplug.com/pricing\" target=\"_blank\">ici.</a>"
 
 #: src/Gateway/PayplugGatewayOney3x.php:188
-msgid ""
-"Your email address is too long and the + character is not valid, please change it to another address (max "
-"100 characters)."
-msgstr ""
-"Votre adresse e-mail est trop longue et le caractère + n’est pas autorisé, veuillez en saisir une autre "
-"qui ne dépasse pas 100 caractères."
+msgid "Your email address is too long and the + character is not valid, please change it to another address (max 100 characters)."
+msgstr "Votre adresse e-mail est trop longue et le caractère + n’est pas autorisé, veuillez en saisir une autre qui ne dépasse pas 100 caractères."
 
 #: src/Gateway/PayplugGatewayRequirements.php:100
 msgid "Your shop currency has been set up with Euro."
@@ -642,9 +600,26 @@ msgstr "support.payplug.com/hc/fr/articles/4408142346002"
 msgid "info"
 msgstr "En savoir plus"
 
-msgid ""
-"Your payment schedule simulation is temporarily unavailable. You will find this information at the "
-"payment stage."
-msgstr ""
-"La simulation de votre échéancier est temporairement indisponible. Vous retrouverez cette information à "
-"l'étape du paiement."
+msgid "Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage."
+msgstr "La simulation de votre échéancier est temporairement indisponible. Vous retrouverez cette information à l'étape du paiement."
+
+msgid "Oney with fees"
+msgstr "Oney avec frais"
+
+msgid "The fees are split between you and your customers"
+msgstr "Les frais sont répartis entre vous et vos clients"
+
+msgid "Oney without fees"
+msgstr "Oney sans frais"
+
+msgid "You pay the fees"
+msgstr "Les frais sont à votre charge"
+
+msgid "Pay by credit card in 3x installments without fees with Oney"
+msgstr "Payer en 3x sans frais par carte avec Oney"
+
+msgid "Pay by credit card in 4x installments without fees with Oney"
+msgstr "Payer en 4x sans frais par carte avec Oney"
+
+msgid "WITHOUT FEES"
+msgstr "SANS FRAIS"

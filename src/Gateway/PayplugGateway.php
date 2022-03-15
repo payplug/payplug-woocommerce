@@ -10,6 +10,7 @@ if (!defined('ABSPATH')) {
 use Payplug\Authentication;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\HttpException;
+use Payplug\Exception\ForbiddenException;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Admin\Ajax;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
@@ -116,6 +117,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $this->email          = $this->get_option('email');
         $this->payment_method = $this->get_option('payment_method');
         $this->oneclick       = 'yes' === $this->get_option('oneclick', 'no');
+		$this->oney_type      = $this->get_option('oney_type', 'with_fees');
 
         add_filter('woocommerce_get_customer_payment_tokens', [$this, 'filter_tokens'], 10, 3);
 
@@ -193,7 +195,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         }
 
         $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees'])) {
+        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees'])) {
             return;
         }
 
@@ -379,15 +381,30 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'default'     => 'no',
 				'desc_tip'    => false
             ],
-            'oney'                => [
-                'title'       => __('Split Oney Payment', 'payplug'),
-                'type'        => 'checkbox',
-                'label'       => __('Activate', 'payplug'),
-                // TRAD
-                'description' => sprintf(__('Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€.', 'payplug'), $min_oney_price, $max_oney_price) . $link,
-                'default'     => 'no',
+			'oney'                => [
+				'title'       => __('Split Oney Payment', 'payplug'),
+				'type'        => 'checkbox',
+				'label'       => __('Activate', 'payplug'),
+				// TRAD
+				'description' => sprintf(__('Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€.', 'payplug'), $min_oney_price, $max_oney_price) . $link,
+				'default'     => 'no',
 				'desc_tip'    => false
-            ]
+			],
+			'oney_type'           => [
+				'title'       => '',
+				'type'        => 'oney_type',
+				'options'     => array(
+					'with_fees' => __('Oney with fees', 'payplug'),
+					'without_fees' => __('Oney without fees', 'payplug'),
+				),
+				'descriptions'     => array(
+					'with_fees' => __('The fees are split between you and your customers', 'payplug'),
+					'without_fees' => __('You pay the fees', 'payplug'),
+				),
+				'description' => '',
+				'default'     => 'with_fees',
+				'desc_tip'    => false
+			],
         ];
 
         if ($this->user_logged_in()) {
@@ -515,7 +532,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 continue;
             }
 
-            if ($current_year === (int) $token->get_expiry_year() && $current_month >= (int) $token->get_expiry_month()) {
+            if ($current_year === (int) $token->get_expiry_year() && $current_month > (int) $token->get_expiry_month()) {
                 unset($tokens[$k]);
                 continue;
             }
@@ -574,6 +591,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         wp_localize_script('payplug-gateway-admin-oney', 'payplug_admin_config', array(
             'ajax_url'      => admin_url('admin-ajax.php'),
             'btn_ok'        => _x('Ok', 'modal', 'payplug'),
+			'has_live_key'  => (false === $this->has_api_key('live')) ? false : true,
         ));
         if ($this->user_logged_in() && false === $this->has_api_key('live')) {
             add_action('admin_footer', function () {
@@ -793,7 +811,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             "1" === $data[$mode_fieldkey] &&
             !empty($data[$live_key_fieldkey])
         ) {
-            $response = Authentication::getAccount(new Payplug($data[$live_key_fieldkey]));
+			try{
+				$response = Authentication::getAccount(new Payplug($data[$live_key_fieldkey]));
+			}  catch (ForbiddenException $e){
+				PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
+				\WC_Admin_Settings::add_error($e->getMessage());
+				return false;
+			}
             PayplugWoocommerceHelper::set_transient_data($response, [
                 'mode' => 'yes'
             ]);
@@ -999,6 +1023,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function process_refund($order_id, $amount = null, $reason = '')
     {
         PayplugGateway::log(sprintf('Processing refund for order #%s', $order_id));
+
+		if( !$this->user_logged_in()){
+			PayplugGateway::log(__('You must be logged in with your PayPlug account.', 'payplug'), 'error');
+			return new \WP_Error('process_refund_error', __('You must be logged in with your PayPlug account.', 'payplug'));
+		}
 
         $order = wc_get_order($order_id);
         if (!$order instanceof \WC_Order) {
@@ -1275,7 +1304,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                         <input class="radio radio-no <?php echo esc_attr($data['class']); ?>" type="radio" name="<?php echo esc_attr($field_key); ?>" id="<?php echo esc_attr($field_key); ?>-no" value="0" <?php checked('0', $checked); ?> <?php disabled($data['disabled'], true); ?> <?php echo $this->get_custom_attribute_html($data); ?>>
                         <label for="<?php echo esc_attr($field_key); ?>-no"><?php echo esc_html($data['no']); ?></label>
                     </div>
-                    <?php echo $this->get_description_html($data); ?>
+                    <div id="live-mode-test-p"><?php echo $this->get_description_html($data); ?></div>
                 </fieldset>
             </td>
         </tr>
@@ -1370,6 +1399,61 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         return ob_get_clean();
     }
 
+	/**
+	 * Generate Oney Type Input HTML.
+	 *
+	 * @param string $key
+	 * @param array $data
+	 *
+	 * @return string
+	 */
+	public function generate_oney_type_html($key, $data)
+	{
+		$field_key = $this->get_field_key($key);
+		$defaults  = array(
+			'title'             => '',
+			'disabled'          => false,
+			'class'             => '',
+			'css'               => '',
+			'placeholder'       => '',
+			'type'              => 'text',
+			'desc_tip'          => false,
+			'description'       => '',
+			'custom_attributes' => [],
+			'options'           => [],
+		);
+
+		$data = wp_parse_args($data, $defaults);
+
+		ob_start();
+		?>
+		<tr valign="top" id="woocommerce_payplug_oney_type">
+			<th scope="row" class="titledesc" style="padding-top: 0px;">
+				<label for="<?php echo esc_attr($field_key); ?>">
+					<?php echo wp_kses_post($data['title']); ?>
+					<?php echo $this->get_tooltip_html($data); ?>
+				</label>
+			</th>
+			<td class="forminp" style="padding-top: 0px;">
+				<fieldset>
+					<legend class="screen-reader-text"><span><?php echo wp_kses_post($data['title']); ?></span>
+					</legend>
+					<?php foreach ($data['options'] as $option_key => $option_value) : ?>
+						<input class="radio <?php echo esc_attr($data['class']); ?>" type="radio" name="<?php echo esc_attr($field_key); ?>" id="<?php echo esc_attr($field_key); ?>-<?php echo esc_attr($option_key); ?>" value="<?php echo esc_attr($option_key); ?>" <?php checked($option_key, $this->get_option($key)); ?> <?php disabled($data['disabled'], true); ?> <?php echo $this->get_custom_attribute_html($data); ?>>
+						<label for="<?php echo esc_attr($field_key); ?>-<?php echo esc_attr($option_key); ?>" style="margin-right: 20px !important;">
+							<span style="font-weight: 500;"><?php echo esc_html($option_value); ?></span>
+							<span style="color:#646970;"> : <?php echo $data['descriptions'][$option_key] ;?></span>
+						</label>
+					<?php endforeach; ?>
+					<?php echo $this->get_description_html($data); ?>
+				</fieldset>
+			</td>
+		</tr>
+		<?php
+
+		return ob_get_clean();
+	}
+
     /**
      * Validate Radio Field.
      *
@@ -1399,6 +1483,23 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
         return ('1' === (string) $value) ? 'yes' : 'no';
     }
+
+	/**
+	 * Validate Oney Type Field.
+	 *
+	 * Make sure the data is escaped correctly, etc.
+	 *
+	 * @param string $key
+	 * @param string|null $value Posted Value
+	 *
+	 * @return string
+	 */
+	public function validate_oney_type_field($key, $value)
+	{
+		$value = is_null($value) ? 'with_fees' : $value;
+
+		return wc_clean(stripslashes($value));
+	}
 
     /**
      * Get PayPlug gateway mode.
@@ -1496,6 +1597,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 unset($gateways[$this->id]);
             }
         }
+		if($this->oney_type == 'with_fees'){
+			unset($gateways['oney_x3_without_fees']);
+			unset($gateways['oney_x4_without_fees']);
+		} else{
+			unset($gateways['oney_x3_with_fees']);
+			unset($gateways['oney_x4_with_fees']);
+		}
         return $gateways;
     }
 
