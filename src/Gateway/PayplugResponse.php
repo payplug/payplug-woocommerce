@@ -198,18 +198,17 @@ class PayplugResponse {
 
 			return;
 		}
-		if ( ( $resource->is_paid == true ) && ( $resource->failure == null ) ) {
-			$log = new \WC_Logger();
-			$log->log( 'INFO', sprintf( 'Order #%s : Oney payment SUCCESS', $order_id ) );
-		}
-		if ( ( $resource->is_paid == false ) && ( $resource->failure != null ) ) {
-			$log = new \WC_Logger();
-			$log->log( 'INFO', sprintf( 'Order #%s : Oney payment FAILED', $order_id ) );
-		}
-		if ( ( $resource->is_paid == false ) && ( $resource->failure == null ) && ( $resource->is_pending == true ) ) {
-			$log = new \WC_Logger();
-			$log->log( 'INFO', sprintf( 'Order #%s : Oney payment PENDING and checked by an Oney agent', $order_id ) );
 
+		if ( ( $resource->is_paid == true ) && ( $resource->failure == null ) ) {
+			PayplugGateway::log( sprintf( 'Order #%s : Oney payment SUCCESS', $order_id ) );
+		}
+
+		if ( ( $resource->is_paid == false ) && ( $resource->failure != null ) ) {
+			PayplugGateway::log( sprintf( 'Order #%s : Oney payment FAILED', $order_id ) );
+		}
+
+		if ( ( $resource->is_paid == false ) && ( $resource->failure == null ) && ( $resource->payment_method['is_pending'] == true ) ) {
+			PayplugGateway::log( sprintf( 'Order #%s : Oney payment PENDING and checked by an Oney agent', $order_id ) );
 		}
 	}
 
