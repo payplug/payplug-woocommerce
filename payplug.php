@@ -7,7 +7,7 @@
  * Author URI:      https://www.payplug.com/
  * Text Domain:     payplug
  * Domain Path:     /languages
- * Version:         1.5.0
+ * Version:         1.6.0
  * WC tested up to: 5.3.0
  * License:         GPLv3 or later
  * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-define( 'PAYPLUG_GATEWAY_VERSION', '1.5.0' );
+define( 'PAYPLUG_GATEWAY_VERSION', '1.6.0' );
 define( 'PAYPLUG_GATEWAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -38,3 +38,18 @@ function init() {
 	PayplugWoocommerce::get_instance();
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
+
+function wpdocs_translate_text($msgstr, $msgid, $domain)
+{
+	$pattern = '/^payplug_.+/';
+
+	if (preg_match($pattern, $msgstr) === 1) {
+		$path = WP_PLUGIN_DIR . '/' . plugin_basename( dirname( __FILE__ ) ) . '/languages/payplug-en_US.mo';
+		$mo = new \MO();
+		$mo->import_from_file($path);
+		return @$mo->entries[$msgstr]->translations[0];
+	}
+
+	return $msgstr;
+}
+add_filter('gettext_payplug', __NAMESPACE__ . '\\wpdocs_translate_text', 10, 3);
