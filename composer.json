@@ -30,7 +30,9 @@
     "autoload": {
         "psr-4": {
             "Payplug\\PayplugWoocommerce\\": "src",
-            "libphonenumber\\": "lib/libphonenumber"
+            "libphonenumber\\": "lib/libphonenumber",
+            "Automattic\\WooCommerce\\": "/var/www/woocommerce/wp-content/plugins/woocommerce/src/",
+            "Automattic\\WooCommerce\\Vendor\\": "/var/www/woocommerce/wp-content/plugins/woocommerce/lib/packages/"
         }
     },
     "autoload-dev": {

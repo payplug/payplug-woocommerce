@@ -191,8 +191,8 @@ class WC_Unit_Tests_Bootstrap {
 		include $this->woocommerce_plugin_dir . '/uninstall.php';
 
 		// Initialize the WC API extensions.
-		\Automattic\WooCommerce\Admin\Install::create_tables();
-		\Automattic\WooCommerce\Admin\Install::create_events();
+		\Automattic\WooCommerce\Internal\Admin\Install::create_tables();
+		\Automattic\WooCommerce\Internal\Admin\Install::create_events();
 
 		WC_Install::install();
 
