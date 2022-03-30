@@ -590,4 +590,34 @@ class PayplugWoocommerceHelper {
 		return strtoupper($country[0]);
 	}
 
+	/**
+	 * Get country of the payplug merchant account and save it to the database
+	 *
+	 * @return string payplug merchant account country
+	 */
+	public static function get_payplug_merchant_country()
+	{
+		$data = get_option('woocommerce_payplug_settings');
+		if (isset($data['payplug_live_key'])) {
+			if (!isset($data['payplug_merchant_country'])) {
+				try {
+					$response = Authentication::getAccount(new Payplug($data['payplug_live_key']));
+					if (isset($response['httpResponse']['country'])) {
+						$data['payplug_merchant_country'] = $response['httpResponse']['country'];
+						update_option(
+							'woocommerce_payplug_settings',
+							apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $data)
+						);
+					}
+				} catch (ForbiddenException $e) {
+					PayplugGateway::log('Error while getting account : ' . $e->getMessage(), 'error');
+					\WC_Admin_Settings::add_error($e->getMessage());
+					$data['payplug_merchant_country'] = 'FR';
+				}
+			}
+			return $data['payplug_merchant_country'];
+		}
+		return wc_get_base_location();
+	}
+
 }
