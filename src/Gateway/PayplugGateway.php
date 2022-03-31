@@ -93,10 +93,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             : self::$log->log($level, $message, array('source' => 'payplug_gateway'));
     }
 
-    /** 
+    /**
      * Construct method
      *
-     * @return void 
+     * @return void
      */
     public function __construct()
     {
@@ -1179,8 +1179,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function validate_order_amount($amount)
     {
         if (
-            $amount < PayplugWoocommerceHelper::get_minimum_amount()
-            || $amount > PayplugWoocommerceHelper::get_maximum_amount()
+            $amount < $this->oney_thresholds_min
+            || $amount > $this->oney_thresholds_max
         ) {
             return new \WP_Error(
                 'invalid order amount',
