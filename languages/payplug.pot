@@ -628,3 +628,13 @@ msgstr ""
 
 msgid "WITHOUT FEES"
 msgstr ""
+
+msgid "I would like to offer guaranteed payment in installments for amounts between %s€ and %s€."
+msgstr ""
+
+msgid "The amount must be between %s€ and %s€."
+msgstr ""
+
+msgid "Please note that the minimum amount entered is greater than the maximum amount entered."
+msgstr ""
+

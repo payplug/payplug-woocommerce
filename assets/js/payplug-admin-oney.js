@@ -1,6 +1,7 @@
 /* global jQuery */
 
 (($, undefined) => {
+
 	var pao = {
 		init: function()  {
 			// setup modal
@@ -22,7 +23,7 @@
 			pao.$yes_no_description = $("#live-mode-test-p");
 			if ($("#woocommerce_payplug_oney").length) {
 				pao.$payplug_oney = $("#woocommerce_payplug_oney")
-				pao.$payplug_oney_type = $("#woocommerce_payplug_oney_type")
+				pao.$payplug_oney_type = $("#woocommerce_payplug_oney_type, #woocommerce_payplug_oney_thresholds")
 				if (pao.$payplug_oney.prop('checked')) {
 					pao.$payplug_oney_type.css('display', 'table-row')
 				} else {
@@ -49,6 +50,7 @@
 					pao.$payplug_oney_type.css('display', 'none')
 				}
 			})
+			pao.init_oney_thresholds()
 		},
 		verifyOney: function()  {
 			pao.$payplug_oney.prop('disabled', true)
@@ -102,7 +104,29 @@
 			if (pao.is_oney_refresh) {
 				window.location.reload()
 			}
+		},
+		init_oney_thresholds: function () {
+			$( "#slider-range" ).slider({
+				range: true,
+				min: Number(payplug_admin_config.min_oney_price),
+				max: Number(payplug_admin_config.max_oney_price),
+				values: [payplug_admin_config.oney_thresholds_min, payplug_admin_config.oney_thresholds_max],
+				slide: function( event, ui ) {
+					$( "#woocommerce_payplug_oney_thresholds_min" ).val( ui.values[ 0 ] )
+					$( "#woocommerce_payplug_oney_thresholds_max" ).val( ui.values[ 1 ])
+					$("#oney_thresholds_description .min").html(ui.values[ 0 ])
+					$("#oney_thresholds_description .max").html(ui.values[ 1 ])
+					$("#slider-range .ui-slider-handle:first-of-type .tooltip").html(ui.values[ 0 ] + '€')
+					$("#slider-range .ui-slider-handle:last-of-type .tooltip").html(ui.values[ 1 ] + '€')
+				}
+			})
+			$("#oney_thresholds_description").html($("#oney_thresholds_description").html().replaceAll("€", "<b>€</b>"))
+			$('.ui-slider-handle').html('<span class="tooltip"></span>')
+			$("#slider-range .ui-slider-handle:first-of-type .tooltip").html(payplug_admin_config.oney_thresholds_min + '€')
+			$("#slider-range .ui-slider-handle:last-of-type .tooltip").html(payplug_admin_config.oney_thresholds_max + '€')
+
 		}
 	}
 	pao.init()
+
 })(jQuery)
