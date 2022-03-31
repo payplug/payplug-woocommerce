@@ -623,5 +623,14 @@ msgstr "Paga in 4x rate senza spese con carta di gradito grazie a Oney"
 msgid "WITHOUT FEES"
 msgstr "SENZA SPESE"
 
+msgid "I would like to offer guaranteed payment in installments for amounts between %s€ and %s€."
+msgstr "Desidero proporre il pagamento a rate garantito per importi compresi tra %s€ e %s€."
+
+msgid "The amount must be between %s€ and %s€."
+msgstr "L’importo deve essere compreso tra %s€ e %s€."
+
+msgid "Please note that the minimum amount entered is greater than the maximum amount entered."
+msgstr "Attenzione, l’importo minimo inserito è superiore all’importo massimo inserito."
+
 #~ msgid "Cart size cannot be greater than 1000 with Oney."
 #~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."

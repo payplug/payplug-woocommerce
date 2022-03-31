@@ -623,3 +623,12 @@ msgstr "Payer en 4x sans frais par carte avec Oney"
 
 msgid "WITHOUT FEES"
 msgstr "SANS FRAIS"
+
+msgid "I would like to offer guaranteed payment in installments for amounts between %s€ and %s€."
+msgstr "Je souhaite proposer le paiement fractionné garanti pour des montants compris entre %s€ et %s€."
+
+msgid "The amount must be between %s€ and %s€."
+msgstr "Le montant doit être compris entre %s€ et %s€."
+
+msgid "Please note that the minimum amount entered is greater than the maximum amount entered."
+msgstr "Attention, le montant minimum renseigné est supérieur au montant maximal renseigné."

@@ -67,6 +67,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     const MAX_AMOUNT = 20000;
 
+	protected $oney_response;
+	protected $min_oney_price, $oney_thresholds_min;
+	protected $max_oney_price, $oney_thresholds_max;
+
     /**
      * Logging method.
      *
@@ -89,6 +93,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             : self::$log->log($level, $message, array('source' => 'payplug_gateway'));
     }
 
+    /** 
+     * Construct method
+     *
+     * @return void 
+     */
     public function __construct()
     {
         $this->id                 = 'payplug';
@@ -108,7 +117,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         if ($this->user_logged_in()) {
             $this->init_payplug();
         }
-        $this->init_form_fields();
 
         $this->title          = $this->get_option('title');
         $this->description    = $this->get_option('description');
@@ -118,6 +126,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $this->payment_method = $this->get_option('payment_method');
         $this->oneclick       = 'yes' === $this->get_option('oneclick', 'no');
 		$this->oney_type      = $this->get_option('oney_type', 'with_fees');
+	    $oney_range = PayplugWoocommerceHelper::get_min_max_oney();
+	    $this->min_oney_price = (isset($oney_range['min'])) ? intval($oney_range['min']) : 100;
+	    $this->max_oney_price = (isset($oney_range['max'])) ? intval($oney_range['max']) : 3000;
+	    $this->oney_thresholds_min = $this->get_option('oney_thresholds_min', $this->min_oney_price );
+	    $this->oney_thresholds_max = $this->get_option('oney_thresholds_max', $this->max_oney_price );
+        $this->init_form_fields();
 
         add_filter('woocommerce_get_customer_payment_tokens', [$this, 'filter_tokens'], 10, 3);
 
@@ -274,11 +288,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function init_form_fields()
     {
-		$oney_range = PayplugWoocommerceHelper::get_min_max_oney();
-        $min_oney_price = (isset($oney_range['min'])) ? $oney_range['min'] : 100;
-        $max_oney_price = (isset($oney_range['max'])) ? $oney_range['max'] : 3000;
-
-		$anchor = esc_html_x( __("More informations", 'payplug'), 'modal', 'payplug' );
+        $anchor = esc_html_x( __("More informations", 'payplug'), 'modal', 'payplug' );
 		$domain = __( 'support.payplug.com/hc/fr/articles/4408142346002', 'payplug' );
 		$link   = sprintf(  ' <a href="https://%s" target="_blank">%s</a>', $domain, $anchor );
 
@@ -386,25 +396,46 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'type'        => 'checkbox',
 				'label'       => __('Activate', 'payplug'),
 				// TRAD
-				'description' => sprintf(__('Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€.', 'payplug'), $min_oney_price, $max_oney_price) . $link,
+				'description' => sprintf(__('Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€.', 'payplug'), $this->min_oney_price, $this->max_oney_price) . $link,
 				'default'     => 'no',
 				'desc_tip'    => false
 			],
-			'oney_type'           => [
-				'title'       => '',
-				'type'        => 'oney_type',
-				'options'     => array(
-					'with_fees' => __('Oney with fees', 'payplug'),
-					'without_fees' => __('Oney without fees', 'payplug'),
-				),
-				'descriptions'     => array(
-					'with_fees' => __('The fees are split between you and your customers', 'payplug'),
-					'without_fees' => __('You pay the fees', 'payplug'),
-				),
-				'description' => '',
-				'default'     => 'with_fees',
-				'desc_tip'    => false
-			],
+	        'oney_type'           => [
+		        'title'       => '',
+		        'type'        => 'oney_type',
+		        'options'     => array(
+			        'with_fees' => __('Oney with fees', 'payplug'),
+			        'without_fees' => __('Oney without fees', 'payplug'),
+		        ),
+		        'descriptions'     => array(
+			        'with_fees' => __('The fees are split between you and your customers', 'payplug'),
+			        'without_fees' => __('You pay the fees', 'payplug'),
+		        ),
+		        'description' => '',
+		        'default'     => 'with_fees',
+		        'desc_tip'    => false
+	        ],
+	        'oney_thresholds'     => [
+		        'title'       => '',
+		        'type'        => 'oney_thresholds',
+		        'description' => sprintf(__('I would like to offer guaranteed payment in installments for amounts between %s€ and %s€.', 'payplug'),
+                    '<b class="min">' . $this->oney_thresholds_min . '</b>', '<b class="max">' . $this->oney_thresholds_max . '</b>'),
+		        'desc_tip'    => false
+	        ],
+	        'oney_thresholds_min' => [
+		        'title'       => '',
+		        'type'        => 'hidden',
+		        'label'       => '',
+		        'description' => '',
+		        'default'     => 'no',
+	        ],
+	        'oney_thresholds_max' => [
+		        'title'       => '',
+		        'type'        => 'hidden',
+		        'label'       => '',
+		        'description' => '',
+		        'default'     => 'no',
+	        ],
         ];
 
         if ($this->user_logged_in()) {
@@ -592,7 +623,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             'ajax_url'      => admin_url('admin-ajax.php'),
             'btn_ok'        => _x('Ok', 'modal', 'payplug'),
 			'has_live_key'  => (false === $this->has_api_key('live')) ? false : true,
+            'min_oney_price' => $this->min_oney_price,
+            'max_oney_price' => $this->max_oney_price,
+	        'oney_thresholds_min' =>$this->oney_thresholds_min,
+	        'oney_thresholds_max' => $this->oney_thresholds_max,
         ));
+
         if ($this->user_logged_in() && false === $this->has_api_key('live')) {
             add_action('admin_footer', function () {
                 $email = $this->get_option('email');
@@ -822,6 +858,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'mode' => 'yes'
             ]);
         }
+
+        // Validate Oney thresholds
+	    if($data['woocommerce_payplug_oney_thresholds_min'] < $this->min_oney_price || $data['woocommerce_payplug_oney_thresholds_max'] > $this->max_oney_price){
+		    \WC_Admin_Settings::add_error(sprintf(__('The amount must be between %s€ and %s€.', 'payplug'), $this->min_oney_price, $this->max_oney_price));
+		    return false;
+	    }
+	    if($data['woocommerce_payplug_oney_thresholds_min'] > $data['woocommerce_payplug_oney_thresholds_max']){
+		    \WC_Admin_Settings::add_error(sprintf(__('Please note that the minimum amount entered is greater than the maximum amount entered.', 'payplug'), $this->min_oney_price, $this->max_oney_price));
+		    return false;
+	    }
 
         $this->data = $data;
         parent::process_admin_options();
@@ -1427,28 +1473,77 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		ob_start();
 		?>
-		<tr valign="top" id="woocommerce_payplug_oney_type">
-			<th scope="row" class="titledesc" style="padding-top: 0px;">
-				<label for="<?php echo esc_attr($field_key); ?>">
+        <tr valign="top" id="woocommerce_payplug_oney_type">
+            <th scope="row" class="titledesc" style="padding-top: 0px;">
+                <label for="<?php echo esc_attr($field_key); ?>">
 					<?php echo wp_kses_post($data['title']); ?>
 					<?php echo $this->get_tooltip_html($data); ?>
-				</label>
-			</th>
-			<td class="forminp" style="padding-top: 0px;">
-				<fieldset>
-					<legend class="screen-reader-text"><span><?php echo wp_kses_post($data['title']); ?></span>
-					</legend>
+                </label>
+            </th>
+            <td class="forminp" style="padding-top: 0px;">
+                <fieldset>
+                    <legend class="screen-reader-text"><span><?php echo wp_kses_post($data['title']); ?></span>
+                    </legend>
 					<?php foreach ($data['options'] as $option_key => $option_value) : ?>
-						<input class="radio <?php echo esc_attr($data['class']); ?>" type="radio" name="<?php echo esc_attr($field_key); ?>" id="<?php echo esc_attr($field_key); ?>-<?php echo esc_attr($option_key); ?>" value="<?php echo esc_attr($option_key); ?>" <?php checked($option_key, $this->get_option($key)); ?> <?php disabled($data['disabled'], true); ?> <?php echo $this->get_custom_attribute_html($data); ?>>
-						<label for="<?php echo esc_attr($field_key); ?>-<?php echo esc_attr($option_key); ?>" style="margin-right: 20px !important;">
-							<span style="font-weight: 500;"><?php echo esc_html($option_value); ?></span>
-							<span style="color:#646970;"> : <?php echo $data['descriptions'][$option_key] ;?></span>
-						</label>
+                        <input class="radio <?php echo esc_attr($data['class']); ?>" type="radio" name="<?php echo esc_attr($field_key); ?>" id="<?php echo esc_attr($field_key); ?>-<?php echo esc_attr($option_key); ?>" value="<?php echo esc_attr($option_key); ?>" <?php checked($option_key, $this->get_option($key)); ?> <?php disabled($data['disabled'], true); ?> <?php echo $this->get_custom_attribute_html($data); ?>>
+                        <label for="<?php echo esc_attr($field_key); ?>-<?php echo esc_attr($option_key); ?>" style="margin-right: 20px !important;">
+                            <span style="font-weight: 500;"><?php echo esc_html($option_value); ?></span>
+                            <span style="color:#646970;"> : <?php echo $data['descriptions'][$option_key] ;?></span>
+                        </label>
 					<?php endforeach; ?>
 					<?php echo $this->get_description_html($data); ?>
-				</fieldset>
-			</td>
-		</tr>
+                </fieldset>
+            </td>
+        </tr>
+		<?php
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Generate Oney Thresholds Input HTML.
+	 *
+	 * @param string $key
+	 * @param array $data
+	 *
+	 * @return string
+	 */
+	public function generate_oney_thresholds_html($key, $data)
+	{
+		$field_key = $this->get_field_key($key);
+		$defaults  = array(
+			'title'             => '',
+			'disabled'          => false,
+			'class'             => '',
+			'css'               => '',
+			'placeholder'       => '',
+			'type'              => 'text',
+			'desc_tip'          => false,
+			'description'       => '',
+			'custom_attributes' => [],
+			'options'           => [],
+		);
+
+		$data = wp_parse_args($data, $defaults);
+
+		ob_start();
+		?>
+        <tr valign="top" id="woocommerce_payplug_oney_thresholds">
+            <th scope="row" class="titledesc" style="padding-top: 0px;">
+                <label for="<?php echo esc_attr($field_key); ?>">
+					<?php echo wp_kses_post($data['title']); ?>
+					<?php echo $this->get_tooltip_html($data); ?>
+                </label>
+            </th>
+            <td class="forminp" style="padding-top: 0px;">
+                <fieldset>
+                    <b class="d-inline-block"><?php echo $this->min_oney_price;?>€</b>
+                    <div class="d-inline-block" id="slider-range"></div>
+                    <b class="d-inline-block"><?php echo $this->max_oney_price;?>€</b>
+                    <div id="oney_thresholds_description"><?php echo $this->get_description_html($data); ?></div>
+                </fieldset>
+            </td>
+        </tr>
 		<?php
 
 		return ob_get_clean();
@@ -1499,6 +1594,23 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$value = is_null($value) ? 'with_fees' : $value;
 
 		return wc_clean(stripslashes($value));
+	}
+
+	/**
+	 * Validate Oney Thresholds Field.
+	 *
+	 * Make sure the data is escaped correctly, etc.
+	 *
+	 * @param string $key
+	 * @param string|null $value Posted Value
+	 *
+	 * @return string
+	 */
+	public function validate_oney_thresholds_field($key, $value)
+	{
+		$value = is_null($value) ? [100, 3000] : $value;
+
+		return wc_clean($value);
 	}
 
     /**
