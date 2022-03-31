@@ -342,7 +342,13 @@ class PayplugWoocommerceHelper {
 	 * @return int
 	 */
 	public static function get_minimum_amount() {
-		return 99;
+		$min = self::get_local_oney_threshold()['oney_thresholds_min'];
+		if ($min) {
+			return $min;
+		} else {
+			return 99;
+		}
+
 	}
 
 	/**
@@ -353,7 +359,13 @@ class PayplugWoocommerceHelper {
 	 * @return int
 	 */
 	public static function get_maximum_amount() {
-		return 2000000;
+		$max = self::get_local_oney_threshold()['oney_thresholds_max'];
+		if ($max) {
+			return $max;
+		} else {
+			return 2000000;
+		}
+
 	}
 
 	/**
@@ -486,6 +498,21 @@ class PayplugWoocommerceHelper {
 	}
 
 	/**
+	 *
+	 * Retrienve the local oney threshold configration
+	 *
+	 * @return array
+	 */
+
+	public static function get_local_oney_threshold() {
+		$options = get_option('woocommerce_payplug_settings', []);
+		return [
+			'oney_thresholds_min' => $options['oney_thresholds_min'],
+			'oney_thresholds_max' => $options['oney_thresholds_max']
+		];
+	}
+
+	/**
 	 * Set current option from payplug settings and api call
 	 *
 	 * @return void
@@ -593,6 +620,14 @@ class PayplugWoocommerceHelper {
 	{
 		preg_match( '([a-z-]+)', get_locale(), $country );
 		return strtoupper($country[0]);
+	}
+
+	public static function amount_check($amount) {
+		if ($amount < self::get_minimum_amount() || $amount > self::get_maximum_amount()) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 }

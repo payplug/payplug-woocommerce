@@ -30,9 +30,9 @@ class PayplugOney
 	 */
 	public function handleMinMaxAmount()
 	{
-		$oney_range = PayplugWoocommerceHelper::get_min_max_oney();
-		$this->set_max_amount($oney_range['max']);
-		$this->set_min_amount($oney_range['min']);
+		$thresholds = PayplugWoocommerceHelper::get_local_oney_threshold();
+		$this->set_max_amount($thresholds['oney_thresholds_max']);
+		$this->set_min_amount($thresholds['oney_thresholds_min']);
 	}
 
 	public function handleOneySimulation()
