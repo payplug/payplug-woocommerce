@@ -50,8 +50,9 @@ class PayplugGatewayOney3x extends PayplugGateway
 
         self::set_oney_configuration();
 
-		$this->min_oney_price = PayplugWoocommerceHelper::get_local_oney_threshold()['oney_thresholds_min'];
-		$this->max_oney_price = PayplugWoocommerceHelper::get_local_oney_threshold()['oney_thresholds_max'];
+		/*$this->min_oney_price = PayplugWoocommerceHelper::get_local_oney_threshold()['oney_thresholds_min'];
+		$this->max_oney_price = PayplugWoocommerceHelper::get_local_oney_threshold()['oney_thresholds_max'];*/
+
     }
 
     /**
@@ -144,8 +145,8 @@ HTML;
 		$products_qty = (int) $cart->cart_contents_count;
 
 		// Min and max
-        if ($total_price < $this->min_oney_price || $total_price > $this->max_oney_price) {
-            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->min_oney_price, $this->max_oney_price).'</div>';
+        if ($total_price < $this->oney_thresholds_min || $total_price > $this->oney_thresholds_max) {
+            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->oney_thresholds_min , $this->oney_thresholds_max ).'</div>';
             return false;
         }
 

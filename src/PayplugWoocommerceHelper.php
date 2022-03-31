@@ -334,39 +334,7 @@ class PayplugWoocommerceHelper {
 		return ( self::is_country_supported( $country ) ) ? strtoupper( $country ) : 'FR';
 	}
 
-	/**
-	 * Get minimum amount allowed by PayPlug.
-	 *
-	 * This amount is in cents.
-	 *
-	 * @return int
-	 */
-	public static function get_minimum_amount() {
-		$min = self::get_local_oney_threshold()['oney_thresholds_min'];
-		if ($min) {
-			return $min;
-		} else {
-			return 99;
-		}
 
-	}
-
-	/**
-	 * Get maximum amount allowed by PayPlug.
-	 *
-	 * This amount is in cents.
-	 *
-	 * @return int
-	 */
-	public static function get_maximum_amount() {
-		$max = self::get_local_oney_threshold()['oney_thresholds_max'];
-		if ($max) {
-			return $max;
-		} else {
-			return 2000000;
-		}
-
-	}
 
 	/**
 	 * Convert amount in cents.
@@ -499,7 +467,7 @@ class PayplugWoocommerceHelper {
 
 	/**
 	 *
-	 * Retrienve the local oney threshold configration
+	 * Retrieve the local oney threshold configration
 	 *
 	 * @return array
 	 */
@@ -620,14 +588,6 @@ class PayplugWoocommerceHelper {
 	{
 		preg_match( '([a-z-]+)', get_locale(), $country );
 		return strtoupper($country[0]);
-	}
-
-	public static function amount_check($amount) {
-		if ($amount < self::get_minimum_amount() || $amount > self::get_maximum_amount()) {
-			return false;
-		} else {
-			return true;
-		}
 	}
 
 }
