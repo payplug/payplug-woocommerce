@@ -62,10 +62,15 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     const MIN_AMOUNT = 0.99;
 
-    /**
-     * @var float
-     */
-    const MAX_AMOUNT = 20000;
+	/**
+	 * @var float
+	 */
+	const MAX_AMOUNT = 20000;
+
+	/**
+	 * @var string
+	 */
+	private $payplug_merchant_country = 'FR';
 
 	protected $oney_response;
 	protected $min_oney_price, $oney_thresholds_min;
@@ -132,6 +137,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	    $this->oney_thresholds_min = $this->get_option('oney_thresholds_min', $this->min_oney_price );
 	    $this->oney_thresholds_max = $this->get_option('oney_thresholds_max', $this->max_oney_price );
         $this->init_form_fields();
+        $this->payplug_merchant_country = PayplugWoocommerceHelper::get_payplug_merchant_country();
 
         add_filter('woocommerce_get_customer_payment_tokens', [$this, 'filter_tokens'], 10, 3);
 
