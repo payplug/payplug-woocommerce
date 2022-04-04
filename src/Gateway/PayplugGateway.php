@@ -160,6 +160,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
         add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
+	    add_filter( 'woocommerce_api_request_url', [$this, 'custom_api_request_url_for_payplug'], 10, 2 );
     }
 
     /**
@@ -1737,4 +1738,19 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $status = $order->get_status();
         return $order && $this->supports('refunds') && $status !== "cancelled" && $status !== "failed";
     }
+
+	/**
+	 * Always return the notification url as http://base_url/?wc-api=PayplugGateway
+	 * in case a custom permalink structure is set
+     *
+     * @return string
+	 */
+	public function custom_api_request_url_for_payplug($api_request_url, $request){
+		if($request == 'PayplugGateway'){
+			$scheme = wp_parse_url( home_url(), PHP_URL_SCHEME );
+			return add_query_arg( 'wc-api', $request, trailingslashit( home_url( '', $scheme ) ) );
+		}
+		return $api_request_url;
+	}
+    
 }
