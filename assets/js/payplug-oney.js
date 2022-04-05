@@ -125,8 +125,8 @@
         })
     };
 
-    $(document).on('ready', function () {
-        _initevent();
+	$(function() {
+		_initevent();
         if (is_cart) {
             $(document).ajaxSuccess(function (event, request, settings) {
                 if (settings.data.includes(payplug_config.ajax_action)) {
