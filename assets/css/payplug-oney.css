@@ -53,6 +53,7 @@
 .payplug-oney .oney-3x { background-image: url(../images/lg-3xoney.png); }
 .payplug-oney .oney-4x { background-image: url(../images/lg-4xoney.png); }
 .payplug-oney .oney-3x4x { background-image: url(../images/lg-3x4xoney.png); min-width: 8em; margin-bottom: -.2em; background-position: center center; float: left;}
+.payplug-oney .oney-without-fees-3x4x-it { background-image: url(../images/Oneywithoutfees3x4x_IT.png); min-width: 13em; margin-bottom: -.2em; background-position: center center; float: left;}
 .payplug-oney .oney-without-fees-3x4x { background-image: url(../images/Oneywithoutfees3x4x.png); min-width: 13em; margin-bottom: -.2em; background-position: center center; float: left;}
 .payplug-oney .oney-logo { background-image: url(../images/lg-oney.png);  width: auto; height: 30px; }
 
