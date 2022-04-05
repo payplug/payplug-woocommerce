@@ -8,7 +8,7 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use function is_cart;
 use function is_checkout;
 
-class OneyBase
+Abstract class OneyBase
 {
 
 	/**

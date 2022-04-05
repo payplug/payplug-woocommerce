@@ -38,7 +38,7 @@ class OneyIT extends OneyBase implements InterfaceOneyLayout
                 </div>
                 <div class='oney-img oney-logo no-margin'></div>
                 <div class='oney-title'>
-                    <p class='no-margin oney-color'>{$f(__('PAYMENT', 'payplug'))} <span class='underline'>{$f(__('WITHOUT FEES', 'payplug'))}</span> </p>
+                    <p class='no-margin oney-color'>{$f(__('payplug_oneyIT_popup-title', 'payplug'))} </p>
                     <p class='no-margin bold oney-color'>{$f(__('BY CREDIT CARD', 'payplug'))}</p>
                 </div>
                 <div class='oney-content oney-3x-content'>
@@ -88,7 +88,7 @@ HTML;
                 </div>
                 <div class='oney-img oney-logo no-margin'></div>
                 <div class='oney-title'>
-                    <p class='no-margin oney-color'>{$f(__('PAYMENT', 'payplug'))} </p>
+                    <p class='no-margin oney-color'>{$f(__('payplug_oneyIT_popup-title', 'payplug'))} </p>
                     <p class='no-margin bold oney-color'>{$f(__('BY CREDIT CARD', 'payplug'))}</p>
                 </div>
                 <div class='oney-content oney-3x-content'>
@@ -124,13 +124,9 @@ HTML;
 
 		$footer = <<<HTML
  			<div class='oney-cgv-content oney-cgv-footer'>
- 				{$f(sprintf(
-			esc_html__("Offre de financement sans assurance avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s€ à %s€. Sous réserve d’acceptation par Oney Bank. Vous disposez d’un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51286585€ - 34 Avenue de Flandre 59 170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07023 261 %s .  Correspondance : CS 60 006 - 59895 Lille Cedex - %s", "payplug"),
-			$min,
-			$max,
-			__("<a href='https://www.orias.fr' target='_empty' > www.orias.fr </a>"),
-			__("<a href=\"https://www.oney.fr\" target=\"_empty\" > www.oney.fr </a>")
-		))}
+				{$f(sprintf(esc_html__('payplug_oneyIT_popup-footer', 'payplug'), $min, $max,
+			__("<a href=\"https://www.oney.fr\" target=\"_empty\" > www.oney.fr </a>", "payplug"),
+			__("payplug_oneyIT_popup-footer_pdf", "payplug")))}
 			</div>
 HTML;
 
@@ -147,17 +143,14 @@ HTML;
 	{
 		$f = function($fn) { return $fn; };
 
-		return <<<HTML
+		$footer =  <<<HTML
  			<div class='oney-cgv-content oney-cgv-footer'>
- 				{$f( sprintf(
-			esc_html__("Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par Oney Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 %s Correspondance : CS 60 006 - 59895 Lille Cedex - %s"),
-			$min,
-			$max,
-			__("<a href='https://www.orias.fr' target='_empty' > www.orias.fr </a>"),
-			__("<a href=\"https://www.oney.fr\" target=\"_empty\" > www.oney.fr </a>")
-		))}
+				{$f(sprintf(esc_html__('payplug_oneyIT_popup-footer', 'payplug'), $min, $max,
+			__("<a href=\"https://www.oney.fr\" target=\"_empty\" > www.oney.fr </a>", "payplug"),
+			__("payplug_oneyIT_popup-footer_pdf", "payplug")))}
 			</div>
 HTML;
+		return $footer;
 
 	}
 
@@ -191,7 +184,7 @@ HTML;
 				 data-max-oney-qty="' .  PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM .'"
 				 data-min-oney="' .  $oney->get_min_amount() . '"
 				 data-max-oney="' .  $oney->get_max_amount() . '">
-				' . __('OR PAY IN', 'payplug') . '
+				' . __('payplug_oneyIT_paywith', 'payplug') . '
 				<div class="payplug-oney-popup">
 					<div class="oney-img ' . $oney->getIcon() . '"></div>
 					<div id="oney-show-popup" class="bold oney-color">?</div>

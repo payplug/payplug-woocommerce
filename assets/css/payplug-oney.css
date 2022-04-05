@@ -25,6 +25,7 @@
     align-items: center;
     font-family: Arial, sans-serif;
 	font-size: 15px;
+	margin-bottom: 10px;
 }
 .payplug-oney .oney-img {
     height: 3rem;
@@ -65,6 +66,7 @@
 .payplug-oney.disabled .oney-4x { background-image: url(../images/lg-4xoney-disabled.png); }
 .payplug-oney.disabled .oney-3x4x { background-image: url(../images/lg-3x4xoney-disabled.png); }
 .payplug-oney.disabled .oney-without-fees-3x4x { background-image: url(../images/Oneywithoutfees3x4x-disable.png); }
+.payplug-oney.disabled .oney-without-fees-3x4x-it { background-image: url(../images/Oneywithoutfees3x4x_IT-disable.png); }
 .underline{text-decoration: underline;}
 .payplug-oney-popup {
     cursor: pointer;

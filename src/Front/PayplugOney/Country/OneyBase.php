@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-Class OneyBase implements InterfaceOney
+Abstract Class OneyBase implements InterfaceOney
 {
 	/**
 	 * @var string
