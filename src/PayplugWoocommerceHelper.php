@@ -334,7 +334,27 @@ class PayplugWoocommerceHelper {
 		return ( self::is_country_supported( $country ) ) ? strtoupper( $country ) : 'FR';
 	}
 
+	/**
+	 * Get minimum amount allowed by PayPlug.
+	 *
+	 * This amount is in cents.
+	 *
+	 * @return int
+	 */
+	public static function get_minimum_amount() {
+		return 99;
+	}
 
+	/**
+	 * Get maximum amount allowed by PayPlug.
+	 *
+	 * This amount is in cents.
+	 *
+	 * @return int
+	 */
+	public static function get_maximum_amount() {
+		return 2000000;
+	}
 
 	/**
 	 * Convert amount in cents.
