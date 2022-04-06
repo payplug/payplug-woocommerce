@@ -121,7 +121,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $this->requirements = new PayplugGatewayRequirements($this);
         if ($this->user_logged_in()) {
             $this->init_payplug();
-        }
+        }else{
+			delete_option('woocommerce_payplug_settings');
+		}
 
         $this->title          = $this->get_option('title');
         $this->description    = $this->get_option('description');
@@ -1737,4 +1739,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $status = $order->get_status();
         return $order && $this->supports('refunds') && $status !== "cancelled" && $status !== "failed";
     }
+
+	public function getPayplugMerchantCountry(){
+		return $this->payplug_merchant_country;
+	}
+
+	public function setPayplugMerchantCountry($country){
+		$this->payplug_merchant_country = $country;
+	}
 }

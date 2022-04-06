@@ -178,6 +178,9 @@ Abstract Class OneyBase implements InterfaceOney
 		$this->total_products = 0;
 	}
 
+	/**
+	 * @return int
+	 */
 	public function getTotalProducts()
 	{
 		return $this->total_products;

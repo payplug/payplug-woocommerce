@@ -13,7 +13,6 @@ use Payplug\PayplugWoocommerce\Admin\Notices;
 use Payplug\PayplugWoocommerce\Admin\WoocommerceActions;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithFees;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithoutFees;
-use Payplug\PayplugWoocommerce\Front\PayplugOneyDetail;
 
 class PayplugWoocommerce {
 

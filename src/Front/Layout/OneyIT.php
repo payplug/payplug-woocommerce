@@ -38,7 +38,7 @@ class OneyIT extends OneyBase implements InterfaceOneyLayout
                 </div>
                 <div class='oney-img oney-logo no-margin'></div>
                 <div class='oney-title'>
-                    <p class='no-margin oney-color'>{$f(__('payplug_oneyIT_popup-title', 'payplug'))} </p>
+                    <p class='no-margin oney-color'>{$f(__('payplug_oneyIT_popup-withoutfees-title', 'payplug'))} </p>
                     <p class='no-margin bold oney-color'>{$f(__('BY CREDIT CARD', 'payplug'))}</p>
                 </div>
                 <div class='oney-content oney-3x-content'>
@@ -125,7 +125,7 @@ HTML;
 		$footer = <<<HTML
  			<div class='oney-cgv-content oney-cgv-footer'>
 				{$f(sprintf(esc_html__('payplug_oneyIT_popup-footer', 'payplug'), $min, $max,
-			__("<a href=\"https://www.oney.fr\" target=\"_empty\" > www.oney.fr </a>", "payplug"),
+			__("payplug_oneyIT_popup-url", "payplug"),
 			__("payplug_oneyIT_popup-footer_pdf", "payplug")))}
 			</div>
 HTML;
@@ -146,7 +146,7 @@ HTML;
 		$footer =  <<<HTML
  			<div class='oney-cgv-content oney-cgv-footer'>
 				{$f(sprintf(esc_html__('payplug_oneyIT_popup-footer', 'payplug'), $min, $max,
-			__("<a href=\"https://www.oney.fr\" target=\"_empty\" > www.oney.fr </a>", "payplug"),
+			__("payplug_oneyIT_popup-url", "payplug"),
 			__("payplug_oneyIT_popup-footer_pdf", "payplug")))}
 			</div>
 HTML;

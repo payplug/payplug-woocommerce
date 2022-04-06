@@ -539,8 +539,7 @@ class PayplugWoocommerceHelper {
 	public static function show_oney_popup()
 	{
 		$account = self::get_account_data_from_options();
-		//TODO:: validate $account["country"] == self::getISOCountryCode() is not only for OneyIT
-		if( $account && $account['permissions'][PayplugPermissions::USE_ONEY] == true && $account["country"] == self::getISOCountryCode() ){
+		if(  $account && $account['permissions'][PayplugPermissions::USE_ONEY] == true && $account["country"] == self::getISOCountryCode() ){
 			return true;
 		}
 
