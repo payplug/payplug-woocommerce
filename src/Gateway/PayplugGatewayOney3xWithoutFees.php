@@ -59,7 +59,7 @@ HTML;
                 $this->description = $this->oney_response;
             }
         }
-        $available_img = ($this->check_oney_is_available() === true) ? 'Oney3x.png' : 'Oney3x_grey.png';
+        $available_img = ($this->check_oney_is_available() === true) ? 'Oney3x-' . $this->getPayplugMerchantCountry(). '.png' : 'Oney3x_grey' . $this->getPayplugMerchantCountry(). '.png';
         $icons = apply_filters('payplug_payment_icons', [
             'payplug' => sprintf('<img src="%s" alt="Oney 3x" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/' . $available_img)),
         ]);
