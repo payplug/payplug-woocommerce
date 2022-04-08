@@ -7,6 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Payplug\Exception\ForbiddenException;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\Resource\APIResource;
 use Payplug\Payplug;
 use Payplug\Authentication;
@@ -492,12 +494,8 @@ class PayplugWoocommerceHelper {
 	 * @return array
 	 */
 
-	public static function get_local_oney_threshold() {
-		$options = get_option('woocommerce_payplug_settings', []);
-		return [
-			'oney_thresholds_min' => $options['oney_thresholds_min'],
-			'oney_thresholds_max' => $options['oney_thresholds_max']
-		];
+	public static function getOneySettings() {
+		return get_option('woocommerce_payplug_settings', []);
 	}
 
 	/**
@@ -561,7 +559,7 @@ class PayplugWoocommerceHelper {
 	public static function show_oney_popup()
 	{
 		$account = self::get_account_data_from_options();
-		if( $account && $account['permissions'][PayplugPermissions::USE_ONEY] == true && $account["country"] == self::getISOCountryCode() ){
+		if(  $account && $account['permissions'][PayplugPermissions::USE_ONEY] == true && $account["country"] == self::getISOCountryCode() ){
 			return true;
 		}
 
@@ -618,26 +616,47 @@ class PayplugWoocommerceHelper {
 	public static function get_payplug_merchant_country()
 	{
 		$data = get_option('woocommerce_payplug_settings');
+
+		//in order to reduce the getAccount calls
 		if (isset($data['payplug_live_key'])) {
+
 			if (!isset($data['payplug_merchant_country'])) {
-				try {
-					$response = Authentication::getAccount(new Payplug($data['payplug_live_key']));
-					if (isset($response['httpResponse']['country'])) {
-						$data['payplug_merchant_country'] = $response['httpResponse']['country'];
-						update_option(
-							'woocommerce_payplug_settings',
-							apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $data)
-						);
-					}
-				} catch (ForbiddenException $e) {
-					PayplugGateway::log('Error while getting account : ' . $e->getMessage(), 'error');
-					\WC_Admin_Settings::add_error($e->getMessage());
-					$data['payplug_merchant_country'] = 'FR';
-				}
+				return self::UpdateCountryOption($data);
 			}
+
 			return $data['payplug_merchant_country'];
 		}
-		return wc_get_base_location();
+
+		$country = wc_get_base_location();
+		return $country['country'];
+
+	}
+
+	/**
+	 * Update payplug options and return the country
+	 *
+	 * @param $options
+	 * @return string
+	 * @throws \Payplug\Exception\ConfigurationException
+	 */
+	public static function UpdateCountryOption($options){
+
+		try {
+			$response = Authentication::getAccount(new Payplug($options['payplug_live_key']));
+
+			if (isset($response['httpResponse']['country'])) {
+				$options['payplug_merchant_country'] = $response['httpResponse']['country'];
+				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+			}
+
+		} catch (ForbiddenException $e) {
+			PayplugGateway::log('Error while getting account : ' . $e->getMessage(), 'error');
+			\WC_Admin_Settings::add_error($e->getMessage());
+			$options['payplug_merchant_country'] = 'FR';
+		}
+
+		return $options['payplug_merchant_country'];
+
 	}
 
 }

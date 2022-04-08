@@ -11,9 +11,8 @@ use Payplug\PayplugWoocommerce\Admin\Ajax;
 use Payplug\PayplugWoocommerce\Admin\Metabox;
 use Payplug\PayplugWoocommerce\Admin\Notices;
 use Payplug\PayplugWoocommerce\Admin\WoocommerceActions;
-use Payplug\PayplugWoocommerce\Front\PayplugOneyDetail;
-use Payplug\PayplugWoocommerce\Front\PayplugOneyWithFees;
-use Payplug\PayplugWoocommerce\Front\PayplugOneyWithoutFees;
+use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithFees;
+use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithoutFees;
 
 class PayplugWoocommerce {
 
@@ -152,9 +151,16 @@ class PayplugWoocommerce {
 	{
 		$options = get_option('woocommerce_payplug_settings', []);
 
+		//if live and don't have country setted on the option
+		if (isset($options['payplug_live_key']) && !isset($options['payplug_merchant_country'])) {
+			$options['payplug_merchant_country'] = PayplugWoocommerceHelper::UpdateCountryOption($options);
+
+		}
+
+		//check if the options has the Country setted
 		Switch($options['oney_type']){
-			case "without_fees" : new PayplugOneyWithoutFees();break;
-			default: new PayplugOneyWithFees();break;
+			case "without_fees" : new OneyWithoutFees();break;
+			default: new OneyWithFees();break;
 		}
 	}
 }

@@ -638,3 +638,20 @@ msgstr ""
 msgid "Please note that the minimum amount entered is greater than the maximum amount entered."
 msgstr ""
 
+msgid "payplug_oneyIT_paywith"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-title"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-footer"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-footer_pdf"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-url"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-withoutfees-title"
+msgstr ""

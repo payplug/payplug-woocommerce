@@ -121,7 +121,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $this->requirements = new PayplugGatewayRequirements($this);
         if ($this->user_logged_in()) {
             $this->init_payplug();
-        }
+        }else{
+			delete_option('woocommerce_payplug_settings');
+		}
 
         $this->title          = $this->get_option('title');
         $this->description    = $this->get_option('description');
@@ -160,7 +162,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
         add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
-	    add_filter( 'woocommerce_api_request_url', [$this, 'custom_api_request_url_for_payplug'], 10, 2 );
     }
 
     /**
@@ -1186,8 +1187,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function validate_order_amount($amount)
     {
         if (
-			$amount < PayplugWoocommerceHelper::get_minimum_amount()
-			|| $amount > PayplugWoocommerceHelper::get_maximum_amount()
+            $amount < $this->oney_thresholds_min
+            || $amount > $this->oney_thresholds_max
         ) {
             return new \WP_Error(
                 'invalid order amount',
@@ -1739,18 +1740,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         return $order && $this->supports('refunds') && $status !== "cancelled" && $status !== "failed";
     }
 
-	/**
-	 * Always return the notification url as http://base_url/?wc-api=PayplugGateway
-	 * in case a custom permalink structure is set
-     *
-     * @return string
-	 */
-	public function custom_api_request_url_for_payplug($api_request_url, $request){
-		if($request == 'PayplugGateway'){
-			$scheme = wp_parse_url( home_url(), PHP_URL_SCHEME );
-			return add_query_arg( 'wc-api', $request, trailingslashit( home_url( '', $scheme ) ) );
-		}
-		return $api_request_url;
+	public function getPayplugMerchantCountry(){
+		return $this->payplug_merchant_country;
 	}
-    
+
+	public function setPayplugMerchantCountry($country){
+		$this->payplug_merchant_country = $country;
+	}
 }
