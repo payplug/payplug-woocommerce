@@ -5,7 +5,7 @@ namespace Payplug\PayplugWoocommerce\Front;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
-class PayplugPayWithOney extends PayplugOney
+class PayplugPayWithOney
 {
 
 	/**
