@@ -1186,15 +1186,18 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function validate_order_amount($amount)
     {
-        if (
-            $amount < $this->oney_thresholds_min
-            || $amount > $this->oney_thresholds_max
-        ) {
-            return new \WP_Error(
-                'invalid order amount',
-                sprintf(__('Payments for this amount (%s) are not authorised with this payment gateway.', 'payplug'), \wc_price($amount / 100))
-            );
-        }
+		if ($this->id != "payplug") {
+			if (
+				$amount < $this->oney_thresholds_min
+				|| $amount > $this->oney_thresholds_max
+			) {
+				return new \WP_Error(
+					'invalid order amount',
+					sprintf(__('Payments for this amount (%s) are not authorised with this payment gateway.', 'payplug'), \wc_price($amount / 100))
+				);
+			}
+		}
+
 
         return $amount;
     }
