@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2021-02-26 14:03+0000\n"
-"PO-Revision-Date: 2022-04-11 14:58+0100\n"
+"PO-Revision-Date: 2022-04-11 17:06+0100\n"
 "Last-Translator: \n"
 "Language-Team: Français\n"
 "Language: fr_FR\n"
@@ -462,8 +462,8 @@ msgid "Something went wrong."
 msgstr "Une erreur s’est produite."
 
 #: src/Gateway/PayplugGateway.php:373
-msgid "Oney split payments"
-msgstr "Paiements Oney"
+msgid "3x 4x Oney payments"
+msgstr "Paiements 3x 4x Oney"
 
 #: src/Admin/Metabox.php:78
 msgid "Status"

@@ -400,7 +400,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'desc_tip'    => false
             ],
 			'oney'                => [
-				'title'       => __('Oney split payments', 'payplug'),
+				'title'       => __('3x 4x Oney payments', 'payplug'),
 				'type'        => 'checkbox',
 				'label'       => __('Activate', 'payplug'),
 				// TRAD

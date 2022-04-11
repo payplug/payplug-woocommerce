@@ -458,8 +458,8 @@ msgid "Something went wrong."
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:373
-msgid "Oney split payments"
-msgstr ""
+msgid "3x 4x Oney payments"
+msgstr "3x 4x Oney payments"
 
 #: src/Admin/Metabox.php:78
 msgid "Status"
