@@ -51,7 +51,7 @@ msgstr ""
 
 #: src/Gateway/PayplugGateway.php:377
 #, php-format
-msgid "Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€."
+msgid "Allow your customers to split payments into 3 or 4 installments, for orders between %s€ and %s€"
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:376
@@ -458,7 +458,7 @@ msgid "Something went wrong."
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:373
-msgid "Split Oney Payment"
+msgid "Oney split payments"
 msgstr ""
 
 #: src/Admin/Metabox.php:78
@@ -500,11 +500,11 @@ msgid "The order %s does not exist."
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:291
-msgid "The payment solution description displayed during checkout."
+msgid "The payment solution description displayed to your customers during checkout"
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:284
-msgid "The payment solution title displayed during checkout."
+msgid "The payment solution title displayed to your customers during checkout"
 msgstr ""
 
 #: src/Gateway/PayplugGatewayOney3x.php:122

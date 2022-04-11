@@ -3,10 +3,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-"
-"woocommerce\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2022-04-06 14:49+0100\n"
+"PO-Revision-Date: 2022-04-11 14:58+0100\n"
 "Last-Translator: \n"
 "Language-Team: English (United States)\n"
 "Language: en_US\n"
@@ -20,6 +19,12 @@ msgstr ""
 #: src/Gateway/PayplugGatewayRequirements.php:71
 msgid "payplug_PayplugGatewayRequirements_curl_requirement_curlinstalled"
 msgstr "The PHP cURL extension is installed and activated on your server."
+
+msgid "Allow your customers to split payments into 3 or 4 installments, for orders between %s€ and %s€"
+msgstr "Allow your customers to split payments into 3 or 4 installments, for orders between %s€ and %s€"
+
+msgid "Oney split payments"
+msgstr "Oney split payments"
 
 msgid "payplug_oneyIT_paywith"
 msgstr ""

@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2021-02-26 14:03+0000\n"
-"PO-Revision-Date: 2022-04-06 14:49+0100\n"
+"PO-Revision-Date: 2022-04-11 14:58+0100\n"
 "Last-Translator: \n"
 "Language-Team: Français\n"
 "Language: fr_FR\n"
@@ -52,8 +52,8 @@ msgstr "Réglages avancés"
 
 #: src/Gateway/PayplugGateway.php:377
 #, php-format
-msgid "Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€."
-msgstr "Permettez à vos clients d’échelonner le paiement de leurs commandes en 3x, 4x à partir de %s€ jusqu'à %s€."
+msgid "Allow your customers to split payments into 3 or 4 installments, for orders between %s€ and %s€"
+msgstr "Permettre à vos clients de payer en 3 ou 4 échéances, pour les commandes de %s€ à %s€."
 
 #: src/Gateway/PayplugGateway.php:376
 #, php-format
@@ -462,8 +462,8 @@ msgid "Something went wrong."
 msgstr "Une erreur s’est produite."
 
 #: src/Gateway/PayplugGateway.php:373
-msgid "Split Oney Payment"
-msgstr "Paiement fractionné Oney"
+msgid "Oney split payments"
+msgstr "Paiements Oney"
 
 #: src/Admin/Metabox.php:78
 msgid "Status"
@@ -504,12 +504,12 @@ msgid "The order %s does not exist."
 msgstr "La commande %s n'existe pas."
 
 #: src/Gateway/PayplugGateway.php:291
-msgid "The payment solution description displayed during checkout."
-msgstr "Personnalisez la description de la passerelle de paiement affichée lors de la commande."
+msgid "The payment solution description displayed to your customers during checkout"
+msgstr "Description de la solution de paiement présentée à vos clients sur la boutique"
 
 #: src/Gateway/PayplugGateway.php:284
-msgid "The payment solution title displayed during checkout."
-msgstr "Personnalisez le nom de la passerelle de paiement affiché lors de la commande."
+msgid "The payment solution title displayed to your customers during checkout"
+msgstr "Nom de la solution de paiement présenté à vos clients sur la boutique"
 
 #: src/Gateway/PayplugGatewayOney3x.php:122
 #: src/Gateway/PayplugGatewayOney3x.php:175 src/Front/PayplugOneyDetail.php:209
