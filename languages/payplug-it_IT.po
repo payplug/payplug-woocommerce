@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2021-02-26 14:03+0000\n"
-"PO-Revision-Date: 2022-04-06 14:49+0100\n"
+"PO-Revision-Date: 2022-04-11 17:06+0100\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -52,8 +52,8 @@ msgstr "Impostazioni avanzate"
 
 #: src/Gateway/PayplugGateway.php:377
 #, php-format
-msgid "Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€."
-msgstr ""
+msgid "Allow your customers to split payments into 3 or 4 installments, for orders between %s€ and %s€"
+msgstr "Permetti ai tuoi clienti di pagare in 3 o 4 rate, per gli acquisti da %s€ a %s€ euro"
 
 #: src/Gateway/PayplugGateway.php:376
 #, php-format
@@ -123,7 +123,7 @@ msgstr "Paga con carta di credito o debito"
 
 #: src/Gateway/PayplugGateway.php:289
 msgid "Description"
-msgstr ""
+msgstr "Descrizione"
 
 #: src/Gateway/PayplugGateway.php:619 src/Gateway/PayplugGateway.php:623
 msgid "Email"
@@ -464,8 +464,8 @@ msgid "Something went wrong."
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:373
-msgid "Split Oney Payment"
-msgstr ""
+msgid "3x 4x Oney payments"
+msgstr "Pagamenti rateali 3x 4x Oney"
 
 #: src/Admin/Metabox.php:78
 msgid "Status"
@@ -506,12 +506,12 @@ msgid "The order %s does not exist."
 msgstr "L'ordine %s non esiste."
 
 #: src/Gateway/PayplugGateway.php:291
-msgid "The payment solution description displayed during checkout."
-msgstr ""
+msgid "The payment solution description displayed to your customers during checkout"
+msgstr "La descrizione della soluzione di pagamento che vedranno i tuoi clienti durante il checkout"
 
 #: src/Gateway/PayplugGateway.php:284
-msgid "The payment solution title displayed during checkout."
-msgstr ""
+msgid "The payment solution title displayed to your customers during checkout"
+msgstr "Il nome della soluzione di pagamento che vedranno i tuoi clienti durante il checkout"
 
 #: src/Gateway/PayplugGatewayOney3x.php:122
 #: src/Gateway/PayplugGatewayOney3x.php:175 src/Front/PayplugOneyDetail.php:209
@@ -548,7 +548,7 @@ msgstr "Non è possibile effettuare il rimborso. La preghiamo di tentare nuovame
 
 #: src/Gateway/PayplugGateway.php:282
 msgid "Title"
-msgstr ""
+msgstr "Titolo"
 
 #: src/Gateway/PayplugGatewayOney3x.php:131
 msgid "Unavailable for the specified country."
