@@ -311,14 +311,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             'title'                   => [
                 'title'       => __('Title', 'payplug'),
                 'type'        => 'text',
-                'description' => __('The payment solution title displayed during checkout.', 'payplug'),
+                'description' => __('The payment solution title displayed to your customers during checkout', 'payplug'),
                 'default'     => _x('Credit card checkout', 'Default gateway title', 'payplug'),
                 'desc_tip'    => false,
             ],
             'description'             => [
                 'title'       => __('Description', 'payplug'),
                 'type'        => 'text',
-                'description' => __('The payment solution description displayed during checkout.', 'payplug'),
+                'description' => __('The payment solution description displayed to your customers during checkout', 'payplug'),
                 'default'     => '',
                 'desc_tip'    => false,
             ],
@@ -400,11 +400,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'desc_tip'    => false
             ],
 			'oney'                => [
-				'title'       => __('Split Oney Payment', 'payplug'),
+				'title'       => __('3x 4x Oney payments', 'payplug'),
 				'type'        => 'checkbox',
 				'label'       => __('Activate', 'payplug'),
 				// TRAD
-				'description' => sprintf(__('Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€.', 'payplug'), $this->min_oney_price, $this->max_oney_price) . $link,
+				'description' => sprintf(__('Allow your customers to split payments into 3 or 4 installments, for orders between %s€ and %s€', 'payplug'), $this->min_oney_price, $this->max_oney_price) . $link,
 				'default'     => 'no',
 				'desc_tip'    => false
 			],
@@ -1444,7 +1444,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                     <input type="hidden" name="save" value="logout">
                     <?php wp_nonce_field('payplug_user_logout', '_logoutaction'); ?>
                     |
-                    <a href="https://portal.payplug.com" target="_blank"><?php _e('Go to your PayPlug Portal', 'payplug'); ?></a>
+                    <a href="https://portal-qa.payplug.com" target="_blank"><?php _e('Go to your PayPlug Portal', 'payplug'); ?></a>
                 </p>
             </td>
         </tr>
