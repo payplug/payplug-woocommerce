@@ -650,6 +650,9 @@ msgstr ""
 msgid "payplug_oneyIT_popup-footer_pdf"
 msgstr ""
 
+msgid "payplug_oneyIT-without-fees_popup-footer_pdf"
+msgstr ""
+
 msgid "payplug_oneyIT_popup-url"
 msgstr ""
 

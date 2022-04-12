@@ -126,7 +126,7 @@ HTML;
  			<div class='oney-cgv-content oney-cgv-footer'>
 				{$f(sprintf(esc_html__('payplug_oneyIT_popup-footer', 'payplug'), $min, $max,
 			__("payplug_oneyIT_popup-url", "payplug"),
-			__("payplug_oneyIT_popup-footer_pdf", "payplug")))}
+			__("payplug_oneyIT-without-fees_popup-footer_pdf", "payplug")))}
 			</div>
 HTML;
 
