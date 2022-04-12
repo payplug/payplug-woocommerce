@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2021-02-26 14:03+0000\n"
-"PO-Revision-Date: 2022-04-11 17:06+0100\n"
+"PO-Revision-Date: 2022-04-12 22:36+0100\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -654,6 +654,9 @@ msgid "payplug_oneyIT_popup-footer"
 msgstr " 3x4x Oney è una dilazione di pagamento che non ricade nell’ambito di applicazione del credito ai consumatori di cui al Titolo VI, Capo II TUB, offerta da Oney Bank SA., capitale € 51.286.585 - 34 Avenue de Flandre 59170 Croix - RCS Lille, Metropole - 546 380 197 - n° Orias 07 023 261, che opera in Italia in regime di libera prestazione di servizi. L’utilizzo di 3x4xOney è riservato alle persone fisiche maggiorenni, per importi finanziabili compresi tra un minimo di €%s e un massimo di €%s con rimborsi rateali fino ad un massimo di 90 giorni ed è soggetto alla preventiva approvazione di Oney Bank SA. Oney Bank SA. prevede l’applicazione di una commissione fissa per l’utilizzo di 3x4xOney. Il cliente ha 14 giorni di tempo dalla data di conclusione di ciascun finanziamento per rinunciarvi e esercitare il diritto di recesso, senza spese e costi. Documenti informativi disponibili su %s %s"
 
 msgid "payplug_oneyIT_popup-footer_pdf"
+msgstr "<br><b><a href='https://www.payplug.com/hubfs/ONEY/payplug-italy.pdf' target='_empty' > Scopri di più </a></b>"
+
+msgid "payplug_oneyIT-without-fees_popup-footer_pdf"
 msgstr "<br><b><a href='https://www.payplug.com/hubfs/ONEY/payplug-italy-no-fees.pdf' target='_empty' > Scopri di più </a></b>"
 
 msgid "payplug_oneyIT_popup-url"
