@@ -46,8 +46,11 @@
 					} else {
 						pao.$payplug_oney_type.css('display', 'table-row')
 					}
+					$("[for=woocommerce_payplug_oney]").siblings('p.description').hide()
+
 				} else {
 					pao.$payplug_oney_type.css('display', 'none')
+					$("[for=woocommerce_payplug_oney]").siblings('p.description').show()
 				}
 			})
 			pao.init_oney_thresholds();
