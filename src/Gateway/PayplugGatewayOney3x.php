@@ -50,9 +50,6 @@ class PayplugGatewayOney3x extends PayplugGateway
 
         self::set_oney_configuration();
 
-		/*$this->min_oney_price = PayplugWoocommerceHelper::get_local_oney_threshold()['oney_thresholds_min'];
-		$this->max_oney_price = PayplugWoocommerceHelper::get_local_oney_threshold()['oney_thresholds_max'];*/
-
     }
 
     /**
