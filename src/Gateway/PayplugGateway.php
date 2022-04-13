@@ -427,8 +427,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	        'oney_thresholds'     => [
 		        'title'       => '',
 		        'type'        => 'oney_thresholds',
-		        'description' => sprintf(__('I would like to offer guaranteed payment in installments for amounts between %s€ and %s€.', 'payplug'),
-                    '<b class="min">' . $this->oney_thresholds_min . '</b>', '<b class="max">' . $this->oney_thresholds_max . '</b>'),
+		        'description' => sprintf(__('I would like to offer guaranteed payment in installments for amounts between %s and %s.', 'payplug'),
+                    '<b class="min">' . $this->oney_thresholds_min . '€</b>', '<b class="max">' . $this->oney_thresholds_max . '€</b>'),
 		        'desc_tip'    => false
 	        ],
 	        'oney_thresholds_min' => [
@@ -1546,9 +1546,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             </th>
             <td class="forminp" style="padding-top: 0px;">
                 <fieldset>
-                    <b class="d-inline-block"><?php echo $this->min_oney_price;?>€</b>
+					 <input type="number" id="payplug_oney_thresholds_min" min="<?php echo $this->min_oney_price;?>" max="<?php echo $this->max_oney_price;?>" class="payplug-admin-oney-threshold-input">
+                    <b class="d-inline-block">€</b>
                     <div class="d-inline-block" id="slider-range"></div>
-                    <b class="d-inline-block"><?php echo $this->max_oney_price;?>€</b>
+					<input type="number" id="payplug_oney_thresholds_max" min="<?php echo $this->min_oney_price;?>" max="<?php echo $this->max_oney_price;?>" class="payplug-admin-oney-threshold-input">
+					<b class="d-inline-block">€</b>
                     <div id="oney_thresholds_description"><?php echo $this->get_description_html($data); ?></div>
                 </fieldset>
             </td>

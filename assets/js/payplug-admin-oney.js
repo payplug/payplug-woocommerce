@@ -50,7 +50,8 @@
 					pao.$payplug_oney_type.css('display', 'none')
 				}
 			})
-			pao.init_oney_thresholds()
+			pao.init_oney_thresholds();
+
 		},
 		verifyOney: function()  {
 			pao.$payplug_oney.prop('disabled', true)
@@ -105,21 +106,60 @@
 				window.location.reload()
 			}
 		},
+
 		init_oney_thresholds: function () {
+
+			var min = Number(payplug_admin_config.min_oney_price);
+			var max = Number(payplug_admin_config.max_oney_price);
+
+			var $hidden_min_input = $("#woocommerce_payplug_oney_thresholds_min");
+			var $hidden_max_input = $("#woocommerce_payplug_oney_thresholds_max");
+
+			var $min_input = $("#payplug_oney_thresholds_min");
+			var $max_input = $("#payplug_oney_thresholds_max");
+
+			$min_input.val(Number($hidden_min_input.val()));
+			$max_input.val(Number($hidden_max_input.val()));
+
 			$( "#slider-range" ).slider({
 				range: true,
-				min: Number(payplug_admin_config.min_oney_price),
-				max: Number(payplug_admin_config.max_oney_price),
+				min: min,
+				max: max,
+				step: 10,
 				values: [payplug_admin_config.oney_thresholds_min, payplug_admin_config.oney_thresholds_max],
 				slide: function( event, ui ) {
-					$( "#woocommerce_payplug_oney_thresholds_min" ).val( ui.values[ 0 ] )
-					$( "#woocommerce_payplug_oney_thresholds_max" ).val( ui.values[ 1 ])
-					$("#oney_thresholds_description .min").html(ui.values[ 0 ])
-					$("#oney_thresholds_description .max").html(ui.values[ 1 ])
-					$("#slider-range .ui-slider-handle:first-of-type .tooltip").html(ui.values[ 0 ] + '€')
-					$("#slider-range .ui-slider-handle:last-of-type .tooltip").html(ui.values[ 1 ] + '€')
+
+					$hidden_min_input.val( ui.values[ 0 ] );
+					$hidden_max_input.val( ui.values[ 1 ]);
+
+					$min_input.val( Number(ui.values[ 0 ]) );
+					$max_input.val( Number(ui.values[ 1 ]) );
+
+					$("#oney_thresholds_description .min, #slider-range .ui-slider-handle:first-of-type .tooltip").text( ui.values[ 0 ] + '€');
+					$("#oney_thresholds_description .max, #slider-range .ui-slider-handle:last-of-type .tooltip").text( ui.values[ 1 ] + '€');
 				}
-			})
+			});
+
+			$("#payplug_oney_thresholds_min, #payplug_oney_thresholds_max").on( "change", function() {
+
+				if( Number($max_input.val()) < Number($min_input.val()) ){
+					$max_input.val( max );
+					$min_input.val( min );
+				}
+
+				if( $min_input.val() < min )
+					$min_input.val(min);
+
+				if( $max_input.val() > max )
+					$max_input.val( max );
+
+				//slider values
+				$( "#slider-range"  ).slider( "option", "values", [ $min_input.val(), $max_input.val() ]);
+				$("#oney_thresholds_description .min, #slider-range .ui-slider-handle:first-of-type .tooltip").text( $min_input.val() + '€');
+				$("#oney_thresholds_description .max, #slider-range .ui-slider-handle:last-of-type .tooltip").text( $max_input.val() + '€');
+
+			});
+
 			$("#oney_thresholds_description").html($("#oney_thresholds_description").html().replaceAll("€", "<b>€</b>"))
 			$('.ui-slider-handle').html('<span class="tooltip"></span>')
 			$("#slider-range .ui-slider-handle:first-of-type .tooltip").html(payplug_admin_config.oney_thresholds_min + '€')
