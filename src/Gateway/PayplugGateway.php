@@ -123,6 +123,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             $this->init_payplug();
         }else{
 			delete_option('woocommerce_payplug_settings');
+			set_transient( PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', [])), null );
 		}
 
         $this->title          = $this->get_option('title');
