@@ -642,7 +642,14 @@ class PayplugWoocommerceHelper {
 	public static function UpdateCountryOption($options){
 
 		try {
-			$response = Authentication::getAccount(new Payplug($options['payplug_live_key']));
+
+			//fail safe for non activated account
+			$key = $options['mode'] === "yes" && !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : $options['payplug_test_key'];
+			if( empty($options['payplug_live_key'] )){
+				$options['mode'] = "no";
+			}
+
+			$response = Authentication::getAccount(new Payplug($key));
 
 			if (isset($response['httpResponse']['country'])) {
 				$options['payplug_merchant_country'] = $response['httpResponse']['country'];
