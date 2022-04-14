@@ -123,6 +123,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             $this->init_payplug();
         }else{
 			delete_option('woocommerce_payplug_settings');
+			set_transient( PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', [])), null );
 		}
 
         $this->title          = $this->get_option('title');
@@ -426,8 +427,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	        'oney_thresholds'     => [
 		        'title'       => '',
 		        'type'        => 'oney_thresholds',
-		        'description' => sprintf(__('I would like to offer guaranteed payment in installments for amounts between %s€ and %s€.', 'payplug'),
-                    '<b class="min">' . $this->oney_thresholds_min . '</b>', '<b class="max">' . $this->oney_thresholds_max . '</b>'),
+		        'description' => sprintf(__('I would like to offer guaranteed payment in installments for amounts between %s and %s.', 'payplug'),
+                    '<b class="min">' . $this->oney_thresholds_min . '€</b>', '<b class="max">' . $this->oney_thresholds_max . '€</b>'),
 		        'desc_tip'    => false
 	        ],
 	        'oney_thresholds_min' => [
@@ -1187,8 +1188,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function validate_order_amount($amount)
     {
         if (
-            $amount < $this->oney_thresholds_min
-            || $amount > $this->oney_thresholds_max
+            $amount < PayplugWoocommerceHelper::get_minimum_amount()
+            || $amount > PayplugWoocommerceHelper::get_maximum_amount()
         ) {
             return new \WP_Error(
                 'invalid order amount',
@@ -1545,10 +1546,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             </th>
             <td class="forminp" style="padding-top: 0px;">
                 <fieldset>
-                    <b class="d-inline-block"><?php echo $this->min_oney_price;?>€</b>
+					<div id="oney_thresholds_description"><?php echo $this->get_description_html($data); ?></div>
+					 <input type="number" id="payplug_oney_thresholds_min" min="<?php echo $this->min_oney_price;?>" max="<?php echo $this->max_oney_price;?>" class="payplug-admin-oney-threshold-input">
+                    <b class="d-inline-block">€</b>
                     <div class="d-inline-block" id="slider-range"></div>
-                    <b class="d-inline-block"><?php echo $this->max_oney_price;?>€</b>
-                    <div id="oney_thresholds_description"><?php echo $this->get_description_html($data); ?></div>
+					<input type="number" id="payplug_oney_thresholds_max" min="<?php echo $this->min_oney_price;?>" max="<?php echo $this->max_oney_price;?>" class="payplug-admin-oney-threshold-input">
+					<b class="d-inline-block">€</b>
                 </fieldset>
             </td>
         </tr>
