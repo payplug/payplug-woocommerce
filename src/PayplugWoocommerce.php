@@ -154,10 +154,6 @@ class PayplugWoocommerce {
 		//if live and don't have country setted on the option
 		if ( !isset($options['payplug_merchant_country']) ) {
 			$options['payplug_merchant_country'] = PayplugWoocommerceHelper::UpdateCountryOption($options);
-
-		}else if( isset($options['payplug_test_key']) && !isset($options['payplug_merchant_country']) ){
-			$options['payplug_merchant_country'] = "FR";
-
 		}
 
 		//failsafe
