@@ -160,6 +160,8 @@
 				$( "#slider-range"  ).slider( "option", "values", [ $min_input.val(), $max_input.val() ]);
 				$("#oney_thresholds_description .min, #slider-range .ui-slider-handle:first-of-type .tooltip").text( $min_input.val() + '€');
 				$("#oney_thresholds_description .max, #slider-range .ui-slider-handle:last-of-type .tooltip").text( $max_input.val() + '€');
+				$("#woocommerce_payplug_oney_thresholds_min").val($min_input.val());
+				$("#woocommerce_payplug_oney_thresholds_max").val($max_input.val());
 
 			});
 
