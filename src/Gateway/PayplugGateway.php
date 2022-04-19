@@ -427,8 +427,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	        'oney_thresholds'     => [
 		        'title'       => '',
 		        'type'        => 'oney_thresholds',
-		        'description' => sprintf(__('I would like to offer guaranteed payment in installments for amounts between %s and %s.', 'payplug'),
-                    '<b class="min">' . $this->oney_thresholds_min . '€</b>', '<b class="max">' . $this->oney_thresholds_max . '€</b>'),
+		        'description' => sprintf(__('I would like to offer guaranteed payment in installments for amounts between %s€ and %s€.', 'payplug'),
+                    '<b class="min">' . $this->oney_thresholds_min . '</b>', '<b class="max">' . $this->oney_thresholds_max . '</b>'),
 		        'desc_tip'    => false
 	        ],
 	        'oney_thresholds_min' => [
