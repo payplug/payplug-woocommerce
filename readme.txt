@@ -84,7 +84,7 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 * Oney Italy
 * Oney Threshold
 * Minor fixes
-* Tested up to Woocommerce 5.9
+* Tested up to Woocommerce 6.4
 * Tested up to Wordpress 5.9
 
 = 1.6.0 =
