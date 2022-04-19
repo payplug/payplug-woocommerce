@@ -135,8 +135,10 @@
 					$min_input.val( Number(ui.values[ 0 ]) );
 					$max_input.val( Number(ui.values[ 1 ]) );
 
-					$("#oney_thresholds_description .min, #slider-range .ui-slider-handle:first-of-type .tooltip").text( ui.values[ 0 ] + '€');
-					$("#oney_thresholds_description .max, #slider-range .ui-slider-handle:last-of-type .tooltip").text( ui.values[ 1 ] + '€');
+					$("#slider-range .ui-slider-handle:first-of-type .tooltip").text( ui.values[ 0 ] + '€');
+					$("#slider-range .ui-slider-handle:last-of-type .tooltip").text( ui.values[ 1 ] + '€');
+					$("#oney_thresholds_description .min").text( ui.values[ 0 ]);
+					$("#oney_thresholds_description .max").text( ui.values[ 1 ]);
 				}
 			});
 
@@ -155,8 +157,10 @@
 
 				//slider values
 				$( "#slider-range"  ).slider( "option", "values", [ $min_input.val(), $max_input.val() ]);
-				$("#oney_thresholds_description .min, #slider-range .ui-slider-handle:first-of-type .tooltip").text( $min_input.val() + '€');
-				$("#oney_thresholds_description .max, #slider-range .ui-slider-handle:last-of-type .tooltip").text( $max_input.val() + '€');
+				$("#slider-range .ui-slider-handle:first-of-type .tooltip").text( $min_input.val() + '€');
+				$("#slider-range .ui-slider-handle:last-of-type .tooltip").text( $max_input.val() + '€');
+				$("#oney_thresholds_description .min").text( $min_input.val());
+				$("#oney_thresholds_description .max").text( $max_input.val());
 				$("#woocommerce_payplug_oney_thresholds_min").val($min_input.val());
 				$("#woocommerce_payplug_oney_thresholds_max").val($max_input.val());
 
