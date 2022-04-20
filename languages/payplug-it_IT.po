@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2021-02-26 14:03+0000\n"
-"PO-Revision-Date: 2022-02-15 22:36+0000\n"
+"PO-Revision-Date: 2022-04-12 22:36+0100\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -20,11 +20,13 @@ msgstr ""
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
 msgstr ""
 
-#: src/Gateway/PayplugGatewayOney4x.php:47 src/Gateway/PayplugGatewayOney3x.php:79
+#: src/Gateway/PayplugGatewayOney4x.php:47
+#: src/Gateway/PayplugGatewayOney3x.php:79
 msgid "1st monthly payment"
 msgstr "1° mensilità"
 
-#: src/Gateway/PayplugGatewayOney4x.php:51 src/Gateway/PayplugGatewayOney3x.php:83
+#: src/Gateway/PayplugGatewayOney4x.php:51
+#: src/Gateway/PayplugGatewayOney3x.php:83
 msgid "2nd monthly payment"
 msgstr "2° mensilità"
 
@@ -50,8 +52,8 @@ msgstr "Impostazioni avanzate"
 
 #: src/Gateway/PayplugGateway.php:377
 #, php-format
-msgid "Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€."
-msgstr ""
+msgid "Allow your customers to split payments into 3 or 4 installments, for orders between %s€ and %s€"
+msgstr "Permetti ai tuoi clienti di pagare in 3 o 4 rate, per gli acquisti da %s€ a %s€ euro"
 
 #: src/Gateway/PayplugGateway.php:376
 #, php-format
@@ -66,7 +68,8 @@ msgstr "Permetti ai tuoi clienti di salvare i dati delle carte di credito per se
 msgid "Amount"
 msgstr "Importo"
 
-#: src/Admin/WoocommerceActions.php:74 src/Admin/Ajax.php:61 src/Admin/Ajax.php:70
+#: src/Admin/WoocommerceActions.php:74 src/Admin/Ajax.php:61
+#: src/Admin/Ajax.php:70
 msgid "An error occured with PayPlug gateway. Please make sure PayPlug settings are correct."
 msgstr "Si è verificato un errore sul gateway PayPlug. Assicurati che PayPlug sia stato configurato correttamente."
 
@@ -78,7 +81,9 @@ msgstr "Si è verificato un errore nel processo di recupero dei dati per il paga
 msgid "An error occurred while collecting refund information from PayPlug."
 msgstr "Si è verificato un errore nel processo di recupero dei dati per il rimborso."
 
-#: src/Gateway/PayplugGatewayOney4x.php:43 src/Gateway/PayplugGatewayOney3x.php:75 src/Front/PayplugOneyDetail.php:133 src/Front/PayplugOneyDetail.php:143
+#: src/Gateway/PayplugGatewayOney4x.php:43
+#: src/Gateway/PayplugGatewayOney3x.php:75 src/Front/PayplugOneyDetail.php:133
+#: src/Front/PayplugOneyDetail.php:143
 msgid "Bring"
 msgstr "Apporto"
 
@@ -118,7 +123,7 @@ msgstr "Paga con carta di credito o debito"
 
 #: src/Gateway/PayplugGateway.php:289
 msgid "Description"
-msgstr ""
+msgstr "Descrizione"
 
 #: src/Gateway/PayplugGateway.php:619 src/Gateway/PayplugGateway.php:623
 msgid "Email"
@@ -376,7 +381,9 @@ msgstr "PAGAMENTO"
 msgid "Payment page"
 msgstr "Pagina di pagamento"
 
-#: src/Gateway/PayplugGatewayOney3x.php:170 src/Gateway/PayplugGateway.php:897 src/Gateway/PayplugGateway.php:900 src/Gateway/PayplugGateway.php:961 src/Gateway/PayplugGateway.php:964
+#: src/Gateway/PayplugGatewayOney3x.php:170 src/Gateway/PayplugGateway.php:897
+#: src/Gateway/PayplugGateway.php:900 src/Gateway/PayplugGateway.php:961
+#: src/Gateway/PayplugGateway.php:964
 msgid "Payment processing failed. Please retry."
 msgstr "Il tentativo di pagamento non è andato a buon fine. La invitiamo a provare nuovamente."
 
@@ -457,8 +464,8 @@ msgid "Something went wrong."
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:373
-msgid "Split Oney Payment"
-msgstr ""
+msgid "3x 4x Oney payments"
+msgstr "Pagamenti rateali 3x 4x Oney"
 
 #: src/Admin/Metabox.php:78
 msgid "Status"
@@ -499,14 +506,15 @@ msgid "The order %s does not exist."
 msgstr "L'ordine %s non esiste."
 
 #: src/Gateway/PayplugGateway.php:291
-msgid "The payment solution description displayed during checkout."
-msgstr ""
+msgid "The payment solution description displayed to your customers during checkout"
+msgstr "La descrizione della soluzione di pagamento che vedranno i tuoi clienti durante il checkout"
 
 #: src/Gateway/PayplugGateway.php:284
-msgid "The payment solution title displayed during checkout."
-msgstr ""
+msgid "The payment solution title displayed to your customers during checkout"
+msgstr "Il nome della soluzione di pagamento che vedranno i tuoi clienti durante il checkout"
 
-#: src/Gateway/PayplugGatewayOney3x.php:122 src/Gateway/PayplugGatewayOney3x.php:175 src/Front/PayplugOneyDetail.php:209
+#: src/Gateway/PayplugGatewayOney3x.php:122
+#: src/Gateway/PayplugGatewayOney3x.php:175 src/Front/PayplugOneyDetail.php:209
 msgid "The payment with Oney is unavailable because you have more than %s items in your cart."
 msgstr "Il pagamento tramite Oney non è disponibile perché hai più di %s prodotti nel tuo carrello."
 
@@ -528,7 +536,8 @@ msgstr "La versione di PHP del tuo server non è compatibile con il modulo. Il t
 msgid "The PHP version on your server is valid."
 msgstr "La versione PHP del tuo server è compatibile con l'estensione."
 
-#: src/Gateway/PayplugGatewayOney3x.php:116 src/Gateway/PayplugGatewayOney3x.php:150 src/Front/PayplugOneyDetail.php:206
+#: src/Gateway/PayplugGatewayOney3x.php:116
+#: src/Gateway/PayplugGatewayOney3x.php:150 src/Front/PayplugOneyDetail.php:206
 #, php-format
 msgid "The total amount of your order should be between %s€ and %s€ to pay with Oney."
 msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ e %s€ per pagare tramite Oney"
@@ -539,7 +548,7 @@ msgstr "Non è possibile effettuare il rimborso. La preghiamo di tentare nuovame
 
 #: src/Gateway/PayplugGateway.php:282
 msgid "Title"
-msgstr ""
+msgstr "Titolo"
 
 #: src/Gateway/PayplugGatewayOney3x.php:131
 msgid "Unavailable for the specified country."
@@ -622,6 +631,36 @@ msgstr "Paga in 4x rate senza spese con carta di gradito grazie a Oney"
 
 msgid "WITHOUT FEES"
 msgstr "SENZA SPESE"
+
+msgid "I would like to offer guaranteed payment in installments for amounts between %s€ and %s€."
+msgstr "Desidero proporre il pagamento a rate garantito per importi compresi tra %s€ e %s€."
+
+msgid "The amount must be between %s€ and %s€."
+msgstr "L’importo deve essere compreso tra %s€ e %s€."
+
+msgid "Please note that the minimum amount entered is greater than the maximum amount entered."
+msgstr "Attenzione, l’importo minimo inserito è superiore all’importo massimo inserito."
+
+msgid "payplug_oneyIT_paywith"
+msgstr "PAGHI IN"
+
+msgid "payplug_oneyIT_popup-title"
+msgstr "PAGHI IN 3 o 4 RATE"
+
+msgid "payplug_oneyIT_popup-withoutfees-title"
+msgstr "NESSUNA COMMISSIONE"
+
+msgid "payplug_oneyIT_popup-footer"
+msgstr " 3x4x Oney è una dilazione di pagamento che non ricade nell’ambito di applicazione del credito ai consumatori di cui al Titolo VI, Capo II TUB, offerta da Oney Bank SA., capitale € 51.286.585 - 34 Avenue de Flandre 59170 Croix - RCS Lille, Metropole - 546 380 197 - n° Orias 07 023 261, che opera in Italia in regime di libera prestazione di servizi. L’utilizzo di 3x4xOney è riservato alle persone fisiche maggiorenni, per importi finanziabili compresi tra un minimo di €%s e un massimo di €%s con rimborsi rateali fino ad un massimo di 90 giorni ed è soggetto alla preventiva approvazione di Oney Bank SA. Oney Bank SA. prevede l’applicazione di una commissione fissa per l’utilizzo di 3x4xOney. Il cliente ha 14 giorni di tempo dalla data di conclusione di ciascun finanziamento per rinunciarvi e esercitare il diritto di recesso, senza spese e costi. Documenti informativi disponibili su %s %s"
+
+msgid "payplug_oneyIT_popup-footer_pdf"
+msgstr "<br><b><a href='https://www.payplug.com/hubfs/ONEY/payplug-italy.pdf' target='_empty' > Scopri di più </a></b>"
+
+msgid "payplug_oneyIT-without-fees_popup-footer_pdf"
+msgstr "<br><b><a href='https://www.payplug.com/hubfs/ONEY/payplug-italy-no-fees.pdf' target='_empty' > Scopri di più </a></b>"
+
+msgid "payplug_oneyIT_popup-url"
+msgstr "<a href='https://www.oney.it' target='_empty' > www.oney.it </a>"
 
 #~ msgid "Cart size cannot be greater than 1000 with Oney."
 #~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."

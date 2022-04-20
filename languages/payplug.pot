@@ -51,7 +51,7 @@ msgstr ""
 
 #: src/Gateway/PayplugGateway.php:377
 #, php-format
-msgid "Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€."
+msgid "Allow your customers to split payments into 3 or 4 installments, for orders between %s€ and %s€"
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:376
@@ -458,8 +458,8 @@ msgid "Something went wrong."
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:373
-msgid "Split Oney Payment"
-msgstr ""
+msgid "3x 4x Oney payments"
+msgstr "3x 4x Oney payments"
 
 #: src/Admin/Metabox.php:78
 msgid "Status"
@@ -500,11 +500,11 @@ msgid "The order %s does not exist."
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:291
-msgid "The payment solution description displayed during checkout."
+msgid "The payment solution description displayed to your customers during checkout"
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:284
-msgid "The payment solution title displayed during checkout."
+msgid "The payment solution title displayed to your customers during checkout"
 msgstr ""
 
 #: src/Gateway/PayplugGatewayOney3x.php:122
@@ -627,4 +627,34 @@ msgid "Pay by credit card in 4x installments without fees with Oney"
 msgstr ""
 
 msgid "WITHOUT FEES"
+msgstr ""
+
+msgid "I would like to offer guaranteed payment in installments for amounts between %s€ and %s€."
+msgstr ""
+
+msgid "The amount must be between %s€ and %s€."
+msgstr ""
+
+msgid "Please note that the minimum amount entered is greater than the maximum amount entered."
+msgstr ""
+
+msgid "payplug_oneyIT_paywith"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-title"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-footer"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-footer_pdf"
+msgstr ""
+
+msgid "payplug_oneyIT-without-fees_popup-footer_pdf"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-url"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-withoutfees-title"
 msgstr ""

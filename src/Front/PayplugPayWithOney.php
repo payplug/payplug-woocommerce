@@ -5,7 +5,7 @@ namespace Payplug\PayplugWoocommerce\Front;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
-class PayplugPayWithOney extends PayplugOney
+class PayplugPayWithOney
 {
 
 	/**
@@ -15,9 +15,10 @@ class PayplugPayWithOney extends PayplugOney
 	 */
 	public function check_oney_frontend() {
 
-		if ( ( is_cart() || is_checkout()) && PayplugWoocommerceHelper::is_oney_available() ) {
+		if ( ( is_cart() || is_checkout()) && PayplugWoocommerceHelper::is_oney_available()) {
 
 			add_action('woocommerce_cart_totals_after_order_total', [$this, 'oney_simulate_payment_detail']);
+		//	add_action('woocommerce_review_order_before_payment', [$this, 'oney_simulate_payment_detail']);
 
 			add_action( 'wp_enqueue_scripts', [$this, 'add_oney_css'] );
 

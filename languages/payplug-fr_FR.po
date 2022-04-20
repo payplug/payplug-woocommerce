@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2021-02-26 14:03+0000\n"
-"PO-Revision-Date: 2022-02-15 22:36+0000\n"
+"PO-Revision-Date: 2022-04-12 22:36+0100\n"
 "Last-Translator: \n"
 "Language-Team: Français\n"
 "Language: fr_FR\n"
@@ -20,11 +20,13 @@ msgstr ""
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
 msgstr "J'ai intégré les mentions légales Oney aux CGVs de mon site."
 
-#: src/Gateway/PayplugGatewayOney4x.php:47 src/Gateway/PayplugGatewayOney3x.php:79
+#: src/Gateway/PayplugGatewayOney4x.php:47
+#: src/Gateway/PayplugGatewayOney3x.php:79
 msgid "1st monthly payment"
 msgstr "1ère mensualité"
 
-#: src/Gateway/PayplugGatewayOney4x.php:51 src/Gateway/PayplugGatewayOney3x.php:83
+#: src/Gateway/PayplugGatewayOney4x.php:51
+#: src/Gateway/PayplugGatewayOney3x.php:83
 msgid "2nd monthly payment"
 msgstr "2ème mensualité"
 
@@ -50,8 +52,8 @@ msgstr "Réglages avancés"
 
 #: src/Gateway/PayplugGateway.php:377
 #, php-format
-msgid "Allow customers to spread out payments over 3 or 4 installments from %s€ to %s€."
-msgstr "Permettez à vos clients d’échelonner le paiement de leurs commandes en 3x, 4x à partir de %s€ jusqu'à %s€."
+msgid "Allow your customers to split payments into 3 or 4 installments, for orders between %s€ and %s€"
+msgstr "Permettre à vos clients de payer en 3 ou 4 échéances, pour les commandes de %s€ à %s€."
 
 #: src/Gateway/PayplugGateway.php:376
 #, php-format
@@ -66,7 +68,8 @@ msgstr "Permettez à vos clients d'enregistrer leurs coordonnées de carte de pa
 msgid "Amount"
 msgstr "Montant"
 
-#: src/Admin/WoocommerceActions.php:74 src/Admin/Ajax.php:61 src/Admin/Ajax.php:70
+#: src/Admin/WoocommerceActions.php:74 src/Admin/Ajax.php:61
+#: src/Admin/Ajax.php:70
 msgid "An error occured with PayPlug gateway. Please make sure PayPlug settings are correct."
 msgstr "Une erreur est survenue avec PayPlug. Veuillez-vous assurer que le portail PayPlug est bien configuré."
 
@@ -78,7 +81,9 @@ msgstr "Une erreur est survenue lors de la récupération des données de paieme
 msgid "An error occurred while collecting refund information from PayPlug."
 msgstr "Une erreur est survenue lors de la récupération des données de remboursement depuis PayPlug."
 
-#: src/Gateway/PayplugGatewayOney4x.php:43 src/Gateway/PayplugGatewayOney3x.php:75 src/Front/PayplugOneyDetail.php:133 src/Front/PayplugOneyDetail.php:143
+#: src/Gateway/PayplugGatewayOney4x.php:43
+#: src/Gateway/PayplugGatewayOney3x.php:75 src/Front/PayplugOneyDetail.php:133
+#: src/Front/PayplugOneyDetail.php:143
 msgid "Bring"
 msgstr "Apport"
 
@@ -374,7 +379,9 @@ msgstr "PAIEMENT"
 msgid "Payment page"
 msgstr "Page de paiement"
 
-#: src/Gateway/PayplugGatewayOney3x.php:170 src/Gateway/PayplugGateway.php:897 src/Gateway/PayplugGateway.php:900 src/Gateway/PayplugGateway.php:961 src/Gateway/PayplugGateway.php:964
+#: src/Gateway/PayplugGatewayOney3x.php:170 src/Gateway/PayplugGateway.php:897
+#: src/Gateway/PayplugGateway.php:900 src/Gateway/PayplugGateway.php:961
+#: src/Gateway/PayplugGateway.php:964
 msgid "Payment processing failed. Please retry."
 msgstr "Le traitement du paiement a échoué. Merci de réessayer."
 
@@ -455,8 +462,8 @@ msgid "Something went wrong."
 msgstr "Une erreur s’est produite."
 
 #: src/Gateway/PayplugGateway.php:373
-msgid "Split Oney Payment"
-msgstr "Paiement fractionné Oney"
+msgid "3x 4x Oney payments"
+msgstr "Paiements 3x 4x Oney"
 
 #: src/Admin/Metabox.php:78
 msgid "Status"
@@ -497,14 +504,15 @@ msgid "The order %s does not exist."
 msgstr "La commande %s n'existe pas."
 
 #: src/Gateway/PayplugGateway.php:291
-msgid "The payment solution description displayed during checkout."
-msgstr "Personnalisez la description de la passerelle de paiement affichée lors de la commande."
+msgid "The payment solution description displayed to your customers during checkout"
+msgstr "Description de la solution de paiement présentée à vos clients sur la boutique"
 
 #: src/Gateway/PayplugGateway.php:284
-msgid "The payment solution title displayed during checkout."
-msgstr "Personnalisez le nom de la passerelle de paiement affiché lors de la commande."
+msgid "The payment solution title displayed to your customers during checkout"
+msgstr "Nom de la solution de paiement présenté à vos clients sur la boutique"
 
-#: src/Gateway/PayplugGatewayOney3x.php:122 src/Gateway/PayplugGatewayOney3x.php:175 src/Front/PayplugOneyDetail.php:209
+#: src/Gateway/PayplugGatewayOney3x.php:122
+#: src/Gateway/PayplugGatewayOney3x.php:175 src/Front/PayplugOneyDetail.php:209
 msgid "The payment with Oney is unavailable because you have more than %s items in your cart."
 msgstr "Votre panier doit contenir moins de %s articles pour pouvoir payer avec Oney."
 
@@ -526,7 +534,8 @@ msgstr "La version PHP de votre serveur n'est pas compatible avec l'extension. V
 msgid "The PHP version on your server is valid."
 msgstr "La version PHP de votre serveur est compatible avec l'extension."
 
-#: src/Gateway/PayplugGatewayOney3x.php:116 src/Gateway/PayplugGatewayOney3x.php:150 src/Front/PayplugOneyDetail.php:206
+#: src/Gateway/PayplugGatewayOney3x.php:116
+#: src/Gateway/PayplugGatewayOney3x.php:150 src/Front/PayplugOneyDetail.php:206
 #, php-format
 msgid "The total amount of your order should be between %s€ and %s€ to pay with Oney."
 msgstr "Le montant total de votre panier doit être compris entre %s€ et %s€ pour payer avec Oney."
@@ -623,3 +632,33 @@ msgstr "Payer en 4x sans frais par carte avec Oney"
 
 msgid "WITHOUT FEES"
 msgstr "SANS FRAIS"
+
+msgid "I would like to offer guaranteed payment in installments for amounts between %s€ and %s€."
+msgstr "Je souhaite proposer le paiement fractionné garanti pour des montants compris entre %s€ et %s€."
+
+msgid "The amount must be between %s€ and %s€."
+msgstr "Le montant doit être compris entre %s€ et %s€."
+
+msgid "Please note that the minimum amount entered is greater than the maximum amount entered."
+msgstr "Attention, le montant minimum renseigné est supérieur au montant maximal renseigné."
+
+msgid "payplug_oneyIT_paywith"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-title"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-footer"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-footer_pdf"
+msgstr ""
+
+msgid "payplug_oneyIT-without-fees_popup-footer_pdf"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-url"
+msgstr ""
+
+msgid "payplug_oneyIT_popup-withoutfees-title"
+msgstr ""
