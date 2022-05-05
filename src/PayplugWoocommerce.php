@@ -55,6 +55,12 @@ class PayplugWoocommerce {
 	public $ajax;
 
 	/**
+	 * The unique identifier of this plugin.
+	 *
+	 */
+	const PLUGIN_ID         = 'plugin-name';
+
+	/**
 	 * Get the singleton instance.
 	 *
 	 * @return PayplugWoocommerce
@@ -160,7 +166,7 @@ class PayplugWoocommerce {
 		if( empty($options['payplug_merchant_country']) ){
 			return ;
 		}
-		
+
 		if( !class_exists( "\\Payplug\\PayplugWoocommerce\\Front\\PayplugOney\\Country\\Oney" .$options['payplug_merchant_country'] )){
 			return ;
 		}
