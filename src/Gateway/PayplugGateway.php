@@ -1445,7 +1445,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                     <input type="hidden" name="save" value="logout">
                     <?php wp_nonce_field('payplug_user_logout', '_logoutaction'); ?>
                     |
-                    <a href="https://portal-qa.payplug.com" target="_blank"><?php _e('Go to your PayPlug Portal', 'payplug'); ?></a>
+                    <a href="https://portal.payplug.com" target="_blank"><?php _e('Go to your PayPlug Portal', 'payplug'); ?></a>
                 </p>
             </td>
         </tr>
