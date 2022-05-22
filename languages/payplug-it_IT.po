@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2021-02-26 14:03+0000\n"
-"PO-Revision-Date: 2022-04-12 22:36+0100\n"
+"PO-Revision-Date: 2022-05-22 22:53+0100\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -661,6 +661,12 @@ msgstr "<br><b><a href='https://www.payplug.com/hubfs/ONEY/payplug-italy-no-fees
 
 msgid "payplug_oneyIT_popup-url"
 msgstr "<a href='https://www.oney.it' target='_empty' > www.oney.it </a>"
+
+msgid "payplug_bancontact_title"
+msgstr "Paga con Bancontact"
+
+msgid "payplug_bancontact_description"
+msgstr ""
 
 #~ msgid "Cart size cannot be greater than 1000 with Oney."
 #~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
