@@ -658,3 +658,9 @@ msgstr ""
 
 msgid "payplug_oneyIT_popup-withoutfees-title"
 msgstr ""
+
+msgid "payplug_bancontact_title"
+msgstr ""
+
+msgid "payplug_bancontact_description"
+msgstr ""
