@@ -664,3 +664,12 @@ msgstr ""
 
 msgid "payplug_bancontact_description"
 msgstr ""
+
+msgid "payplug_bancontact_activate_title"
+msgstr ""
+
+msgid "payplug_bancontact_activate_label"
+msgstr ""
+
+msgid "payplug_bancontact_activation_description"
+msgstr ""
