@@ -400,6 +400,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'default'     => 'no',
 				'desc_tip'    => false
             ],
+			'bancontact'                 => [
+				'title'       => __('payplug_bancontact_title', 'payplug'),
+				'type'        => 'checkbox',
+				'label'       => __('Activate', 'payplug'),
+				'description' => __('payplug_bancontact_activate_description', 'payplug'),
+				'default'     => 'no',
+			],
 			'oney'                => [
 				'title'       => __('3x 4x Oney payments', 'payplug'),
 				'type'        => 'checkbox',
@@ -612,6 +619,21 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             ['jquery-ui-dialog'],
             PAYPLUG_GATEWAY_VERSION
         );
+
+		wp_enqueue_script(
+			'payplug-gateway-admin-bancontact',
+			PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin-bancontact.js',
+			['jquery-ui-dialog'],
+			PAYPLUG_GATEWAY_VERSION
+		);
+
+		wp_localize_script('payplug-gateway-admin-bancontact', 'payplug_admin_config', array(
+			'ajax_url'      => admin_url('admin-ajax.php'),
+			'has_live_key'  => (false === $this->has_api_key('live')) ? false : true,
+			'btn_ok'        => _x('Ok', 'modal', 'payplug'),
+			'btn_label'     => _x('Cancel', 'modal', 'payplug'),
+			'general_error' => _x('Something went wrong. Please refresh the page and retry.', 'modal', 'payplug'),
+		));
 
         wp_localize_script('payplug-gateway-admin', 'payplug_admin_config', array(
             'ajax_url'      => admin_url('admin-ajax.php'),

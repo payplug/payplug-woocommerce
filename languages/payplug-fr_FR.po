@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2021-02-26 14:03+0000\n"
-"PO-Revision-Date: 2022-04-12 22:36+0100\n"
+"PO-Revision-Date: 2022-05-23 22:40+0100\n"
 "Last-Translator: \n"
 "Language-Team: Français\n"
 "Language: fr_FR\n"
@@ -661,4 +661,19 @@ msgid "payplug_oneyIT_popup-url"
 msgstr ""
 
 msgid "payplug_oneyIT_popup-withoutfees-title"
+msgstr ""
+
+msgid "payplug_bancontact_title"
+msgstr "Payer avec Bancontact"
+
+msgid "payplug_bancontact_description"
+msgstr ""
+
+msgid "payplug_bancontact_activate_title"
+msgstr "Activer les paiements Bancontact"
+
+msgid "payplug_bancontact_activate_label"
+msgstr "Activer les paiements Bancontact (Bêta)"
+
+msgid "payplug_bancontact_activation_description"
 msgstr ""
