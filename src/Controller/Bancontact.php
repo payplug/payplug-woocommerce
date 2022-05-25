@@ -69,42 +69,32 @@ class Bancontact extends PayplugGateway
 	 */
 	public function process_standard_payment($order, $amount, $customer_id)
 	{
-		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 		try {
+
+			// Check Bancontact availability
 			if (!$this->checkBancontact()) {
 				throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
 			}
 
+			// create the paymnt array
 			$payment = new Payment($this->id, $order, $customer_id, $amount);
-			$payment      = $this->api->payment_create($payment->data());
+
+			// create the payplug payment object from the array
+			$payment = $this->api->payment_create($payment->data());
 
 			// Save transaction id for the order
-			PayplugWoocommerceHelper::is_pre_30()
-				? update_post_meta($order_id, '_transaction_id', $payment->id)
-				: $order->set_transaction_id($payment->id);
+			$this->save_transaction_id_after_payment_creation($order, $payment);
 
-			if (is_callable([$order, 'save'])) {
-				$order->save();
-			}
-
-			/**
-			 * Fires once a payment has been created.
-			 *
-			 * @param int $order_id Order ID
-			 * @param PaymentResource $payment Payment resource
-			 */
-			\do_action('payplug_gateway_payment_created', $order_id, $payment);
-
-			$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
-			PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
-
-			PayplugGateway::log(sprintf('Payment creation complete for order #%s', $order_id));
+			// process_standard_payment callback
+			$this->process_standard_payment_callback($order, $payment);
 
 			return [
 				'result'   => 'success',
 				'redirect' => $payment->hosted_payment->payment_url,
 				'cancel'   => $payment->hosted_payment->cancel_url,
 			];
+
+			$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 
 		} catch (HttpException $e) {
 			PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
@@ -114,6 +104,34 @@ class Bancontact extends PayplugGateway
 			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
 		}
 
+	}
+
+	// Save transaction id for the order
+	protected function save_transaction_id_after_payment_creation($order, $payment){
+		PayplugWoocommerceHelper::is_pre_30()
+			? update_post_meta($order->id, '_transaction_id', $payment->id)
+			: $order->set_transaction_id($payment->id);
+
+		if (is_callable([$order, 'save'])) {
+			$order->save();
+		}
+	}
+
+	// process_standard_payment callback
+	protected function process_standard_payment_callback($order, $payment){
+		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
+		/**
+		 * Fires once a payment has been created.
+		 *
+		 * @param int $order_id Order ID
+		 * @param PaymentResource $payment Payment resource
+		 */
+		\do_action('payplug_gateway_payment_created', $order_id, $payment);
+
+		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
+		PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
+
+		PayplugGateway::log(sprintf('Payment creation complete for order #%s', $order_id));
 	}
 
 }
