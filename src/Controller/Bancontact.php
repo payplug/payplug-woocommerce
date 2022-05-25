@@ -4,6 +4,7 @@ namespace Payplug\PayplugWoocommerce\Controller;
 
 use Payplug\Exception\HttpException;
 use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
+use Payplug\PayplugWoocommerce\Model\Payment;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\Resource\Payment as PaymentResource;
@@ -74,37 +75,8 @@ class Bancontact extends PayplugGateway
 				throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
 			}
 
-			$address_data = PayplugAddressData::from_order($order);
-			$payment_data = [
-				'amount'           => $amount,
-				'currency'         => get_woocommerce_currency(),
-				'payment_method'   => $this->id,
-				'billing'          => $address_data->get_billing(),
-				'shipping'         => $address_data->get_shipping(),
-				'hosted_payment'   => [
-					'return_url' => esc_url_raw($order->get_checkout_order_received_url()),
-					'cancel_url' => esc_url_raw($order->get_cancel_order_url_raw()),
-				],
-				'notification_url' => esc_url_raw(WC()->api_request_url('PayplugGateway')),
-				'metadata'         => [
-					'order_id'    => $order_id,
-					'customer_id' => ((int) $customer_id > 0) ? $customer_id : 'guest',
-					'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
-				],
-				"save_card"=> false,
-     			"force_3ds"=> false
-			];
-
-			/**
-			 * Filter the payment data before it's used
-			 *
-			 * @param array $payment_data
-			 * @param int $order_id
-			 * @param array $customer_details
-			 * @param PayplugAddressData $address_data
-			 */
-			$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
-			$payment      = $this->api->payment_create($payment_data);
+			$payment = new Payment($this->id, $order, $customer_id, $amount);
+			$payment      = $this->api->payment_create($payment->data());
 
 			// Save transaction id for the order
 			PayplugWoocommerceHelper::is_pre_30()
