@@ -645,7 +645,7 @@ class PayplugWoocommerceHelper {
 		try {
 
 			//fail safe for non activated account
-			if (isset($options['mode']))
+			if ((isset($options['mode'])) && $options['payplug_test_key'])
 				$key = $options['mode'] === "yes" && !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : $options['payplug_test_key'];
 			if( empty($options['payplug_live_key'] )){
 				$options['mode'] = "no";
