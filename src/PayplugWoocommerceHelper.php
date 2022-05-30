@@ -518,7 +518,7 @@ class PayplugWoocommerceHelper {
 			self::set_transient_data($parameters_account, $options);
 		} catch (\Payplug\Exception\UnauthorizedException $e) {
 		} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
-		}
+		} catch (\Payplug\Exception\ForbiddenException $e){return array();}
 
 	}
 
