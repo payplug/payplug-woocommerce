@@ -519,8 +519,7 @@ class PayplugWoocommerceHelper {
 		} catch (\Payplug\Exception\UnauthorizedException $e) {
 		} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
 		} catch( \Payplug\Exception\ForbiddenException $e){
-			
-		}
+		} catch (\Payplug\Exception\ForbiddenException $e){return array();}
 
 	}
 
