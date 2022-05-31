@@ -8,7 +8,7 @@
  * Text Domain:     payplug
  * Domain Path:     /languages
  * Version:         1.8.0
- * WC tested up to: 6.4.0
+ * WC tested up to: 6.5.1
  * License:         GPLv3 or later
  * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
  */
