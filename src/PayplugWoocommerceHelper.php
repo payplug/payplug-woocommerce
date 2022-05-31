@@ -483,6 +483,7 @@ class PayplugWoocommerceHelper {
 		$account = get_transient($transient_key);
 		if (is_array($account)) {
 			$account['oneyEnabled'] = (isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
+			$account['bancontact'] = !empty($options['bancontact']) ? $options['bancontact'] : '';
 		}
 		return $account;
 	}
@@ -518,8 +519,7 @@ class PayplugWoocommerceHelper {
 		} catch (\Payplug\Exception\UnauthorizedException $e) {
 		} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
 		} catch( \Payplug\Exception\ForbiddenException $e){
-			
-		}
+		} catch (\Payplug\Exception\ForbiddenException $e){return array();}
 
 	}
 
@@ -646,12 +646,14 @@ class PayplugWoocommerceHelper {
 		try {
 
 			//fail safe for non activated account
-			$key = $options['mode'] === "yes" && !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : $options['payplug_test_key'];
+			if ((isset($options['mode'])) && $options['payplug_test_key'])
+				$key = $options['mode'] === "yes" && !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : $options['payplug_test_key'];
 			if( empty($options['payplug_live_key'] )){
 				$options['mode'] = "no";
 			}
 
-			$response = Authentication::getAccount(new Payplug($key));
+			if (isset($key))
+				$response = Authentication::getAccount(new Payplug($key));
 
 			if (isset($response['httpResponse']['country'])) {
 				$options['payplug_merchant_country'] = $response['httpResponse']['country'];
