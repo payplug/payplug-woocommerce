@@ -21,12 +21,12 @@ msgstr ""
 #: src/Gateway/PayplugGatewayOney4x.php:47
 #: src/Gateway/PayplugGatewayOney3x.php:79
 msgid "1st monthly payment"
-msgstr "1° mensilità"
+msgstr "2^ rata"
 
 #: src/Gateway/PayplugGatewayOney4x.php:51
 #: src/Gateway/PayplugGatewayOney3x.php:83
 msgid "2nd monthly payment"
-msgstr "2° mensilità"
+msgstr "3^ rata"
 
 #: src/Admin/Metabox.php:97
 msgid "3 D Secure"
@@ -34,7 +34,7 @@ msgstr "3 D Secure"
 
 #: src/Gateway/PayplugGatewayOney4x.php:55
 msgid "3rd monthly payment"
-msgstr "3° mensilità"
+msgstr "4^ rata"
 
 #: src/Gateway/PayplugGateway.php:367 src/Gateway/PayplugGateway.php:375
 msgid "Activate"
@@ -83,11 +83,11 @@ msgstr "Si è verificato un errore nel processo di recupero dei dati per il rimb
 #: src/Gateway/PayplugGatewayOney3x.php:75 src/Front/PayplugOneyDetail.php:133
 #: src/Front/PayplugOneyDetail.php:143
 msgid "Bring"
-msgstr "Apporto"
+msgstr "1^ rata contestuale all’acquisto"
 
 #: src/Front/PayplugOneyDetail.php:128
 msgid "BY CREDIT CARD"
-msgstr "CON CARTA DI CREDITO"
+msgstr "CON CARTA DI CREDITO DEBITO E POSTEPAY"
 
 #: src/Admin/Metabox.php:94
 msgid "Card mask"
@@ -267,6 +267,9 @@ msgstr "Modalità"
 msgid "monthly payment of"
 msgstr "mensilitàs"
 
+msgid "IT monthly payment of"
+msgstr "Più %s rate da"
+
 #: src/Admin/Metabox.php:98
 msgid "No"
 msgstr "No"
@@ -289,7 +292,7 @@ msgstr "Non pagato"
 
 #: src/Front/PayplugOneyDetail.php:135 src/Front/PayplugOneyDetail.php:145
 msgid "Of which financing cost"
-msgstr "Di cui costo di finanziamento"
+msgstr "Di cui una commissione di"
 
 #: src/Front/PayplugOneyDetail.php:115
 #, php-format
@@ -361,11 +364,11 @@ msgstr "Password"
 
 #: src/Gateway/PayplugGatewayOney3x.php:37
 msgid "Pay by card in 3x with Oney"
-msgstr "Paga con la carta in 3x con Oney (Eccetto prepagate)"
+msgstr "Paga con la carta in 3x con Oney"
 
 #: src/Gateway/PayplugGatewayOney4x.php:24
 msgid "Pay by card in 4x with Oney"
-msgstr "Paga con la carta in 4x con Oney (Eccetto prepagate)"
+msgstr "Paga con la carta in 4x con Oney"
 
 #: src/Gateway/PayplugGateway.php:104
 msgid "Pay with another credit card"
@@ -643,7 +646,7 @@ msgid "payplug_oneyIT_paywith"
 msgstr "PAGHI IN"
 
 msgid "payplug_oneyIT_popup-title"
-msgstr "PAGHI IN 3 o 4 RATE"
+msgstr "PAGHI IN 3 OPPURE 4 RATE"
 
 msgid "payplug_oneyIT_popup-withoutfees-title"
 msgstr "NESSUNA COMMISSIONE"
