@@ -36,10 +36,14 @@ class Bancontact extends PayplugGateway
 	private function checkBancontact(){
 		$account = PayplugWoocommerceHelper::get_account_data_from_options();
 
-		if (isset($account['payment_methods']['bancontact']['enabled'])) {
-			return  $account['payment_methods']['bancontact']['enabled'];
+		if (isset($account['payment_methods']['bancontact']['enabled']) ) {
+
+			if( !empty($account['bancontact']) && $account['bancontact'] === 'yes' )
+				return  $account['payment_methods']['bancontact']['enabled'];
+
 		}
-		return true;
+		
+		return false;
 	}
 
 
