@@ -265,6 +265,9 @@ msgstr "Mode"
 msgid "monthly payment of"
 msgstr "mensualités de"
 
+msgid "IT monthly payment of"
+msgstr ""
+
 #: src/Admin/Metabox.php:98
 msgid "No"
 msgstr "Non"
