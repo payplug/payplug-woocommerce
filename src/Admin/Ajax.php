@@ -28,10 +28,12 @@ class Ajax {
 
 	const REFRESH_KEY_ACTION = 'payplug_refresh_keys';
 	const CHECK_LIVE_PERMISSIONS = 'check_live_permissions';
+	const CHECK_BANCONTACT_PERMISSIONS = 'check_bancontact_permissions';
 
 	public function __construct() {
 		add_action( 'wp_ajax_' . self::REFRESH_KEY_ACTION, [ $this, 'handle_refresh_keys' ] );
 		add_action( 'wp_ajax_' . self::CHECK_LIVE_PERMISSIONS, [ $this, 'check_live_permissions' ] );
+		add_action( 'wp_ajax_' . self::CHECK_BANCONTACT_PERMISSIONS, [ $this, 'check_bancontact_permissions' ] );
 	}
 
 	public function handle_refresh_keys() {
@@ -120,6 +122,22 @@ class Ajax {
 		PayplugWoocommerceHelper::set_transient_data($account);
         $permissions = $account['httpResponse']['permissions'];
 		wp_send_json_success($permissions);
+	}
+
+
+	public function check_bancontact_permissions() {
+		try{
+			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
+
+		}  catch (PayplugException $e){
+			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
+			wp_send_json_error(["error" => $e->getMessage()]);
+			return false;
+		}
+
+		PayplugWoocommerceHelper::set_transient_data($account);
+		$bancontact = isset($account['httpResponse']['payment_methods']['bancontact']['enabled']) ? $account['httpResponse']['payment_methods']['bancontact']['enabled']: false;
+		wp_send_json_success($bancontact);
 	}
 
 	/**

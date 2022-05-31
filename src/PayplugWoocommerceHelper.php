@@ -483,6 +483,7 @@ class PayplugWoocommerceHelper {
 		$account = get_transient($transient_key);
 		if (is_array($account)) {
 			$account['oneyEnabled'] = (isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
+			$account['bancontact'] = !empty($options['bancontact']) ? $options['bancontact'] : '';
 		}
 		return $account;
 	}

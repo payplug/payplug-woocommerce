@@ -10,6 +10,8 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 class Bancontact extends PayplugGateway
 {
 
+	protected $enable = false;
+
 	public function __construct()
 	{
 
@@ -25,8 +27,18 @@ class Bancontact extends PayplugGateway
 		$this->title = __('payplug_bancontact_title', 'payplug');
 		$this->description = __('payplug_bancontact_description', 'payplug');
 
+		$this->checkBancontact();
+
 	}
 
+	private function checkBancontact(){
+		$account = PayplugWoocommerceHelper::get_account_data_from_options();
+
+		if (isset($account['payment_methods']['bancontact']['enabled'])) {
+			return  $account['payment_methods']['bancontact']['enabled'];
+		}
+		return true;
+	}
 
 
 	/**
