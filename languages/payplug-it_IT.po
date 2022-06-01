@@ -676,7 +676,16 @@ msgid "payplug_bancontact_activate_label"
 msgstr "Attiva i pagamenti Bancontact"
 
 msgid "payplug_bancontact_activation_description"
-msgstr "Attiva i pagamenti Bancontact (Beta)"
+msgstr ""
+
+msgid "payplug_bancontact_activation_request"
+msgstr "Richiedo Bancontact"
+
+msgid "payplug_bancontact_activation_url"
+msgstr "support.payplug.com/hc/it/requests/new"
+
+msgid "payplug_bancontact_testmode_description"
+msgstr "Non disponibile in modalità TEST. Attiva la modalità LIVE."
 
 #~ msgid "Cart size cannot be greater than 1000 with Oney."
 #~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."

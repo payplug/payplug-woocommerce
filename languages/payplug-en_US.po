@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2022-05-31 14:52+0100\n"
+"PO-Revision-Date: 2022-06-03 10:36+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -59,3 +59,12 @@ msgstr "Activate Bancontact payments (Beta)"
 
 msgid "payplug_bancontact_activation_description"
 msgstr ""
+
+msgid "payplug_bancontact_activation_request"
+msgstr "Get Bancontact"
+
+msgid "payplug_bancontact_activation_url"
+msgstr "support.payplug.com/hc/en-gb/requests/new"
+
+msgid "payplug_bancontact_testmode_description"
+msgstr "This feature is not available for the TEST mode. Please activate the LIVE mode to be able to use it."

@@ -678,3 +678,12 @@ msgstr "Activer les paiements Bancontact (Bêta)"
 
 msgid "payplug_bancontact_activation_description"
 msgstr ""
+
+msgid "payplug_bancontact_activation_request"
+msgstr "Je demande Bancontact"
+
+msgid "payplug_bancontact_activation_url"
+msgstr "support.payplug.com/hc/fr/requests/new"
+
+msgid "payplug_bancontact_testmode_description"
+msgstr "Cette fonctionnalité n’est pas disponible en mode TEST. Veuillez activer le mode LIVE pour l’utiliser."

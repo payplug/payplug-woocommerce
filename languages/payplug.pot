@@ -676,3 +676,12 @@ msgstr ""
 
 msgid "payplug_bancontact_activation_description"
 msgstr ""
+
+msgid "payplug_bancontact_testmode_description"
+msgstr "This feature is not available for the TEST mode. Please activate the LIVE mode to be able to use it."
+
+msgid "payplug_bancontact_activation_request"
+msgstr ""
+
+msgid "payplug_bancontact_activation_url"
+msgstr ""
