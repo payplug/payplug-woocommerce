@@ -26,7 +26,7 @@ class Bancontact extends PayplugGateway
 		$this->method_description = __('payplug_bancontact_description', 'payplug');
 
 		$this->title = __('payplug_bancontact_title', 'payplug');
-		$this->description = __('payplug_bancontact_description', 'payplug');
+		$this->description = '';
 
 		if(!$this->checkBancontact())
 			$this->enabled = 'no';
