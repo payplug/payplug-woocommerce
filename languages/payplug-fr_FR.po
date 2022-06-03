@@ -665,7 +665,7 @@ msgid "payplug_oneyIT_popup-withoutfees-title"
 msgstr ""
 
 msgid "payplug_bancontact_title"
-msgstr "Paiement Bancontact"
+msgstr "Payer avec Bancontact"
 
 msgid "payplug_bancontact_description"
 msgstr "Permettez à vos clients de payer avec leurs cartes Bancontact."
