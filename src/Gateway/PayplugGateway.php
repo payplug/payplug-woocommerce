@@ -409,7 +409,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'title'       => __('payplug_bancontact_activate_title', 'payplug'),
 				'type'        => 'checkbox',
 				'label'       => __('Activate', 'payplug'),
-				'description' => __('payplug_bancontact_activate_description', 'payplug') . $request_bancontact,
+				'description' => '<label id="bancontact_test_mode_description"> '. __('payplug_bancontact_testmode_description', 'payplug') .' </label>' .
+					__('payplug_bancontact_activate_description', 'payplug') . $request_bancontact,
 				'default'     => 'no',
 			],
 			'oney'                => [

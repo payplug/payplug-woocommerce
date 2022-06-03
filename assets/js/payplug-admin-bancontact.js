@@ -23,27 +23,26 @@
 		},
 		checkbancontact: (event)=> {
 
-			console.log("here");
 			payplug_admin.disableBancontact();
 
 			if(payplug_admin.isTestMode()){
 				payplug_admin.uncheckBancontact();
 				payplug_admin.disableBancontact();
+				$("#bancontact_test_mode_description").show();
 				return;
 			}
+			$("#bancontact_test_mode_description").hide();
 
 			payplug_admin.checkBancontactPermissions((res) => {
 				if(false === res.success){
 					payplug_admin.uncheckBancontact();
 					payplug_admin.disableBancontact();
-					console.log(res.success);
 					return;
 				}
 
 				if(false === res.data){
 					payplug_admin.uncheckBancontact();
 					payplug_admin.disableBancontact();
-					console.log(res.data);
 					return;
 				}
 
