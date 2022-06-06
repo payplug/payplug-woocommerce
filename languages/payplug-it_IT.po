@@ -670,7 +670,7 @@ msgid "payplug_bancontact_description"
 msgstr "Attiva i pagamenti Bancontact."
 
 msgid "payplug_bancontact_activate_title"
-msgstr ""
+msgstr "Attiva i pagamenti Bancontact"
 
 msgid "payplug_bancontact_activate_label"
 msgstr "Attiva i pagamenti Bancontact"
