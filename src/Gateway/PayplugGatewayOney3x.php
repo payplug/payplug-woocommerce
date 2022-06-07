@@ -86,15 +86,15 @@ class PayplugGatewayOney3x extends PayplugGateway
                 $this->description = <<<HTML
                 <p>
                     <div class="payplug-oney-flex">
-                        <div>{$f(__('Bring', 'payplug'))} :</div>
+                        <div>{$f(__('Bring', 'payplug'))}:</div>
                         <div>{$this->oney_response['x3_with_fees']['down_payment_amount']} {$currency}</div>
                     </div>
                     <div class="payplug-oney-flex">
-                        <div>{$f(__('1st monthly payment', 'payplug'))} :</div>
+                        <div>{$f(__('1st monthly payment', 'payplug'))}:</div>
                         <div>{$this->oney_response['x3_with_fees']['installments'][0]['amount']} {$currency}</div>
                     </div>
                     <div class="payplug-oney-flex">
-                        <div>{$f(__('2nd monthly payment', 'payplug'))} :</div>
+                        <div>{$f(__('2nd monthly payment', 'payplug'))}:</div>
                         <div>{$this->oney_response['x3_with_fees']['installments'][1]['amount']} {$currency}</div>
                     </div>
                 </p>
