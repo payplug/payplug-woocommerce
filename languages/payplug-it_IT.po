@@ -689,3 +689,9 @@ msgstr "Non disponibile in modalità TEST. Attiva la modalità LIVE."
 
 #~ msgid "Cart size cannot be greater than 1000 with Oney."
 #~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
+
+msgid "oney_installments_pop_up"
+msgstr "Pop-up con le rate Oney"
+
+msgid "display_the_oney_installments_pop_up_on_the_product_page"
+msgstr "Mostra il pop-up con le rate Oney nella pagina del Prodotto."
