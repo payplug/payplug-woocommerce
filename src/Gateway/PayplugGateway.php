@@ -460,10 +460,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		        'description' => '',
 		        'default'     => 'no',
 	        ],
-			'oney_product_animation'                   => [
+			'marketing'                   => [
 				'title'       => __('oney_installments_pop_up', 'payplug'),
 				'type'        => 'checkbox',
-				'description' => __('display_the_oney_installments_pop_up_on_the_product_page', 'payplug'),
+				'description' => __('Display the Oney installments pop-up on the Product page.', 'payplug'),
 				'label'       => __('Activate', 'payplug'),
 				'default'     => 'no',
 				'desc_tip'    => false
