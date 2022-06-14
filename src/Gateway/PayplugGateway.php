@@ -141,7 +141,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	    $this->oney_thresholds_max = $this->get_option('oney_thresholds_max', $this->max_oney_price );
         $this->init_form_fields();
         $this->payplug_merchant_country = PayplugWoocommerceHelper::get_payplug_merchant_country();
-        $this->marketing = $this->get_option('marketing');
+        $this->oney_product_animation = $this->get_option('oney_product_animation');
 
         add_filter('woocommerce_get_customer_payment_tokens', [$this, 'filter_tokens'], 10, 3);
 
@@ -460,7 +460,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		        'description' => '',
 		        'default'     => 'no',
 	        ],
-			'marketing'                   => [
+			'oney_product_animation'                   => [
 				'title'       => __('oney_installments_pop_up', 'payplug'),
 				'type'        => 'checkbox',
 				'description' => __('display_the_oney_installments_pop_up_on_the_product_page', 'payplug'),
