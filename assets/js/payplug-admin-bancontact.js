@@ -29,20 +29,25 @@
 				payplug_admin.uncheckBancontact();
 				payplug_admin.disableBancontact();
 				$("#bancontact_test_mode_description").show();
+				$("#bancontact_call_to_action").hide();
+				$("#bancontact_live_mode_description_disabled").hide();
 				return;
 			}
 			$("#bancontact_test_mode_description").hide();
+			$("#bancontact_call_to_action").show();
 
 			payplug_admin.checkBancontactPermissions((res) => {
 				if(false === res.success){
 					payplug_admin.uncheckBancontact();
 					payplug_admin.disableBancontact();
+					$("#bancontact_live_mode_description_disabled").show();
 					return;
 				}
 
 				if(false === res.data){
 					payplug_admin.uncheckBancontact();
 					payplug_admin.disableBancontact();
+					$("#bancontact_live_mode_description_disabled").show();
 					return;
 				}
 
@@ -61,6 +66,7 @@
 		},
 		enableBancontact: function(){
 			jQuery("#woocommerce_payplug_bancontact").prop("disabled", false);
+			jQuery("#bancontact_live_mode_description_disabled").hide();
 		}
 	}
 	payplug_admin.init();
