@@ -40,14 +40,12 @@
 				if(false === res.success){
 					payplug_admin.uncheckBancontact();
 					payplug_admin.disableBancontact();
-					$("#bancontact_live_mode_description_disabled").show();
 					return;
 				}
 
 				if(false === res.data){
 					payplug_admin.uncheckBancontact();
 					payplug_admin.disableBancontact();
-					$("#bancontact_live_mode_description_disabled").show();
 					return;
 				}
 
@@ -63,6 +61,8 @@
 		},
 		disableBancontact: function(){
 			jQuery("#woocommerce_payplug_bancontact").prop("disabled", true);
+			if(!payplug_admin.isTestMode())
+				jQuery("#bancontact_live_mode_description_disabled").show()
 		},
 		enableBancontact: function(){
 			jQuery("#woocommerce_payplug_bancontact").prop("disabled", false);
