@@ -23,7 +23,7 @@
 			pao.$yes_no_description = $("#live-mode-test-p");
 			if ($("#woocommerce_payplug_oney").length) {
 				pao.$payplug_oney = $("#woocommerce_payplug_oney")
-				pao.$payplug_oney_type = $("#woocommerce_payplug_oney_type, #woocommerce_payplug_oney_thresholds")
+				pao.$payplug_oney_type = $("#woocommerce_payplug_oney_type, #woocommerce_payplug_oney_thresholds, #oney_installments_pop_up")
 				if (pao.$payplug_oney.prop('checked')) {
 					pao.$payplug_oney_type.css('display', 'table-row')
 				} else {
