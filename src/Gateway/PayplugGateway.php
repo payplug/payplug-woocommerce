@@ -460,13 +460,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		        'description' => '',
 		        'default'     => 'no',
 	        ],
-			'marketing'                   => [
+			'oney_product_animation' => [
 				'title'       => __('oney_installments_pop_up', 'payplug'),
-				'type'        => 'checkbox',
-				'description' => __('Display the Oney installments pop-up on the Product page.', 'payplug'),
+				'description' => __('display_the_oney_installments_pop_up_on_the_product_page', 'payplug'),
 				'label'       => __('Activate', 'payplug'),
 				'default'     => 'no',
-				'desc_tip'    => false
+				'desc_tip'    => false,
+				'type' => 'oney_product_animation'
 			],
         ];
 
@@ -1492,6 +1492,57 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         return ob_get_clean();
     }
 
+
+	/**
+	 * Generate Oney popup option HTML.
+	 *
+	 * @param string $key
+	 * @param array $data
+	 *
+	 * @return string
+	 */
+	public function generate_oney_product_animation_html($key, $data)
+	{
+		$field_key = $this->get_field_key($key);
+
+		$defaults  = array(
+			'title'             => '',
+			'disabled'          => false,
+			'class'             => '',
+			'css'               => '',
+			'placeholder'       => '',
+			'type'              => 'checkbox',
+			'desc_tip'          => false,
+			'description'       => '',
+			'custom_attributes' => [],
+			'options'           => [],
+		);
+
+		$data = wp_parse_args($data, $defaults);
+
+		ob_start();
+		?>
+		<tr valign="top" id="oney_installments_pop_up">
+			<th scope="row" class="titledesc">
+				<label for="<?php echo esc_attr($field_key); ?>">
+					<?php echo wp_kses_post($data['title']); ?>
+					<?php echo $this->get_tooltip_html($data); ?>
+				</label>
+			</th>
+			<td class="forminp">
+				<fieldset>
+					<legend class="screen-reader-text"><span><?php echo wp_kses_post($data['title']); ?></span></legend>
+					<label for="woocommerce_payplug_oney_product_animation">
+						<input class="" type="checkbox" name="woocommerce_payplug_oney_product_animation" id="woocommerce_payplug_oney_product_animation" style="" <?php echo (($this->oney_product_animation == 'on') ? "checked" : ''); ?>> <?php echo wp_kses_post($data['label']); ?></label><br>
+					<p class="description"> <?php echo wp_kses_post($data['description']); ?></p>
+				</fieldset>
+			</td>
+		</tr>
+		<?php
+
+		return ob_get_clean();
+	}
+
 	/**
 	 * Generate Oney Type Input HTML.
 	 *
@@ -1627,6 +1678,19 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
         return ('1' === (string) $value) ? 'yes' : 'no';
     }
+
+	/**
+	 * Validate Yes/No Field.
+	 *
+	 * @param string $key
+	 * @param string $value Posted Value
+	 *
+	 * @return string
+	 */
+	public function validate_oney_product_animation_field($key, $value)
+	{
+		return ('on' === (string) $value) ? 'on' : 'off';
+	}
 
 	/**
 	 * Validate Oney Type Field.
