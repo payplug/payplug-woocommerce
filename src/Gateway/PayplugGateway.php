@@ -1533,7 +1533,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				<fieldset>
 					<legend class="screen-reader-text"><span><?php echo wp_kses_post($data['title']); ?></span></legend>
 					<label for="woocommerce_payplug_oney_product_animation">
-						<input class="" type="checkbox" name="woocommerce_payplug_oney_product_animation" id="woocommerce_payplug_oney_product_animation" style="" <?php echo (($this->oney_product_animation == 'on') ? "checked" : ''); ?>> <?php echo wp_kses_post($data['label']); ?></label><br>
+						<input class="" type="checkbox" name="woocommerce_payplug_oney_product_animation" id="woocommerce_payplug_oney_product_animation" style="" <?php echo (($this->oney_product_animation == 'yes') ? "checked" : ''); ?>> <?php echo wp_kses_post($data['label']); ?></label><br>
 					<p class="description"> <?php echo wp_kses_post($data['description']); ?></p>
 				</fieldset>
 			</td>
@@ -1689,7 +1689,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 */
 	public function validate_oney_product_animation_field($key, $value)
 	{
-		return ('on' === (string) $value) ? 'on' : 'off';
+		return ('on' === (string) $value) ? 'yes' : 'no';
 	}
 
 	/**
