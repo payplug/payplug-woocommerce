@@ -682,10 +682,10 @@ msgid "payplug_bancontact_activation_request"
 msgstr "Richiedo Bancontact"
 
 msgid "payplug_bancontact_activation_url"
-msgstr "support.payplug.com/hc/it/requests/new"
+msgstr "support.payplug.com/hc/it/requests/new?ticket_form_id=4583813991452"
 
 msgid "payplug_bancontact_testmode_description"
-msgstr "Non disponibile in modalità Test. <a href='https://support.payplug.com/hc/en-gb/requests/new' target='_blank' >Richiedi Bancontact</a> e attiva la modalità LIVE."
+msgstr "Non disponibile in modalità Test. <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=4583813991452' target='_blank' >Richiedi Bancontact</a> e attiva la modalità LIVE."
 
 msgid "payplug_bancontact_livemode_description_disabled"
 msgstr "Non puoi ancora accedere a questa funzionalità."
