@@ -44,19 +44,19 @@ class PayplugGatewayOney4xWithoutFees extends PayplugGatewayOney3x
                 $this->description = <<<HTML
                 <p>
                     <div class="payplug-oney-flex">
-                        <div>{$f(__('Bring', 'payplug'))} :</div>
+                        <div>{$f(__('Bring', 'payplug'))}:</div>
                         <div>{$this->oney_response['x4_without_fees']['down_payment_amount']} {$currency}</div>
                     </div>
                     <div class="payplug-oney-flex">
-                        <div>{$f(__('1st monthly payment', 'payplug'))} :</div>
+                        <div>{$f(__('1st monthly payment', 'payplug'))}:</div>
                         <div>{$this->oney_response['x4_without_fees']['installments'][0]['amount']} {$currency}</div>
                     </div>
                     <div class="payplug-oney-flex">
-                        <div>{$f(__('2nd monthly payment', 'payplug'))} :</div>
+                        <div>{$f(__('2nd monthly payment', 'payplug'))}:</div>
                         <div>{$this->oney_response['x4_without_fees']['installments'][1]['amount']} {$currency}</div>
                     </div>
                     <div class="payplug-oney-flex">
-                        <div>{$f(__('3rd monthly payment', 'payplug'))} :</div>
+                        <div>{$f(__('3rd monthly payment', 'payplug'))}:</div>
                         <div>{$this->oney_response['x4_without_fees']['installments'][2]['amount']} {$currency}</div>
                     </div>
                 </p>

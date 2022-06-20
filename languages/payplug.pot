@@ -265,6 +265,9 @@ msgstr ""
 msgid "monthly payment of"
 msgstr ""
 
+msgid "IT monthly payment of"
+msgstr ""
+
 #: src/Admin/Metabox.php:98
 msgid "No"
 msgstr ""
@@ -658,3 +661,33 @@ msgstr ""
 
 msgid "payplug_oneyIT_popup-withoutfees-title"
 msgstr ""
+
+msgid "payplug_bancontact_title"
+msgstr ""
+
+msgid "payplug_bancontact_description"
+msgstr ""
+
+msgid "payplug_bancontact_activate_title"
+msgstr ""
+
+msgid "payplug_bancontact_activate_label"
+msgstr ""
+
+msgid "payplug_bancontact_activation_description"
+msgstr ""
+
+msgid "payplug_bancontact_testmode_description"
+msgstr "This feature is not available for the TEST mode. Please activate the LIVE mode to be able to use it."
+
+msgid "payplug_bancontact_activation_request"
+msgstr ""
+
+msgid "payplug_bancontact_activation_url"
+msgstr ""
+
+msgid "oney_installments_pop_up"
+msgstr "Oney installments pop-up"
+
+msgid "display_the_oney_installments_pop_up_on_the_product_page"
+msgstr "Display the Oney installments pop-up on the Product page."

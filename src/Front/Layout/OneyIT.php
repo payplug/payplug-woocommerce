@@ -44,20 +44,20 @@ class OneyIT extends OneyBase implements InterfaceOneyLayout
                 <div class='oney-content oney-3x-content'>
                     <div class='oney-img oney-3x no-margin'></div>
                     <div class='oney-details'>
-                        <p class='bold no-margin'> {$f(__('Bring', 'payplug'))} : {$x3['down_payment_amount']}  €</p>
-                        <p class='bold no-margin'>+2  {$f(__('monthly payment of', 'payplug'))} : {$x3['installments'][0]['amount']} € </p>
-                        <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))} : {$financing_cost_3x} € </p>
-                        <p class='no-margin'> {$f(__('TAEG', 'payplug'))} : {$x3['effective_annual_percentage_rate']}  % </p>
+                        <p class='bold no-margin'> {$f(__('Bring', 'payplug'))}: {$x3['down_payment_amount']}  €</p>
+                        <p class='bold no-margin'>{$f(sprintf(__('IT monthly payment of', 'payplug'),2))}: {$x3['installments'][0]['amount']} € </p>
+                        <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))}: {$financing_cost_3x} € </p>
+                        <p class='no-margin'> {$f(__('TAEG', 'payplug'))}: {$x3['effective_annual_percentage_rate']}  % </p>
                     </div>
                 </div>
                 <div class='oney-separator'></div>
                 <div class='oney-content oney-4x-content'>
                     <div class='oney-img oney-4x no-margin'></div>
                     <div class='oney-details'>
-                        <p class='bold no-margin'> {$f(__('Bring', 'payplug'))} : {$x4['down_payment_amount']}  €</p>
-                        <p class='bold no-margin'>+3  {$f(__('monthly payment of', 'payplug'))} : {$x4['installments'][0]['amount']}  € </p>
-                        <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))} : {$financing_cost_4x} € </p>
-                        <p class='no-margin'> {$f(__('TAEG', 'payplug'))} : {$x4['effective_annual_percentage_rate']}  % </p>
+                        <p class='bold no-margin'> {$f(__('Bring', 'payplug'))}: {$x4['down_payment_amount']}  €</p>
+                        <p class='bold no-margin'>{$f(sprintf(__('IT monthly payment of', 'payplug'), 3))}: {$x4['installments'][0]['amount']}  € </p>
+                        <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))}: {$financing_cost_4x} € </p>
+                        <p class='no-margin'> {$f(__('TAEG', 'payplug'))}: {$x4['effective_annual_percentage_rate']}  % </p>
                     </div>
                 </div>
 HTML;
@@ -94,20 +94,20 @@ HTML;
                 <div class='oney-content oney-3x-content'>
                     <div class='oney-img oney-3x no-margin'></div>
                     <div class='oney-details'>
-                        <p class='bold no-margin'> {$f(__('Bring', 'payplug'))} : {$x3['down_payment_amount']}  €</p>
-                        <p class='bold no-margin'>+2  {$f(__('monthly payment of', 'payplug'))} : {$x3['installments'][0]['amount']} € </p>
-                        <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))} : {$financing_cost_3x} € </p>
-                        <p class='no-margin'> {$f(__('TAEG', 'payplug'))} : {$x3['effective_annual_percentage_rate']}  % </p>
+                        <p class='bold no-margin'> {$f(__('Bring', 'payplug'))}: {$x3['down_payment_amount']}  €</p>
+                        <p class='bold no-margin'>{$f(sprintf(__('IT monthly payment of', 'payplug'),2))}: {$x3['installments'][0]['amount']} € </p>
+                        <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))}: {$financing_cost_3x} € </p>
+                        <p class='no-margin'> {$f(__('TAEG', 'payplug'))}: {$x3['effective_annual_percentage_rate']}  % </p>
                     </div>
                 </div>
                 <div class='oney-separator'></div>
                 <div class='oney-content oney-4x-content'>
                     <div class='oney-img oney-4x no-margin'></div>
                     <div class='oney-details'>
-                        <p class='bold no-margin'> {$f(__('Bring', 'payplug'))} : {$x4['down_payment_amount']}  €</p>
-                        <p class='bold no-margin'>+3  {$f(__('monthly payment of', 'payplug'))} : {$x4['installments'][0]['amount']}  € </p>
-                        <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))} : {$financing_cost_4x} € </p>
-                        <p class='no-margin'> {$f(__('TAEG', 'payplug'))} : {$x4['effective_annual_percentage_rate']}  % </p>
+                        <p class='bold no-margin'> {$f(__('Bring', 'payplug'))}: {$x4['down_payment_amount']}  €</p>
+                        <p class='bold no-margin'>{$f(sprintf(__('IT monthly payment of', 'payplug'),3))}: {$x4['installments'][0]['amount']}  € </p>
+                        <p class='no-margin'> {$f(__('Of which financing cost', 'payplug'))}: {$financing_cost_4x} € </p>
+                        <p class='no-margin'> {$f(__('TAEG', 'payplug'))}: {$x4['effective_annual_percentage_rate']}  % </p>
                     </div>
                 </div>
 HTML;
