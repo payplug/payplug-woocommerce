@@ -64,10 +64,13 @@ msgid "payplug_bancontact_activation_request"
 msgstr "Get Bancontact"
 
 msgid "payplug_bancontact_activation_url"
-msgstr "support.payplug.com/hc/en-gb/requests/new?ticket_form_id=4583813991452"
+msgstr "support.payplug.com/hc/en-gb/requests/new"
 
 msgid "payplug_bancontact_testmode_description"
-msgstr "This feature is not available for the TEST mode. <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=4583813991452' target='_blank' >Get Bancontact</a> and activate the LIVE mode to be able to use it."
+msgstr "This feature is not available for the TEST mode. Please activate the LIVE mode to be able to use it."
 
-msgid "payplug_bancontact_livemode_description_disabled"
-msgstr "You do not have access to this feature yet."
+msgid "oney_installments_pop_up"
+msgstr "Oney installments pop-up"
+
+msgid "display_the_oney_installments_pop_up_on_the_product_page"
+msgstr "Display the Oney installments pop-up on the Product page."

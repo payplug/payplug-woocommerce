@@ -7,6 +7,7 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use function is_cart;
 use function is_checkout;
+use function is_product;
 
 Abstract class OneyBase
 {
@@ -33,7 +34,11 @@ Abstract class OneyBase
 		add_action( 'wp_ajax_simulate_oney_payment', [ $this, 'simulateOneyPayment' ]);
 		add_action( 'wp_ajax_nopriv_simulate_oney_payment', [ $this, 'simulateOneyPayment' ]);
 		add_action( 'template_redirect', [ $this, 'showOneyAnimation' ] );
-		add_action( 'woocommerce_before_add_to_cart_form', [ $this, 'showOneyAnimationProduct' ] );
+
+		$product_page_animation = get_option('woocommerce_payplug_settings', [])['oney_product_animation'];
+
+		if ($product_page_animation == 'yes')
+			add_action( 'woocommerce_before_add_to_cart_form', [ $this, 'showOneyAnimationProduct' ] );
 	}
 
 	/**

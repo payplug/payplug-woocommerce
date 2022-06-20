@@ -67,7 +67,6 @@
 		enableBancontact: function(){
 			jQuery("#woocommerce_payplug_bancontact").prop("disabled", false);
 			jQuery("#bancontact_live_mode_description_disabled").hide();
-			jQuery("#bancontact_call_to_action").hide();
 		}
 	}
 	payplug_admin.init();

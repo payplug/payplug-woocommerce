@@ -683,10 +683,13 @@ msgid "payplug_bancontact_activation_request"
 msgstr "Je demande Bancontact"
 
 msgid "payplug_bancontact_activation_url"
-msgstr "support.payplug.com/hc/fr/requests/new?ticket_form_id=4583813991452"
+msgstr "support.payplug.com/hc/fr/requests/new"
 
 msgid "payplug_bancontact_testmode_description"
-msgstr "Cette fonctionnalité n’est pas disponible en mode TEST. <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=4583813991452' target='_blank' >Demandez Bancontact</a> et activez le mode LIVE."
+msgstr "Cette fonctionnalité n’est pas disponible en mode TEST. Veuillez activer le mode LIVE pour l’utiliser."
 
-msgid "payplug_bancontact_livemode_description_disabled"
-msgstr "Vous n’avez pas encore accès à cette fonctionnalité."
+msgid "oney_installments_pop_up"
+msgstr "Pop-up des versements Oney"
+
+msgid "display_the_oney_installments_pop_up_on_the_product_page"
+msgstr "Afficher la pop-up des versements Oney sur la page Produit."
