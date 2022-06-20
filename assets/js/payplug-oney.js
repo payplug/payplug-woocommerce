@@ -57,7 +57,7 @@
                 totalsProduct >= maxOneyQty ?
                     popup.find('#oney-popup-error .oney-error.qty').show() :
                     popup.find('#oney-popup-error .oney-error.range').show()
-            } 
+            }
         };
 
         function _bindCloseOneyPopup() {
@@ -74,9 +74,9 @@
                 _hidePopup();
             });
         }
-        
+
         _bindCloseOneyPopup();
-        qtyInput.unbind()
+        qtyInput.unbind();
         qtyInput.on('change', function () {
             totalsProduct = $(this).val()
             popupLoaded = false
@@ -89,7 +89,7 @@
                 oneyData.addClass('disabled')
                 popup.addClass('disabled')
             }
-        })
+        });
         showpopuponey.unbind();
         showpopuponey.on('click', function () {
             _showPopup(true);
@@ -122,7 +122,21 @@
             if(popup.is(':visible')) {
                 _showPopup()
             }
-        })
+        });
+
+		$(document).ready(function () {
+			totalsProduct = qtyInput.val()
+			popupLoaded = false
+			if (_isInOneyRange() && totalsProduct < maxOneyQty) {
+				oneyData.removeClass('disabled')
+				popup.removeClass('disabled').removeClass('loaded')
+				popup.html('')
+			} else {
+				_checkOneyError()
+				oneyData.addClass('disabled')
+				popup.addClass('disabled')
+			}
+		});
     };
 
 	$(function() {
@@ -136,5 +150,8 @@
                 popupLoaded = false;
             });
         }
+
     });
+
+
 })(jQuery);
