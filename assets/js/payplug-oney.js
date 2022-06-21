@@ -125,16 +125,18 @@
         });
 
 		$(document).ready(function () {
-			totalsProduct = qtyInput.val()
-			popupLoaded = false
-			if (_isInOneyRange() && totalsProduct < maxOneyQty) {
-				oneyData.removeClass('disabled')
-				popup.removeClass('disabled').removeClass('loaded')
-				popup.html('')
-			} else {
-				_checkOneyError()
-				oneyData.addClass('disabled')
-				popup.addClass('disabled')
+			if (!(is_cart)) {
+				totalsProduct = qtyInput.val()
+				popupLoaded = false
+				if (_isInOneyRange() && totalsProduct < maxOneyQty) {
+					oneyData.removeClass('disabled')
+					popup.removeClass('disabled').removeClass('loaded')
+					popup.html('')
+				} else {
+					_checkOneyError()
+					oneyData.addClass('disabled')
+					popup.addClass('disabled')
+				}
 			}
 		});
     };
