@@ -110,11 +110,11 @@ class PayplugResponse {
 				}
 			}
 
-		} else if (($this->gateway->id == "payplug") || ($this->gateway->id == "bancontact")) {
+		} else if ($this->gateway->id == "payplug") {
 
 			// Ignore paid orders
 			if ($order->is_paid()) {
-				PayplugGateway::log(sprintf('Order #%s : Order is already complete. Ignoring IPN.', $order_id));
+				PayplugGateway::log(sprintf('Order #%s : Payplug order is already complete. Ignoring IPN.', $order_id));
 				return;
 			}
 
@@ -128,7 +128,7 @@ class PayplugResponse {
 				/** This action is documented in src/Gateway/PayplugResponse */
 				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
 				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
-				PayplugGateway::log(sprintf('Order #%s : Payment IPN %s processing completed but failed.', $order_id, $resource->id));
+				PayplugGateway::log(sprintf('Order #%s : Payplug payment IPN %s processing completed but failed.', $order_id, $resource->id));
 
 				return;
 			}
@@ -156,7 +156,58 @@ class PayplugResponse {
 				 */
 				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
 				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
-				PayplugGateway::log(sprintf('Order #%s : Payment IPN %s processing completed successfully.', $order_id, $resource->id));
+				PayplugGateway::log(sprintf('Order #%s : PayPlug payment IPN %s processing completed successfully.', $order_id, $resource->id));
+
+				return;
+			}
+
+		} else if ($this->gateway->id == "bancontact") {
+
+			// Ignore paid orders
+			if ($order->is_paid()) {
+				PayplugGateway::log(sprintf('Order #%s : Bancontact order is already complete. Ignoring IPN.', $order_id));
+				return;
+			}
+
+			if (!empty($resource->failure)) {
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
+				$order->update_status(
+					'failed',
+					sprintf(__('PayPlug IPN OK | Transaction %s failed : %s', 'payplug'), $resource->id, wc_clean($resource->failure->message))
+				);
+
+				/** This action is documented in src/Gateway/PayplugResponse */
+				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
+				PayplugGateway::log(sprintf('Order #%s : Bancontact payment IPN %s processing completed but failed.', $order_id, $resource->id));
+
+				return;
+			}
+
+			$this->bancontact_ipn($resource);
+
+			if ($resource->is_paid) {
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
+				if (!$is_payment_with_token) {
+					$this->maybe_save_card($resource);
+				}
+
+				$this->maybe_save_address_hash($resource);
+				$order->add_order_note(sprintf(__('PayPlug IPN OK | Transaction %s', 'payplug'), wc_clean($resource->id)));
+				$order->payment_complete(wc_clean($resource->id));
+				if (PayplugWoocommerceHelper::is_pre_30()) {
+					$order->reduce_order_stock();
+				}
+
+				/**
+				 * Fires once a payment response has been processed.
+				 *
+				 * @param int $order_id Order ID
+				 * @param PaymentResource $resource Payment resource
+				 */
+				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
+				PayplugGateway::log(sprintf('Order #%s : Bancontact payment IPN %s processing completed successfully.', $order_id, $resource->id));
 
 				return;
 			}
@@ -172,7 +223,18 @@ class PayplugResponse {
 
 	public function payplug_ipn($resource) {
 		$order_id = wc_clean( $resource->metadata['order_id'] );
-		PayplugGateway::log( sprintf( 'Order #%s : Begin processing payment IPN %s', $order_id, $resource->id ) );
+		PayplugGateway::log( sprintf( 'Order #%s : Begin processing Payplug payment IPN %s', $order_id, $resource->id ) );
+	}
+
+	/**
+	 * Bancontact IPN
+	 *
+	 * @param $resource
+	 */
+
+	public function bancontact_ipn($resource) {
+		$order_id = wc_clean( $resource->metadata['order_id'] );
+		PayplugGateway::log( sprintf( 'Order #%s : Begin processing Bancontact payment IPN %s', $order_id, $resource->id ) );
 	}
 
 	/**
