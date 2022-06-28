@@ -134,7 +134,10 @@ class PayplugResponse {
 				return;
 			}
 
-			$this->payplug_bancontact_ipn($resource, $gateway_name);
+			if ($this->gateway->id == "payplug")
+				$this->payplug_ipn($resource);
+			elseif ($this->gateway->id == "bancontact")
+				$this->bancontact_ipn($resource);
 
 			if ($resource->is_paid) {
 				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
@@ -167,14 +170,25 @@ class PayplugResponse {
 	}
 
 	/**
-	 * Payplug & Bancontact IPN
+	 * Payplug IPN
 	 *
 	 * @param $resource
 	 */
 
-	public function payplug_bancontact_ipn($resource, $gateway_name) {
+	public function payplug_ipn($resource) {
 		$order_id = wc_clean( $resource->metadata['order_id'] );
-		PayplugGateway::log( sprintf( 'Order #%s : Begin processing '. $gateway_name .' payment IPN %s', $order_id, $resource->id ) );
+		PayplugGateway::log( sprintf( 'Order #%s : Begin processing Payplug payment IPN %s', $order_id, $resource->id ) );
+	}
+
+	/**
+	 * Bancontact IPN
+	 *
+	 * @param $resource
+	 */
+
+	public function bancontact_ipn($resource) {
+		$order_id = wc_clean( $resource->metadata['order_id'] );
+		PayplugGateway::log( sprintf( 'Order #%s : Begin processing Bancontact payment IPN %s', $order_id, $resource->id ) );
 	}
 
 	/**
@@ -390,25 +404,25 @@ class PayplugResponse {
 
 		PayplugGateway::log( sprintf( 'Saving card from transaction %s for customer %s', wc_clean( $resource->id ), $customer->ID ) );
 
-        $token = new WC_Payment_Token_CC();
-        $existing_tokens = WC_Payment_Tokens::get_customer_tokens( $customer->ID , $this->gateway->id );
-        $set_token = wc_clean( $resource->card->id );
-        $set_last4 = wc_clean( $resource->card->last4 );
-        $set_expiry_year =  wc_clean( $resource->card->exp_year ) ;
-        $set_expiry_month = zeroise( (int) wc_clean( $resource->card->exp_month ), 2 ) ;
-        $set_card_type =  \strtolower( wc_clean( $resource->card->brand ) ) ;
-        if(!empty($existing_tokens)) {
-            foreach($existing_tokens as $token_id => $existing_token) {
-                $current_data = $existing_token->get_data();
-                if( $current_data['token'] === $set_token &&
-                    $current_data['last4'] === $set_last4 &&
-                    $current_data['expiry_year'] === $set_expiry_year &&
-                    $current_data['expiry_month'] === $set_expiry_month &&
-                    $current_data['card_type'] === $set_card_type) {
-                    $token->set_id($current_data['id']);
-                }
-            }
-        }
+		$token = new WC_Payment_Token_CC();
+		$existing_tokens = WC_Payment_Tokens::get_customer_tokens( $customer->ID , $this->gateway->id );
+		$set_token = wc_clean( $resource->card->id );
+		$set_last4 = wc_clean( $resource->card->last4 );
+		$set_expiry_year =  wc_clean( $resource->card->exp_year ) ;
+		$set_expiry_month = zeroise( (int) wc_clean( $resource->card->exp_month ), 2 ) ;
+		$set_card_type =  \strtolower( wc_clean( $resource->card->brand ) ) ;
+		if(!empty($existing_tokens)) {
+			foreach($existing_tokens as $token_id => $existing_token) {
+				$current_data = $existing_token->get_data();
+				if( $current_data['token'] === $set_token &&
+				    $current_data['last4'] === $set_last4 &&
+				    $current_data['expiry_year'] === $set_expiry_year &&
+				    $current_data['expiry_month'] === $set_expiry_month &&
+				    $current_data['card_type'] === $set_card_type) {
+					$token->set_id($current_data['id']);
+				}
+			}
+		}
 
 		$token->set_token( $set_token );
 		$token->set_gateway_id( 'payplug' );
