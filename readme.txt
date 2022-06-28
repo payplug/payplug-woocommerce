@@ -80,6 +80,13 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 1.8.1 =
+* Paylater Improvements
+* Bancontact Improvements
+* Minor fixes
+* Tested up to Woocommerce 6.6.1
+* Tested up to Wordpress 6
+
 = 1.8.0 =
 * Bancontact (beta)
 * Translations change for Oney Italy
