@@ -685,3 +685,9 @@ msgstr ""
 
 msgid "payplug_bancontact_activation_url"
 msgstr ""
+
+msgid "oney_installments_pop_up"
+msgstr "Oney installments pop-up"
+
+msgid "display_the_oney_installments_pop_up_on_the_product_page"
+msgstr "Display the Oney installments pop-up on the Product page."

@@ -68,3 +68,9 @@ msgstr "support.payplug.com/hc/en-gb/requests/new"
 
 msgid "payplug_bancontact_testmode_description"
 msgstr "This feature is not available for the TEST mode. Please activate the LIVE mode to be able to use it."
+
+msgid "oney_installments_pop_up"
+msgstr "Oney installments pop-up"
+
+msgid "display_the_oney_installments_pop_up_on_the_product_page"
+msgstr "Display the Oney installments pop-up on the Product page."
