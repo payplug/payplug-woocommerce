@@ -1,4 +1,4 @@
-name: GitHub Actions Demo
+name: Payplug Woocommerce CI
 on: [push]
 jobs:
   Generate-Zip-File:
