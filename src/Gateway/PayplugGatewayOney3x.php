@@ -225,6 +225,12 @@ HTML;
 
             $address_data = PayplugAddressData::from_order($order);
 
+	        $return_url = esc_url_raw($order->get_checkout_order_received_url());
+
+	        if (!(str_starts_with($return_url, "http"))) {
+		        $return_url = get_site_url().$return_url;
+	        }
+
             $cart_items = [];
             $items = $order->get_items();
             foreach($items as $item) {
@@ -255,7 +261,7 @@ HTML;
                 ],
                 'notification_url' => esc_url_raw(WC()->api_request_url('PayplugGateway')),
                 'hosted_payment'   => [
-                    'return_url' => esc_url_raw($order->get_checkout_order_received_url()),
+                    'return_url' => $return_url,
                     'cancel_url' => esc_url_raw($order->get_cancel_order_url_raw()),
                 ],
                 'metadata'         => [
