@@ -1,0 +1,17 @@
+name: GitHub Actions Demo
+on: [push]
+jobs:
+  Generate-Zip-File:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Start the zip generation
+        run: ./bin/build-plugin-zip.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: payplug-woocommerce.zip
+          path: /home/runner/work/payplug-woocommerce/payplug-woocommerce.zip
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+
