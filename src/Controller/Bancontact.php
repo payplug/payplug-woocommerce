@@ -42,7 +42,7 @@ class Bancontact extends PayplugGateway
 				return  $account['payment_methods']['bancontact']['enabled'];
 
 		}
-		
+
 		return false;
 	}
 
@@ -82,6 +82,13 @@ class Bancontact extends PayplugGateway
 			}
 
 			$address_data = PayplugAddressData::from_order($order);
+
+			$return_url = esc_url_raw($order->get_checkout_order_received_url());
+
+			if (!(str_starts_with($return_url, "http"))) {
+				$return_url = get_site_url().$return_url;
+			}
+
 			$payment_data = [
 				'amount'           => $amount,
 				'currency'         => get_woocommerce_currency(),
@@ -89,7 +96,7 @@ class Bancontact extends PayplugGateway
 				'billing'          => $address_data->get_billing(),
 				'shipping'         => $address_data->get_shipping(),
 				'hosted_payment'   => [
-					'return_url' => esc_url_raw($order->get_checkout_order_received_url()),
+					'return_url' => $return_url,
 					'cancel_url' => esc_url_raw($order->get_cancel_order_url_raw()),
 				],
 				'notification_url' => esc_url_raw(WC()->api_request_url('PayplugGateway')),
