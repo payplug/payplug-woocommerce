@@ -4,7 +4,7 @@ jobs:
   Generate-Zip-File:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
+      - name: Check out repository code ${{ github.workflow }}
         uses: actions/checkout@v3
       - name: Start the zip generation
         run: ./bin/build-plugin-zip.sh
