@@ -306,6 +306,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$anchor_bancontact = esc_html_x( __("payplug_bancontact_activation_request", 'payplug'), 'modal', 'payplug' );
 		$domain_bancontact = __( 'payplug_bancontact_activation_url', 'payplug' );
 		$bancontact_call_to_action = sprintf(  ' <a id="bancontact_call_to_action" href="https://%s" target="_blank">%s</a>', $domain_bancontact, $anchor_bancontact );
+		$applepay_call_to_action = sprintf(  ' <a id="bancontact_call_to_action" href="https://%s" target="_blank">%s</a>', $domain_bancontact, $anchor_bancontact );
 
         $fields = [
             'enabled'                 => [
@@ -413,6 +414,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'description' => '<p class="description" id="bancontact_test_mode_description"> '. __('payplug_bancontact_testmode_description', 'payplug') .' </p>' .
 								 '<p class="description" id="bancontact_live_mode_description_disabled"> '. __('payplug_bancontact_livemode_description_disabled', 'payplug') .' </p>' .
 								 $bancontact_call_to_action,
+				'default'     => 'no',
+			],
+			'applepay'                 => [
+				'title'       => __('payplug_applepay_activate_title', 'payplug'),
+				'type'        => 'checkbox',
+				'label'       => __('Activate', 'payplug'),
+				'description' => '<p class="description" id="applepay_test_mode_description"> '. __('payplug_applepay_testmode_description', 'payplug') .' </p>' .
+								 '<p class="description" id="applepay_live_mode_description_disabled"> '. __('payplug_applepay_livemode_description', 'payplug') .' </p>' ,
 				'default'     => 'no',
 			],
 			'oney'                => [
@@ -639,6 +648,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		wp_enqueue_script(
 			'payplug-gateway-admin-bancontact',
 			PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin-bancontact.js',
+			['jquery-ui-dialog'],
+			PAYPLUG_GATEWAY_VERSION
+		);
+
+		wp_enqueue_script(
+			'payplug-gateway-admin-applepay',
+			PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin-applepay.js',
 			['jquery-ui-dialog'],
 			PAYPLUG_GATEWAY_VERSION
 		);
