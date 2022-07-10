@@ -23,19 +23,23 @@
 		},
 		checkApplePay: (event)=> {
 
-			payplug_admin.disableApplePay();
-
 			if(payplug_admin.isTestMode()){
 				payplug_admin.uncheckApplePay();
 				payplug_admin.disableApplePay();
-				$("#applepay_test_mode_description").show();
-				$("#applepay_call_to_action").hide();
-				$("#applepay_live_mode_description_disabled").hide();
+				$("#apple_pay_test_mode_description").show();
+				$("#apple_pay_call_to_action").hide();
+				$("#apple_pay_live_mode_description").hide();
 				return;
+			} else {
+				payplug_admin.enableApplePay();
+				$("#apple_pay_test_mode_description").hide();
+				$("#apple_pay_call_to_action").show();
+				$("#apple_pay_live_mode_description").show();
 			}
-			$("#applepay_test_mode_description").hide();
+
 
 			payplug_admin.checkApplePayPermissions((res) => {
+				console.log(res);
 				if(false === res.success){
 					payplug_admin.uncheckApplePay();
 					payplug_admin.disableApplePay();
@@ -44,7 +48,6 @@
 
 				if(false === res.data){
 					payplug_admin.uncheckApplePay();
-					payplug_admin.disableApplePay();
 					return;
 				}
 
@@ -56,16 +59,16 @@
 			return jQuery("#woocommerce_payplug_mode-no").prop("checked");
 		},
 		uncheckApplePay: function(){
-			jQuery("#woocommerce_payplug_applepay").prop("checked", false);
+			jQuery("#woocommerce_payplug_apple_pay").prop("checked", false);
 		},
 		disableApplePay: function(){
-			//jQuery("#woocommerce_payplug_bancontact").prop("disabled", true);
+			jQuery("#woocommerce_payplug_apple_pay").prop("disabled", true);
 			if(!payplug_admin.isTestMode())
-				jQuery("#applepay_live_mode_description_disabled").show()
+				jQuery("#apple_pay_live_mode_description_disabled").show()
 		},
 		enableApplePay: function(){
-			jQuery("#woocommerce_payplug_applepay").prop("disabled", false);
-			jQuery("#applepay_live_mode_description_disabled").hide();
+			jQuery("#woocommerce_payplug_apple_pay").prop("disabled", false);
+			jQuery("#apple_pay_live_mode_description_disabled").hide();
 		}
 	}
 	payplug_admin.init();

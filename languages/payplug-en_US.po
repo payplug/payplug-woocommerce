@@ -74,3 +74,12 @@ msgstr "Oney installments pop-up"
 
 msgid "display_the_oney_installments_pop_up_on_the_product_page"
 msgstr "Display the Oney installments pop-up on the Product page."
+
+msgid "payplug_apple_pay_activate_title"
+msgstr "Apple Pay payment"
+
+msgid "payplug_apple_pay_testmode_description"
+msgstr "Unavailable in test mode"
+
+msgid "payplug_apple_pay_livemode_description"
+msgstr "Display the Apple Pay payment button on your store, on the checkout."
