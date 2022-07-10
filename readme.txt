@@ -80,7 +80,7 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
-= 1.8.1 =
+= 1.8.2 =
 * Minor fixes
 * Tested up to Woocommerce 6.6.1
 * Tested up to Wordpress 6
