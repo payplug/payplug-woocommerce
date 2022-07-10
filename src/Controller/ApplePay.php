@@ -22,10 +22,10 @@ class ApplePay extends PayplugGateway
 		$this->id                 = 'apple_pay';
 
 		/** @var \WC_Payment_Gateway overwrite for apple pay settings  */
-		$this->method_title       = __('payplug_applepay_title', 'payplug');
-		$this->method_description = __('payplug_applepay_description', 'payplug');
+		$this->method_title       = __('payplug_apple_pay_title', 'payplug');
+		$this->method_description = __('payplug_apple_pay_description', 'payplug');
 
-		$this->title = __('payplug_applepay_title', 'payplug');
+		$this->title = __('payplug_apple_pay_title', 'payplug');
 		$this->description = '';
 
 		if(!$this->checkApplePay())

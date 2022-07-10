@@ -153,7 +153,7 @@ class Ajax {
 		}
 
 		PayplugWoocommerceHelper::set_transient_data($account);
-		$applepay = isset($account['httpResponse']['payment_methods']['applepay']['enabled']) ? $account['httpResponse']['payment_methods']['applepay']['enabled']: false;
+		$applepay = isset($account['httpResponse']['payment_methods']['apple_pay']['enabled']) ? $account['httpResponse']['payment_methods']['apple_pay']['enabled']: false;
 		wp_send_json_success($applepay);
 	}
 
