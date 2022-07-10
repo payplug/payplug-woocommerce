@@ -130,6 +130,7 @@ class PayplugWoocommerce {
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3xWithoutFees';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4xWithoutFees';
 		$methods[] = __NAMESPACE__ . '\\Controller\\Bancontact';
+		$methods[] = __NAMESPACE__ . '\\Controller\\ApplePay';
 
 		return $methods;
 	}
@@ -162,7 +163,7 @@ class PayplugWoocommerce {
 		if( empty($options['payplug_merchant_country']) ){
 			return ;
 		}
-		
+
 		if( !class_exists( "\\Payplug\\PayplugWoocommerce\\Front\\PayplugOney\\Country\\Oney" .$options['payplug_merchant_country'] )){
 			return ;
 		}
