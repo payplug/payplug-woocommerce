@@ -45,13 +45,16 @@ git clean -xdf
 
 # Run the build
 status "Installing dependencies..."
-npm install
 composer install --prefer-dist --no-dev -o
-status "Generating build..."
-npm run build:css
 
 # Remove any existing zip file
 rm -f payplug-woocommerce.zip
+
+# Remove any existing zip file
+rm -f payplug-woocommerce.zip
+
+# Set the api-qa endpoint
+sed -i 's/api.payplug.com/api-qa.payplug.com/g' 'vendor/payplug/payplug-php/lib/Payplug/Core/APIRoutes.php'
 
 # Generate the plugin zip file
 status "Creating archive..."
