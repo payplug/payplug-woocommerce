@@ -81,7 +81,7 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 
 == Changelog ==
 = 1.8.2 =
-* Minor fixes
+* Minor fixes (Specifications of payment gateway logs and fail safe on the return url)
 * Tested up to Woocommerce 6.6.1
 * Tested up to Wordpress 6
 
