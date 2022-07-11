@@ -153,7 +153,17 @@ class Ajax {
 		}
 
 		PayplugWoocommerceHelper::set_transient_data($account);
-		$applepay = isset($account['httpResponse']['payment_methods']['apple_pay']['enabled']) ? $account['httpResponse']['payment_methods']['apple_pay']['enabled']: false;
+		$applepay = false;
+
+		if ($account['httpResponse']['payment_methods']['apple_pay']['enabled']) {
+			foreach ($account['httpResponse']['payment_methods']['apple_pay']['allowed_domain_names'] as $domain_name) {
+				if (strpos($domain_name, get_site_url()) !== false) {
+					$applepay = true;
+					continue;
+				}
+			}
+		}
+		//$applepay = ((isset($account['httpResponse']['payment_methods']['apple_pay']['enabled']))) ? $account['httpResponse']['payment_methods']['apple_pay']['enabled']: false;
 		wp_send_json_success($applepay);
 	}
 
