@@ -157,7 +157,7 @@ class Ajax {
 
 		if ($account['httpResponse']['payment_methods']['apple_pay']['enabled']) {
 			foreach ($account['httpResponse']['payment_methods']['apple_pay']['allowed_domain_names'] as $domain_name) {
-				if (strpos($domain_name, get_site_url()) !== false) {
+				if (strpos(get_site_url(), $domain_name) !== false) {
 					$applepay = true;
 					continue;
 				}
