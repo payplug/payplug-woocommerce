@@ -156,14 +156,11 @@ class Ajax {
 		$applepay = false;
 
 		if ($account['httpResponse']['payment_methods']['apple_pay']['enabled']) {
-			foreach ($account['httpResponse']['payment_methods']['apple_pay']['allowed_domain_names'] as $domain_name) {
-				if (strpos(get_site_url(), $domain_name) !== false) {
-					$applepay = true;
-					continue;
-				}
+			if (in_array(strtr(get_site_url(), array("http://" => "", "http://" => "")), $account['httpResponse']['payment_methods']['apple_pay']['allowed_domain_names'])) {
+				$applepay = true;
 			}
+
 		}
-		//$applepay = ((isset($account['httpResponse']['payment_methods']['apple_pay']['enabled']))) ? $account['httpResponse']['payment_methods']['apple_pay']['enabled']: false;
 		wp_send_json_success($applepay);
 	}
 
