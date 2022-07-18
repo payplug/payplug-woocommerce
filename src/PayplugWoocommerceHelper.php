@@ -484,6 +484,7 @@ class PayplugWoocommerceHelper {
 		if (is_array($account)) {
 			$account['oneyEnabled'] = (isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
 			$account['bancontact'] = !empty($options['bancontact']) ? $options['bancontact'] : '';
+			$account['apple_pay'] = !empty($options['apple_pay']) ? $options['apple_pay'] : '';
 		}
 		return $account;
 	}
