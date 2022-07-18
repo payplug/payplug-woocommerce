@@ -108,7 +108,7 @@ class ApplePay extends PayplugGateway
 			'jquery',
 			'apple-pay-sdk'
 		], PAYPLUG_GATEWAY_VERSION, true);
-		wp_localize_script( 'payplug-apple-pay', 'payplug_apple_pay_config',
+		wp_localize_script( 'payplug-apple-pay', 'apple_pay_params',
 			array(
 				'ajax_url_payplug_create_order' => \WC_AJAX::get_endpoint('payplug_create_order'),
 				'chosen_payment_method'=> WC()->session->get( 'chosen_payment_method')
