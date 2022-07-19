@@ -7,7 +7,6 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\Resource\Payment as PaymentResource;
-use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 
 class ApplePay extends PayplugGateway
 {
@@ -29,7 +28,7 @@ class ApplePay extends PayplugGateway
 
 		$this->title = 'payplug_apple_pay_title';
 		$this->description = '<div id="apple-pay-button-wrapper"><apple-pay-button buttonstyle="black" type="pay" locale="'. get_locale() .'"></apple-pay-button></div>';
-		$this->domain_name = strtr(get_site_url(), array("http://" => "", "http://" => ""));
+		$this->domain_name = strtr(get_site_url(), array("http://" => "", "https://" => ""));
 
 		if (!$this->checkApplePay()) {
 			$this->enabled = 'no';
@@ -57,7 +56,7 @@ class ApplePay extends PayplugGateway
 			if( !empty($account['apple_pay']) && $account['apple_pay'] === 'yes' ) {
 				$applepay = false;
 				if ($account['payment_methods']['apple_pay']['enabled']) {
-					if (in_array(strtr(get_site_url(), array("http://" => "", "http://" => "")), $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
+					if (in_array($this->domain_name, $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
 						$applepay = true;
 					}
 				}
@@ -111,7 +110,11 @@ class ApplePay extends PayplugGateway
 		wp_localize_script( 'payplug-apple-pay', 'apple_pay_params',
 			array(
 				'ajax_url_payplug_create_order' => \WC_AJAX::get_endpoint('payplug_create_order'),
-				'chosen_payment_method'=> WC()->session->get( 'chosen_payment_method')
+				'chosen_payment_method'=> WC()->session->get( 'chosen_payment_method'),
+				'countryCode' => WC()->customer->get_billing_country(),
+				'currencyCode' => get_woocommerce_currency(),
+				'total' => WC()->cart->total,
+				'apple_pay_domain' => $this->domain_name
 			)
 		);
 	}
@@ -132,6 +135,105 @@ class ApplePay extends PayplugGateway
 			$icons_str .= $icon;
 		}
 		return $icons_str;
+	}
+
+	/**
+	 * @param \WC_Order $order
+	 * @param int $amount
+	 * @param int $customer_id
+	 *
+	 * @return array
+	 * @throws \Exception
+	 */
+	public function process_standard_payment($order, $amount, $customer_id)
+	{
+		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
+		try {
+			if (!$this->checkApplePay()) {
+				throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+			}
+
+			$address_data = PayplugAddressData::from_order($order);
+
+			$return_url = esc_url_raw($order->get_checkout_order_received_url());
+
+			if (!(str_starts_with($return_url, "http"))) {
+				$return_url = get_site_url().$return_url;
+			}
+
+			$payment_data = [
+				'amount'           => $amount,
+				'currency'         => get_woocommerce_currency(),
+				'payment_method' => 'apple_pay',
+				'payment_context' => array(
+					'apple_pay' => array(
+						'domain_name' => $this->domain_name,
+						'application_data' => base64_encode(json_encode(array(
+							'apple_pay_domain' => $this->domain_name,
+						)))
+					)
+				),
+				'billing'          => $address_data->get_billing(),
+				'shipping'         => $address_data->get_shipping(),
+				'hosted_payment'   => [
+					'return_url' => $return_url,
+					'cancel_url' => esc_url_raw($order->get_cancel_order_url_raw()),
+				],
+				'notification_url' => esc_url_raw(WC()->api_request_url('PayplugGateway')),
+				'metadata'         => [
+					'order_id'    => $order_id,
+					'customer_id' => ((int) $customer_id > 0) ? $customer_id : 'guest',
+					'domain'      => $this->domain_name,
+				]
+			];
+
+			/**
+			 * Filter the payment data before it's used
+			 *
+			 * @param array $payment_data
+			 * @param int $order_id
+			 * @param array $customer_details
+			 * @param PayplugAddressData $address_data
+			 */
+			$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
+			$payment      = $this->api->payment_create($payment_data);
+
+			// Save transaction id for the order
+			PayplugWoocommerceHelper::is_pre_30()
+				? update_post_meta($order_id, '_transaction_id', $payment->id)
+				: $order->set_transaction_id($payment->id);
+
+			if (is_callable([$order, 'save'])) {
+				$order->save();
+			}
+
+			/**
+			 * Fires once a payment has been created.
+			 *
+			 * @param int $order_id Order ID
+			 * @param PaymentResource $payment Payment resource
+			 */
+			\do_action('payplug_gateway_payment_created', $order_id, $payment);
+
+			$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
+			PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
+
+			PayplugGateway::log(sprintf('Payment creation complete for order #%s', $order_id));
+
+			return [
+				'result'   => 'success',
+				'merchant_session' => $payment->payment_method["merchant_session"],
+				'payment_id' => $payment->id
+			];
+
+		} catch (HttpException $e) {
+			PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
+			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+		} catch (\Exception $e) {
+			PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, $e->getMessage()), 'error');
+			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+		}
+
 	}
 
 }
