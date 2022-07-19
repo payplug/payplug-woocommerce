@@ -163,7 +163,7 @@ class PayplugWoocommerce {
 		if( empty($options['payplug_merchant_country']) ){
 			return ;
 		}
-		
+
 		if( !class_exists( "\\Payplug\\PayplugWoocommerce\\Front\\PayplugOney\\Country\\Oney" .$options['payplug_merchant_country'] )){
 			return ;
 		}

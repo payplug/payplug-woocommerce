@@ -484,8 +484,15 @@ class PayplugWoocommerceHelper {
 		if (is_array($account)) {
 			$account['oneyEnabled'] = (isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
 			$account['bancontact'] = !empty($options['bancontact']) ? $options['bancontact'] : '';
-			$account['apple_pay'] = !empty($options['apple_pay']) ? $options['apple_pay'] : '';
-		}
+
+			if ($account['payment_methods']['apple_pay']['enabled']) {
+				if (in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
+					$account['apple_pay'] = "yes";
+				}
+
+			}
+
+    }
 		return $account;
 	}
 
