@@ -156,7 +156,7 @@ class Ajax {
 		$applepay = false;
 
 		if ($account['httpResponse']['payment_methods']['apple_pay']['enabled']) {
-			if (in_array(strtr(get_site_url(), array("http://" => "", "http://" => "")), $account['httpResponse']['payment_methods']['apple_pay']['allowed_domain_names'])) {
+			if (in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['httpResponse']['payment_methods']['apple_pay']['allowed_domain_names'])) {
 				$applepay = true;
 			}
 
