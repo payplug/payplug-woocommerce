@@ -34,6 +34,27 @@ class Ajax {
 		add_action( 'wp_ajax_' . self::REFRESH_KEY_ACTION, [ $this, 'handle_refresh_keys' ] );
 		add_action( 'wp_ajax_' . self::CHECK_LIVE_PERMISSIONS, [ $this, 'check_live_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_BANCONTACT_PERMISSIONS, [ $this, 'check_bancontact_permissions' ] );
+		add_action( 'wp_ajax_payplug_update_settings', [ $this, 'payplug_update_settings'] );
+
+	}
+
+	function payplug_update_settings() {
+		$option_key = 'woocommerce_payplug_settings';
+		$gateway_id = 'payplug';
+		$settings = [
+			'title' => $_POST['title'],
+			'description' => $_POST['description'],
+
+			'enabled' => 'yes',
+			'email' => 'testplugin+bancontact@payplug.com',
+			'payplug_test_key' => 'sk_test_3tUBfgLpUMb1Frwwcr7frc',
+			'payplug_live_key' => 'sk_live_4qeZdSglALq3CYsXSUSGmc',
+			'payplug_merchant_id' => '651488',
+			'mode' => 'no'
+		];
+		do_action( 'woocommerce_update_option', array( 'id' => $option_key ) );
+		return update_option( $option_key, apply_filters( 'woocommerce_settings_api_sanitized_fields_' . $gateway_id, $settings ), 'yes' );
+		wp_send_json_success(array());
 	}
 
 	public function handle_refresh_keys() {

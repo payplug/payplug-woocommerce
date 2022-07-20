@@ -164,6 +164,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
         add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
+		add_action( 'wp_ajax_payplug_update_settings', [ $this, 'payplug_update_settings'] );
     }
 
     /**
@@ -296,6 +297,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     /**
      * Register gateway settings.
      */
+	/*
     public function init_form_fields()
     {
         $anchor = esc_html_x( __("More informations", 'payplug'), 'modal', 'payplug' );
@@ -478,14 +480,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             }
         }
 
-        /**
-         * Filter PayPlug gateway settings.
-         *
-         * @param array $fields
-         */
+
         $fields            = apply_filters('payplug_gateway_settings', $fields);
         $this->form_fields = $fields;
     }
+	*/
 
     /**
      * Set global configuration for PayPlug instance.
@@ -676,7 +675,48 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	        'oney_thresholds_max' => $this->oney_thresholds_max,
         ));
 
-        if ($this->user_logged_in() && false === $this->has_api_key('live')) {
+		// Code for VueJs
+
+		wp_enqueue_script('vue',
+			'https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js',
+			[],
+			'2.5.17');
+
+		wp_enqueue_script(
+			'payplug-admin-vuejs',
+			PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin-vue.js',
+			['vue'],
+			PAYPLUG_GATEWAY_VERSION,
+			true
+		);
+		add_filter('script_loader_tag', [$this, 'add_type_attribute'] , 10, 3);
+
+		wp_enqueue_style(
+			'payplug-admin-vuecss',
+			PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-admin-vue.css',
+			[],
+			PAYPLUG_GATEWAY_VERSION
+		);
+
+		$options = get_option($this->get_option_key());
+		if(isset($options['payplug_live_key']))
+			unset($options['payplug_live_key']);
+		if(isset($options['payplug_test_key']))
+			unset($options['payplug_test_key']);
+		$translations = ['Title'];
+		$path = PAYPLUG_GATEWAY_PLUGIN_URL  . '/languages/payplug-it_IT.mo';
+		$mo = new \MO();
+		$mo->import_from_file($path);
+		foreach ($translations as $translation)
+			$translations[$translation] = @$mo->entries[$translation]->translations[0];
+
+		wp_localize_script('payplug-admin-vuejs', 'vars', array(
+			'ajax_url'      => admin_url('admin-ajax.php'),
+			'options' 		=> $options,
+			'translations' 		=> $translations
+		));
+
+		if ($this->user_logged_in() && false === $this->has_api_key('live')) {
             add_action('admin_footer', function () {
                 $email = $this->get_option('email');
 ?>
@@ -707,6 +747,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             <?php echo $payplug_requirements->currency_requirement(); ?>
             <?php echo $payplug_requirements->oney_requirement(); ?>
         </div>
+		<div id="mount"></div>
         <?php echo wp_kses_post(wpautop($this->get_method_description())); ?>
 
         <?php if ($this->user_logged_in()) : ?>
@@ -762,6 +803,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         </div>
         <?php
     }
+
+	function add_type_attribute($tag, $handle, $src) {
+		// if not your script, do nothing and return original $tag
+		if ( 'payplug-admin-vuejs' !== $handle ) {
+			return $tag;
+		}
+		// change the script tag by adding type="module" and return it.
+		$tag = '<script id="payplug-admin-vuejs" type="module" src="' . esc_url( $src ) . '"></script>';
+		return $tag;
+	}
 
     /**
      * Process admin options.
