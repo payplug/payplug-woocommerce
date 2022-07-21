@@ -20,15 +20,14 @@ class ApplePay extends PayplugGateway
 		parent::__construct();
 
 		/** @var \WC_Settings_API  override $id */
-		$this->id = 'apple_pay';
+		$this->id                 = 'apple_pay';
 
-		/** @var \WC_Payment_Gateway overwrite for apple pay settings */
-		$this->method_title = __('payplug_apple_pay_title', 'payplug');
-		$this->method_description = "";
+		/** @var \WC_Payment_Gateway overwrite for apple pay settings  */
+		$this->method_title       = __('payplug_apple_pay_title', 'payplug');
+		$this->method_description = __('payplug_apple_pay_description', 'payplug');
 
 		$this->title = __('payplug_apple_pay_title', 'payplug');
-		$this->description = '<div id="apple-pay-button-wrapper"><apple-pay-button buttonstyle="black" type="pay" locale="'. get_locale() .'"></apple-pay-button></div>';
-		$this->domain_name = strtr(get_site_url(), array("http://" => "", "https://" => ""));
+		$this->description = '';
 
 		if (!$this->checkApplePay()) {
 			$this->enabled = 'no';
@@ -112,6 +111,15 @@ class ApplePay extends PayplugGateway
 		);
 	}
 
+
+	}
+
+	public static function display_notice() {
+		?>
+		<div class="notice notice-error is-dismissible">
+		<p><?php _e( 'You don\'t have access to this feature yet. To activate Apple Pay, please contact support@payplug.com', 'payplug' ); ?></p>
+		</div>
+		<?php
 	/**
 	 * Get payment icons.
 	 *
@@ -130,7 +138,6 @@ class ApplePay extends PayplugGateway
 		}
 		return $icons_str;
 	}
-
 
 	/**
 	 * @param \WC_Order $order
