@@ -38,32 +38,30 @@ class ApplePay extends PayplugGateway
 
 		if (isset($account['payment_methods']['apple_pay']['enabled']) ) {
 
-			if( !empty($account['apple_pay']) && $account['apple_pay'] === 'yes' )
+			if( !empty($account['apple_pay']) && $account['apple_pay'] === 'yes' ) {
 				return  $account['payment_methods']['apple_pay']['enabled'];
+			} else {
+				add_action( 'woocommerce_settings_saved', [$this ,"display_notice"] );
+				return false;
+			}
 
+		} else {
+			add_action( 'woocommerce_settings_saved', [$this ,"display_notice"] );
+			return false;
 		}
 
-		return false;
+
+	}
+
+	public static function display_notice() {
+		?>
+		<div class="notice notice-error is-dismissible">
+		<p><?php _e( 'You don\'t have access to this feature yet. To activate Apple Pay, please contact support@payplug.com', 'payplug' ); ?></p>
+		</div>
+		<?php
 	}
 
 
-	/**
-	 * Get payment icons.
-	 *
-	 * @return string
-	 */
-	public function get_icon()
-	{
-		$available_img = 'lg-bancontact-checkout.png';
-		$icons = apply_filters('payplug_payment_icons', [
-			'payplug' => sprintf('<img src="%s" alt="Oney 4x" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/' . $available_img)),
-		]);
-		$icons_str = '';
-		foreach ($icons as $icon) {
-			$icons_str .= $icon;
-		}
-		return $icons_str;
-	}
 
 	/**
 	 * @param \WC_Order $order
