@@ -1,22 +1,14 @@
 /* global window, apple_pay_params */
-(function ($) {
+(function($){
+
+	var $apple_pay_button = $('apple-pay-button')
 	var apple_pay = {
 		init: function () {
-			$('body').on( 'init_checkout update_checkout updated_checkout payment_method_selected', function () {
-				var payment_method = $('input[name="payment_method"]:checked').attr("value")
-				apple_pay.ShowHideSubmitButton(payment_method)
-			})
-			this.$apple_pay_button = $('apple-pay-button')
-			this.$apple_pay_button.on(
+			$apple_pay_button = $('apple-pay-button')
+			$apple_pay_button.on(
 				'click',
 				apple_pay.ProcessCheckout
 			)
-		},
-		ShowHideSubmitButton: function (payment_method) {
-			if (payment_method == 'apple_pay')
-				$('*[name=woocommerce_checkout_place_order]').hide()
-			else
-				$('*[name=woocommerce_checkout_place_order]').show();
 		},
 		ProcessCheckout: function (e) {
 			e.preventDefault();
@@ -50,16 +42,34 @@
 			$(document.body).trigger('checkout_error')
 		},
 		ScrollToNotices: function () {
-		var scrollElement = $('.woocommerce-NoticeGroup-updateOrderReview, .woocommerce-NoticeGroup-checkout')
-		if (!scrollElement.length) {
-			scrollElement = $('.form.checkout')
-		}
-		$('html, body').animate({
-			scrollTop: (scrollElement.offset().top - 100)
-		}, 500)
-	},
+			var scrollElement = $('.woocommerce-NoticeGroup-updateOrderReview, .woocommerce-NoticeGroup-checkout')
+			if (!scrollElement.length) {
+				scrollElement = $('.form.checkout')
+			}
+			$('html, body').animate({
+				scrollTop: (scrollElement.offset().top - 100)
+			}, 500)
+		},
 	}
-	$(document).ready(function () {
-		apple_pay.init()
-	})
-})(jQuery);
+
+	var applePaycontroller = function(){
+		if(jQuery("[name=payment_method]:checked").val() === "apple_pay"){
+			jQuery("[name=woocommerce_checkout_place_order]").prop("disabled", true);
+
+			//enable buttons
+			apple_pay.init();
+		}else{
+			jQuery("[name=woocommerce_checkout_place_order]").prop("disabled", false);
+		}
+	}
+
+	jQuery(document).on("change click", "[name=payment_method]", applePaycontroller);
+
+	$( document ).ajaxComplete(function() {
+		applePaycontroller();
+	});
+
+	jQuery("[name=payment_method]").prop("checked", false);
+})(jQuery)
+
+

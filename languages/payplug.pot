@@ -686,6 +686,10 @@ msgstr ""
 msgid "payplug_bancontact_activation_url"
 msgstr ""
 
+msgid "payplug_apple_pay_title"
+msgstr "Pay with Apple Pay"
+
+
 msgid "oney_installments_pop_up"
 msgstr "Oney installments pop-up"
 
