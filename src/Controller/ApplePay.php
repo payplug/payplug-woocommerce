@@ -44,7 +44,6 @@ class ApplePay extends PayplugGateway
 	 * Check Apple Pay Availability
 	 *
 	 */
-
 	private function checkApplePay(){
 		$account = PayplugWoocommerceHelper::get_account_data_from_options();
 
@@ -53,7 +52,7 @@ class ApplePay extends PayplugGateway
 			if( !empty($account['apple_pay']) && $account['apple_pay'] === 'yes' ) {
 				$applepay = false;
 				if ($account['payment_methods']['apple_pay']['enabled']) {
-					if (in_array(strtr(get_site_url(), array("http://" => "", "http://" => "")), $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
+					if (in_array($this->domain_name, $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
 						$applepay = true;
 					}
 				}
@@ -107,7 +106,10 @@ class ApplePay extends PayplugGateway
 		wp_localize_script( 'payplug-apple-pay', 'apple_pay_params',
 			array(
 				'ajax_url_payplug_create_order' => \WC_AJAX::get_endpoint('payplug_create_order'),
-				'chosen_payment_method'=> WC()->session->get( 'chosen_payment_method')
+				'countryCode' => WC()->customer->get_billing_country(),
+				'currencyCode' => get_woocommerce_currency(),
+				'total' => WC()->cart->total,
+				'apple_pay_domain' => $this->domain_name
 			)
 		);
 	}
@@ -159,7 +161,15 @@ class ApplePay extends PayplugGateway
 			$payment_data = [
 				'amount'           => $amount,
 				'currency'         => get_woocommerce_currency(),
-				'payment_method'   => $this->id,
+				'payment_method' => $this->id,
+				'payment_context' => array(
+					'apple_pay' => array(
+						'domain_name' => $this->domain_name,
+						'application_data' => base64_encode(json_encode(array(
+							'apple_pay_domain' => $this->domain_name,
+						)))
+					)
+				),
 				'billing'          => $address_data->get_billing(),
 				'shipping'         => $address_data->get_shipping(),
 				'hosted_payment'   => [
@@ -170,10 +180,8 @@ class ApplePay extends PayplugGateway
 				'metadata'         => [
 					'order_id'    => $order_id,
 					'customer_id' => ((int) $customer_id > 0) ? $customer_id : 'guest',
-					'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
-				],
-				"save_card"=> false,
-				"force_3ds"=> false
+					'domain'      => $this->domain_name,
+				]
 			];
 
 			/**
@@ -211,8 +219,8 @@ class ApplePay extends PayplugGateway
 
 			return [
 				'result'   => 'success',
-				'redirect' => $payment->hosted_payment->payment_url,
-				'cancel'   => $payment->hosted_payment->cancel_url,
+				'merchant_session' => $payment->payment_method["merchant_session"],
+				'payment_id' => $payment->id
 			];
 
 		} catch (HttpException $e) {
