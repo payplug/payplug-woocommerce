@@ -12,6 +12,7 @@ use Payplug\PayplugWoocommerce\Admin\Metabox;
 use Payplug\PayplugWoocommerce\Admin\Notices;
 use Payplug\PayplugWoocommerce\Admin\WoocommerceActions;
 use Payplug\PayplugWoocommerce\Controller\Bancontact;
+use Payplug\PayplugWoocommerce\Controller\ApplePay;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithFees;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithoutFees;
 
