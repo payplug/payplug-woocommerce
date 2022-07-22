@@ -57,7 +57,7 @@ class ApplePay extends PayplugGateway
 					}
 				}
 
-				return  $applepay && $this->checkDeviceComptability();
+				return  $applepay && $this->checkDeviceComptability() && $this->isSSL();
 			}
 		}
 
@@ -82,6 +82,21 @@ class ApplePay extends PayplugGateway
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check if SSL
+	 *
+	 */
+	public function isSSL()
+	{
+		if( !empty( $_SERVER['https'] ) )
+			return true;
+
+		if( !empty( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' )
+			return true;
+
+		return false;
 	}
 
 	/**
