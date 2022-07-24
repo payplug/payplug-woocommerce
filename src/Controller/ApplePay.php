@@ -40,33 +40,51 @@ class ApplePay extends PayplugGateway
 	}
 
 	/**
-	 * Check Apple Pay Availability
-	 *
+	 * @return bool|void
 	 */
+	public function process_admin_options() {
+		$data = $this->get_post_data();
 
-	private function checkApplePay(){
+		if (isset($data['woocommerce_payplug_apple_pay'])) {
+			if (($data['woocommerce_payplug_apple_pay'] == 1) && (!$this->checkApplePay())) {
+				add_action( 'woocommerce_settings_saved', [$this ,"display_notice"] );
+			}
+		}
+
+	}
+
+	/**
+	 *
+	 * Check Apple Pay Authorization
+	 *
+	 * @return bool
+	 */
+	private function checkApplePay() {
 		$account = PayplugWoocommerceHelper::get_account_data_from_options();
 
-		if (isset($account['payment_methods']['apple_pay']['enabled']) ) {
+		if ( isset( $account['payment_methods']['apple_pay']['enabled'] ) ) {
 
-			if( !empty($account['apple_pay']) && $account['apple_pay'] === 'yes' ) {
+			if ( ! empty( $account['apple_pay'] ) && $account['apple_pay'] === 'yes' ) {
 				$applepay = false;
-				if ($account['payment_methods']['apple_pay']['enabled']) {
-					if (in_array(strtr(get_site_url(), array("http://" => "", "http://" => "")), $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
+				if ( $account['payment_methods']['apple_pay']['enabled'] ) {
+					if ( in_array( strtr( get_site_url(), array(
+						"http://" => "",
+						"http://" => ""
+					) ), $account['payment_methods']['apple_pay']['allowed_domain_names'] ) ) {
 						$applepay = true;
 					}
 				}
 
-				return  $applepay && $this->checkDeviceComptability();
+				return $applepay && $this->checkDeviceComptability();
 			}
 		}
 
 		return false;
 	}
-
 	/**
 	 * Check User-Agent to make sure it is on Mac OS and in Safari Browser
 	 *
+	 * @return bool
 	 */
 	private function checkDeviceComptability(){
 		$user_agent = $_SERVER['HTTP_USER_AGENT'];
@@ -110,9 +128,11 @@ class ApplePay extends PayplugGateway
 			)
 		);
 	}
-
-
-	}
+	/**
+	 * Display unauthorized error
+	 *
+	 * @return void
+	 */
 
 	public static function display_notice() {
 		?>
@@ -120,6 +140,8 @@ class ApplePay extends PayplugGateway
 		<p><?php _e( 'You don\'t have access to this feature yet. To activate Apple Pay, please contact support@payplug.com', 'payplug' ); ?></p>
 		</div>
 		<?php
+	}
+
 	/**
 	 * Get payment icons.
 	 *
