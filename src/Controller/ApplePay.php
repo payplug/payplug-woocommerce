@@ -33,34 +33,59 @@ class ApplePay extends PayplugGateway
 
 	}
 
+	/**
+	 * @return bool|void
+	 */
+	public function process_admin_options() {
+		$data = $this->get_post_data();
+
+		if (isset($data['woocommerce_payplug_apple_pay'])) {
+			if (($data['woocommerce_payplug_apple_pay'] == 1) && (!$this->checkApplePay())) {
+				add_action( 'woocommerce_settings_saved', [$this ,"display_notice"] );
+			}
+		}
+
+	}
+
+	/**
+	 *
+	 * Check Apple Pay Authorization
+	 *
+	 * @return bool
+	 */
 	private function checkApplePay(){
 		$account = PayplugWoocommerceHelper::get_account_data_from_options();
 
 		if (isset($account['payment_methods']['apple_pay']['enabled']) ) {
 
 			if( !empty($account['apple_pay']) && $account['apple_pay'] === 'yes' ) {
-				return  $account['payment_methods']['apple_pay']['enabled'];
-			} else {
-				add_action( 'woocommerce_settings_saved', [$this ,"display_notice"] );
-				return false;
-			}
+				$applepay = false;
+				if ($account['payment_methods']['apple_pay']['enabled']) {
+					if (in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
+						$applepay = true;
+					}
+				}
 
-		} else {
-			add_action( 'woocommerce_settings_saved', [$this ,"display_notice"] );
-			return false;
+				return  $applepay && $this->checkDeviceComptability();
+			}
 		}
 
-
+		return false;
 	}
+
+	/**
+	 * Display unauthorized error
+	 *
+	 * @return void
+	 */
 
 	public static function display_notice() {
 		?>
 		<div class="notice notice-error is-dismissible">
-		<p><?php _e( 'You don\'t have access to this feature yet. To activate Apple Pay, please contact support@payplug.com', 'payplug' ); ?></p>
+		<p><?php echo __( 'payplug_apple_pay_unauthorized_error', 'payplug' ); ?></p>
 		</div>
 		<?php
 	}
-
 
 
 	/**
@@ -154,6 +179,27 @@ class ApplePay extends PayplugGateway
 			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
 		}
 
+	}
+
+	/**
+	 * Check User-Agent to make sure it is on Mac OS and in Safari Browser
+	 *
+	 * @return bool
+	 */
+	private function checkDeviceComptability(){
+		$user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+		// Check if the Browser is Safari
+		if (stripos( $user_agent, 'Chrome') !== false) {
+			return false;
+		} elseif (stripos( $user_agent, 'Safari') !== false) {
+			// Check if the OS is Mac
+			if(!preg_match('/macintosh|mac os x/i', $user_agent)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 }

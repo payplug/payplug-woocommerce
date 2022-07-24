@@ -707,3 +707,6 @@ msgstr "Non disponibile in modalità Test"
 
 msgid "payplug_apple_pay_livemode_description"
 msgstr "Visualizza il pulsante di pagamento Apple Pay sul tuo negozio, sulla pagina di pagamento."
+
+msgid "payplug_apple_pay_unauthorized_error"
+msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Apple Pay, contatta <a href='mailto:support@payplug.com'>support@payplug.com</a>"
