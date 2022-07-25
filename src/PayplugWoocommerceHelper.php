@@ -494,9 +494,12 @@ class PayplugWoocommerceHelper {
 					update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
 				}
 
-			}
-
-    }
+			} else {
+				$account['apple_pay'] = "no";
+				$options['apple_pay'] = "no";
+				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+		}
+		}
 		return $account;
 	}
 
