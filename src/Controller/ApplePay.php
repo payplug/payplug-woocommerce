@@ -30,7 +30,7 @@ class ApplePay extends PayplugGateway
 		$this->description = '<div id="apple-pay-button-wrapper"><apple-pay-button buttonstyle="black" type="pay" locale="'. get_locale() .'"></apple-pay-button></div>';
 		$this->domain_name = strtr(get_site_url(), array("http://" => "", "https://" => ""));
 
-		if (!$this->checkApplePay()) {
+		if (!($this->checkApplePay() && $this->checkDeviceComptability() && $this->isSSL())) {
 			$this->enabled = 'no';
 
 		} else {
@@ -74,7 +74,7 @@ class ApplePay extends PayplugGateway
 					}
 				}
 
-				return  $applepay && $this->checkDeviceComptability() && $this->isSSL();
+				return  $applepay;
 			}
 		}
 
@@ -94,6 +94,7 @@ class ApplePay extends PayplugGateway
 		</div>
 		<?php
 	}
+
 	/**
 	 * Check User-Agent to make sure it is on Mac OS and in Safari Browser
 	 *
@@ -152,6 +153,7 @@ class ApplePay extends PayplugGateway
 		wp_localize_script( 'payplug-apple-pay', 'apple_pay_params',
 			array(
 				'ajax_url_payplug_create_order' => \WC_AJAX::get_endpoint('payplug_create_order'),
+				'ajax_url_applepay_update_payment' => \WC_AJAX::get_endpoint('applepay_update_payment'),
 				'countryCode' => WC()->customer->get_billing_country(),
 				'currencyCode' => get_woocommerce_currency(),
 				'total' => WC()->cart->total,
@@ -167,9 +169,9 @@ class ApplePay extends PayplugGateway
 	 */
 	public function get_icon()
 	{
-		$available_img = 'lg-bancontact-checkout.png';
+		$available_img = 'apple-pay-checkout.svg';
 		$icons = apply_filters('payplug_payment_icons', [
-			'payplug' => sprintf('<img src="%s" alt="Oney 4x" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/' . $available_img)),
+			'payplug' => sprintf('<img src="%s" alt="Apple Pay" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/' . $available_img)),
 		]);
 		$icons_str = '';
 		foreach ($icons as $icon) {
@@ -203,6 +205,12 @@ class ApplePay extends PayplugGateway
 				$return_url = get_site_url().$return_url;
 			}
 
+			// delivery_type must be removed in Apple Pay
+			$billing = $address_data->get_billing();
+			unset($billing['delivery_type']);
+			$shipping = $address_data->get_shipping();
+			unset($shipping['delivery_type']);
+
 			$payment_data = [
 				'amount'           => $amount,
 				'currency'         => get_woocommerce_currency(),
@@ -215,8 +223,8 @@ class ApplePay extends PayplugGateway
 						)))
 					)
 				),
-				'billing'          => $address_data->get_billing(),
-				'shipping'         => $address_data->get_shipping(),
+				'billing'          => $billing,
+				'shipping'         => $shipping,
 				'hosted_payment'   => [
 					'return_url' => $return_url,
 					'cancel_url' => esc_url_raw($order->get_cancel_order_url_raw()),
@@ -265,7 +273,9 @@ class ApplePay extends PayplugGateway
 			return [
 				'result'   => 'success',
 				'merchant_session' => $payment->payment_method["merchant_session"],
-				'payment_id' => $payment->id
+				'payment_id' => $payment->id,
+				'cancel_url' => esc_url_raw($order->get_cancel_order_url_raw()),
+				'return_url' => $return_url,
 			];
 
 		} catch (HttpException $e) {

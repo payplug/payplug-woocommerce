@@ -10,3 +10,9 @@ apple-pay-button {
 	--apple-pay-button-padding: 0px 0px;
 	--apple-pay-button-box-sizing: border-box;
 }
+
+apple-pay-button.isDisabled {
+	pointer-events: none;
+	cursor: not-allowed;
+	opacity: 0.5;
+}

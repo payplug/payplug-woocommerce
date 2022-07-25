@@ -15,6 +15,8 @@
 			e.preventDefault()
 			e.stopImmediatePropagation()
 			apple_pay.CreateSession()
+			apple_pay.CancelOrder()
+			apple_pay.PaymentCompleted()
 			$('form.woocommerce-checkout').block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } })
 			$.post(
 				apple_pay_params.ajax_url_payplug_create_order,
@@ -77,6 +79,8 @@
 		BeginSession: function (response) {
 			session.payment_id = response.payment_id
 			session.order_id = response.order_id
+			session.cancel_url = response.cancel_url
+			session.return_url = response.return_url
 			apple_pay.MerchantValidated(session, response.merchant_session)
 			session.begin()
 		},
@@ -87,6 +91,36 @@
 				} catch (err) {
 					alert(err)
 				}
+			}
+		},
+		CancelOrder: function () {
+			session.oncancel = event => {
+				$('apple-pay-button').addClass("isDisabled")
+				window.location = session.cancel_url
+			}
+		},
+		PaymentCompleted: function () {
+			session.onpaymentauthorized = event => {
+				$('apple-pay-button').addClass("isDisabled")
+				jQuery.ajax({
+					url: apple_pay_params.ajax_url_applepay_update_payment,
+					type: 'post',
+					data: {'action': 'applepay_update_payment', 'post_type': 'POST',
+						'payment_id': session.payment_id, 'payment_token': event.payment.token, 'order_id': session.order_id},
+					dataType: 'json',
+					success:function(res) {
+						var apple_pay_Session_status = ApplePaySession.STATUS_SUCCESS;
+						if (res.data.result !== true) {
+							apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
+						}
+						session.completePayment({"status": apple_pay_Session_status})
+						window.location = session.return_url
+					},
+					error: function(err){
+						console.log(err)
+						$('apple-pay-button').removeClass("isDisabled")
+					},
+				})
 			}
 		}
 	}
