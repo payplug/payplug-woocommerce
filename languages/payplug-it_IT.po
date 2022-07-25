@@ -710,3 +710,6 @@ msgstr "Paga con Apple Pay"
 
 #~ msgid "Cart size cannot be greater than 1000 with Oney."
 #~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
+
+msgid "payplug_apple_pay_unauthorized_error"
+msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Apple Pay, contatta <a href='mailto:support@payplug.com'>support@payplug.com</a>"

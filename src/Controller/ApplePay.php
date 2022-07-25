@@ -41,9 +41,26 @@ class ApplePay extends PayplugGateway
 	}
 
 	/**
-	 * Check Apple Pay Availability
-	 *
+	 * @return bool|void
 	 */
+	public function process_admin_options() {
+		$data = $this->get_post_data();
+
+		if (isset($data['woocommerce_payplug_apple_pay'])) {
+			if (($data['woocommerce_payplug_apple_pay'] == 1) && (!$this->checkApplePay())) {
+				add_action( 'woocommerce_settings_saved', [$this ,"display_notice"] );
+			}
+		}
+
+	}
+
+	/**
+	 *
+	 * Check Apple Pay Authorization
+	 *
+	 * @return bool
+	 */
+
 	private function checkApplePay(){
 		$account = PayplugWoocommerceHelper::get_account_data_from_options();
 
@@ -65,8 +82,22 @@ class ApplePay extends PayplugGateway
 	}
 
 	/**
+	 * Display unauthorized error
+	 *
+	 * @return void
+	 */
+
+	public static function display_notice() {
+		?>
+		<div class="notice notice-error is-dismissible">
+			<p><?php echo __( 'payplug_apple_pay_unauthorized_error', 'payplug' ); ?></p>
+		</div>
+		<?php
+	}
+	/**
 	 * Check User-Agent to make sure it is on Mac OS and in Safari Browser
 	 *
+	 * @return bool
 	 */
 	private function checkDeviceComptability(){
 		$user_agent = $_SERVER['HTTP_USER_AGENT'];
@@ -136,10 +167,9 @@ class ApplePay extends PayplugGateway
 	 */
 	public function get_icon()
 	{
-		$available_img = 'apple-pay-checkout.svg';
+		$available_img = 'lg-bancontact-checkout.png';
 		$icons = apply_filters('payplug_payment_icons', [
-			'payplug' => sprintf('<img src="%s" alt="Apple Pay" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/' . $available_img)),
-
+			'payplug' => sprintf('<img src="%s" alt="Oney 4x" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/' . $available_img)),
 		]);
 		$icons_str = '';
 		foreach ($icons as $icon) {
