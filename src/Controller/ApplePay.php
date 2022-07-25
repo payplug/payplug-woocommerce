@@ -139,12 +139,6 @@ class ApplePay extends PayplugGateway
 			)
 		);
 	}
-	/**
-	 * Display unauthorized error
-	 *
-	 * @return void
-	 */
-
 
 	/**
 	 * Get payment icons.
@@ -257,3 +251,5 @@ class ApplePay extends PayplugGateway
 		}
 
 	}
+
+}
