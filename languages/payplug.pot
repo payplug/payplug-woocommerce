@@ -692,9 +692,11 @@ msgstr ""
 msgid "payplug_apple_pay_title"
 msgstr "Pay with Apple Pay"
 
-
 msgid "oney_installments_pop_up"
 msgstr "Oney installments pop-up"
 
 msgid "display_the_oney_installments_pop_up_on_the_product_page"
 msgstr "Display the Oney installments pop-up on the Product page."
+
+msgid "payplug_apple_pay_livemode_description"
+msgstr "Display the Apple Pay payment button on your store, on the checkout. This button will only be seen on a Safari browser."

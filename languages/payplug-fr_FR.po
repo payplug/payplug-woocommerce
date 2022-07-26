@@ -701,7 +701,7 @@ msgid "payplug_apple_pay_testmode_description"
 msgstr "Non disponible en mode test"
 
 msgid "payplug_apple_pay_livemode_description"
-msgstr "Afficher le bouton de paiement Apple Pay sur votre boutique, sur le checkout."
+msgstr "Afficher le bouton de paiement Apple Pay sur votre boutique, sur le checkout. Le bouton ne sera visible que depuis un navigateur Safari."
 
 msgid "payplug_apple_pay_title"
 msgstr "Payer avec Apple Pay"
