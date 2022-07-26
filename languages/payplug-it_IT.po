@@ -703,7 +703,7 @@ msgid "payplug_apple_pay_testmode_description"
 msgstr "Non disponibile in modalità Test"
 
 msgid "payplug_apple_pay_livemode_description"
-msgstr "Visualizza il pulsante di pagamenti Apple Pay sul tuo negozio, sulla pagina di pagamento."
+msgstr "Visualizza il pulsante di pagamenti Apple Pay sul tuo negozio, sulla pagina di pagamento. Il pulsante sarà visibile solo da un browser Safari."
 
 msgid "payplug_apple_pay_title"
 msgstr "Paga con Apple Pay"
