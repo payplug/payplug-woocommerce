@@ -117,7 +117,6 @@
 						window.location = session.return_url
 					},
 					error: function(err){
-						console.log(err)
 						$('apple-pay-button').removeClass("isDisabled")
 					},
 				})
