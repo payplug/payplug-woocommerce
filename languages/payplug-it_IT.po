@@ -697,19 +697,19 @@ msgid "display_the_oney_installments_pop_up_on_the_product_page"
 msgstr "Mostra il pop-up con le rate Oney nella pagina del Prodotto."
 
 msgid "payplug_apple_pay_activate_title"
-msgstr "Pagamento Apple Pay"
+msgstr "Pagamenti Apple Pay"
 
 msgid "payplug_apple_pay_testmode_description"
 msgstr "Non disponibile in modalità Test"
 
 msgid "payplug_apple_pay_livemode_description"
-msgstr "Visualizza il pulsante di pagamento Apple Pay sul tuo negozio, sulla pagina di pagamento."
+msgstr "Visualizza il pulsante di pagamenti Apple Pay sul tuo negozio, sulla pagina di pagamento."
 
 msgid "payplug_apple_pay_title"
 msgstr "Paga con Apple Pay"
 
-#~ msgid "Cart size cannot be greater than 1000 with Oney."
-#~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
-
 msgid "payplug_apple_pay_unauthorized_error"
 msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Apple Pay, contatta <a href='mailto:support@payplug.com'>support@payplug.com</a>"
+
+#~ msgid "Cart size cannot be greater than 1000 with Oney."
+#~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
