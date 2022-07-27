@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2022-06-03 10:36+0100\n"
+"PO-Revision-Date: 2022-07-26 14:55+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -74,3 +74,18 @@ msgstr "Oney installments pop-up"
 
 msgid "display_the_oney_installments_pop_up_on_the_product_page"
 msgstr "Display the Oney installments pop-up on the Product page."
+
+msgid "payplug_apple_pay_activate_title"
+msgstr "Apple Pay payments"
+
+msgid "payplug_apple_pay_testmode_description"
+msgstr "Unavailable in test mode"
+
+msgid "payplug_apple_pay_livemode_description"
+msgstr "Display the Apple Pay payment button on your store, on the checkout. This button will only be seen on a Safari browser."
+
+msgid "payplug_apple_pay_unauthorized_error"
+msgstr "You don't have access to this feature yet. To activate Apple Pay, please contact <a href='mailto:support@payplug.com'>support@payplug.com</a>"
+
+msgid "payplug_apple_pay_title"
+msgstr "Pay with Apple Pay"
