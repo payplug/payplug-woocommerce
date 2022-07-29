@@ -91,6 +91,9 @@ class PayplugResponse {
 			if($gateway_id == "bancontact") {
 				$this->bancontact_ipn($resource);
 			}
+			if($gateway_id == "apple_pay") {
+				$this->apple_pay_ipn($resource);
+			}
 		} elseif ($gateway_id == "payplug") {
 			$this->payplug_ipn($resource);
 		}
@@ -140,6 +143,16 @@ class PayplugResponse {
 	}
 
 	/**
+	 * Apple Pay IPN
+	 *
+	 * @param $resource
+	 */
+	public function apple_pay_ipn($resource) {
+		$order_id = wc_clean( $resource->metadata['order_id'] );
+		PayplugGateway::log( sprintf( 'Order #%s : Begin processing Apple Pay payment IPN %s', $order_id, $resource->id ) );
+	}
+
+	/**
 	 * Oney IPN
 	 *
 	 * @param $resource
@@ -178,7 +191,7 @@ class PayplugResponse {
 		if (str_starts_with($gateway_id, 'oney_')) {
 			return str_replace("_", " ", $gateway_name);
 		}
-		return $gateway_name;
+		return ucwords(str_replace("_", " ", $gateway_name));
 	}
 
 	/**
