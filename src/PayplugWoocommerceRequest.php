@@ -100,17 +100,6 @@ class PayplugWoocommerceRequest {
 			$data = array( 'apple_pay' => $apple_pay );
 			$update = $payment->update($data);
 
-			$order = new \WC_Order($order_id);
-			if (!empty($order)) {
-				if($update->is_paid) {
-					PayplugGateway::log(sprintf('Order #%s : Apple Pay order is complete.', $order_id));
-					$order->update_status('completed');
-				} else {
-					PayplugGateway::log(sprintf('Order #%s : Apple Pay order Failed.', $order_id));
-					$order->update_status('failed');
-				}
-			}
-
 			wp_send_json_success([ "result" => $update->is_paid ]);
 
 		}catch (\Exception $e){
