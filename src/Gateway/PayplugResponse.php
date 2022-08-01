@@ -187,11 +187,7 @@ class PayplugResponse {
 	 * @param $gateway_id
 	 */
 	private function gateway_name($gateway_id){
-		$gateway_name = ucfirst($gateway_id);
-		if (str_starts_with($gateway_id, 'oney_')) {
-			return str_replace("_", " ", $gateway_name);
-		}
-		return ucwords(str_replace("_", " ", $gateway_name));
+		return ucwords(str_replace("_", " ", $gateway_id));
 	}
 
 	/**
