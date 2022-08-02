@@ -645,6 +645,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		add_filter('script_loader_tag', [$this, 'add_type_attribute'] , 10, 3);
 
+		wp_enqueue_style(
+			'payplug-admin-vuecss',
+			PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-admin-vue.css',
+			[],
+			PAYPLUG_GATEWAY_VERSION
+		);
+
         wp_enqueue_style(
             'payplug-gateway-style',
             PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/app.css',
