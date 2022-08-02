@@ -630,6 +630,21 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function admin_options()
     {
+		wp_enqueue_script('vue',
+			'https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js',
+			[],
+			'2.5.17');
+
+		wp_enqueue_script(
+			'payplug-admin-vuejs',
+			PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin-vue.js',
+			['vue'],
+			PAYPLUG_GATEWAY_VERSION,
+			true
+		);
+
+		add_filter('script_loader_tag', [$this, 'add_type_attribute'] , 10, 3);
+
         wp_enqueue_style(
             'payplug-gateway-style',
             PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/app.css',
@@ -712,6 +727,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
         $payplug_requirements = new PayplugGatewayRequirements($this); ?>
 
+		<div id="vue"></div>
         <h2 class="title--logo"><?php esc_html($this->get_method_title()) ?></h2>
         <p><?php _e(sprintf('Version %s', PAYPLUG_GATEWAY_VERSION)); ?></p>
         <div class="payplug-requirements">
@@ -777,6 +793,17 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         </div>
         <?php
     }
+
+	function add_type_attribute($tag, $handle, $src) {
+		// if not your script, do nothing and return original $tag
+		if ( 'payplug-admin-vuejs' !== $handle ) {
+			return $tag;
+		}
+		// change the script tag by adding type="module" and return it.
+		$tag = '<script id="payplug-admin-vuejs" type="module" src="' . esc_url( $src ) . '"></script>
+';
+		return $tag;
+	}
 
     /**
      * Process admin options.
