@@ -652,11 +652,19 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			PAYPLUG_GATEWAY_VERSION
 		);
 
+		$translations = ['Title', 'oney_installments_pop_up'];
+		$path = PAYPLUG_GATEWAY_PLUGIN_URL  . '/languages/payplug-it_IT.mo';
+		$mo = new \MO();
+		$mo->import_from_file($path);
+		foreach ($translations as $translation)
+			$translations[$translation] = @$mo->entries[$translation]->translations[0];
+
 		wp_localize_script('payplug-admin-vuejs', 'vars', array(
 			'base_url'      => PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/',
 			'logged_in'		=> $this->user_logged_in(),
 			'ajax_url'      => admin_url('admin-ajax.php'),
 			'options' 		=> get_option($this->get_option_key()),
+			'translations' 		=> $translations,
 		));
 
         wp_enqueue_style(

@@ -28,6 +28,7 @@ import General from "./components/molecules/General.vue.js"
 `,
 		mounted: function () {
 			console.log(this.message)
+			//alert(vars.translations['Title'])
 		}
 	})
 
