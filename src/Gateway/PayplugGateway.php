@@ -630,6 +630,51 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function admin_options()
     {
+		//import css
+		wp_enqueue_style('payplug-gateway-style', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/admin-v3.8.2.css', [], PAYPLUG_GATEWAY_VERSION);
+
+		//import vuejs
+		wp_enqueue_script('vue', 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js', [], '2.5.17');
+?>
+
+		<div id="content" class="bootstrap ">
+			<div class="payplugConfiguration">
+	  			<div class="payplug" id="app"></div>
+			</div>
+		</div>
+
+
+		<script type="module">
+			import app from '/wp-content/plugins/payplug/assets/js/app.js'
+			const {createApp} = Vue;
+			createApp(app).mount('#app');
+		</script>
+
+
+
+
+
+
+
+<?php
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public function admin_options2(){
         wp_enqueue_style(
             'payplug-gateway-style',
             PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/app.css',
