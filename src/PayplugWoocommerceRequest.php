@@ -3,6 +3,8 @@
 namespace Payplug\PayplugWoocommerce;
 
 // Exit if accessed directly
+use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -36,6 +38,7 @@ class PayplugWoocommerceRequest {
 
 		add_action( 'template_redirect', [ $this, 'set_session' ] );
 		add_action( 'wc_ajax_payplug_create_order', [ $this, 'ajax_create_order' ] );
+		add_action( 'wc_ajax_applepay_update_payment', [ $this, 'applepay_update_payment' ] );
 	}
 
 	/**
@@ -57,6 +60,10 @@ class PayplugWoocommerceRequest {
 		$wc_session->set_customer_session_cookie( true );
 	}
 
+	/**
+	 * Create the woocommerce order in the BO
+	 *
+	 */
 	public function ajax_create_order() {
 		if ( WC()->cart->is_empty() ) {
 			wp_send_json_error( __( 'Empty cart', 'payplug' ) );
@@ -70,4 +77,34 @@ class PayplugWoocommerceRequest {
 
 		die( 0 );
 	}
+
+	/**
+	 * Update Payplug API Payment for Apple Pay
+	 */
+	public function applepay_update_payment() {
+
+		$options = get_option('woocommerce_payplug_settings', []);
+		$order_id = $_POST['order_id'];
+		$payment_id = $_POST['payment_id'];
+
+		try{
+			\Payplug\Payplug::init(array(
+				'secretKey' => @$options['payplug_live_key'],
+				'apiVersion' => "2019-08-06",
+			));
+
+			$apple_pay = array();
+			$apple_pay['payment_token'] = $_POST['payment_token'];
+			$payment = \Payplug\Payment::retrieve($payment_id);
+
+			$data = array( 'apple_pay' => $apple_pay );
+			$update = $payment->update($data);
+
+			wp_send_json_success([ "result" => $update->is_paid ]);
+
+		}catch (\Exception $e){
+			wp_send_json_error($e->getMessage());
+		}
+	}
+
 }

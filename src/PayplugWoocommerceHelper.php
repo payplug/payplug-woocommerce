@@ -484,6 +484,21 @@ class PayplugWoocommerceHelper {
 		if (is_array($account)) {
 			$account['oneyEnabled'] = (isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
 			$account['bancontact'] = !empty($options['bancontact']) ? $options['bancontact'] : '';
+
+			if ($account['payment_methods']['apple_pay']['enabled']) {
+				if (in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
+					$account['apple_pay'] = "yes";
+				} else {
+					$account['apple_pay'] = "no";
+					$options['apple_pay'] = "no";
+					update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+				}
+
+			} else {
+				$account['apple_pay'] = "no";
+				$options['apple_pay'] = "no";
+				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+		}
 		}
 		return $account;
 	}
