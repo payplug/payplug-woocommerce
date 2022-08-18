@@ -245,6 +245,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return;
         }
 
+		//FIXME:: this is being runned 1 time for each gateway,
+		// this comparisson is only needed to only run the process_method one time
+		if($payment_method != $this->id){
+			return;
+		}
+
         $this->response->process_payment($payment);
     }
 

@@ -43,10 +43,7 @@ class PayplugResponse {
 		$gateway_id = $order->get_payment_method();
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($resource);
 
-		// Remove duplicate Logs
-		if( $gateway_id != $this->gateway->id) {
-			return;
-		}
+		PayplugGateway::log( $this->gateway->id, "error");
 
 		// Ignore undefined orders
 		if (!$order) {
