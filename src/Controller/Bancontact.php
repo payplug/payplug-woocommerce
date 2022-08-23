@@ -85,7 +85,7 @@ class Bancontact extends PayplugGateway
 
 			$return_url = esc_url_raw($order->get_checkout_order_received_url());
 
-			if (!(str_starts_with($return_url, "http"))) {
+			if (!(substr( $return_url, 0, 4 ) === "http")) {
 				$return_url = get_site_url().$return_url;
 			}
 
