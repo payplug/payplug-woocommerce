@@ -82,7 +82,7 @@ class PayplugResponse {
 		// but not for Payplug credit card gateway (in this case we check the payment_method from the order itself not the $resource)
 		if (isset($resource->payment_method) && is_array($resource->payment_method)) {
 			$gateway_id = $resource->payment_method['type'];
-			if (str_starts_with($gateway_id, 'oney_')) {
+			if (substr( $gateway_id, 0, 5 ) === "oney_") {
 				$this->oney_ipn($resource);
 			}
 			if($gateway_id == "bancontact") {
