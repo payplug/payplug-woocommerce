@@ -36,6 +36,57 @@ class Ajax {
 		add_action( 'wp_ajax_' . self::CHECK_LIVE_PERMISSIONS, [ $this, 'check_live_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_BANCONTACT_PERMISSIONS, [ $this, 'check_bancontact_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_APPLEPAY_PERMISSIONS, [ $this, 'check_applepay_permissions' ] );
+		$authenticated = current_user_can('administrator');
+		add_action( 'rest_api_init', function () use($authenticated) {
+			register_rest_route( 'payplug', '/data', array(
+				'methods' => 'GET',
+				'callback' => array($this, "get_data"),
+				'permission_callback' => function() use($authenticated) {return $authenticated;}
+			) );
+		} );
+		add_action( 'rest_api_init', function () use($authenticated) {
+			register_rest_route( 'payplug', '/save_data', array(
+				'methods' => 'POST',
+				'callback' => array($this, "save_data"),
+				'permission_callback' => function() use($authenticated) {return $authenticated;}
+			) );
+		} );
+	}
+
+	public function get_data() {
+		$options = get_option('woocommerce_payplug_settings', []);
+		$translations = [
+			"payplug_general_title" => __("payplug_general_title", "payplug"),
+			"payplug_general_description" => __("payplug_general_description", "payplug"),
+			"payplug_title" => __("payplug_title", "payplug"),
+			"payplug_description" => __("payplug_description", "payplug"),
+			"payplug_save_changes" => __("payplug_save_changes", "payplug"),
+			"payplug_changed_saved_message" => __("payplug_changed_saved_message", "payplug"),
+		];
+
+		return ["options" => $options, "translations" => $translations];
+	}
+
+	public function save_data() {
+		$bozo = [
+			"title" => $_POST["title"],
+			"description" => $_POST["description"],
+		];
+		$option_key = 'woocommerce_payplug_settings';
+		$gateway_id = 'payplug';
+		$settings = [
+			'title' => $_POST['title'],
+			'description' => $_POST['description'],
+
+			'enabled' => 'yes',
+			'email' => 'testplugin+bancontact@payplug.com',
+			'payplug_test_key' => 'sk_test_3tUBfgLpUMb1Frwwcr7frc',
+			'payplug_live_key' => 'sk_live_4qeZdSglALq3CYsXSUSGmc',
+			'payplug_merchant_id' => '651488',
+			'mode' => 'yes'
+		];
+		do_action( 'woocommerce_update_option', array( 'id' => $option_key ) );
+		return update_option( $option_key, apply_filters( 'woocommerce_settings_api_sanitized_fields_' . $gateway_id, $settings ), 'yes' );
 	}
 
 	public function handle_refresh_keys() {

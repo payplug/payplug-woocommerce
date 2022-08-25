@@ -708,3 +708,21 @@ msgstr "Payer avec Apple Pay"
 
 msgid "payplug_apple_pay_unauthorized_error"
 msgstr "Vous n'avez pas accès à cette fonctionnalité. Pour activer Apple Pay, contactez <a href='mailto:support@payplug.com'>support@payplug.com</a>"
+
+msgid "payplug_general_title"
+msgstr "Général"
+
+msgid "payplug_general_description"
+msgstr "Ceci est une description simple pour ce bloc"
+
+msgid "payplug_title"
+msgstr "Titre"
+
+msgid "payplug_description"
+msgstr "Description"
+
+msgid "payplug_save_changes"
+msgstr "Sauvegarder les modifications"
+
+msgid "payplug_changed_saved_message"
+msgstr "Données enregistrées avec succès !"

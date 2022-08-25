@@ -713,3 +713,21 @@ msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Apple Pay,
 
 #~ msgid "Cart size cannot be greater than 1000 with Oney."
 #~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
+
+msgid "payplug_general_title"
+msgstr "Generale"
+
+msgid "payplug_general_description"
+msgstr "Questa è una semplice descrizione per questo blocco"
+
+msgid "payplug_title"
+msgstr "Titolo"
+
+msgid "payplug_decsription"
+msgstr "Descrizione"
+
+msgid "payplug_save_changes"
+msgstr "Salvare le modifiche"
+
+msgid "payplug_changed_saved_message"
+msgstr "Dati salvati con successo!"
