@@ -89,3 +89,89 @@ msgstr "You don't have access to this feature yet. To activate Apple Pay, please
 
 msgid "payplug_apple_pay_title"
 msgstr "Pay with Apple Pay"
+
+# New translations
+
+msgid "payplug_login_title"
+msgstr "General"
+
+msgid "payplug_login_description"
+msgstr "Log in to your PayPlug account."
+
+msgid "payplug_email_address"
+msgstr "E-mail address"
+
+msgid "payplug_password"
+msgstr "Password"
+
+msgid "payplug_connect_button"
+msgstr "Connect account"
+
+msgid "payplug_credentials_error"
+msgstr "The email and/or password was not correct."
+
+msgid "payplug_ok"
+msgstr "OK"
+
+msgid "payplug_not_registered_yet_button"
+msgstr "Not registered to PayPlug yet?"
+
+msgid "payplug_forget_password"
+msgstr "Forgot your password?"
+
+msgid "payplug_register_title"
+msgstr "General"
+
+msgid "payplug_register_description"
+msgstr "Registration"
+
+msgid "payplug_register_note"
+msgstr "Create your account to use the module."
+
+msgid "payplug_create_account_button"
+msgstr "Create a PayPlug account"
+
+msgid "payplug_create_account_button_link"
+msgstr "https://portal.payplug.com/login"
+
+msgid "payplug_already_have_account_button"
+msgstr "I already have a PayPlug account"
+
+msgid "payplug_general_title"
+msgstr "General"
+
+msgid "payplug_general_description"
+msgstr "General settings of the module"
+
+msgid "payplug_logout"
+msgstr "Log out"
+
+msgid "payplug_portal_link"
+msgstr "Access my PayPlug portal"
+
+msgid "payplug_mode"
+msgstr "Mode"
+
+msgid "payplug_test_mode_note"
+msgstr "In TEST mode, all payments will be simulations and will not generate real transactions."
+
+msgid "payplug_live_mode_note"
+msgstr "In LIVE mode, the payments will generate real transactions."
+
+msgid "payplug_learn_more"
+msgstr "Learn more"
+
+msgid "payplug_learn_more_link"
+msgstr "https://support.payplug.com/hc/en-gb/articles/360021142492"
+
+msgid "payplug_test"
+msgstr "Test"
+
+msgid "payplug_live"
+msgstr "Live"
+
+msgid "payplug_status_title"
+msgstr "Status"
+
+msgid "payplug_status_description"
+msgstr "Control your environment to ensure that the module is in perfect working order"

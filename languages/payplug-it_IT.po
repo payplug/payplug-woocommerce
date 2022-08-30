@@ -185,7 +185,7 @@ msgid "https://www.payplug.com/modules/woocommerce"
 msgstr "https://www.payplug.com/it/modules/woocommerce"
 
 #: src/Gateway/PayplugGateway.php:329
-msgid "In TEST mode, all payments will be simulations and will not generate real transactions."
+msgid "Pagamenti in modalità TEST, sono simulazioni e non generano transazioni reali."
 msgstr "La modalità TEST permette di  effettuare solo delle simulazioni di pagamento e non genera reali transazioni."
 
 #: src/Gateway/PayplugGateway.php:345
@@ -713,3 +713,89 @@ msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Apple Pay,
 
 #~ msgid "Cart size cannot be greater than 1000 with Oney."
 #~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
+
+# New translations
+
+msgid "payplug_login_title"
+msgstr "Generale"
+
+msgid "payplug_login_description"
+msgstr "Connettiti al tuo account PayPlug."
+
+msgid "payplug_email_address"
+msgstr "Indirizzo E-mail"
+
+msgid "payplug_password"
+msgstr "Password"
+
+msgid "payplug_connect_button"
+msgstr "Accedi al tuo conto"
+
+msgid "payplug_credentials_error"
+msgstr "L'e-mail e/o la password non erano corrette."
+
+msgid "payplug_ok"
+msgstr "OK"
+
+msgid "payplug_not_registered_yet_button"
+msgstr "Non hai ancora un account PayPlug?"
+
+msgid "payplug_forget_password"
+msgstr "Hai dimenticato la password?"
+
+msgid "payplug_register_title"
+msgstr "Generale"
+
+msgid "payplug_register_description"
+msgstr "Iscrizione"
+
+msgid "payplug_register_note"
+msgstr "Crea il tuo account per poter utilizzare il modulo."
+
+msgid "payplug_create_account_button"
+msgstr "Crea un account PayPlug"
+
+msgid "payplug_create_account_button_link"
+msgstr "https://portal.payplug.com/login"
+
+msgid "payplug_already_have_account_button"
+msgstr "Ho già un account PayPlug"
+
+msgid "payplug_general_title"
+msgstr "Generale"
+
+msgid "payplug_general_description"
+msgstr "Impostazioni generali del modulo"
+
+msgid "payplug_logout"
+msgstr "Disconnettersi"
+
+msgid "payplug_portal_link"
+msgstr "Accesso al mio portale PayPlug"
+
+msgid "payplug_mode"
+msgstr "Modalità"
+
+msgid "payplug_test_mode_note"
+msgstr "Pagamenti in modalità TEST, sono simulazioni e non generano transazioni reali."
+
+msgid "payplug_live_mode_note"
+msgstr "In modalità LIVE, i pagamenti genereranno transazioni reali."
+
+msgid "payplug_learn_more"
+msgstr "Scopri di più"
+
+msgid "payplug_learn_more_link"
+msgstr "https://support.payplug.com/hc/it/articles/360021142492"
+
+msgid "payplug_test"
+msgstr "Test"
+
+msgid "payplug_live"
+msgstr "Live"
+
+msgid "payplug_status_title"
+msgstr "Stato"
+
+msgid "payplug_status_description"
+msgstr "Controlla il tuo ambiente per assicurarti che il modulo funzioni perfettamente"

@@ -183,7 +183,7 @@ msgid "https://www.payplug.com/modules/woocommerce"
 msgstr "https://www.payplug.com/fr/modules/woocommerce"
 
 #: src/Gateway/PayplugGateway.php:329
-msgid "In TEST mode, all payments will be simulations and will not generate real transactions."
+msgid "En mode TEST, tous les paiements sont des simulations et ne génèreront pas de transactions réelles."
 msgstr "En mode TEST, tous les paiements sont des simulations et ne génèreront pas de transactions réelles."
 
 #: src/Gateway/PayplugGateway.php:345
@@ -357,7 +357,7 @@ msgid "Partially refunded"
 msgstr "Partiellement remboursé"
 
 #: src/Gateway/PayplugGateway.php:630 src/Gateway/PayplugGateway.php:634
-msgid "Password"
+msgid "Mot de passe"
 msgstr "Mot de passe"
 
 #: src/Gateway/PayplugGatewayOney3x.php:37
@@ -708,3 +708,89 @@ msgstr "Payer avec Apple Pay"
 
 msgid "payplug_apple_pay_unauthorized_error"
 msgstr "Vous n'avez pas accès à cette fonctionnalité. Pour activer Apple Pay, contactez <a href='mailto:support@payplug.com'>support@payplug.com</a>"
+
+# New translations
+
+msgid "payplug_login_title"
+msgstr "Général"
+
+msgid "payplug_login_description"
+msgstr "Connectez-vous à votre compte PayPlug."
+
+msgid "payplug_email_address"
+msgstr "Adresse E-mail"
+
+msgid "payplug_password"
+msgstr "Mot de passe"
+
+msgid "payplug_connect_button"
+msgstr "Connexion"
+
+msgid "payplug_credentials_error"
+msgstr "L'e-mail et/ou le mot de passe n'étaient pas corrects."
+
+msgid "payplug_ok"
+msgstr "OK"
+
+msgid "payplug_not_registered_yet_button"
+msgstr "Pas encore de compte PayPlug ?"
+
+msgid "payplug_forget_password"
+msgstr "Mot de passe oublié ?"
+
+msgid "payplug_register_title"
+msgstr "Général"
+
+msgid "payplug_register_description"
+msgstr "Inscription"
+
+msgid "payplug_register_note"
+msgstr "Créez votre compte pour pouvoir utiliser le module."
+
+msgid "payplug_create_account_button"
+msgstr "Inscription PayPlug"
+
+msgid "payplug_create_account_button_link"
+msgstr "https://portal.payplug.com/login"
+
+msgid "payplug_already_have_account_button"
+msgstr "J'ai déjà un compte PayPlug"
+
+msgid "payplug_general_title"
+msgstr "Général"
+
+msgid "payplug_general_description"
+msgstr "Configurations générales du module"
+
+msgid "payplug_logout"
+msgstr "Se déconnecter"
+
+msgid "payplug_portal_link"
+msgstr "Accéder à mon portail PayPlug"
+
+msgid "payplug_mode"
+msgstr "Mode"
+
+msgid "payplug_test_mode_note"
+msgstr "En mode TEST, tous les paiements sont des simulations et ne génèreront pas de transactions réelles."
+
+msgid "payplug_live_mode_note"
+msgstr "En mode LIVE, les paiements généreront de véritables transactions."
+
+msgid "payplug_learn_more"
+msgstr "Apprendre encore plus"
+
+msgid "payplug_learn_more_link"
+msgstr "https://support.payplug.com/hc/fr/articles/360021142492"
+
+msgid "payplug_test"
+msgstr "Test"
+
+msgid "payplug_live"
+msgstr "Live"
+
+msgid "payplug_status_title"
+msgstr "Statut"
+
+msgid "payplug_status_description"
+msgstr "Contrôlez votre environnement pour vous assurer que le module est en parfait état de fonctionnement"
