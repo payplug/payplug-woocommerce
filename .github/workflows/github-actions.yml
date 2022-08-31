@@ -21,6 +21,6 @@ jobs:
       - name: Check out repository code ${{ github.workflow }}
         uses: actions/checkout@v3
       - name: Install composer dependencies
-        run: ./bin/php-compatibility
+        run: ./bin/php-compatibility.sh
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
