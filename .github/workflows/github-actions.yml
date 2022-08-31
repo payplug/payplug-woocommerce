@@ -28,4 +28,8 @@ jobs:
         run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
       - name: Test php version 5.7
         run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.7
+      - name: asjhdgasjhd
+        run: vendor/bin/phpcs --colors --report=code ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3 --report-file=/home/runner/work/payplug-woocommerce/report-5.3.txt
+      - name: asjhdgasjhd
+        run: echo 'ls'
       - run: echo "🍏 This job's status is ${{ job.status }}."
