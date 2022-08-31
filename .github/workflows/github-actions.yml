@@ -20,10 +20,8 @@ jobs:
     steps:
       - name: Check out repository code ${{ github.workflow }}
         uses: actions/checkout@v3
-      - name: Install composer dependencies
+      - name: Test php version 5.3
         run: ./bin/php-compatibility.sh
-      - name: Print Test php version 5.3
-        run: vendor/bin/phpcs --colors --report=code ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3 --report-file=/home/runner/work/payplug-woocommerce/report-5.3.txt
 
 
       - run: echo "🍏 This job's status is ${{ job.status }}."

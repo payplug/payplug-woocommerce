@@ -20,3 +20,4 @@ composer install --ignore-platform-reqs
 vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
 touch /home/runner/work/payplug-woocommerce/report-5.3.txt
 vendor/bin/phpcs --colors -s --report=summary  ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3
+vendor/bin/phpcs --colors --report=code ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3 --report-file=/home/runner/work/payplug-woocommerce/report-5.3.txt
