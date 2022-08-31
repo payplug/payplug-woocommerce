@@ -30,4 +30,4 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: report-5.3.txt
-          path: /home/runner/work/payplug-woocommerce/report-5.3.txt
+          path: /home/runner/work/payplug-woocommerce/report.txt
