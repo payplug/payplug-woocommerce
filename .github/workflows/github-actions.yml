@@ -1,7 +1,7 @@
 name: Payplug Woocommerce CI
 on: [ push ]
 jobs:
-  Generate-Zip-File:
+Generate-Zip-File:
     name: 1) Generate-Zip-File
     runs-on: ubuntu-latest
     steps:
@@ -14,6 +14,7 @@ jobs:
           name: payplug-woocommerce.zip
           path: /home/runner/work/payplug-woocommerce/payplug-woocommerce.zip
       - run: echo "🍏 This job's status is ${{ job.status }}."
+
   Check-PHP-Compatibility-5-3:
     name: 2) Check PHP Compatibility 5.3
     runs-on: ubuntu-latest
@@ -29,6 +30,20 @@ jobs:
       - name: Test php version 5.3
         run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3
 
+Check-PHP-Compatibility-5-6:
+  name: 2) Check PHP Compatibility 5.6
+  runs-on: ubuntu-latest
+  steps:
+    - name: Check out repository code ${{ github.workflow }}
+      uses: actions/checkout@v3
+    - name: Install composer dependencies
+      uses: ramsey/composer-install@v2
+      with:
+        composer-options: "--ignore-platform-reqs"
+    - name: Install "PHPCompatibility" coding standard
+      run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
+    - name: Test php version 5.6
+      run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.6
 
 
 
