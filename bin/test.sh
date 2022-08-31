@@ -12,10 +12,9 @@ COLOR_RESET='\033[0m';
 status () {
 	echo -e "\n${YELLOW_BOLD}$1${COLOR_RESET}\n"
 }
-try
-	vendor/bin/phpcs --colors --report=code ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3 --report-file=/home/runner/work/payplug-woocommerce/report.txt
-catch
-	echo "Error in $__EXCEPTION_SOURCE__ at line: $__EXCEPTION_LINE__!"
+
+vendor/bin/phpcs --colors --report=code ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3 --report-file=/home/runner/work/payplug-woocommerce/report.txt
+
 status "ERROR: Cannot build plugin zip with dirty working tree."
 ls
 

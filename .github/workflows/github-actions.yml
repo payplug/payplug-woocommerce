@@ -32,9 +32,6 @@ jobs:
         run: touch /home/runner/work/payplug-woocommerce/report.txt
       - name: Main
         run: ./bin/test.sh
-      - name: Hello world
-        run: |
-          write-output "Hello World"
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
 
