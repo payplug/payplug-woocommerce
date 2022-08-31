@@ -24,9 +24,7 @@ jobs:
       - name: Check out repository code ${{ github.workflow }}
         uses: actions/checkout@v3
       - name: Install composer dependencies
-        run: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v2
       - name: Test php version 5.3
         run: ./vendor/bin/phpcs -p -v --colors ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3
       - run: echo "🍏 This job's status is ${{ job.status }}."
-
-
