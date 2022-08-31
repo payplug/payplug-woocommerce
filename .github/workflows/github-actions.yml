@@ -1,19 +1,19 @@
 name: Payplug Woocommerce CI
 on: [ push ]
 jobs:
-Generate-Zip-File:
-  name: 1) Generate-Zip-File
-  runs-on: ubuntu-latest
-  steps:
-    - name: Check out repository code ${{ github.workflow }}
-      uses: actions/checkout@v3
-    - name: Start the zip generation
-      run: ./bin/build-plugin-zip.sh qa
-    - uses: actions/upload-artifact@v3
-      with:
-        name: payplug-woocommerce.zip
-        path: /home/runner/work/payplug-woocommerce/payplug-woocommerce.zip
-    - run: echo "🍏 This job's status is ${{ job.status }}."
+  Generate-Zip-File:
+    name: 1) Generate-Zip-File
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code ${{ github.workflow }}
+        uses: actions/checkout@v3
+      - name: Start the zip generation
+        run: ./bin/build-plugin-zip.sh qa
+      - uses: actions/upload-artifact@v3
+        with:
+          name: payplug-woocommerce.zip
+          path: /home/runner/work/payplug-woocommerce/payplug-woocommerce.zip
+      - run: echo "🍏 This job's status is ${{ job.status }}."
 
   Check-PHP-Compatibility-5-3:
     name: 2) Check PHP Compatibility 5.3
