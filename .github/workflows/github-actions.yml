@@ -27,11 +27,11 @@ jobs:
       - name: Install "PHPCompatibility" coding standard
         run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
       - name: Test php version 5.3
-        run: ./vendor/bin/phpcs --colors --report-full=full.txt ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3
+        run: ./vendor/bin/phpcs --colors --report-full=/home/runner/work/payplug-woocommerce/full.txt ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3
 
       - uses: actions/upload-artifact@v3
         with:
           name: php-compatibility-5.3.txt
-          path: /home/runner/work/payplug-woocommerce/php-compatibility-5.3.txt
+          path: /home/runner/work/payplug-woocommerce/full.txt
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
