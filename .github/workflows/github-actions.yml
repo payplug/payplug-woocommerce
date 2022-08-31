@@ -1,8 +1,5 @@
 name: Payplug Woocommerce CI
-on:
-  push:
-    branches:
-      - "WOOC-442"
+on: [ push ]
 jobs:
   Generate-Zip-File:
     name: 1) Generate-Zip-File
@@ -25,6 +22,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Install composer dependencies
         uses: ramsey/composer-install@v2
+        with:
+          composer-options: "--ignore-platform-reqs"
       - name: Test php version 5.3
         run: ./vendor/bin/phpcs -p -v --colors ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3
       - run: echo "🍏 This job's status is ${{ job.status }}."
