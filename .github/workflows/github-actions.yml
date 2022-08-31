@@ -15,21 +15,6 @@ jobs:
           path: /home/runner/work/payplug-woocommerce/payplug-woocommerce.zip
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
-  Check-PHP-Compatibility-5-3:
-    name: 2) Check PHP Compatibility 5.3
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code ${{ github.workflow }}
-        uses: actions/checkout@v3
-      - name: Install composer dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: "--ignore-platform-reqs"
-      - name: Install "PHPCompatibility" coding standard
-        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
-      - name: Test php version 5.3
-        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3
-
   Check-PHP-Compatibility-5-6:
     name: 2) Check PHP Compatibility 5.6
     runs-on: ubuntu-latest
@@ -46,7 +31,7 @@ jobs:
         run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.6
 
   Check-PHP-Compatibility-7-0:
-    name: 2) Check PHP Compatibility 7.0
+    name: 3) Check PHP Compatibility 7.0
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code ${{ github.workflow }}
@@ -61,7 +46,7 @@ jobs:
         run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.0
 
   Check-PHP-Compatibility-7-1:
-    name: 2) Check PHP Compatibility 7.1
+    name: 4) Check PHP Compatibility 7.1
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code ${{ github.workflow }}
@@ -76,7 +61,7 @@ jobs:
         run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.1
 
   Check-PHP-Compatibility-7-2:
-    name: 2) Check PHP Compatibility 7.2
+    name: 5) Check PHP Compatibility 7.2
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code ${{ github.workflow }}
@@ -91,7 +76,7 @@ jobs:
         run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.2
 
   Check-PHP-Compatibility-7-3:
-    name: 2) Check PHP Compatibility 7.3
+    name: 6) Check PHP Compatibility 7.3
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code ${{ github.workflow }}
@@ -106,7 +91,7 @@ jobs:
         run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.3
 
   Check-PHP-Compatibility-7-4:
-    name: 2) Check PHP Compatibility 7.4
+    name: 7) Check PHP Compatibility 7.4
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code ${{ github.workflow }}
@@ -121,7 +106,7 @@ jobs:
         run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.4
 
   Check-PHP-Compatibility-8-0:
-    name: 2) Check PHP Compatibility 8.0
+    name: 8) Check PHP Compatibility 8.0
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code ${{ github.workflow }}
@@ -136,7 +121,7 @@ jobs:
         run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 8.0
 
   Check-PHP-Compatibility-8-1:
-    name: 2) Check PHP Compatibility 8.1
+    name: 9) Check PHP Compatibility 8.1
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code ${{ github.workflow }}
