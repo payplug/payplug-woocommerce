@@ -1,7 +1,11 @@
 name: Payplug Woocommerce CI
-on: [push]
+on:
+  push:
+    branches:
+      - "WOOC-442"
 jobs:
   Generate-Zip-File:
+    name: 1) Generate-Zip-File
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code ${{ github.workflow }}
@@ -12,6 +16,32 @@ jobs:
         with:
           name: payplug-woocommerce.zip
           path: /home/runner/work/payplug-woocommerce/payplug-woocommerce.zip
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+  Check-PHP-Compatibility:
+    name: 2) Check PHP Compatibility
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - "5.3"
+          - "5.4"
+          - "5.5"
+          - "5.6"
+          - "7.0"
+          - "7.1"
+          - "7.2"
+          - "7.3"
+          - "7.4"
+          - "8.0"
+          - "8.1"
+    steps:
+      - name: Check out repository code ${{ github.workflow }}
+        uses: actions/checkout@v3
+      - name: Install composer dependencies
+        run: ramsey/composer-install@v2
+      - name: Test php version ${{ matrix.php-version }}
+        run: ./vendor/bin/phpcs -p -v --colors ./src/ --standard=PHPCompatibility --runtime-set testVersion ${{ matrix.php-version }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
 
