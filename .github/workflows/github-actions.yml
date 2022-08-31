@@ -20,28 +20,13 @@ jobs:
   Check-PHP-Compatibility:
     name: 2) Check PHP Compatibility
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        php-version:
-          - "5.3"
-          - "5.4"
-          - "5.5"
-          - "5.6"
-          - "7.0"
-          - "7.1"
-          - "7.2"
-          - "7.3"
-          - "7.4"
-          - "8.0"
-          - "8.1"
     steps:
       - name: Check out repository code ${{ github.workflow }}
         uses: actions/checkout@v3
       - name: Install composer dependencies
         run: ramsey/composer-install@v2
-      - name: Test php version ${{ matrix.php-version }}
-        run: ./vendor/bin/phpcs -p -v --colors ./src/ --standard=PHPCompatibility --runtime-set testVersion ${{ matrix.php-version }}
+      - name: Test php version 5.3
+        run: ./vendor/bin/phpcs -p -v --colors ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
 
