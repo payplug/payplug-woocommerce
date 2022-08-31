@@ -738,6 +738,9 @@ msgstr "Pas encore de compte PayPlug ?"
 msgid "payplug_forget_password"
 msgstr "Mot de passe oublié ?"
 
+msgid "payplug_forget_password_link"
+msgstr "https://portal.payplug.com/forgot_password"
+
 msgid "payplug_register_title"
 msgstr "Général"
 

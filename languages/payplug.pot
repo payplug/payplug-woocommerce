@@ -730,6 +730,9 @@ msgstr "Not registered to PayPlug yet?"
 msgid "payplug_forget_password"
 msgstr "Forgot your password?"
 
+msgid "payplug_forget_password_link"
+msgstr "https://portal.payplug.com/forgot_password"
+
 msgid "payplug_register_title"
 msgstr "General"
 

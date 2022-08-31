@@ -36,11 +36,18 @@ class Ajax {
 		add_action( 'wp_ajax_' . self::CHECK_LIVE_PERMISSIONS, [ $this, 'check_live_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_BANCONTACT_PERMISSIONS, [ $this, 'check_bancontact_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_APPLEPAY_PERMISSIONS, [ $this, 'check_applepay_permissions' ] );
-		$authenticated = current_user_can('administrator');
+		$authenticated = true;//current_user_can('administrator');
 		add_action( 'rest_api_init', function () use($authenticated) {
-			register_rest_route( 'payplug', '/get_data', array(
+			register_rest_route( 'payplug', '/data', array(
 				'methods' => 'GET',
 				'callback' => array($this, "get_data"),
+				'permission_callback' => function() use($authenticated) {return $authenticated;}
+			) );
+		} );
+		add_action( 'rest_api_init', function () use($authenticated) {
+			register_rest_route( 'payplug', '/login', array(
+				'methods' => 'POST',
+				'callback' => array($this, "login"),
 				'permission_callback' => function() use($authenticated) {return $authenticated;}
 			) );
 		} );
@@ -48,6 +55,10 @@ class Ajax {
 
 	public function get_data() {
 		$options = get_option('woocommerce_payplug_settings', []);
+		unset($options["payplug_test_key"]);
+		unset($options["payplug_live_key"]);
+		unset($options["payplug_merchant_id"]);
+
 		$options["user_logged_in"] = $this->user_logged_in($options);
 		$translations = [
 			"login" => [
@@ -60,6 +71,7 @@ class Ajax {
 				"payplug_ok" => __("payplug_ok", "payplug"),
 				"payplug_not_registered_yet_button" => __("payplug_not_registered_yet_button", "payplug"),
 				"payplug_forget_password" => __("payplug_forget_password", "payplug"),
+				"payplug_forget_password_link" => __("payplug_forget_password_link", "payplug"),
 			],
 			"register" => [
 				"payplug_register_title" => __("payplug_register_title", "payplug"),
@@ -89,6 +101,10 @@ class Ajax {
 		];
 
 		return ["data" => $options, "translations" => $translations];
+	}
+
+	public function login() {
+		return $_POST;
 	}
 
 	/**
