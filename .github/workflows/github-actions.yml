@@ -30,8 +30,6 @@ jobs:
         run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.7
       - name: create report-5.3.txt
         run: touch /home/runner/work/payplug-woocommerce/report.txt
-      - name: asjhdgasjhd
-        run: vendor/bin/phpcs --colors --report=code ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3 --report-file=./report.txt
       - name: Main
         run: ./bin/test.sh
       - run: echo "🍏 This job's status is ${{ job.status }}."
