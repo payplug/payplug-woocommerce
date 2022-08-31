@@ -26,11 +26,12 @@ jobs:
           composer-options: "--ignore-platform-reqs"
       - name: Install "PHPCompatibility" coding standard
         run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
-      - name: Test php version 5.3
-        run: ./vendor/bin/phpcs -p -v --colors ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3
-      - uses: actions/upload-artifact@v2  # upload test results
-        if: success() || failure()        # run this step even if previous step failed
-        with:
-          name: test-results
-          path: jest-junit.xml
+      - name: Test php version 5.6
+        run: ./vendor/bin/phpcs -p -v -s --colors ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.6
+
+      #- uses: actions/upload-artifact@v3
+      #  with:
+      #    name: payplug-woocommerce.zip
+      #    path: /home/runner/work/payplug-woocommerce/payplug-woocommerce.zip
+
       - run: echo "🍏 This job's status is ${{ job.status }}."
