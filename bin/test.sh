@@ -15,4 +15,5 @@ status () {
 }
 
 status "ERROR: Cannot build plugin zip with dirty working tree."
+ls
 vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.3
