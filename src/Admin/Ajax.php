@@ -3,6 +3,8 @@
 namespace Payplug\PayplugWoocommerce\Admin;
 
 // Exit if accessed directly
+use Payplug\Exception\ConfigurationException;
+use Payplug\Exception\HttpException;
 use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
@@ -45,6 +47,13 @@ class Ajax {
 			) );
 		} );
 		add_action( 'rest_api_init', function () use($authenticated) {
+			register_rest_route( 'payplug', '/logout', array(
+				'methods' => 'GET',
+				'callback' => array($this, "logout"),
+				'permission_callback' => function() use($authenticated) {return $authenticated;}
+			) );
+		} );
+		add_action( 'rest_api_init', function () use($authenticated) {
 			register_rest_route( 'payplug', '/login', array(
 				'methods' => 'POST',
 				'callback' => array($this, "login"),
@@ -55,11 +64,11 @@ class Ajax {
 
 	public function get_data() {
 		$options = get_option('woocommerce_payplug_settings', []);
+		$options["user_logged_in"] = $this->user_logged_in($options);
 		unset($options["payplug_test_key"]);
 		unset($options["payplug_live_key"]);
 		unset($options["payplug_merchant_id"]);
 
-		$options["user_logged_in"] = $this->user_logged_in($options);
 		$translations = [
 			"login" => [
 				"payplug_login_title" => __("payplug_login_title", "payplug"),
@@ -103,8 +112,67 @@ class Ajax {
 		return ["data" => $options, "translations" => $translations];
 	}
 
+	public function logout() {
+		$data                        = get_option("woocommerce_payplug_settings");
+		$data['payplug_test_key']    = '';
+		$data['payplug_live_key']    = '';
+		$data['payplug_merchant_id'] = '';
+		$data['enabled']             = 'no';
+		$data['mode']                = 'no';
+		$data['oneclick']            = 'no';
+		update_option(
+			"woocommerce_payplug_settings",
+			apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $data)
+		);
+		wp_send_json(array("success" => true, "message" => __('Successfully logged out.', 'payplug')));
+	}
+
 	public function login() {
-		return $_POST;
+		$email    = $_POST['email'];
+		$password = wp_unslash($_POST['password']);
+
+		$response = $this->retrieve_user_api_keys($email, $password);
+
+		// try to use the api keys to retrieve the merchant id
+		$merchant_id = isset($response['test']) ? $this->retrieve_merchant_id($response['test']) : '';
+
+		$data["enabled"] = "yes";
+		$data["mode"] = "no";
+		$data["payplug_test_key"] = !empty($response['test']) ? esc_attr($response['test']) : null;
+		$data["payplug_live_key"] = !empty($response['live']) ? esc_attr($response['live']) : null;
+		$data["payplug_merchant_id"] = esc_attr($merchant_id);
+		$data["email"] = esc_html($email);
+
+		update_option(
+			"woocommerce_payplug_settings",
+			apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $data)
+		);
+		wp_send_json(array("success" => true, "message" => __('Successfully logged in.', 'payplug')));
+	}
+
+
+	/**
+	 * Get user's keys.
+	 *
+	 * @param string $email
+	 * @param string $password
+	 *
+	 * @return array|\WP_Error
+	 */
+	public function retrieve_user_api_keys($email, $password)
+	{
+		if (empty($email) || empty($password)) {
+			wp_send_json(array("success" => false, "message" => __('Please fill all login fields', 'payplug')));
+		}
+		try {
+			$response = Authentication::getKeysByLogin($email, $password);
+			if (empty($response) || !isset($response['httpResponse'])) {
+				wp_send_json(array("success" => false, "message" => __('Invalid credentials.', 'payplug')));
+			}
+			return $response['httpResponse']['secret_keys'];
+		} catch (HttpException $e) {
+			wp_send_json(array("success" => false, "message" => __('Invalid credentials.', 'payplug')));
+		}
 	}
 
 	/**
@@ -115,6 +183,39 @@ class Ajax {
 	public function user_logged_in($options)
 	{
 		return !empty($options['payplug_test_key']);
+	}
+
+	/**
+	 * Get user merchant id.
+	 *
+	 * This method might be called during the login process before the global PayPlug
+	 * configuration is set. In that case you can pass a valid token to make the request.
+	 *
+	 * @param string|null $key
+	 *
+	 * @return string
+	 */
+	public function retrieve_merchant_id($key = null)
+	{
+		try {
+			$response    = !is_null($key) ? Authentication::getAccount(new Payplug($key)) : Authentication::getAccount();
+			PayplugWoocommerceHelper::set_transient_data($response);
+			$merchant_id = isset($response['httpResponse']['id']) ? $response['httpResponse']['id'] : '';
+		} catch (ConfigurationException $e) {
+			PayplugGateway::log(sprintf('Missing API key for PayPlug client : %s', wc_print_r($e->getMessage(), true)), 'error');
+
+			$merchant_id = '';
+		} catch (HttpException $e) {
+			PayplugGateway::log(sprintf('Account request error from PayPlug API : %s', wc_print_r($e->getErrorObject(), true)), 'error');
+
+			$merchant_id = '';
+		} catch (\Exception $e) {
+			PayplugGateway::log(sprintf('Account request error : %s', wc_clean($e->getMessage())), 'error');
+
+			$merchant_id = '';
+		}
+
+		return $merchant_id;
 	}
 
 	public function handle_refresh_keys() {
@@ -271,4 +372,5 @@ class Ajax {
 			'yes'
 		);
 	}
+
 }
