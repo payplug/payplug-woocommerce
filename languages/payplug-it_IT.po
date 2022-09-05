@@ -713,3 +713,12 @@ msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Apple Pay,
 
 #~ msgid "Cart size cannot be greater than 1000 with Oney."
 #~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
+
+msgid "payplug_amex_title"
+msgstr "Pagamenti Amex"
+
+msgid "payplug_amex_activate"
+msgstr "Connessione effettuata"
+
+msgid "payplug_amex_description"
+msgstr "Permetti ai tuoi clienti di pagare con la loro carta American Express. Visualizza il pulsante di pagamento Amex sul tuo negozio, sulla pagina di pagamento."
