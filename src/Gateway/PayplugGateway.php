@@ -426,7 +426,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'type'        => 'checkbox',
 				'label'       => __('Activate', 'payplug'),
 				'description' => '<p class="description" id="apple_pay_test_mode_description"> '. __('payplug_apple_pay_testmode_description', 'payplug') .' </p>' .
-								 '<p class="description" id="apple_pay_live_mode_description"> '. __('payplug_apple_pay_livemode_description', 'payplug') .' </p>' ,
+					'<p class="description" id="apple_pay_live_mode_description"> '. __('payplug_apple_pay_livemode_description', 'payplug') .' </p>' ,
+				'default'     => 'no',
+			],
+			'american_express'          => [
+				'title'       => __('payplug_amex_title', 'payplug'),
+				'type'        => 'checkbox',
+				'label'       => __('payplug_amex_activate', 'payplug'),
+				'description' => '<p class="description"> '. __('payplug_amex_description', 'payplug') .' </p>' ,
 				'default'     => 'no',
 			],
 			'oney'                => [
@@ -438,21 +445,21 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'default'     => 'no',
 				'desc_tip'    => false
 			],
-	        'oney_type'           => [
-		        'title'       => '',
-		        'type'        => 'oney_type',
-		        'options'     => array(
-			        'with_fees' => __('Oney with fees', 'payplug'),
-			        'without_fees' => __('Oney without fees', 'payplug'),
-		        ),
-		        'descriptions'     => array(
-			        'with_fees' => __('The fees are split between you and your customers', 'payplug'),
-			        'without_fees' => __('You pay the fees', 'payplug'),
-		        ),
-		        'description' => '',
-		        'default'     => 'with_fees',
-		        'desc_tip'    => false
-	        ],
+			'oney_type'           => [
+				'title'       => '',
+				'type'        => 'oney_type',
+				'options'     => array(
+					'with_fees' => __('Oney with fees', 'payplug'),
+					'without_fees' => __('Oney without fees', 'payplug'),
+				),
+				'descriptions'     => array(
+					'with_fees' => __('The fees are split between you and your customers', 'payplug'),
+					'without_fees' => __('You pay the fees', 'payplug'),
+				),
+				'description' => '',
+				'default'     => 'with_fees',
+				'desc_tip'    => false
+			],
 	        'oney_thresholds'     => [
 		        'title'       => '',
 		        'type'        => 'oney_thresholds',
@@ -661,6 +668,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			'payplug-gateway-admin-applepay',
 			PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin-applepay.js',
 			['jquery-ui-dialog'],
+			PAYPLUG_GATEWAY_VERSION
+		);
+
+		wp_enqueue_script(
+			'payplug-gateway-admin-amex',
+			PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin-amex.js',
+			[],
 			PAYPLUG_GATEWAY_VERSION
 		);
 
