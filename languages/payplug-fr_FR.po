@@ -732,3 +732,7 @@ msgstr "American Express n’est pas disponible en mode TEST. Pour l’activer, 
 
 msgid "payplug_bancontact_unauthorized_message"
 msgstr "Vous n'avez pas accès à cette fonctionnalité. Pour activer Bancontact, rendez-vous sur le formulaire suivant <a href='https://support.payplug.com/hc/fr/requests/new' target='_blank'>Envoyer une demande – Centre d'assistance</a>"
+
+msgid "payplug_amex_unauthorized_message"
+msgstr "Vous n'avez pas accès à cette fonctionnalité. Pour activer American Express, rendez-vous sur le formulaire suivant <a href='https://support.payplug.com/hc/fr/requests/new' target='_blank'>Envoyer une demande – Centre d'assistance</a>"
+
