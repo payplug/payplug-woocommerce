@@ -176,8 +176,8 @@ class Ajax {
 		}
 
 		PayplugWoocommerceHelper::set_transient_data($account);
-		$bancontact = isset($account['httpResponse']['payment_methods']['american_express']['enabled']) ? $account['httpResponse']['payment_methods']['american_express']['enabled']: false;
-		wp_send_json_success($bancontact);
+		$amex = isset($account['httpResponse']['payment_methods']['american_express']['enabled']) ? $account['httpResponse']['payment_methods']['american_express']['enabled']: false;
+		wp_send_json_success($amex);
 	}
 
 	/**
