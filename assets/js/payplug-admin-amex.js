@@ -23,28 +23,28 @@
 		},
 		check_american_express: (event)=> {
 
-			payplug_admin.disableamerican_express();
+			payplug_admin.disable_american_express();
 
 			if(payplug_admin.isTestMode()){
 				payplug_admin.uncheck_american_express();
-				payplug_admin.disableamerican_express();
+				payplug_admin.disable_american_express();
 				return;
 			}
 
 			payplug_admin.check_american_express_permissions((res) => {
 				if(false === res.success){
 					payplug_admin.uncheck_american_express();
-					payplug_admin.disableamerican_express();
+					payplug_admin.disable_american_express();
 					return;
 				}
 
 				if(false === res.data){
 					payplug_admin.uncheck_american_express();
-					payplug_admin.disableamerican_express();
+					payplug_admin.disable_american_express();
 					return;
 				}
 
-				payplug_admin.enableamerican_express();
+				payplug_admin.enable_american_express();
 			});
 
 		},
@@ -54,10 +54,10 @@
 		uncheck_american_express: function(){
 			jQuery("#woocommerce_payplug_american_express").prop("checked", false);
 		},
-		disableamerican_express: function(){
+		disable_american_express: function(){
 			jQuery("#woocommerce_payplug_american_express").prop("disabled", true);
 		},
-		enableamerican_express: function(){
+		enable_american_express: function(){
 			jQuery("#woocommerce_payplug_american_express").prop("disabled", false);
 		}
 	}
