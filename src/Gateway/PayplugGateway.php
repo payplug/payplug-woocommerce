@@ -429,6 +429,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 								 '<p class="description" id="apple_pay_live_mode_description"> '. __('payplug_apple_pay_livemode_description', 'payplug') .' </p>' ,
 				'default'     => 'no',
 			],
+			'american_express'          => [
+				'title'       => __('payplug_amex_title', 'payplug'),
+				'type'        => 'checkbox',
+				'label'       => __('payplug_amex_activate', 'payplug'),
+				'description' => '<p class="description" id="amex_test_mode_description"> '. __('payplug_amex_testmode_description', 'payplug') .' </p>' .
+								 '<p class="description" id="amex_live_mode_description"> '. __('payplug_amex_livemode_description', 'payplug') .' </p>' ,
+				'default'     => 'no',
+			],
 			'oney'                => [
 				'title'       => __('3x 4x Oney payments', 'payplug'),
 				'type'        => 'checkbox',
@@ -661,6 +669,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			'payplug-gateway-admin-applepay',
 			PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin-applepay.js',
 			['jquery-ui-dialog'],
+			PAYPLUG_GATEWAY_VERSION
+		);
+
+		wp_enqueue_script(
+			'payplug-gateway-admin-amex',
+			PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin-amex.js',
+			[],
 			PAYPLUG_GATEWAY_VERSION
 		);
 
