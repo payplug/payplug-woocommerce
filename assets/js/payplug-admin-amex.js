@@ -28,7 +28,12 @@
 			if(payplug_admin.isTestMode()){
 				payplug_admin.uncheck_american_express();
 				payplug_admin.disable_american_express();
+				$("#amex_test_mode_description").show();
+				$("#amex_live_mode_description").hide();
 				return;
+			} else {
+				$("#amex_test_mode_description").hide();
+				$("#amex_live_mode_description").show();
 			}
 
 			payplug_admin.check_american_express_permissions((res) => {
