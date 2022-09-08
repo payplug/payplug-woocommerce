@@ -725,3 +725,9 @@ msgstr "Permetti ai tuoi clienti di pagare con la loro carta American Express. V
 
 msgid "payplug_amex_unauthorized_message"
 msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare American Express, compila questo modulo <a href='https://support.payplug.com/hc/it/requests/new' target='_blank'>Invia una richiesta – Centro assistenza</a>"
+
+msgid "payplug_amex_livemode_description"
+msgstr "Permetti ai tuoi clienti di pagare con la loro carta American Express. Visualizza il pulsante di pagamento Amex sul tuo negozio, sulla pagina di pagamento."
+
+msgid "payplug_amex_testmode_description"
+msgstr "American Express non è disponibile in modalità TEST. Per attivarla è necessario mettere il modulo PayPlug in modalità LIVE."
