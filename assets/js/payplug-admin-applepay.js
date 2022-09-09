@@ -39,7 +39,6 @@
 
 
 			payplug_admin.checkApplePayPermissions((res) => {
-				console.log(res);
 				if(false === res.success){
 					payplug_admin.uncheckApplePay();
 					payplug_admin.disableApplePay();
