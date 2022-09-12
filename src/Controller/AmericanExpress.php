@@ -54,7 +54,7 @@ class AmericanExpress extends PayplugGateway
 	 */
 	public function process_admin_options() {
 		$data = $this->get_post_data();
-		if ($this->get_post_data()['woocommerce_payplug_mode'] === '0') {
+		if ($data['woocommerce_payplug_mode'] === '0') {
 			$options = get_option('woocommerce_payplug_settings', []);
 			$options['american_express'] = 'no';
 			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
@@ -62,6 +62,9 @@ class AmericanExpress extends PayplugGateway
 
 		if (isset($data['woocommerce_payplug_american_express'])) {
 			if (($data['woocommerce_payplug_american_express'] == 1) && (!$this->checkAmericanExpress())) {
+				$options = get_option('woocommerce_payplug_settings', []);
+				$options['american_express'] = 'no';
+				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
 				add_action( 'woocommerce_settings_saved', [$this ,"display_notice"] );
 			}
 		}
