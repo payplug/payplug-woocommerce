@@ -54,7 +54,7 @@ class ApplePay extends PayplugGateway
 
 		if (isset($data['woocommerce_payplug_apple_pay'])) {
 			if (($data['woocommerce_payplug_apple_pay'] == 1) && (!$this->checkApplePay())) {
-				add_action( 'woocommerce_settings_saved', [$this ,"display_notice"] );
+				add_action( 'admin_notices', [$this ,"display_notice"] );
 			}
 		}
 
