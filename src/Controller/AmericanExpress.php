@@ -65,7 +65,7 @@ class AmericanExpress extends PayplugGateway
 				$options = get_option('woocommerce_payplug_settings', []);
 				$options['american_express'] = 'no';
 				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
-				add_action( 'woocommerce_settings_saved', [$this ,"display_notice"] );
+				add_action( 'admin_notices', [$this ,"display_notice"] );
 			}
 		}
 

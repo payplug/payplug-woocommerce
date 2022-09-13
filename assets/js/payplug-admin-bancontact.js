@@ -30,6 +30,8 @@
 				$("#bancontact_call_to_action").hide();
 				$("#bancontact_live_mode_description_disabled").hide();
 				return;
+			} else {
+				payplug_admin.enableBancontact();
 			}
 			$("#bancontact_test_mode_description").hide();
 			$("#bancontact_call_to_action").show();
