@@ -158,4 +158,40 @@ class Bancontact extends PayplugGateway
 
 	}
 
+	/**
+	 * @return bool|void
+	 */
+	public function process_admin_options() {
+		$data = $this->get_post_data();
+		if ($data['woocommerce_payplug_mode'] === '0') {
+			$options = get_option('woocommerce_payplug_settings', []);
+			$options['bancontact'] = 'no';
+			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+		}
+
+		if (isset($data['woocommerce_payplug_bancontact'])) {
+			if (($data['woocommerce_payplug_bancontact'] == 1) && (!$this->checkBancontact())) {
+				$options = get_option('woocommerce_payplug_settings', []);
+				$options['bancontact'] = 'no';
+				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+				add_action( 'woocommerce_settings_saved', [$this ,"display_notice"] );
+			}
+		}
+
+	}
+
+
+	/**
+	 * Display unauthorized error
+	 *
+	 * @return void
+	 */
+	public static function display_notice() {
+		?>
+		<div class="notice notice-error is-dismissible">
+			<p><?php echo __( 'payplug_bancontact_unauthorized_message', 'payplug' ); ?></p>
+		</div>
+		<?php
+	}
+
 }

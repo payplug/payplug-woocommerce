@@ -13,9 +13,7 @@
 
 		},
 		check_american_express_permissions: (callback) => {
-			$("#amex_test_mode_description").hide();
-			$("#amex_live_mode_description").hide();
-			$("#amex_unauthorized_description").hide();
+
 			payplug_admin.xhr = $
 				.post(
 					payplug_admin_config.ajax_url,
@@ -26,16 +24,15 @@
 				).done((res) => { callback(res) });
 		},
 		check_american_express: (event)=> {
-			payplug_admin.disable_american_express();
 
 			if(payplug_admin.isTestMode()){
 				payplug_admin.uncheck_american_express();
 				payplug_admin.disable_american_express();
 				$("#amex_test_mode_description").show();
 				$("#amex_live_mode_description").hide();
-				$("#amex_unauthorized_description").hide();
 				return;
 			} else {
+				payplug_admin.enable_american_express();
 				$("#amex_test_mode_description").hide();
 				$("#amex_live_mode_description").show();
 			}
@@ -49,9 +46,6 @@
 
 				if(false === res.data){
 					payplug_admin.uncheck_american_express();
-					payplug_admin.disable_american_express();
-					$("#amex_live_mode_description").hide();
-					$("#amex_unauthorized_description").show();
 					return;
 				}
 
@@ -69,7 +63,6 @@
 			jQuery("#woocommerce_payplug_american_express").prop("disabled", true);
 		},
 		enable_american_express: function(){
-			$("#amex_live_mode_description").show();
 			jQuery("#woocommerce_payplug_american_express").prop("disabled", false);
 		}
 	}

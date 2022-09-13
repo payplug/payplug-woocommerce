@@ -23,8 +23,6 @@
 		},
 		checkbancontact: (event)=> {
 
-			payplug_admin.disableBancontact();
-
 			if(payplug_admin.isTestMode()){
 				payplug_admin.uncheckBancontact();
 				payplug_admin.disableBancontact();
@@ -45,7 +43,6 @@
 
 				if(false === res.data){
 					payplug_admin.uncheckBancontact();
-					payplug_admin.disableBancontact();
 					return;
 				}
 
