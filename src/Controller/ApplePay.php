@@ -45,13 +45,13 @@ class ApplePay extends PayplugGateway
 	 */
 	public function process_admin_options() {
 		$data = $this->get_post_data();
-
-		if ($this->get_post_data()['woocommerce_payplug_mode'] === '0') {
-			$options = get_option('woocommerce_payplug_settings', []);
-			$options['apple_pay'] = 'no';
-			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+		if (isset($data['woocommerce_payplug_mode'])) {
+			if ( $this->get_post_data()['woocommerce_payplug_mode'] === '0' ) {
+				$options              = get_option( 'woocommerce_payplug_settings', [] );
+				$options['apple_pay'] = 'no';
+				update_option( 'woocommerce_payplug_settings', apply_filters( 'woocommerce_settings_api_sanitized_fields_payplug', $options ) );
+			}
 		}
-
 		if (isset($data['woocommerce_payplug_apple_pay'])) {
 			if (($data['woocommerce_payplug_apple_pay'] == 1) && (!$this->checkApplePay())) {
 				add_action( 'admin_notices', [$this ,"display_notice"] );
