@@ -10,7 +10,6 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Exception\PayplugException;
-use Payplug\PayplugWoocommerce\Admin\Vue;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,27 +22,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Ajax {
 
-	/**
-	 * @var PayplugPermissions
-	 */
-	private $permissions;
+    /**
+     * @var PayplugPermissions
+     */
+    private $permissions;
 
 	const REFRESH_KEY_ACTION = 'payplug_refresh_keys';
 	const CHECK_LIVE_PERMISSIONS = 'check_live_permissions';
 	const CHECK_BANCONTACT_PERMISSIONS = 'check_bancontact_permissions';
 	const CHECK_APPLEPAY_PERMISSIONS = 'check_applepay_permissions';
-	const CHECK_AMERICAN_EXPRESS_PERMISSIONS = 'check_american_express_permissions';
 	const PAYPLUG_LOGIN = 'payplug_login';
-	const PAYPLUG_INIT = 'payplug_init';
 
 	public function __construct() {
 		add_action( 'wp_ajax_' . self::REFRESH_KEY_ACTION, [ $this, 'handle_refresh_keys' ] );
 		add_action( 'wp_ajax_' . self::CHECK_LIVE_PERMISSIONS, [ $this, 'check_live_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_BANCONTACT_PERMISSIONS, [ $this, 'check_bancontact_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_APPLEPAY_PERMISSIONS, [ $this, 'check_applepay_permissions' ] );
-		add_action( 'wp_ajax_' . self::CHECK_AMERICAN_EXPRESS_PERMISSIONS, [ $this, 'check_american_express_permissions' ] );
 		add_action( 'wp_ajax_' . self::PAYPLUG_LOGIN, [ $this, 'payplug_login' ] );
-		add_action( 'wp_ajax_' . self::PAYPLUG_INIT, [ $this, 'payplug_init' ] );
 	}
 
 	public function handle_refresh_keys() {
@@ -121,7 +116,7 @@ class Ajax {
 		);
 	}
 
-	public function check_live_permissions() {
+    public function check_live_permissions() {
 		try{
 			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
 		}  catch (PayplugException $e){
@@ -130,9 +125,10 @@ class Ajax {
 			return false;
 		}
 		PayplugWoocommerceHelper::set_transient_data($account);
-		$permissions = $account['httpResponse']['permissions'];
+        $permissions = $account['httpResponse']['permissions'];
 		wp_send_json_success($permissions);
 	}
+
 
 	public function check_bancontact_permissions() {
 		try{
@@ -216,6 +212,7 @@ class Ajax {
 		);
 	}
 
+
 	/**
 	 *
 	 * Ajax paypal login
@@ -225,74 +222,19 @@ class Ajax {
 
 	public function payplug_login() {
 
-		$email = sanitize_email($_POST['payplug_email']);
-		$password = wp_unslash($_POST['payplug_password']);
-		$wp_nonce = $_POST['_wpnonce'];
-		$wp_loginaction = $_POST['_loginaction'];
+		$email = $_POST['payplug_email'];
+		$password = $_POST['payplug_password'];
 
 		try {
 			$response = Authentication::getPermissionsByLogin($email, $password);
 			if (empty($response) || !isset($response)) {
+				var_dump($response);
 				return wp_send_json_error($response);
 			}
 			$payplug = new PayplugGateway();
 			$form_fields = $payplug->get_form_fields();
 
-			$payplug = new PayplugGateway();
-			$form_fields = $payplug->get_form_fields();
-
-			$api_keys = $payplug->retrieve_user_api_keys($email, $password);
-
-			foreach ($form_fields as $key => $field) {
-				if (in_array($field['type'], ['title', 'login'])) {
-					continue;
-				}
-
-				switch ($key) {
-					case 'enabled':
-						$val = 'yes';
-						break;
-					case 'mode':
-						$val = 'no';
-						break;
-					case 'payplug_test_key':
-						$val = !empty($api_keys['test']) ? esc_attr($api_keys['test']) : null;
-						break;
-					case 'payplug_live_key':
-						$val = !empty($api_keys['live']) ? esc_attr($api_keys['live']) : null;
-						break;
-					case 'email':
-						$val = esc_html($email);
-						break;
-					default:
-						$val = $payplug->get_option($key);
-				}
-
-				$data[$key] = $val;
-			}
-
-			$payplug->set_post_data($data);
-			update_option(
-				$payplug->get_option_key(),
-				apply_filters('woocommerce_settings_api_sanitized_fields_' . $payplug->id, $data)
-			);
-
-			$user = [
-				"logged" => true,
-				"email" => $email,
-				"mode" => 0
-			];
-			$wp = [
-				"WP" => [
-					"_wpnonce" => $wp_nonce,
-					"_loginaction" => $wp_loginaction
-				]
-			];
-
-
-			return wp_send_json_success( [
-				                             "settings" => $user + $response + $wp
-			                             ] + ( new Vue )->init() );
+			return wp_send_json_success($response);
 		} catch (HttpException $e) {
 			return wp_send_json_error($e->getErrorObject());
 		}
