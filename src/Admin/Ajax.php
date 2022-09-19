@@ -3,6 +3,7 @@
 namespace Payplug\PayplugWoocommerce\Admin;
 
 // Exit if accessed directly
+use Payplug\Exception\HttpException;
 use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
@@ -31,6 +32,7 @@ class Ajax {
 	const CHECK_BANCONTACT_PERMISSIONS = 'check_bancontact_permissions';
 	const CHECK_APPLEPAY_PERMISSIONS = 'check_applepay_permissions';
 	const CHECK_AMERICAN_EXPRESS_PERMISSIONS = 'check_american_express_permissions';
+	const PAYPLUG_LOGIN = 'payplug_login';
 
 	public function __construct() {
 		add_action( 'wp_ajax_' . self::REFRESH_KEY_ACTION, [ $this, 'handle_refresh_keys' ] );
@@ -38,6 +40,7 @@ class Ajax {
 		add_action( 'wp_ajax_' . self::CHECK_BANCONTACT_PERMISSIONS, [ $this, 'check_bancontact_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_APPLEPAY_PERMISSIONS, [ $this, 'check_applepay_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_AMERICAN_EXPRESS_PERMISSIONS, [ $this, 'check_american_express_permissions' ] );
+		add_action( 'wp_ajax_' . self::PAYPLUG_LOGIN, [ $this, 'payplug_login' ] );
 	}
 
 	public function handle_refresh_keys() {
@@ -208,5 +211,30 @@ class Ajax {
 			),
 			'yes'
 		);
+	}
+
+	/**
+	 *
+	 * Ajax paypal login
+	 *
+	 * @return JSON
+	 */
+
+	public function payplug_login() {
+
+		$email = $_POST['payplug_email'];
+		$password = $_POST['payplug_password'];
+
+		try {
+			$response = Authentication::getPermissionsByLogin($email, $password);
+			if (empty($response) || !isset($response)) {
+				var_dump($response);
+				return wp_send_json_error($response);
+			}
+
+			return wp_send_json_success($response);
+		} catch (HttpException $e) {
+			return wp_send_json_error($e->getErrorObject());
+		}
 	}
 }
