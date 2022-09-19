@@ -235,6 +235,7 @@ class Ajax {
 			if (empty($response) || !isset($response)) {
 				return wp_send_json_error($response);
 			}
+
 			$payplug = new PayplugGateway();
 			$form_fields = $payplug->get_form_fields();
 
@@ -286,9 +287,7 @@ class Ajax {
 				]
 			];
 
-			return wp_send_json_success( [
-				"settings" => $user + $response + $wp
-			                             ] + ( new Vue )->init() );
+			return wp_send_json_success( ["settings" => $user + $response + $wp ] + ( new Vue )->init() );
 		} catch (HttpException $e) {
 			return wp_send_json_error($e->getErrorObject());
 		}
