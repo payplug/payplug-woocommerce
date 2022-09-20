@@ -43,7 +43,6 @@ class PayplugResponse {
 		$gateway_id = $order->get_payment_method();
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($resource);
 
-		PayplugGateway::log( $this->gateway->id, "error");
 
 		// Ignore undefined orders
 		if (!$order) {
@@ -82,15 +81,22 @@ class PayplugResponse {
 		// but not for Payplug credit card gateway (in this case we check the payment_method from the order itself not the $resource)
 		if (isset($resource->payment_method) && is_array($resource->payment_method)) {
 			$gateway_id = $resource->payment_method['type'];
-			if (substr( $gateway_id, 0, 5 ) === "oney_") {
-				$this->oney_ipn($resource);
+
+			switch ($gateway_id) {
+				case substr( $gateway_id, 0, 5 ) === "oney_" :
+					$this->oney_ipn($resource);
+					break;
+				case "bancontact" :
+					$this->bancontact_ipn($resource);
+					break;
+				case "apple_pay" :
+					$this->apple_pay_ipn($resource);
+					break;
+				case "american_express" :
+					$this->amex_ipn($resource);
+					break;
 			}
-			if($gateway_id == "bancontact") {
-				$this->bancontact_ipn($resource);
-			}
-			if($gateway_id == "apple_pay") {
-				$this->apple_pay_ipn($resource);
-			}
+
 		} elseif ($gateway_id == "payplug") {
 			$this->payplug_ipn($resource);
 		}
@@ -147,6 +153,16 @@ class PayplugResponse {
 	public function apple_pay_ipn($resource) {
 		$order_id = wc_clean( $resource->metadata['order_id'] );
 		PayplugGateway::log( sprintf( 'Order #%s : Begin processing Apple Pay payment IPN %s', $order_id, $resource->id ) );
+	}
+
+	/**
+	 * American Express IPN
+	 *
+	 * @param $resource
+	 */
+	public function amex_ipn($resource) {
+		$order_id = wc_clean( $resource->metadata['order_id'] );
+		PayplugGateway::log( sprintf( 'Order #%s : Begin processing Amex payment IPN %s', $order_id, $resource->id ) );
 	}
 
 	/**
