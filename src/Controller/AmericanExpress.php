@@ -91,7 +91,7 @@ class AmericanExpress extends PayplugGateway
 	public function get_icon() {
 	$available_img = 'Amex_logo_color.svg';
 	$icons = apply_filters('payplug_payment_icons', [
-		'payplug' => sprintf('<img src="%s" alt="Amex Icon class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/' . $available_img)),
+		'payplug' => sprintf('<img src="%s" alt="Amex Icon" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/' . $available_img)),
 	]);
 	$icons_str = '';
 	foreach ($icons as $icon) {
