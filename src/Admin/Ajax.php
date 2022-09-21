@@ -207,8 +207,8 @@ class Ajax {
 
 	public function payplug_login() {
 
-		$email = $_POST['payplug_email'];
-		$password = $_POST['payplug_password'];
+		$email = sanitize_email($_POST['payplug_email']);
+		$password = wp_unslash($_POST['payplug_password']);
 
 		try {
 			$response = Authentication::getPermissionsByLogin($email, $password);
