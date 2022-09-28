@@ -31,6 +31,7 @@ class Vue {
 	}
 
 	public function payplug_section_logged() {
+
 		return [
 			"title" => __('payplug_section_logged_title', 'payplug'),
 			"descriptions" => [

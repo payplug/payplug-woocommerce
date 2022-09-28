@@ -235,11 +235,15 @@ class Ajax {
 			if (empty($response) || !isset($response)) {
 				return wp_send_json_error($response);
 			}
+			$payplug = new PayplugGateway();
+			$form_fields = $payplug->get_form_fields();
 
 			$payplug = new PayplugGateway();
 			$form_fields = $payplug->get_form_fields();
 
 			$api_keys = $payplug->retrieve_user_api_keys($email, $password);
+
+			$merchant_id = isset($api_keys['test']) ? $payplug->retrieve_merchant_id($api_keys['test']) : '';
 
 			foreach ($form_fields as $key => $field) {
 				if (in_array($field['type'], ['title', 'login'])) {
