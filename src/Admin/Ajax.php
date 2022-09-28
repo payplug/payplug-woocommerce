@@ -10,6 +10,7 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Exception\PayplugException;
+use Payplug\PayplugWoocommerce\Admin\Vue;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -215,10 +216,57 @@ class Ajax {
 			if (empty($response) || !isset($response)) {
 				return wp_send_json_error($response);
 			}
+			$payplug = new PayplugGateway();
+			$form_fields = $payplug->get_form_fields();
 
-			return wp_send_json_success($response);
+			$api_keys = $payplug->retrieve_user_api_keys($email, $password);
+
+			$merchant_id = isset($api_keys['test']) ? $payplug->retrieve_merchant_id($api_keys['test']) : '';
+
+			foreach ($form_fields as $key => $field) {
+				if (in_array($field['type'], ['title', 'login'])) {
+					continue;
+				}
+
+				switch ($key) {
+					case 'enabled':
+						$val = 'yes';
+						break;
+					case 'mode':
+						$val = 'no';
+						break;
+					case 'payplug_test_key':
+						$val = !empty($api_keys['test']) ? esc_attr($api_keys['test']) : null;
+						break;
+					case 'payplug_live_key':
+						$val = !empty($api_keys['live']) ? esc_attr($api_keys['live']) : null;
+						break;
+					case 'email':
+						$val = esc_html($email);
+						break;
+					default:
+						$val = $payplug->get_option($key);
+				}
+
+				$data[$key] = $val;
+			}
+
+			$payplug->set_post_data($data);
+			update_option(
+				$payplug->get_option_key(),
+				apply_filters('woocommerce_settings_api_sanitized_fields_' . $payplug->id, $data)
+			);
+
+			$user = [
+				"logged" => true,
+				"email" => $email,
+				"merchant_id" => $merchant_id
+			];
+
+			return wp_send_json_success( ["settings" => $user + $response] + ( new Vue )->init() );
 		} catch (HttpException $e) {
 			return wp_send_json_error($e->getErrorObject());
 		}
 	}
+
 }
