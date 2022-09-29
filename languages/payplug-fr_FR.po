@@ -708,3 +708,39 @@ msgstr "Payer avec Apple Pay"
 
 msgid "payplug_apple_pay_unauthorized_error"
 msgstr "Vous n'avez pas accès à cette fonctionnalité. Pour activer Apple Pay, contactez <a href='mailto:support@payplug.com'>support@payplug.com</a>"
+
+msgid "payplug_section_logged_title"
+msgstr "Général"
+
+msgid "payplug_section_logged_description"
+msgstr "Configurations générales du module"
+
+msgid "payplug_section_logged_logout"
+msgstr "Se déconnecter"
+
+msgid "payplug_section_logged_mode"
+msgstr "Environnement"
+
+msgid "payplug_section_logged_test_description"
+msgstr "En mode TEST, tous les paiements sont des simulations et ne génèreront pas de transactions réelles."
+
+msgid "payplug_section_logged_live_description"
+msgstr "In LIVE mode, the payments will generate real transactions."
+
+msgid "payplug_section_logged_link_access_portal"
+msgstr "Accéder à mon portail PayPlug"
+
+msgid "payplug_section_header_title"
+msgstr "La solution de paiement qui augmente vos ventes."
+
+msgid "payplug_section_header_live_description"
+msgstr "PayPlug, c'est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main."
+
+msgid "payplug_section_header_test_description"
+msgstr "PayPlug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools."
+
+msgid "payplug_section_header_enable_label"
+msgstr "Enable Plugin"
+
+msgid "payplug_section_header_disable_label"
+msgstr "Disable Plugin"
