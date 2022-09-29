@@ -241,8 +241,6 @@ class Ajax {
 
 			$api_keys = $payplug->retrieve_user_api_keys($email, $password);
 
-			$merchant_id = isset($api_keys['test']) ? $payplug->retrieve_merchant_id($api_keys['test']) : '';
-
 			foreach ($form_fields as $key => $field) {
 				if (in_array($field['type'], ['title', 'login'])) {
 					continue;
@@ -280,7 +278,6 @@ class Ajax {
 			$user = [
 				"logged" => true,
 				"email" => $email,
-				"merchant_id" => $merchant_id,
 				"mode" => 0
 			];
 			$wp = [
