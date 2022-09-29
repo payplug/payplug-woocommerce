@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -713,24 +713,6 @@ msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Apple Pay,
 
 msgid "payplug_bancontact_unauthorized_message"
 msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Bancontact, compila questo modulo <a href='https://support.payplug.com/hc/it/requests/new' target='_blank'>Invia una richiesta – Centro assistenza</a>"
-
-msgid "payplug_amex_title"
-msgstr "Paga con Amex"
-
-msgid "payplug_amex_activate"
-msgstr "Connessione effettuata"
-
-msgid "payplug_amex_description"
-msgstr "Permetti ai tuoi clienti di pagare con la loro carta American Express. Visualizza il pulsante di pagamento Amex sul tuo negozio, sulla pagina di pagamento."
-
-msgid "payplug_amex_unauthorized_message"
-msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare American Express, compila questo modulo <a href='https://support.payplug.com/hc/it/requests/new' target='_blank'>Invia una richiesta – Centro assistenza</a>"
-
-msgid "payplug_amex_livemode_description"
-msgstr "Permetti ai tuoi clienti di pagare con la loro carta American Express. Visualizza il pulsante di pagamento Amex sul tuo negozio, sulla pagina di pagamento."
-
-msgid "payplug_amex_testmode_description"
-msgstr "American Express non è disponibile in modalità TEST. Per attivarla è necessario mettere il modulo PayPlug in modalità LIVE."
 
 msgid "payplug_section_logged_title"
 msgstr "Generale"
