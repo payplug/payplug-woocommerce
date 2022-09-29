@@ -89,3 +89,39 @@ msgstr "You don't have access to this feature yet. To activate Apple Pay, please
 
 msgid "payplug_apple_pay_title"
 msgstr "Pay with Apple Pay"
+
+msgid "payplug_section_logged_title"
+msgstr "General"
+
+msgid "payplug_section_logged_description"
+msgstr "General settings of the module"
+
+msgid "payplug_section_logged_logout"
+msgstr "Disconnect"
+
+msgid "payplug_section_logged_mode"
+msgstr "Environment"
+
+msgid "payplug_section_logged_test_description"
+msgstr "In TEST mode, all payments will be simulations and will not generate real transactions."
+
+msgid "payplug_section_logged_live_description"
+msgstr "In LIVE mode, the payments will generate real transactions."
+
+msgid "payplug_section_logged_link_access_portal"
+msgstr "Access my PayPlug portal"
+
+msgid "payplug_section_header_title"
+msgstr "The payment solution that increases your turnover."
+
+msgid "payplug_section_header_live_description"
+msgstr "PayPlug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools."
+
+msgid "payplug_section_header_test_description"
+msgstr "PayPlug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools."
+
+msgid "payplug_section_header_enable_label"
+msgstr "Enable Plugin"
+
+msgid "payplug_section_header_disable_label"
+msgstr "Disable Plugin"
