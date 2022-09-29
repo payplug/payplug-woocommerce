@@ -11,7 +11,7 @@ namespace Payplug\PayplugWoocommerce\Admin;
 
 class Vue {
 
-	public function init(): array {
+	public function init() {
 
 		if (!empty(get_option('woocommerce_payplug_settings', [])['payplug_test_key'])) {
 			$header = $this->payplug_section_header();
@@ -26,7 +26,7 @@ class Vue {
 		return $this->payplug_section_login();
 	}
 
-	public function payplug_section_logged(): array {
+	public function payplug_section_logged() {
 		return [
 			"title" => __('payplug_section_logged_title', 'payplug'),
 			"descriptions" => [
@@ -79,7 +79,7 @@ class Vue {
 		];
 	}
 
-	public function payplug_section_login(): array {
+	public function payplug_section_login() {
 		$header = $this->payplug_section_header();
 
 		return [
@@ -87,7 +87,7 @@ class Vue {
 		];
 	}
 
-	public function payplug_section_header(): array {
+	public function payplug_section_header() {
 
 		return [
 			"title" => __('payplug_section_header_title', 'payplug'),
