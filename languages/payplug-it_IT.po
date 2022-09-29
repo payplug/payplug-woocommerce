@@ -711,9 +711,6 @@ msgstr "Paga con Apple Pay"
 msgid "payplug_apple_pay_unauthorized_error"
 msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Apple Pay, contatta <a href='mailto:support@payplug.com'>support@payplug.com</a>"
 
-msgid "payplug_bancontact_unauthorized_message"
-msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Bancontact, compila questo modulo <a href='https://support.payplug.com/hc/it/requests/new' target='_blank'>Invia una richiesta – Centro assistenza</a>"
-
 msgid "payplug_section_logged_title"
 msgstr "Generale"
 
@@ -782,3 +779,6 @@ msgstr "Attiva il pagamento in un click"
 
 msgid "payplug_section_one_click_option_description"
 msgstr "I tuoi clienti potranno salvare la loro carta ed effettuare il loro prossimo acquisto in un click."
+
+#~ msgid "Cart size cannot be greater than 1000 with Oney."
+#~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."

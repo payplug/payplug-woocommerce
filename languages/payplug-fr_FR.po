@@ -709,9 +709,6 @@ msgstr "Payer avec Apple Pay"
 msgid "payplug_apple_pay_unauthorized_error"
 msgstr "Vous n'avez pas accès à cette fonctionnalité. Pour activer Apple Pay, contactez <a href='mailto:support@payplug.com'>support@payplug.com</a>"
 
-msgid "payplug_bancontact_unauthorized_message"
-msgstr "Vous n'avez pas accès à cette fonctionnalité. Pour activer Bancontact, rendez-vous sur le formulaire suivant <a href='https://support.payplug.com/hc/fr/requests/new' target='_blank'>Envoyer une demande – Centre d'assistance</a>"
-
 msgid "payplug_section_logged_title"
 msgstr "Général"
 
