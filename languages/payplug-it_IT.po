@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -714,5 +714,38 @@ msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Apple Pay,
 msgid "payplug_bancontact_unauthorized_message"
 msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Bancontact, compila questo modulo <a href='https://support.payplug.com/hc/it/requests/new' target='_blank'>Invia una richiesta – Centro assistenza</a>"
 
-#~ msgid "Cart size cannot be greater than 1000 with Oney."
-#~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
+msgid "payplug_section_logged_title"
+msgstr "Generale"
+
+msgid "payplug_section_logged_description"
+msgstr "Impostazioni generali del modulo"
+
+msgid "payplug_section_logged_logout"
+msgstr "Disconnetti"
+
+msgid "payplug_section_logged_mode"
+msgstr "Ambiente"
+
+msgid "payplug_section_logged_test_description"
+msgstr "Pagamenti in modalità TEST, sono simulazioni e non generano transazioni reali."
+
+msgid "payplug_section_logged_live_description"
+msgstr "In LIVE mode, the payments will generate real transactions."
+
+msgid "payplug_section_logged_link_access_portal"
+msgstr "Accesso al mio portale PayPlug"
+
+msgid "payplug_section_header_title"
+msgstr "La soluzione di pagamento che aumenta le tue vendite."
+
+msgid "payplug_section_header_live_description"
+msgstr "PayPlug è la soluzione di pagamento francese dedicata alle PMI. Fai decollare la tua performance grazie ai nostri strumenti orientati alla conversione, 100% chiavi in mano."
+
+msgid "payplug_section_header_test_description"
+msgstr "PayPlug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools."
+
+msgid "payplug_section_header_enable_label"
+msgstr "Enable Plugin"
+
+msgid "payplug_section_header_disable_label"
+msgstr "Disable Plugin"
