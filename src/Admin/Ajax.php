@@ -34,6 +34,7 @@ class Ajax {
 	const CHECK_APPLEPAY_PERMISSIONS = 'check_applepay_permissions';
 	const CHECK_AMERICAN_EXPRESS_PERMISSIONS = 'check_american_express_permissions';
 	const PAYPLUG_LOGIN = 'payplug_login';
+	const PAYPLUG_INIT = 'payplug_init';
 
 	public function __construct() {
 		add_action( 'wp_ajax_' . self::REFRESH_KEY_ACTION, [ $this, 'handle_refresh_keys' ] );
@@ -42,6 +43,7 @@ class Ajax {
 		add_action( 'wp_ajax_' . self::CHECK_APPLEPAY_PERMISSIONS, [ $this, 'check_applepay_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_AMERICAN_EXPRESS_PERMISSIONS, [ $this, 'check_american_express_permissions' ] );
 		add_action( 'wp_ajax_' . self::PAYPLUG_LOGIN, [ $this, 'payplug_login' ] );
+		add_action( 'wp_ajax_' . self::PAYPLUG_INIT, [ $this, 'payplug_init' ] );
 	}
 
 	public function handle_refresh_keys() {
@@ -280,6 +282,20 @@ class Ajax {
 		} catch (HttpException $e) {
 			return wp_send_json_error($e->getErrorObject());
 		}
+	}
+
+
+	/**
+	 *
+	 * Ajax payplug initialisation
+	 *
+	 * @return JSON
+	 */
+
+	public function payplug_init() {
+
+		return wp_send_json_success( ( new Vue )->init() );
+
 	}
 
 }
