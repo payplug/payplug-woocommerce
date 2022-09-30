@@ -33,6 +33,7 @@ class Ajax {
 	const CHECK_BANCONTACT_PERMISSIONS = 'check_bancontact_permissions';
 	const CHECK_APPLEPAY_PERMISSIONS = 'check_applepay_permissions';
 	const PAYPLUG_LOGIN = 'payplug_login';
+	const PAYPLUG_INIT = 'payplug_init';
 
 	public function __construct() {
 		add_action( 'wp_ajax_' . self::REFRESH_KEY_ACTION, [ $this, 'handle_refresh_keys' ] );
@@ -40,6 +41,7 @@ class Ajax {
 		add_action( 'wp_ajax_' . self::CHECK_BANCONTACT_PERMISSIONS, [ $this, 'check_bancontact_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_APPLEPAY_PERMISSIONS, [ $this, 'check_applepay_permissions' ] );
 		add_action( 'wp_ajax_' . self::PAYPLUG_LOGIN, [ $this, 'payplug_login' ] );
+		add_action( 'wp_ajax_' . self::PAYPLUG_INIT, [ $this, 'payplug_init' ] );
 	}
 
 	public function handle_refresh_keys() {
