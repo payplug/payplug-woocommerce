@@ -152,3 +152,33 @@ msgstr "Enable Plugin"
 
 msgid "payplug_section_header_disable_label"
 msgstr "Disable Plugin"
+
+msgid "payplug_section_login_description"
+msgstr "Log in to your PayPlug account."
+
+msgid "payplug_section_login_not_registered"
+msgstr "Not registered to PayPlug yet?"
+
+msgid "payplug_section_login_connect"
+msgstr "Connect account"
+
+msgid "payplug_section_login_email_label"
+msgstr "E-mail address"
+
+msgid "payplug_section_login_password_label"
+msgstr "Password"
+
+msgid "payplug_section_login_forgot_password"
+msgstr "Forgot your password?"
+
+msgid "payplug_section_subscribe_description"
+msgstr "Registration"
+
+msgid "payplug_section_subscribe_link_create_account"
+msgstr "Create a Payplug account"
+
+msgid "payplug_section_subscribe_content_description"
+msgstr "Create your account to use the module."
+
+msgid "payplug_section_subscribe_already_have_account"
+msgstr "I already have a Payplug account"
