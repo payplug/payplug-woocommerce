@@ -23,7 +23,11 @@ class Vue {
 			];
 		}
 
-		return $this->payplug_section_login();
+		return [
+			"header" => $this->payplug_section_header(),
+			"login" => $this->payplug_section_login(),
+			"subscribe" => $this->payplug_section_subscribe()
+		];
 	}
 
 	public function payplug_section_logged() {
@@ -80,10 +84,73 @@ class Vue {
 	}
 
 	public function payplug_section_login() {
-		$header = $this->payplug_section_header();
+
+		$login = [
+			"name" => "generalLogin",
+			"title" => __('payplug_section_logged_title', 'payplug'),
+			"descriptions" => [
+				"live" => [
+					"description" => __('payplug_section_login_description', 'payplug'),
+					"not_registered" => __('payplug_section_login_not_registered', 'payplug'),
+					"connect" => __('payplug_section_login_connect', 'payplug'),
+					"email_label" => __('payplug_section_login_email_label', 'payplug'),
+					"email_placeholder" => __('payplug_section_login_email_label', 'payplug'),
+					"password_label" => __('payplug_section_login_password_label', 'payplug'),
+					"password_placeholder" => __('payplug_section_login_password_label', 'payplug'),
+					"link_forgot_password" =>  [
+						"text" => __('payplug_section_login_forgot_password', 'payplug'),
+						"url" => "https://www.payplug.com/portal/forgot_password",
+						"target" => "_blank"
+					],
+				],
+				"sandbox" => [
+					"description" => __('payplug_section_login_description', 'payplug'),
+					"not_registered" => __('payplug_section_login_not_registered', 'payplug'),
+					"connect" => __('payplug_section_login_connect', 'payplug'),
+					"email_label" => __('payplug_section_login_email_label', 'payplug'),
+					"email_placeholder" => __('payplug_section_login_email_label', 'payplug'),
+					"password_label" => __('payplug_section_login_password_label', 'payplug'),
+					"password_placeholder" => __('payplug_section_login_password_label', 'payplug'),
+					"link_forgot_password" =>  [
+						"text" => __('payplug_section_login_forgot_password', 'payplug'),
+						"url" => "https://www.payplug.com/portal/forgot_password",
+						"target" => "_blank"
+					],
+				]
+			]
+		];
 
 		return [
-			"header" => $header,
+			"login" => $login
+		];
+	}
+
+	public function payplug_section_subscribe() {
+		return [
+			"name" => "generalSubscribe",
+			"title" => __('payplug_section_logged_title', 'payplug'),
+			"descriptions" => [
+				"live" => [
+					"description" => __('payplug_section_subscribe_description', 'payplug'),
+					"link_create_account" => [
+						"text" => __('payplug_section_subscribe_link_create_account', 'payplug'),
+						"url" => "https://portal.payplug.com",
+						"target" => "_blank"
+					],
+					"content_description" => __('payplug_section_subscribe_content_description', 'payplug'),
+					"already_have_account" => __('payplug_section_subscribe_already_have_account', 'payplug'),
+				],
+				"sandbox" => [
+					"description" => __('payplug_section_subscribe_description', 'payplug'),
+					"link_create_account" => [
+						"text" => __('payplug_section_subscribe_link_create_account', 'payplug'),
+						"url" => "https://portal.payplug.com",
+						"target" => "_blank"
+					],
+					"content_description" => __('payplug_section_subscribe_content_description', 'payplug'),
+					"already_have_account" => __('payplug_section_subscribe_already_have_account', 'payplug'),
+				]
+			]
 		];
 	}
 
