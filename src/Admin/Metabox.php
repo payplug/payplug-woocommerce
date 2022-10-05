@@ -43,7 +43,7 @@ class Metabox {
 
 		$payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
 
-		if(!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay'])) {
+		if(!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express'])) {
 			return;
 		}
 
