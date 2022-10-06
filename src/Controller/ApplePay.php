@@ -128,8 +128,12 @@ class ApplePay extends PayplugGateway
 	 */
 	public function isSSL()
 	{
-		if( !empty( $_SERVER['https'] ) )
+		if( !empty( $_SERVER['HTTPS'] ) ) {
+			if ( 'on' == strtolower($_SERVER['HTTPS']) )
+				return true;
+		} elseif ( isset($_SERVER['SERVER_PORT']) && ( '443' == $_SERVER['SERVER_PORT'] ) ) {
 			return true;
+		}
 
 		if( !empty( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' )
 			return true;
