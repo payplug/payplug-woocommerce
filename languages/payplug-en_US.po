@@ -91,7 +91,7 @@ msgid "payplug_apple_pay_title"
 msgstr "Pay with Apple Pay"
 
 msgid "payplug_amex_title"
-msgstr "Amex payments"
+msgstr "Pay with Amex"
 
 msgid "payplug_amex_activate"
 msgstr "Activate"
