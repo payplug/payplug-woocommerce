@@ -710,7 +710,7 @@ msgid "payplug_apple_pay_unauthorized_error"
 msgstr "Vous n'avez pas accès à cette fonctionnalité. Pour activer Apple Pay, contactez <a href='mailto:support@payplug.com'>support@payplug.com</a>"
 
 msgid "payplug_amex_title"
-msgstr "Paiements Amex"
+msgstr "Payer avec Amex"
 
 msgid "payplug_amex_activate"
 msgstr "Activer"

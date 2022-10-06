@@ -718,7 +718,7 @@ msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Bancontact
 #~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
 
 msgid "payplug_amex_title"
-msgstr "Pagamenti Amex"
+msgstr "Paga con Amex"
 
 msgid "payplug_amex_activate"
 msgstr "Connessione effettuata"
