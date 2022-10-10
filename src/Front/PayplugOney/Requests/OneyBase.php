@@ -35,11 +35,9 @@ Abstract class OneyBase
 		add_action( 'wp_ajax_nopriv_simulate_oney_payment', [ $this, 'simulateOneyPayment' ]);
 		add_action( 'template_redirect', [ $this, 'showOneyAnimation' ] );
 
-		// Avoid Undefined array key
 		$options = get_option('woocommerce_payplug_settings', []);
-		$product_page_animation = isset($options['oney_product_animation']) ? $options['oney_product_animation'] : "";
 
-		if ($product_page_animation == 'yes')
+		if (isset($options['oney_product_animation']) && ($options['oney_product_animation'] == 'yes'))
 			add_action( 'woocommerce_before_add_to_cart_form', [ $this, 'showOneyAnimationProduct' ] );
 	}
 
