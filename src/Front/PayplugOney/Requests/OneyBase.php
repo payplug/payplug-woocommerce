@@ -37,7 +37,7 @@ Abstract class OneyBase
 
 		// Avoid Undefined array key
 		$options = get_option('woocommerce_payplug_settings', []);
-		$product_page_animation = @$options['oney_product_animation'];
+		$product_page_animation = isset($options['oney_product_animation']) ? $options['oney_product_animation'] : "";
 
 		if ($product_page_animation == 'yes')
 			add_action( 'woocommerce_before_add_to_cart_form', [ $this, 'showOneyAnimationProduct' ] );
