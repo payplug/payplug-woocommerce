@@ -128,12 +128,8 @@ class ApplePay extends PayplugGateway
 	 */
 	public function isSSL()
 	{
-		if( !empty( $_SERVER['HTTPS'] ) ) {
-			if ( 'on' == strtolower($_SERVER['HTTPS']) )
-				return true;
-		} elseif ( isset($_SERVER['SERVER_PORT']) && ( '443' == $_SERVER['SERVER_PORT'] ) ) {
+		if( !empty( $_SERVER['https'] ) )
 			return true;
-		}
 
 		if( !empty( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' )
 			return true;
@@ -156,10 +152,10 @@ class ApplePay extends PayplugGateway
 	public function add_apple_pay_js() {
 		wp_enqueue_script( 'apple-pay-sdk', 'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js', array(), false, true );
 		wp_enqueue_script('payplug-apple-pay', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-apple-pay.js',
-		[
-			'jquery',
-			'apple-pay-sdk'
-		], PAYPLUG_GATEWAY_VERSION, true);
+			[
+				'jquery',
+				'apple-pay-sdk'
+			], PAYPLUG_GATEWAY_VERSION, true);
 		wp_localize_script( 'payplug-apple-pay', 'apple_pay_params',
 			array(
 				'ajax_url_payplug_create_order' => \WC_AJAX::get_endpoint('payplug_create_order'),
