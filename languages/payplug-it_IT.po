@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -710,6 +710,9 @@ msgstr "Paga con Apple Pay"
 
 msgid "payplug_apple_pay_unauthorized_error"
 msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Apple Pay, contatta <a href='mailto:support@payplug.com'>support@payplug.com</a>"
+
+msgid "payplug_bancontact_unauthorized_message"
+msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Bancontact, compila questo modulo <a href='https://support.payplug.com/hc/it/requests/new' target='_blank'>Invia una richiesta – Centro assistenza</a>"
 
 #~ msgid "Cart size cannot be greater than 1000 with Oney."
 #~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
