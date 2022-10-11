@@ -135,7 +135,7 @@ class ApplePay extends PayplugGateway
 			return true;
 		}
 
-		if( !empty( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' )
+		if( !empty( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https' )
 			return true;
 
 		return false;
