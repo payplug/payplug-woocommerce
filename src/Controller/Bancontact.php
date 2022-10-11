@@ -106,7 +106,7 @@ class Bancontact extends PayplugGateway
 					'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
 				],
 				"save_card"=> false,
-     			"force_3ds"=> false
+				"force_3ds"=> false
 			];
 
 			/**
