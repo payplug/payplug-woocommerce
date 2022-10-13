@@ -287,7 +287,10 @@ class Ajax {
 				]
 			];
 
-			return wp_send_json_success( ["settings" => $user + $response + $wp ] + ( new Vue )->init() );
+
+			return wp_send_json_success( [
+				"settings" => $user + $response + $wp
+			                             ] + ( new Vue )->init() );
 		} catch (HttpException $e) {
 			return wp_send_json_error($e->getErrorObject());
 		}
