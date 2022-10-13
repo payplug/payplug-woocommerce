@@ -227,6 +227,8 @@ class Ajax {
 
 		$email = sanitize_email($_POST['payplug_email']);
 		$password = wp_unslash($_POST['payplug_password']);
+		$wp_nonce = $_POST['_wpnonce'];
+		$wp_loginaction = $_POST['_loginaction'];
 
 		try {
 			$response = Authentication::getPermissionsByLogin($email, $password);
@@ -277,8 +279,16 @@ class Ajax {
 				"email" => $email,
 				"mode" => 0
 			];
+			$wp = [
+				"WP" => [
+					"_wpnonce" => $wp_nonce,
+					"_loginaction" => $wp_loginaction
+				]
+			];
 
-			return wp_send_json_success( ["settings" => $user + $response] + ( new Vue )->init() );
+			return wp_send_json_success( [
+				"settings" => $user + $response + $wp
+			                             ] + ( new Vue )->init() );
 		} catch (HttpException $e) {
 			return wp_send_json_error($e->getErrorObject());
 		}
