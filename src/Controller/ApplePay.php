@@ -45,10 +45,16 @@ class ApplePay extends PayplugGateway
 	 */
 	public function process_admin_options() {
 		$data = $this->get_post_data();
-
+		if (isset($data['woocommerce_payplug_mode'])) {
+			if ( $this->get_post_data()['woocommerce_payplug_mode'] === '0' ) {
+				$options              = get_option( 'woocommerce_payplug_settings', [] );
+				$options['apple_pay'] = 'no';
+				update_option( 'woocommerce_payplug_settings', apply_filters( 'woocommerce_settings_api_sanitized_fields_payplug', $options ) );
+			}
+		}
 		if (isset($data['woocommerce_payplug_apple_pay'])) {
 			if (($data['woocommerce_payplug_apple_pay'] == 1) && (!$this->checkApplePay())) {
-				add_action( 'woocommerce_settings_saved', [$this ,"display_notice"] );
+				add_action( 'admin_notices', [$this ,"display_notice"] );
 			}
 		}
 
@@ -122,10 +128,14 @@ class ApplePay extends PayplugGateway
 	 */
 	public function isSSL()
 	{
-		if( !empty( $_SERVER['https'] ) )
+		if( !empty( $_SERVER['HTTPS'] ) ) {
+			if ( 'on' == strtolower($_SERVER['HTTPS']) )
+				return true;
+		} elseif ( isset($_SERVER['SERVER_PORT']) && ( '443' == $_SERVER['SERVER_PORT'] ) ) {
 			return true;
+		}
 
-		if( !empty( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' )
+		if( !empty( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https' )
 			return true;
 
 		return false;
@@ -146,10 +156,10 @@ class ApplePay extends PayplugGateway
 	public function add_apple_pay_js() {
 		wp_enqueue_script( 'apple-pay-sdk', 'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js', array(), false, true );
 		wp_enqueue_script('payplug-apple-pay', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-apple-pay.js',
-		[
-			'jquery',
-			'apple-pay-sdk'
-		], PAYPLUG_GATEWAY_VERSION, true);
+			[
+				'jquery',
+				'apple-pay-sdk'
+			], PAYPLUG_GATEWAY_VERSION, true);
 		wp_localize_script( 'payplug-apple-pay', 'apple_pay_params',
 			array(
 				'ajax_url_payplug_create_order' => \WC_AJAX::get_endpoint('payplug_create_order'),
