@@ -83,7 +83,7 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 = 1.9.4 =
 * Fix for the Apple Pay payment method activation
 * Minor fixes
-* Tested up to Woocommerce 6.9.4
+* Tested up to Woocommerce 7.0.0
 * Tested up to Wordpress 6.0.2
 
 = 1.9.3 =
