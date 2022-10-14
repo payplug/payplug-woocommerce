@@ -23,10 +23,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Ajax {
 
-    /**
-     * @var PayplugPermissions
-     */
-    private $permissions;
+	/**
+	 * @var PayplugPermissions
+	 */
+	private $permissions;
 
 	const REFRESH_KEY_ACTION = 'payplug_refresh_keys';
 	const CHECK_LIVE_PERMISSIONS = 'check_live_permissions';
@@ -121,7 +121,7 @@ class Ajax {
 		);
 	}
 
-    public function check_live_permissions() {
+	public function check_live_permissions() {
 		try{
 			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
 		}  catch (PayplugException $e){
@@ -130,7 +130,7 @@ class Ajax {
 			return false;
 		}
 		PayplugWoocommerceHelper::set_transient_data($account);
-        $permissions = $account['httpResponse']['permissions'];
+		$permissions = $account['httpResponse']['permissions'];
 		wp_send_json_success($permissions);
 	}
 
@@ -289,7 +289,7 @@ class Ajax {
 
 
 			return wp_send_json_success( [
-				"settings" => $user + $response + $wp
+				                             "settings" => $user + $response + $wp
 			                             ] + ( new Vue )->init() );
 		} catch (HttpException $e) {
 			return wp_send_json_error($e->getErrorObject());
