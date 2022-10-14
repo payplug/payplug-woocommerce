@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2022-11-04 11:23+0000\n"
+"PO-Revision-Date: 2022-11-04 11:24+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -89,6 +89,9 @@ msgstr "You don't have access to this feature yet. To activate Apple Pay, please
 
 msgid "payplug_apple_pay_title"
 msgstr "Pay with Apple Pay"
+
+msgid "payplug_bancontact_unauthorized_message"
+msgstr "You don't have access to this feature yet. To activate Bancontact, please fill in the following form <a href='https://support.payplug.com/hc/en-gb/requests/new' target='_blank'>Submit a request – Help Center</a>"
 
 msgid "payplug_section_logged_title"
 msgstr "General"
