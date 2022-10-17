@@ -30,12 +30,14 @@ class Ajax {
 	const CHECK_LIVE_PERMISSIONS = 'check_live_permissions';
 	const CHECK_BANCONTACT_PERMISSIONS = 'check_bancontact_permissions';
 	const CHECK_APPLEPAY_PERMISSIONS = 'check_applepay_permissions';
+	const CHECK_AMERICAN_EXPRESS_PERMISSIONS = 'check_american_express_permissions';
 
 	public function __construct() {
 		add_action( 'wp_ajax_' . self::REFRESH_KEY_ACTION, [ $this, 'handle_refresh_keys' ] );
 		add_action( 'wp_ajax_' . self::CHECK_LIVE_PERMISSIONS, [ $this, 'check_live_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_BANCONTACT_PERMISSIONS, [ $this, 'check_bancontact_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_APPLEPAY_PERMISSIONS, [ $this, 'check_applepay_permissions' ] );
+		add_action( 'wp_ajax_' . self::CHECK_AMERICAN_EXPRESS_PERMISSIONS, [ $this, 'check_american_express_permissions' ] );
 	}
 
 	public function handle_refresh_keys() {
@@ -126,7 +128,6 @@ class Ajax {
 		wp_send_json_success($permissions);
 	}
 
-
 	public function check_bancontact_permissions() {
 		try{
 			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
@@ -162,6 +163,21 @@ class Ajax {
 
 		}
 		wp_send_json_success($applepay);
+	}
+
+	public function check_american_express_permissions() {
+		try{
+			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
+
+		}  catch (PayplugException $e){
+			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
+			wp_send_json_error(["error" => $e->getMessage()]);
+			return false;
+		}
+
+		PayplugWoocommerceHelper::set_transient_data($account);
+		$amex = isset($account['httpResponse']['payment_methods']['american_express']['enabled']) ? $account['httpResponse']['payment_methods']['american_express']['enabled']: false;
+		wp_send_json_success($amex);
 	}
 
 	/**

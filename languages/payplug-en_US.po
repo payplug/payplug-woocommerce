@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2022-10-11 17:26+0100\n"
+"PO-Revision-Date: 2022-10-17 10:17+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -89,6 +89,30 @@ msgstr "You don't have access to this feature yet. To activate Apple Pay, please
 
 msgid "payplug_apple_pay_title"
 msgstr "Pay with Apple Pay"
+
+msgid "payplug_amex_title"
+msgstr "Pay with Amex"
+
+msgid "payplug_amex_activate"
+msgstr "Activate"
+
+msgid "payplug_amex_unauthorized_message"
+msgstr "You don't have access to this feature yet. To activate American Express, please fill in the following form <a href='https://support.payplug.com/hc/en-gb/requests/new' target='_blank'>Submit a request – Help Center</a>"
+
+msgid "payplug_amex_livemode_description"
+msgstr "Allow your customers to pay with their American Express cards. Display the Amex payment button on your store, on the checkout."
+
+msgid "payplug_amex_testmode_description"
+msgstr "American Express is not available in TEST mode. To activate it, you must switch your PayPlug module to LIVE mode."
+
+msgid "payplug_amex_unauthorized_description"
+msgstr "You don't have access to this feature yet. To activate American Express, please fill in the following form"
+
+msgid "payplug_amex_activation_request"
+msgstr "Submit a request"
+
+msgid "payplug_amex_activation_url"
+msgstr "support.payplug.com/hc/en-gb/requests/new"
 
 msgid "payplug_bancontact_unauthorized_message"
 msgstr "You don't have access to this feature yet. To activate Bancontact, please fill in the following form <a href='https://support.payplug.com/hc/en-gb/requests/new' target='_blank'>Submit a request – Help Center</a>"

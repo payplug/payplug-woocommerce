@@ -219,7 +219,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         }
 
         $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay'])) {
+        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express'])) {
             return;
         }
 
@@ -427,6 +427,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'label'       => __('Activate', 'payplug'),
 				'description' => '<p class="description" id="apple_pay_test_mode_description"> '. __('payplug_apple_pay_testmode_description', 'payplug') .' </p>' .
 								 '<p class="description" id="apple_pay_live_mode_description"> '. __('payplug_apple_pay_livemode_description', 'payplug') .' </p>' ,
+				'default'     => 'no',
+			],
+			'american_express'          => [
+				'title'       => __('payplug_amex_title', 'payplug'),
+				'type'        => 'checkbox',
+				'label'       => __('payplug_amex_activate', 'payplug'),
+				'description' => '<p class="description" id="amex_test_mode_description"> '. __('payplug_amex_testmode_description', 'payplug') .' </p>' .
+								 '<p class="description" id="amex_live_mode_description"> '. __('payplug_amex_livemode_description', 'payplug') .' </p>' ,
 				'default'     => 'no',
 			],
 			'oney'                => [
@@ -661,6 +669,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			'payplug-gateway-admin-applepay',
 			PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin-applepay.js',
 			['jquery-ui-dialog'],
+			PAYPLUG_GATEWAY_VERSION
+		);
+
+		wp_enqueue_script(
+			'payplug-gateway-admin-amex',
+			PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-admin-amex.js',
+			[],
 			PAYPLUG_GATEWAY_VERSION
 		);
 
