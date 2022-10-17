@@ -437,8 +437,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'title'       => __('payplug_amex_title', 'payplug'),
 				'type'        => 'checkbox',
 				'label'       => __('payplug_amex_activate', 'payplug'),
-				'description' => '<p class="description" id="amex_unauthorized_description"> '. __('payplug_amex_unauthorized_description', 'payplug'). $amex_call_to_action .' </p>' .
-								 '<p class="description" id="amex_test_mode_description"> '. __('payplug_amex_testmode_description', 'payplug') .' </p>' .
+				'description' => '<p class="description" id="amex_test_mode_description"> '. __('payplug_amex_testmode_description', 'payplug') .' </p>' .
 								 '<p class="description" id="amex_live_mode_description"> '. __('payplug_amex_livemode_description', 'payplug') .' </p>' ,
 				'default'     => 'no',
 			],

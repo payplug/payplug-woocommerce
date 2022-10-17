@@ -729,15 +729,3 @@ msgstr "Permettez à vos clients de payer avec leurs cartes American Express en 
 
 msgid "payplug_amex_testmode_description"
 msgstr "American Express n’est pas disponible en mode TEST. Pour l’activer, passez votre module PayPlug en mode LIVE."
-
-msgid "payplug_bancontact_unauthorized_message"
-msgstr "Vous n'avez pas accès à cette fonctionnalité. Pour activer Bancontact, rendez-vous sur le formulaire suivant <a href='https://support.payplug.com/hc/fr/requests/new' target='_blank'>Envoyer une demande – Centre d'assistance</a>"
-
-msgid "payplug_amex_unauthorized_message"
-msgstr "Vous n'avez pas accès à cette fonctionnalité. Pour activer American Express, rendez-vous sur le formulaire suivant <a href='https://support.payplug.com/hc/fr/requests/new' target='_blank'>Envoyer une demande – Centre d'assistance</a>"
-
-msgid "payplug_amex_livemode_description"
-msgstr "Permettez à vos clients de payer avec leurs cartes American Express en affichant le bouton de paiement Amex sur le checkout de votre boutique."
-
-msgid "payplug_amex_testmode_description"
-msgstr "American Express n’est pas disponible en mode TEST. Pour l’activer, passez votre module PayPlug en mode LIVE."
