@@ -700,3 +700,15 @@ msgstr "Display the Oney installments pop-up on the Product page."
 
 msgid "payplug_apple_pay_livemode_description"
 msgstr "Display the Apple Pay payment button on your store, on the checkout. This button will only be seen on a Safari browser."
+
+msgid "payplug_amex_title"
+msgstr "Amex payments"
+
+msgid "payplug_amex_activate"
+msgstr "Activate"
+
+msgid "payplug_amex_description"
+msgstr "Allow your customers to pay with their American Express cards. Display the Amex payment button on your store, on the checkout."
+
+msgid "payplug_amex_unauthorized_message"
+msgstr "You don't have access to this feature yet. To activate American Express, please fill in the following form <a href='https://support.payplug.com/hc/en-gb/requests/new' target='_blank'>Submit a request – Help Center</a>"

@@ -4,7 +4,7 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 4.4
 Tested up to: 6.0.2
 Requires PHP: 5.6
-Stable tag: 1.9.4
+Stable tag: 1.10.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -80,6 +80,11 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 1.10.0 =
+* American Express
+* Tested up to Woocommerce 7.0.0
+* Tested up to Wordpress 6.0.2
+
 = 1.9.4 =
 * Fix for the Apple Pay payment method activation
 * Minor fixes
