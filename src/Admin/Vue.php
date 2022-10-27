@@ -4,6 +4,8 @@ namespace Payplug\PayplugWoocommerce\Admin;
 
 
 use Payplug\PayplugWoocommerce\Controller\ApplePay;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayRequirements;
 
 /**
  * PayPlug admin Vue.js dashboard handler.
@@ -12,6 +14,9 @@ use Payplug\PayplugWoocommerce\Controller\ApplePay;
  */
 class Vue {
 
+	/**
+	 * @return array
+	 */
 	public function init() {
 
 		if ( ! empty( get_option( 'woocommerce_payplug_settings', [] )['payplug_test_key'] ) ) {
@@ -19,21 +24,27 @@ class Vue {
 			$logged = $this->payplug_section_logged();
 
 			return [
-			//	"payment_settings" => $this->one_click_option( true ),
 				"db_save_options" => get_option( 'woocommerce_payplug_settings', [] ),
 				"header"           => $header,
 				"logged"           => $logged,
 				"payment_methods"  => $this->payplug_section_payment_methods(),
+				"payment_paylater"  => $this->payplug_section_paylater(),
 			];
 		}
 
 		return [
 			"header"    => $this->payplug_section_header(),
 			"login"     => $this->payplug_section_login(),
-			"subscribe" => $this->payplug_section_subscribe()
+			"subscribe" => $this->payplug_section_subscribe(),
+			"payment_methods"  => $this->payplug_section_payment_methods(),
+			"payment_paylater"  => $this->payplug_section_paylater(),
+			"status" => $this->payplug_section_status()
 		];
 	}
 
+	/**
+	 * @return array
+	 */
 	public function payplug_section_logged() {
 
 		return [
@@ -88,6 +99,9 @@ class Vue {
 		];
 	}
 
+	/**
+	 * @return array[]
+	 */
 	public function payplug_section_login() {
 
 		$login = [
@@ -130,6 +144,9 @@ class Vue {
 		];
 	}
 
+	/**
+	 * @return array
+	 */
 	public function payplug_section_subscribe() {
 		return [
 			"name"         => "generalSubscribe",
@@ -159,6 +176,9 @@ class Vue {
 		];
 	}
 
+	/**
+	 * @return array
+	 */
 	public function payplug_section_header() {
 
 		return [
@@ -192,6 +212,9 @@ class Vue {
 
 	}
 
+	/**
+	 * @return array
+	 */
 	public function payplug_section_payment_methods() {
 		$section = [
 			"name"         => "paymentMethodsBlock",
@@ -207,13 +230,21 @@ class Vue {
 			"options"      => [
 				$this->payment_method_standard(),
 				$this->payment_method_applepay(),
-				$this->payment_method_bancontact()
+				$this->payment_method_bancontact(),
+				$this->payment_method_amex()
 			]
 		];
 
 		return $section;
 	}
 
+	/**
+	 * @param $text
+	 * @param $url
+	 * @param $target
+	 *
+	 * @return array
+	 */
 	public function link_component( $text, $url, $target ) {
 		return [
 			"text"   => $text,
@@ -222,6 +253,11 @@ class Vue {
 		];
 	}
 
+	/**
+	 * @param $active
+	 *
+	 * @return array
+	 */
 	public function payment_method_standard( $active = false ) {
 		return [
 			"type"         => "payment_method",
@@ -246,6 +282,11 @@ class Vue {
 		];
 	}
 
+	/**
+	 * @param $active
+	 *
+	 * @return array|bool[]|false[]
+	 */
 	public function one_click_option( $active = null ) {
 		$option = [
 			"type"         => "payment_option",
@@ -280,6 +321,9 @@ class Vue {
 		return $option;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function embeded_option() {
 		$option = (get_option( 'woocommerce_payplug_settings', [] )['payment_method'] != "") ? get_option( 'woocommerce_payplug_settings', [] )['payment_method'] : false;
 		return [
@@ -318,6 +362,11 @@ class Vue {
 		];
 	}
 
+	/**
+	 * @param $active
+	 *
+	 * @return array
+	 */
 	public function payment_method_applepay( $active = false ) {
 		return [
 			"type" => "payment_method",
@@ -338,6 +387,11 @@ class Vue {
 		];
 	}
 
+	/**
+	 * @param $active
+	 *
+	 * @return array
+	 */
 	public function payment_method_bancontact( $active = false ) {
 		return [
 			"type" => "payment_method",
@@ -358,7 +412,37 @@ class Vue {
 		];
 	}
 
-	public function payment_section_paylater($active = false) {
+	/**
+	 * @param $active
+	 *
+	 * @return array
+	 */
+	public function payment_method_amex( $active = false ) {
+		return [
+			"type" => "payment_method",
+			"name" => "american_express",
+			"title" => __( 'payplug_section_american_express_payment_title', 'payplug' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/lg-american_express-checkout.png' ),
+			"checked" =>  $active,
+			"descriptions" => [
+				"live"    => [
+					"description"      => __( 'payplug_section_american_express_payment_description', 'payplug' ),
+					"link_know_more" => $this->link_component(__( 'payplug_section_american_express_payment_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+				],
+				"sandbox" => [
+					"description"      => __( 'payplug_section_applepay_payment_description', 'payplug' ),
+					"link_know_more" => $this->link_component(__( 'payplug_section_american_express_payment_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+				]
+			],
+		];
+	}
+
+	/**
+	 * @param $active
+	 *
+	 * @return array
+	 */
+	public function payplug_section_paylater($active = false) {
 		$section = [
 			"name"         => "paymentMethodsBlock",
 			"title"        => __( 'payplug_section_paylater_title', 'payplug' ),
@@ -410,6 +494,10 @@ class Vue {
 
 		return $section;
 	}
+
+	/**
+	 * @return array
+	 */
 	public function thresholds_option() {
 		$min_amount = (! empty( get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_min'] )) ? get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_min'] : 100;
 		$max_amount = (! empty( get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_max'] )) ? get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_min'] : 100;
@@ -442,15 +530,11 @@ class Vue {
 		return $thresholds;
 	}
 
-	public function optimized_option() {
-		$optimized = [
-			"name" => "optimized",
-			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/lg-oney.png' ),
-		];
-
-		return $optimized;
-	}
-
+	/**
+	 * @param $active
+	 *
+	 * @return array
+	 */
 	public function show_oney_popup_product($active = false) {
 		return [
 			"name" => "product",
@@ -459,6 +543,60 @@ class Vue {
 			"switch" => true,
 			"checked" => $active
 		];
+	}
+
+	public function payplug_section_status() {
+		$payplug_requirements = new PayplugGatewayRequirements(new PayplugGateway());
+
+		$status = [
+			"title" => __("payplug_section_status_title", "payplug"),
+			"descriptions" => [
+				"live" => [
+					"description" => __("payplug_section_status_description", "payplug"),
+					"errorMessage" => __("payplug_section_status_errorMessage", "payplug"),
+					"check" => __("payplug_section_status_check", "payplug"),
+					"enable_debug_label" => __("payplug_section_status_debug_label", "payplug"),
+					"enable_debug_description" => __("payplug_section_status_debug_description", "payplug"),
+				],
+				"sandbox" => [
+					"description" => __("payplug_section_status_description", "payplug"),
+					"errorMessage" => __("payplug_section_status_errorMessage", "payplug"),
+					"check" => __("payplug_section_status_check", "payplug"),
+					"enable_debug_label" => __("payplug_section_status_debug_label", "payplug"),
+					"enable_debug_description" => __("payplug_section_status_debug_description", "payplug"),
+				]
+			],
+			"options" => [
+				"type" => "-warning",
+				"name" => "requirements",
+				"options" => [
+					[
+						"status" => $payplug_requirements->valid_curl(),
+						"text" => __("payplug_section_status_curl", "payplug")
+					],
+					[
+						"status" => $payplug_requirements->valid_php(),
+						"text" => __("payplug_section_status_php", "payplug")
+					],
+					[
+						"status" => $payplug_requirements->valid_openssl(),
+						"text" => __("payplug_section_status_ssl", "payplug")
+					],
+					[
+						"status" => $payplug_requirements->valid_currency(),
+						"text" => __("payplug_section_status_currency", "payplug")
+					],
+					[
+						"status" => $payplug_requirements->valid_account(),
+						"text" => __("payplug_section_status_account", "payplug")
+					]
+				]
+			],
+			"enable_debug_name" => "payplug_debug",
+			"enable_debug_checked" => false
+		];
+
+		return $status;
 	}
 
 }
