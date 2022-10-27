@@ -148,10 +148,10 @@ msgid "payplug_section_header_test_description"
 msgstr "PayPlug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools."
 
 msgid "payplug_section_header_enable_label"
-msgstr "Enable Plugin"
+msgstr "Enabled plugin"
 
 msgid "payplug_section_header_disable_label"
-msgstr "Disable Plugin"
+msgstr "Disabled Plugin"
 
 msgid "payplug_section_login_description"
 msgstr "Log in to your PayPlug account."
@@ -182,3 +182,36 @@ msgstr "Create your account to use the module."
 
 msgid "payplug_section_subscribe_already_have_account"
 msgstr "I already have a Payplug account"
+
+msgid "payplug_section_payment_methods_title"
+msgstr "Payment methods"
+
+msgid "payplug_section_payment_methods_description"
+msgstr "Choose the payment methods you wish to offer your customers."
+
+msgid "payplug_section_standard_payment_title"
+msgstr "Payment by card"
+
+msgid "payplug_section_standard_payment_description"
+msgstr "Offer payment by credit card to your customers. Only Euro payments can be processed with PayPlug."
+
+msgid "payplug_section_standard_payment_option_title"
+msgstr "Presentation of the payment page"
+
+msgid "payplug_section_standard_payment_redirected_description"
+msgstr "Your customers will see the payment form appear directly on the checkout page of your store."
+
+msgid "payplug_section_standard_payment_popup_description"
+msgstr "Your customers will see a customizable payment pop-up window appear on the checkout page of your store."
+
+msgid "payplug_section_standard_payment_option_popup_label"
+msgstr "Pop-up"
+
+msgid "payplug_section_standard_payment_option_redirected_label"
+msgstr "Redirected"
+
+msgid "payplug_section_one_click_option_title"
+msgstr "Activate one-click payment"
+
+msgid "payplug_section_one_click_option_description"
+msgstr "Your customers will be able to register their card and make their next purchase in one click."

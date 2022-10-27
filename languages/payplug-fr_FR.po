@@ -758,10 +758,43 @@ msgid "payplug_section_header_live_description"
 msgstr "PayPlug, c'est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main."
 
 msgid "payplug_section_header_test_description"
-msgstr "PayPlug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools."
+msgstr "PayPlug, c'est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main."
 
 msgid "payplug_section_header_enable_label"
-msgstr "Enable Plugin"
+msgstr "Module activé"
 
 msgid "payplug_section_header_disable_label"
-msgstr "Disable Plugin"
+msgstr "Module désactivé"
+
+msgid "payplug_section_payment_methods_title"
+msgstr "Moyens de paiement"
+
+msgid "payplug_section_payment_methods_description"
+msgstr "Choisissez les moyens de paiement que vous souhaitez proposer à vos clients."
+
+msgid "payplug_section_standard_payment_title"
+msgstr "Paiement par carte"
+
+msgid "payplug_section_standard_payment_description"
+msgstr "Proposez le paiement par carte bancaire à vos clients. La passerelle de paiement PayPlug ne peut être activée que pour des paiements en euros."
+
+msgid "payplug_section_standard_payment_option_title"
+msgstr "Présentation de la page de paiement"
+
+msgid "payplug_section_standard_payment_redirected_description"
+msgstr "Vos clients verront apparaître le formulaire de paiement directement dans la page de checkout de votre boutique."
+
+msgid "payplug_section_standard_payment_popup_description"
+msgstr "Vos clients verront apparaître une pop-up de paiement personnalisable sur la page de checkout de votre boutique."
+
+msgid "payplug_section_standard_payment_option_popup_label"
+msgstr "Pop-up"
+
+msgid "payplug_section_standard_payment_option_redirected_label"
+msgstr "Redirigée"
+
+msgid "payplug_section_one_click_option_title"
+msgstr "Activer le paiement en un clic"
+
+msgid "payplug_section_one_click_option_description"
+msgstr "Vos clients pourront enregistrer leur carte et effectuer leurs prochains achats en un clic."

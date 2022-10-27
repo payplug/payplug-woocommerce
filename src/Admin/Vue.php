@@ -333,14 +333,16 @@ class Vue {
 			"title"        => __( 'payplug_section_standard_payment_option_title', 'payplug' ),
 			"descriptions" => [
 				"live"    => [
-					"description"    => __( 'payplug_section_standard_payment_option_description', 'payplug' ),
+					"description_redirected"    => __( 'payplug_section_standard_payment_redirected_description', 'payplug' ),
+					"description_popup"    => __( 'payplug_section_standard_payment_popup_description', 'payplug' ),
 					"link_know_more" => $this->link_component(
 						__( 'payplug_section_standard_payment_know_more', 'payplug' ),
 						"https://support.payplug.com/hc/en-gb/articles/4409698334098",
 						"_blank" ),
 				],
 				"sandbox" => [
-					"description"    => __( 'payplug_section_standard_payment_option_description', 'payplug' ),
+					"description_redirected"    => __( 'payplug_section_standard_payment_redirected_description', 'payplug' ),
+					"description_popup"    => __( 'payplug_section_standard_payment_popup_description', 'payplug' ),
 					"link_know_more" => $this->link_component(
 						__( 'payplug_section_standard_payment_know_more', 'payplug' ),
 						"https://support.payplug.com/hc/en-gb/articles/4409698334098",

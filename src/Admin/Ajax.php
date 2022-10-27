@@ -308,7 +308,19 @@ class Ajax {
 
 	public function payplug_init() {
 
-		return wp_send_json_success( ( new Vue )->init() );
+		$wp_nonce = wp_create_nonce();
+		$wp_loginaction = $_POST['_loginaction'];
+
+		$wp = [
+			"WP" => [
+				"_wpnonce" => $wp_nonce,
+				"_loginaction" => $wp_loginaction
+			]
+		];
+
+		return wp_send_json_success([
+			"settings" => $wp
+		] + ( new Vue )->init() );
 
 	}
 
