@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2022-11-04 11:24+0000\n"
+"PO-Revision-Date: 2022-11-04 11:25+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -191,3 +191,15 @@ msgstr "Activate one-click payment"
 
 msgid "payplug_section_one_click_option_description"
 msgstr "Your customers will be able to register their card and make their next purchase in one click."
+
+msgid "payplug_section_applepay_payment_title"
+msgstr "Apple Pay payment"
+
+msgid "payplug_section_applepay_payment_description"
+msgstr "Display the Apple Pay payment button on your store"
+
+msgid "payplug_section_bancontact_payment_title"
+msgstr "Bancontact payment"
+
+msgid "payplug_know_more_label"
+msgstr "Know more"

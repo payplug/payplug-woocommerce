@@ -379,11 +379,11 @@ class Vue {
 			"descriptions" => [
 				"live"    => [
 					"description"      => __( 'payplug_section_applepay_payment_description', 'payplug' ),
-					"link_know_more" => $this->link_component(__( 'payplug_section_applepay_payment_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
+					"link_know_more" => $this->link_component(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
 				],
 				"sandbox" => [
 					"description"      => __( 'payplug_section_applepay_payment_description', 'payplug' ),
-					"link_know_more" => $this->link_component(__( 'payplug_section_applepay_payment_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
+					"link_know_more" => $this->link_component(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
 				]
 			],
 		];
@@ -404,11 +404,11 @@ class Vue {
 			"descriptions" => [
 				"live"    => [
 					"description"      => __( 'payplug_section_bancontact_payment_description', 'payplug' ),
-					"link_know_more" => $this->link_component(__( 'payplug_section_bancontact_payment_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+					"link_know_more" => $this->link_component(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
 				],
 				"sandbox" => [
 					"description"      => __( 'payplug_section_applepay_payment_description', 'payplug' ),
-					"link_know_more" => $this->link_component(__( 'payplug_section_bancontact_payment_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+					"link_know_more" => $this->link_component(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
 				]
 			],
 		];
@@ -429,11 +429,11 @@ class Vue {
 			"descriptions" => [
 				"live"    => [
 					"description"      => __( 'payplug_section_american_express_payment_description', 'payplug' ),
-					"link_know_more" => $this->link_component(__( 'payplug_section_american_express_payment_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+					"link_know_more" => $this->link_component(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
 				],
 				"sandbox" => [
 					"description"      => __( 'payplug_section_applepay_payment_description', 'payplug' ),
-					"link_know_more" => $this->link_component(__( 'payplug_section_american_express_payment_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+					"link_know_more" => $this->link_component(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
 				]
 			],
 		];

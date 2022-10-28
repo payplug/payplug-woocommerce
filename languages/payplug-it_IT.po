@@ -780,5 +780,14 @@ msgstr "Attiva il pagamento in un click"
 msgid "payplug_section_one_click_option_description"
 msgstr "I tuoi clienti potranno salvare la loro carta ed effettuare il loro prossimo acquisto in un click."
 
-#~ msgid "Cart size cannot be greater than 1000 with Oney."
-#~ msgstr "Il tuo carrello non può contenere più di 1000 articoli con Oney."
+msgid "payplug_section_applepay_payment_title"
+msgstr "Pagamento Apple Pay"
+
+msgid "payplug_section_applepay_payment_description"
+msgstr "Visualizza il pulsante di pagamento Apple Pay sul tuo negozio"
+
+msgid "payplug_section_bancontact_payment_title"
+msgstr "Pagamento Bancontact"
+
+msgid "payplug_know_more_label"
+msgstr "Sapere di più"

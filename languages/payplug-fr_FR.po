@@ -777,3 +777,15 @@ msgstr "Activer le paiement en un clic"
 
 msgid "payplug_section_one_click_option_description"
 msgstr "Vos clients pourront enregistrer leur carte et effectuer leurs prochains achats en un clic."
+
+msgid "payplug_section_applepay_payment_title"
+msgstr "Paiement Apple Pay"
+
+msgid "payplug_section_applepay_payment_description"
+msgstr "Afficher le bouton de paiement Apple Pay sur votre boutique"
+
+msgid "payplug_section_bancontact_payment_title"
+msgstr "Paiement Bancontact"
+
+msgid "payplug_know_more_label"
+msgstr "En savoir plus"
