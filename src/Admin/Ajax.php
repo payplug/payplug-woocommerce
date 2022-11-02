@@ -233,6 +233,7 @@ class Ajax {
 		try {
 			$response = Authentication::getPermissionsByLogin($email, $password);
 			if (empty($response) || !isset($response)) {
+				http_response_code(401);
 				return wp_send_json_error($response);
 			}
 			$payplug = new PayplugGateway();
@@ -290,6 +291,7 @@ class Ajax {
 				                             "settings" => $user + $response + $wp
 			                             ] + ( new Vue )->init() );
 		} catch (HttpException $e) {
+			http_response_code(401);
 			return wp_send_json_error($e->getErrorObject());
 		}
 	}

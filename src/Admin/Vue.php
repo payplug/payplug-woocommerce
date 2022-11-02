@@ -382,7 +382,7 @@ class Vue {
 					"link_know_more" => $this->link_component(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
 				],
 				"sandbox" => [
-					"description"      => __( 'payplug_section_applepay_payment_description', 'payplug' ),
+					"description"      => __( 'payplug_apple_pay_testmode_description', 'payplug' ),
 					"link_know_more" => $this->link_component(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
 				]
 			],
