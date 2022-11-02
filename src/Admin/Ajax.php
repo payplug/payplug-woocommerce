@@ -6,11 +6,11 @@ namespace Payplug\PayplugWoocommerce\Admin;
 use Payplug\Exception\HttpException;
 use Payplug\Payplug;
 use Payplug\Authentication;
+use Payplug\PayplugWoocommerce\Admin\Vue;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Exception\PayplugException;
-use Payplug\PayplugWoocommerce\Admin\Vue;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,6 +35,7 @@ class Ajax {
 	const CHECK_AMERICAN_EXPRESS_PERMISSIONS = 'check_american_express_permissions';
 	const PAYPLUG_LOGIN = 'payplug_login';
 	const PAYPLUG_INIT = 'payplug_init';
+	const PAYPLUG_LOGOUT = 'payplug_logout';
 
 	public function __construct() {
 		add_action( 'wp_ajax_' . self::REFRESH_KEY_ACTION, [ $this, 'handle_refresh_keys' ] );
@@ -44,6 +45,7 @@ class Ajax {
 		add_action( 'wp_ajax_' . self::CHECK_AMERICAN_EXPRESS_PERMISSIONS, [ $this, 'check_american_express_permissions' ] );
 		add_action( 'wp_ajax_' . self::PAYPLUG_LOGIN, [ $this, 'payplug_login' ] );
 		add_action( 'wp_ajax_' . self::PAYPLUG_INIT, [ $this, 'payplug_init' ] );
+		add_action( 'wp_ajax_' . self::PAYPLUG_LOGOUT, [ $this, 'payplug_logout' ] );
 	}
 
 	public function handle_refresh_keys() {
@@ -309,5 +311,37 @@ class Ajax {
 		return wp_send_json_success( ( new Vue )->init() );
 
 	}
+
+	/**
+	 * @return bool|null
+	 */
+
+	public function payplug_logout() {
+
+		$payplug = new PayplugGateway();
+
+		if ($payplug->user_logged_in()) {
+			$data                        = get_option($payplug->get_option_key());
+			$data['payplug_test_key']    = '';
+			$data['payplug_live_key']    = '';
+			$data['payplug_merchant_id'] = '';
+			$data['enabled']             = 'no';
+			$data['mode']                = 'no';
+			$data['oneclick']            = 'no';
+			update_option(
+				$payplug->get_option_key(),
+				apply_filters('woocommerce_settings_api_sanitized_fields_' . $payplug->id, $data)
+			);
+			if("payplug" === $payplug->id) {
+				http_response_code(200);
+				return wp_send_json_success(__('Successfully logged out.', 'payplug'));
+			}
+		} else {
+			http_response_code(400);
+			return wp_send_json_error(__('Already logged out.', 'payplug'));
+		}
+
+	}
+
 
 }
