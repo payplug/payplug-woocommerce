@@ -703,7 +703,29 @@ class PayplugWoocommerceHelper {
 	}
 
 	public static function check_mode(){
-		return get_option('mode', 'no') ? false : true;
+		return get_option( 'woocommerce_payplug_settings', [] )['mode'] ? false : true;
+	}
+
+	public static function payplug_logout($gateway) {
+
+		if ($gateway->user_logged_in()) {
+			$data                        = get_option($gateway->get_option_key());
+			$data['payplug_test_key']    = '';
+			$data['payplug_live_key']    = '';
+			$data['payplug_merchant_id'] = '';
+			$data['enabled']             = 'no';
+			$data['mode']                = 'no';
+			$data['oneclick']            = 'no';
+			update_option(
+				$gateway->get_option_key(),
+				apply_filters('woocommerce_settings_api_sanitized_fields_' . $gateway->id, $data)
+			);
+			if("payplug" === $gateway->id) {
+				return true;
+			}
+		} else {
+			return false;
+		}
 	}
 
 }

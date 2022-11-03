@@ -749,18 +749,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 $this->permissions->clear_permissions();
             }
 
-            $data                        = get_option($this->get_option_key());
-            $data['payplug_test_key']    = '';
-            $data['payplug_live_key']    = '';
-            $data['payplug_merchant_id'] = '';
-            $data['enabled']             = 'no';
-            $data['mode']                = 'no';
-            $data['oneclick']            = 'no';
-            update_option(
-                $this->get_option_key(),
-                apply_filters('woocommerce_settings_api_sanitized_fields_' . $this->id, $data)
-            );
-            if("payplug" === $this->id) {
+            if(PayplugWoocommerceHelper::payplug_logout($this)) {
                 \WC_Admin_Settings::add_message(__('Successfully logged out.', 'payplug'));
             }
 
