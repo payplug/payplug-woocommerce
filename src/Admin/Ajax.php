@@ -320,22 +320,9 @@ class Ajax {
 
 		$payplug = new PayplugGateway();
 
-		if ($payplug->user_logged_in()) {
-			$data                        = get_option($payplug->get_option_key());
-			$data['payplug_test_key']    = '';
-			$data['payplug_live_key']    = '';
-			$data['payplug_merchant_id'] = '';
-			$data['enabled']             = 'no';
-			$data['mode']                = 'no';
-			$data['oneclick']            = 'no';
-			update_option(
-				$payplug->get_option_key(),
-				apply_filters('woocommerce_settings_api_sanitized_fields_' . $payplug->id, $data)
-			);
-			if("payplug" === $payplug->id) {
-				http_response_code(200);
-				return wp_send_json_success(__('Successfully logged out.', 'payplug'));
-			}
+		if (PayplugWoocommerceHelper::payplug_logout($payplug)) {
+			http_response_code(200);
+			return wp_send_json_success(__('Successfully logged out.', 'payplug'));
 		} else {
 			http_response_code(400);
 			return wp_send_json_error(__('Already logged out.', 'payplug'));
