@@ -6,6 +6,7 @@ namespace Payplug\PayplugWoocommerce\Admin;
 use Payplug\PayplugWoocommerce\Controller\ApplePay;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayRequirements;
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 /**
  * PayPlug admin Vue.js dashboard handler.
@@ -19,7 +20,7 @@ class Vue {
 	 */
 	public function init() {
 
-		if ( ! empty( get_option( 'woocommerce_payplug_settings', [] )['payplug_test_key'] ) ) {
+		if ( PayplugWoocommerceHelper::user_logged_in() ) {
 			$header = $this->payplug_section_header();
 			$logged = $this->payplug_section_logged();
 

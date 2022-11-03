@@ -686,8 +686,20 @@ class PayplugWoocommerceHelper {
 
 	}
 
-	public static function get_live_key() {
+	public static function get_live_key()
+	{
 		return get_option('woocommerce_payplug_settings', [])['payplug_live_key'];
+	}
+
+	/**
+	 *
+	 * Checks fi the user is logged in
+	 *
+	 * @return bool
+	 */
+	public static function user_logged_in()
+	{
+		return !empty(get_option( 'woocommerce_payplug_settings', [] )['payplug_test_key']);
 	}
 
 }
