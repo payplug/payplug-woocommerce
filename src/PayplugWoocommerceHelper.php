@@ -686,4 +686,8 @@ class PayplugWoocommerceHelper {
 
 	}
 
+	public static function get_live_key() {
+		return get_option('woocommerce_payplug_settings', [])['payplug_live_key'];
+	}
+
 }

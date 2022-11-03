@@ -117,7 +117,7 @@ class Ajax {
 
     public function check_live_permissions() {
 		try{
-			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
+			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
 			wp_send_json_error(["error" => $e->getMessage()]);
@@ -130,7 +130,7 @@ class Ajax {
 
 	public function check_bancontact_permissions() {
 		try{
-			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
+			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
@@ -145,7 +145,7 @@ class Ajax {
 
 	public function check_applepay_permissions() {
 		try{
-			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
+			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
@@ -167,7 +167,7 @@ class Ajax {
 
 	public function check_american_express_permissions() {
 		try{
-			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
+			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
