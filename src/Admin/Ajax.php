@@ -310,7 +310,9 @@ class Ajax {
 		$wp_loginaction = $_POST['_loginaction'];
 
 		$wp = [
-			"WP" => [
+			"logged" => PayplugWoocommerceHelper::user_logged_in(),
+			"mode" => PayplugWoocommerceHelper::check_mode(),
+			"WP" =>  [
 				"_wpnonce" => $wp_nonce,
 				"_loginaction" => $wp_loginaction
 			]

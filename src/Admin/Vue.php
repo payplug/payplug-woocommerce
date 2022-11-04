@@ -142,9 +142,7 @@ class Vue {
 			]
 		];
 
-		return [
-			"login" => $login
-		];
+		return $login;
 	}
 
 	/**

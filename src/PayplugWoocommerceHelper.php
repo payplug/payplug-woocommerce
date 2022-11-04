@@ -702,4 +702,8 @@ class PayplugWoocommerceHelper {
 		return !empty(get_option( 'woocommerce_payplug_settings', [] )['payplug_test_key']);
 	}
 
+	public static function check_mode(){
+		return get_option('mode', 'no') ? false : true;
+	}
+
 }
