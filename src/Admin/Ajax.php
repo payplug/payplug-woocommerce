@@ -32,7 +32,6 @@ class Ajax {
 	const CHECK_LIVE_PERMISSIONS = 'check_live_permissions';
 	const CHECK_BANCONTACT_PERMISSIONS = 'check_bancontact_permissions';
 	const CHECK_APPLEPAY_PERMISSIONS = 'check_applepay_permissions';
-	const CHECK_AMERICAN_EXPRESS_PERMISSIONS = 'check_american_express_permissions';
 	const PAYPLUG_LOGIN = 'payplug_login';
 	const PAYPLUG_INIT = 'payplug_init';
 
@@ -41,7 +40,6 @@ class Ajax {
 		add_action( 'wp_ajax_' . self::CHECK_LIVE_PERMISSIONS, [ $this, 'check_live_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_BANCONTACT_PERMISSIONS, [ $this, 'check_bancontact_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_APPLEPAY_PERMISSIONS, [ $this, 'check_applepay_permissions' ] );
-		add_action( 'wp_ajax_' . self::CHECK_AMERICAN_EXPRESS_PERMISSIONS, [ $this, 'check_american_express_permissions' ] );
 		add_action( 'wp_ajax_' . self::PAYPLUG_LOGIN, [ $this, 'payplug_login' ] );
 		add_action( 'wp_ajax_' . self::PAYPLUG_INIT, [ $this, 'payplug_init' ] );
 	}
@@ -134,6 +132,7 @@ class Ajax {
 		wp_send_json_success($permissions);
 	}
 
+
 	public function check_bancontact_permissions() {
 		try{
 			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
@@ -216,6 +215,7 @@ class Ajax {
 		);
 	}
 
+
 	/**
 	 *
 	 * Ajax paypal login
@@ -233,9 +233,9 @@ class Ajax {
 		try {
 			$response = Authentication::getPermissionsByLogin($email, $password);
 			if (empty($response) || !isset($response)) {
+				http_response_code(401);
 				return wp_send_json_error($response);
 			}
-
 			$payplug = new PayplugGateway();
 			$form_fields = $payplug->get_form_fields();
 
@@ -287,11 +287,11 @@ class Ajax {
 				]
 			];
 
-
 			return wp_send_json_success( [
 				                             "settings" => $user + $response + $wp
 			                             ] + ( new Vue )->init() );
 		} catch (HttpException $e) {
+			http_response_code(401);
 			return wp_send_json_error($e->getErrorObject());
 		}
 	}
@@ -306,7 +306,21 @@ class Ajax {
 
 	public function payplug_init() {
 
-		return wp_send_json_success( ( new Vue )->init() );
+		$wp_nonce = wp_create_nonce();
+		$wp_loginaction = $_POST['_loginaction'];
+
+		$wp = [
+			"logged" => PayplugWoocommerceHelper::user_logged_in(),
+			"mode" => PayplugWoocommerceHelper::check_mode(),
+			"WP" =>  [
+				"_wpnonce" => $wp_nonce,
+				"_loginaction" => $wp_loginaction
+			]
+		];
+
+		return wp_send_json_success([
+			"settings" => $wp
+		] + ( new Vue )->init() );
 
 	}
 

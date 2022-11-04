@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2022-10-19 16:14+0100\n"
+"PO-Revision-Date: 2022-11-04 11:25+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -90,30 +90,6 @@ msgstr "You don't have access to this feature yet. To activate Apple Pay, please
 msgid "payplug_apple_pay_title"
 msgstr "Pay with Apple Pay"
 
-msgid "payplug_amex_title"
-msgstr "Pay with Amex"
-
-msgid "payplug_amex_activate"
-msgstr "Activate"
-
-msgid "payplug_amex_unauthorized_message"
-msgstr "You don't have access to this feature yet. To activate American Express, please fill in the following form <a href='https://support.payplug.com/hc/en-gb/requests/new' target='_blank'>Submit a request – Help Center</a>"
-
-msgid "payplug_amex_livemode_description"
-msgstr "Allow your customers to pay with their American Express cards. Display the Amex payment button on your store, on the checkout."
-
-msgid "payplug_amex_testmode_description"
-msgstr "American Express is not available in TEST mode. To activate it, you must switch your PayPlug module to LIVE mode."
-
-msgid "payplug_amex_unauthorized_description"
-msgstr "You don't have access to this feature yet. To activate American Express, please fill in the following form"
-
-msgid "payplug_amex_activation_request"
-msgstr "Submit a request"
-
-msgid "payplug_amex_activation_url"
-msgstr "support.payplug.com/hc/en-gb/requests/new"
-
 msgid "payplug_bancontact_unauthorized_message"
 msgstr "You don't have access to this feature yet. To activate Bancontact, please fill in the following form <a href='https://support.payplug.com/hc/en-gb/requests/new' target='_blank'>Submit a request – Help Center</a>"
 
@@ -148,10 +124,10 @@ msgid "payplug_section_header_test_description"
 msgstr "PayPlug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools."
 
 msgid "payplug_section_header_enable_label"
-msgstr "Enable Plugin"
+msgstr "Enabled plugin"
 
 msgid "payplug_section_header_disable_label"
-msgstr "Disable Plugin"
+msgstr "Disabled Plugin"
 
 msgid "payplug_section_login_description"
 msgstr "Log in to your PayPlug account."
@@ -182,3 +158,48 @@ msgstr "Create your account to use the module."
 
 msgid "payplug_section_subscribe_already_have_account"
 msgstr "I already have a Payplug account"
+
+msgid "payplug_section_payment_methods_title"
+msgstr "Payment methods"
+
+msgid "payplug_section_payment_methods_description"
+msgstr "Choose the payment methods you wish to offer your customers."
+
+msgid "payplug_section_standard_payment_title"
+msgstr "Payment by card"
+
+msgid "payplug_section_standard_payment_description"
+msgstr "Offer payment by credit card to your customers. Only Euro payments can be processed with PayPlug."
+
+msgid "payplug_section_standard_payment_option_title"
+msgstr "Presentation of the payment page"
+
+msgid "payplug_section_standard_payment_redirected_description"
+msgstr "Your customers will see the payment form appear directly on the checkout page of your store."
+
+msgid "payplug_section_standard_payment_popup_description"
+msgstr "Your customers will see a customizable payment pop-up window appear on the checkout page of your store."
+
+msgid "payplug_section_standard_payment_option_popup_label"
+msgstr "Pop-up"
+
+msgid "payplug_section_standard_payment_option_redirected_label"
+msgstr "Redirected"
+
+msgid "payplug_section_one_click_option_title"
+msgstr "Activate one-click payment"
+
+msgid "payplug_section_one_click_option_description"
+msgstr "Your customers will be able to register their card and make their next purchase in one click."
+
+msgid "payplug_section_applepay_payment_title"
+msgstr "Apple Pay payment"
+
+msgid "payplug_section_applepay_payment_description"
+msgstr "Display the Apple Pay payment button on your store"
+
+msgid "payplug_section_bancontact_payment_title"
+msgstr "Bancontact payment"
+
+msgid "payplug_know_more_label"
+msgstr "Know more"
