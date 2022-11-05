@@ -791,3 +791,9 @@ msgstr "Pagamento Bancontact"
 
 msgid "payplug_know_more_label"
 msgstr "Sapere di più"
+
+msgid "payplug_error_wrong_credentials"
+msgstr "L'indirizzo mail e/o la password sono errati."
+
+msgid "payplug_section_login_forgot_password"
+msgstr "Hai dimenticato la password?"

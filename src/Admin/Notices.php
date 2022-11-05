@@ -17,8 +17,8 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 class Notices {
 
 	public function __construct() {
-		add_action( 'admin_notices', [ $this, 'admin_notices' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
+		//add_action( 'admin_notices', [ $this, 'admin_notices' ] );
+		//add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 	}
 
 	/**
