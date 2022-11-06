@@ -25,9 +25,11 @@ class Vue {
 		if ( PayplugWoocommerceHelper::user_logged_in() ) {
 			$header = $this->payplug_section_header();
 			$logged = $this->payplug_section_logged();
+			$payplug_wooc_settings = get_option( 'woocommerce_payplug_settings', [] );
+			unset($payplug_wooc_settings["payplug_live_key"]);
 
 			return [
-				"db_save_options" => get_option( 'woocommerce_payplug_settings', [] ),
+				"payplug_wooc_settings" => $payplug_wooc_settings,
 				"header"           => $header,
 				"logged"           => $logged,
 				"payment_methods"  => $this->payplug_section_payment_methods(),
