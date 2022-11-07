@@ -236,7 +236,9 @@ class Ajax {
 			$response = Authentication::getPermissionsByLogin($email, $password);
 			if (empty($response) || !isset($response)) {
 				http_response_code(401);
-				return wp_send_json_error($response);
+				return wp_send_json_error(array(
+					'message' => __( 'payplug_error_wrong_credentials.', 'payplug' ),
+				));
 			}
 			$payplug = new PayplugGateway();
 			$form_fields = $payplug->get_form_fields();
@@ -293,8 +295,12 @@ class Ajax {
 				                             "settings" => $user + $response + $wp
 			                             ] + ( new Vue )->init() );
 		} catch (HttpException $e) {
+
+			//TODO:: error handler, Authentication::getPermissionsByLogin comes here
 			http_response_code(401);
-			return wp_send_json_error($e->getErrorObject());
+			$error = __("payplug_error_wrong_credentials", "payplug");
+			return wp_send_json_error(array('message' => $error));
+
 		}
 	}
 
