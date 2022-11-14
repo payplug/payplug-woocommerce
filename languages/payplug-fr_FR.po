@@ -829,3 +829,8 @@ msgstr "Proposer le paiement fractionné garanti pour des montants entre"
 msgid "and"
 msgstr "et"
 
+msgid "payplug_section_bancontact_payment_description"
+msgstr "Permettez à vos clients de payer avec leurs cartes Bancontact."
+
+msgid "payplug_section_american_express_payment_description"
+msgstr "Permettez à vos clients de payer avec leurs cartes American Express."

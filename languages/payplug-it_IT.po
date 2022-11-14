@@ -831,3 +831,8 @@ msgstr "Proporre pagamenti rateali garantiti per importi compresi tra"
 msgid "and"
 msgstr "e"
 
+msgid "payplug_section_bancontact_payment_description"
+msgstr "Permetti ai tuoi clienti di pagare con le carte Bancontact."
+
+msgid "payplug_section_american_express_payment_description"
+msgstr "Permetti ai tuoi clienti di pagare con la loro carta American Express."
