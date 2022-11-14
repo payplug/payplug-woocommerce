@@ -46,7 +46,7 @@ msgstr "Activer le mode debug"
 
 #: src/Gateway/PayplugGateway.php:357
 msgid "Advanced Settings"
-msgstr "Réglages avancés"
+msgstr "Paramétrages avancés"
 
 #: src/Gateway/PayplugGateway.php:377
 #, php-format
@@ -692,7 +692,7 @@ msgid "oney_installments_pop_up"
 msgstr "Pop-up des versements Oney"
 
 msgid "display_the_oney_installments_pop_up_on_the_product_page"
-msgstr "Afficher la pop-up des versements Oney sur la page Produit."
+msgstr "Afficher les échéanciers sur la page Produit"
 
 msgid "payplug_apple_pay_activate_title"
 msgstr "Paiement Apple Pay"
@@ -795,3 +795,37 @@ msgstr "L'e-mail ou le mot de passe saisi est incorrect."
 
 msgid "payplug_section_login_forgot_password"
 msgstr "Mot de passe oublié?"
+
+msgid "payplug_section_paylater_title"
+msgstr "PayLater"
+
+msgid "payplug_section_paylater_description"
+msgstr "Permettez à vos client de payer en plusieurs fois."
+
+msgid "payplug_section_oney_title"
+msgstr "Paiements 3x 4x Oney"
+
+msgid "payplug_section_paylater_description_oney"
+msgstr "Vos clients pourront choisir de payer leurs commandes en 3 ou 4 échéances. Vous pouvez prendre (ou non) l'ensemble des frais à votre charge."
+
+msgid "payplug_label_with_fees"
+msgstr "Avec frais"
+
+msgid "payplug_text_with_fees"
+msgstr "Les frais sont répartis entre vous et vos clients."
+
+msgid "payplug_label_without_fees"
+msgstr "Sans frais"
+
+msgid "payplug_text_without_fees"
+msgstr "Les frais sont à votre charge."
+
+msgid "payplug_thresholds_oney_title"
+msgstr "Personnalisez votre offre de paiement fractionné"
+
+msgid "payplug_thresholds_oney_description"
+msgstr "Proposer le paiement fractionné garanti pour des montants entre"
+
+msgid "and"
+msgstr "et"
+

@@ -14,6 +14,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.0.1\n"
 
+msgid "Advanced Settings"
+msgstr "Advanced Settings"
+
 #: src/Gateway/PayplugGatewayRequirements.php:71
 msgid "payplug_PayplugGatewayRequirements_curl_requirement_curlinstalled"
 msgstr "The PHP cURL extension is installed and activated on your server."
@@ -73,7 +76,7 @@ msgid "oney_installments_pop_up"
 msgstr "Oney installments pop-up"
 
 msgid "display_the_oney_installments_pop_up_on_the_product_page"
-msgstr "Display the Oney installments pop-up on the Product page."
+msgstr "Display the installments on the Product page"
 
 msgid "payplug_apple_pay_activate_title"
 msgstr "Apple Pay payments"
@@ -206,3 +209,38 @@ msgstr "Know more"
 
 msgid "payplug_error_wrong_credentials"
 msgstr "The email and/or password is incorrect."
+
+msgid "payplug_section_paylater_title"
+msgstr "PayLater"
+
+msgid "payplug_section_paylater_description"
+msgstr "Allow your customers to pay in installments."
+
+msgid "payplug_section_oney_title"
+msgstr "3x 4x Oney payments"
+
+msgid "payplug_section_paylater_description_oney"
+msgstr "Your customers can choose to pay for their orders in 3 or 4 installments. Choose below whether or not you want to pay all the fees."
+
+msgid "payplug_label_with_fees"
+msgstr "With fees"
+
+msgid "payplug_text_with_fees"
+msgstr "The fees are split between you and your customers."
+
+msgid "payplug_label_without_fees"
+msgstr "Without fees"
+
+msgid "payplug_text_without_fees"
+msgstr "You pay the fees."
+
+msgid "payplug_thresholds_oney_title"
+msgstr "Customise your split payment offer"
+
+msgid "payplug_thresholds_oney_description"
+msgstr "Offer guaranteed split payments for amounts between"
+
+msgid "and"
+msgstr "and"
+
+
