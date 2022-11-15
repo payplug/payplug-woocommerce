@@ -110,7 +110,7 @@ class PaymentMethods {
 				[
 					"name"    => "payplug_embedded",
 					"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
-					"value"   => "redirected"
+					"value"   => "redirect"
 				]
 			]
 		];
