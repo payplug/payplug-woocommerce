@@ -46,7 +46,7 @@ msgid "Activate debug mode"
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:357
-msgid "Advanced Settings"
+msgid "payplug_advanced_settings"
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:377
@@ -715,3 +715,49 @@ msgstr "You don't have access to this feature yet. To activate American Express,
 
 msgid "payplug_error_wrong_credentials"
 msgstr ""
+
+msgid "payplug_section_paylater_title"
+msgstr ""
+
+msgid "payplug_section_paylater_description"
+msgstr ""
+
+msgid "payplug_section_oney_title"
+msgstr ""
+
+msgid "payplug_section_paylater_description_oney"
+msgstr ""
+
+msgid "payplug_label_with_fees"
+msgstr ""
+
+msgid "payplug_text_with_fees"
+msgstr ""
+
+msgid "payplug_label_without_fees"
+msgstr ""
+
+msgid "payplug_text_without_fees"
+msgstr ""
+
+msgid "payplug_thresholds_oney_title"
+msgstr ""
+
+msgid "payplug_thresholds_oney_description"
+msgstr ""
+
+msgid "and"
+msgstr ""
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -45,7 +45,7 @@ msgid "Activate debug mode"
 msgstr "Attivare la modalità Debug"
 
 #: src/Gateway/PayplugGateway.php:357
-msgid "Advanced Settings"
+msgid "payplug_advanced_settings"
 msgstr "Impostazioni avanzate"
 
 #: src/Gateway/PayplugGateway.php:377
@@ -694,7 +694,7 @@ msgid "oney_installments_pop_up"
 msgstr "Pop-up con le rate Oney"
 
 msgid "display_the_oney_installments_pop_up_on_the_product_page"
-msgstr "Mostra il pop-up con le rate Oney nella pagina del Prodotto."
+msgstr "Visualizza il calendario di pagamento nella pagina del prodotto"
 
 msgid "payplug_apple_pay_activate_title"
 msgstr "Pagamenti Apple Pay"
@@ -797,3 +797,37 @@ msgstr "L'indirizzo mail e/o la password sono errati."
 
 msgid "payplug_section_login_forgot_password"
 msgstr "Hai dimenticato la password?"
+
+msgid "payplug_section_paylater_title"
+msgstr "PayLater"
+
+msgid "payplug_section_paylater_description"
+msgstr "Offri ai tuoi clienti la possibilità di pagare a rate."
+
+msgid "payplug_section_oney_title"
+msgstr "Pagamenti rateali 3x 4x Oney"
+
+msgid "payplug_section_paylater_description_oney"
+msgstr "I tuoi clienti possono scegliere di pagare gli ordini in 3 o 4 rate. Scegli qui sotto se vuoi prendere a tuo carico tutti i costi (o meno)."
+
+msgid "payplug_label_with_fees"
+msgstr "Con spese"
+
+msgid "payplug_text_with_fees"
+msgstr "Le spese sono ripartite tra te e i tuoi clienti."
+
+msgid "payplug_label_without_fees"
+msgstr "Senza spese"
+
+msgid "payplug_text_without_fees"
+msgstr "Le spese sono a tuo carico."
+
+msgid "payplug_thresholds_oney_title"
+msgstr "Personalizza la tua offerta di pagamento rateale"
+
+msgid "payplug_thresholds_oney_description"
+msgstr "Proporre pagamenti rateali garantiti per importi compresi tra"
+
+msgid "and"
+msgstr "e"
+

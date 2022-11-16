@@ -397,7 +397,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'desc_tip'    => false
             ],
             'title_advanced_settings' => [
-                'title'       => __('Advanced Settings', 'payplug'),
+                'title'       => __('payplug_advanced_settings', 'payplug'),
                 'description' => __(
                     'Your current offer does not allow this option. Try it on TEST mode. More information <a href="https://www.payplug.com/pricing" target="_blank">here.</a>',
                     'payplug'
