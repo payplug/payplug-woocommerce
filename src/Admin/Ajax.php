@@ -357,43 +357,37 @@ class Ajax {
 
 	public function payplug_save_data() {
 
-		$data = (new PayplugGateway())->get_post_data();
-		$options = get_option('woocommerce_payplug_settings', []);
-
-		$options['enabled'] = (Validator::enabled($data['enabled'])) ? $data['enabled'] : "";
-		$options['mode'] = (Validator::mode($data['mode'])) ? $data['mode'] : "";
-		$options['payment_method'] = (Validator::payment_method($data['payment_method'])) ? $data['payment_method'] : "";
-		$options['debug'] = (Validator::debug($data['debug'])) ? $data['debug'] : "";
-		$options['oneclick'] = (Validator::oneclick($data['oneclick'])) ? $data['oneclick'] : "";
-		$options['bancontact'] = (Validator::bancontact($data['bancontact'])) ? $data['bancontact'] : "";
-		$options['apple_pay'] = (Validator::apple_pay($data['apple_pay'])) ? $data['apple_pay'] : "";
-		$options['american_express'] = (Validator::american_express($data['american_express'])) ? $data['american_express'] : "";
-		$options['oney'] = (Validator::oney($data['oney'])) ? $data['oney'] : "";
-		$options['oney_type'] = (Validator::oney_type($data['oney_type'])) ? $data['oney_type'] : "";
-		$options['oney_thresholds_min'] = (Validator::oney_thresholds($data['oney_thresholds_min'], $data['oney_thresholds_max'])) ? $data['oney_thresholds_min'] : "";
-		$options['oney_thresholds_max'] = (Validator::oney_thresholds($data['oney_thresholds_max'], $data['oney_thresholds_max'])) ? $data['oney_thresholds_max'] : "";
-
-
-
-
-
-
-		$email = sanitize_email($_POST['payplug_email']);
-		$password = wp_unslash($_POST['payplug_password']);
-		$wp_nonce = $_POST['_wpnonce'];
-		$wp_loginaction = $_POST['_loginaction'];
-
-
-
-
 		$payplug = new PayplugGateway();
 
-		$payplug->set_post_data($data);
+		if ($payplug->user_logged_in()) {
 
-		update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
-		http_response_code(200);
+			$data = $payplug->get_post_data();
+			$options = get_option('woocommerce_payplug_settings', []);
 
-		return wp_send_json_success();
+			$options['enabled'] = (Validator::enabled($data['enabled'])) ? $data['enabled'] : "";
+			$options['mode'] = (Validator::mode($data['mode'])) ? $data['mode'] : "";
+			$options['payment_method'] = (Validator::payment_method($data['payment_method'])) ? $data['payment_method'] : "";
+			$options['debug'] = (Validator::debug($data['debug'])) ? $data['debug'] : "";
+			$options['oneclick'] = (Validator::oneclick($data['oneclick'])) ? $data['oneclick'] : "";
+			$options['bancontact'] = (Validator::bancontact($data['bancontact'])) ? $data['bancontact'] : "";
+			$options['apple_pay'] = (Validator::apple_pay($data['apple_pay'])) ? $data['apple_pay'] : "";
+			$options['american_express'] = (Validator::american_express($data['american_express'])) ? $data['american_express'] : "";
+			$options['oney'] = (Validator::oney($data['oney'])) ? $data['oney'] : "";
+			$options['oney_type'] = (Validator::oney_type($data['oney_type'])) ? $data['oney_type'] : "";
+			$options['oney_thresholds_min'] = (Validator::oney_thresholds($data['oney_thresholds_min'], $data['oney_thresholds_max'])) ? $data['oney_thresholds_min'] : "";
+			$options['oney_thresholds_max'] = (Validator::oney_thresholds($data['oney_thresholds_max'], $data['oney_thresholds_max'])) ? $data['oney_thresholds_max'] : "";
+
+
+			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+
+			http_response_code(200);
+
+			return wp_send_json_success();
+		} else {
+			http_response_code(403);
+			return wp_send_json("You are not logged in !");
+		}
+
 
 	}
 
