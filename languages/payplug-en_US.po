@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: \n"
+"PO-Revision-Date: 2022-11-16 17:08+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -81,7 +81,7 @@ msgstr "Display the installments on the Product page"
 msgid "payplug_apple_pay_activate_title"
 msgstr "Apple Pay payments"
 
-msgid "payplug_apple_pay_testmode_description"
+msgid "payplug_unavailable_testmode_description"
 msgstr "Unavailable in test mode"
 
 msgid "payplug_apple_pay_livemode_description"
@@ -246,5 +246,20 @@ msgstr "and"
 msgid "payplug_section_bancontact_payment_description"
 msgstr "Allow your customers to pay with their Bancontact cards."
 
+msgid "payplug_section_american_express_payment_title"
+msgstr "AmEx Payment"
+
 msgid "payplug_section_american_express_payment_description"
 msgstr "Allow your customers to pay with their American Express cards."
+
+msgid "payplug_bancontact_access_error"
+msgstr "You do not have access to this feature yet. To activate Bancontact, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=4583813991452' target='_blank'>the following form</a>"
+
+msgid "payplug_amex_access_error"
+msgstr "You do not have access to this feature yet. To activate American Express, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=6331992459420' target='_blank'>the following form</a>"
+
+msgid "payplug_applepay_access_error"
+msgstr "You do not have access to this feature yet. To activate Apple Pay, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=5965121371548' target='_blank'>the following form</a>"
+
+msgid "payplug_enable_feature"
+msgstr "Enable feature"

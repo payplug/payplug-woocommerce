@@ -183,6 +183,7 @@ class Vue {
 	 * @return array
 	 */
 	public function payplug_section_header() {
+		$enable = ( !empty( get_option( 'woocommerce_payplug_settings', [] )['enabled'] ) && get_option( 'woocommerce_payplug_settings', [] )['enabled'] === "yes") ? true : false;
 
 		return [
 			"title"        => __( 'payplug_section_header_title', 'payplug' ),
@@ -203,11 +204,12 @@ class Vue {
 					[
 						"value"   => 1,
 						"label"   => __( 'payplug_section_header_enable_label', 'payplug' ),
-						"checked" => true
+						"checked" => $enable === true ? true : false
 					],
 					[
 						"value" => 0,
 						"label" => __( 'payplug_section_header_disable_label', 'payplug' ),
+						"checked" => $enable === false ? true : false
 					]
 				]
 			]

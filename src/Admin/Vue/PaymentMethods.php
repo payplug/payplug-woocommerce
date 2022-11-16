@@ -78,6 +78,7 @@ class PaymentMethods {
 	 */
 	public function embeded_option() {
 		$option = (get_option( 'woocommerce_payplug_settings', [] )['payment_method'] != "") ? get_option( 'woocommerce_payplug_settings', [] )['payment_method'] : false;
+
 		return [
 			"type"         => "payment_option",
 			"sub_type"     => "IOptions",
@@ -106,12 +107,13 @@ class PaymentMethods {
 					"name"  => "payplug_embedded",
 					"label" => __( 'payplug_section_standard_payment_option_popup_label', 'payplug' ),
 					"value" => "popup",
-					"checked" => true,
+					"checked" => $option === "embedded" ? true : false
 				],
 				[
 					"name"    => "payplug_embedded",
 					"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
-					"value"   => "redirected"
+					"value"   => "redirected",
+					"checked" => $option === "redirect" ? true : false
 				]
 			]
 		];
@@ -135,7 +137,7 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
 				],
 				"sandbox" => [
-					"description"      => __( 'payplug_apple_pay_testmode_description', 'payplug' ),
+					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
 				]
 			],
@@ -160,7 +162,7 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
 				],
 				"sandbox" => [
-					"description"      => __( 'payplug_section_applepay_payment_description', 'payplug' ),
+					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
 				]
 			],
@@ -185,7 +187,7 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
 				],
 				"sandbox" => [
-					"description"      => __( 'payplug_section_applepay_payment_description', 'payplug' ),
+					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
 				]
 			],
