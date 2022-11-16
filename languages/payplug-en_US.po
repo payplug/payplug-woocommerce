@@ -14,7 +14,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.0.1\n"
 
-msgid "Advanced Settings"
+msgid "payplug_advanced_settings"
 msgstr "Advanced Settings"
 
 #: src/Gateway/PayplugGatewayRequirements.php:71

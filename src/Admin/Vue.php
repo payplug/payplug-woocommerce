@@ -273,7 +273,7 @@ class Vue {
 						"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), "https://support.payplug.com/hc/fr/articles/4408142346002", "_blank"),
 					],
 					"advanced" => [
-						"description" => __( 'Advanced Settings', 'payplug' ),""
+						"description" => __( 'payplug_advanced_settings', 'payplug' ),""
 					]
 				],
 				"options" => [

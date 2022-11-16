@@ -46,7 +46,7 @@ msgid "Activate debug mode"
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:357
-msgid "Advanced Settings"
+msgid "payplug_advanced_settings"
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:377
