@@ -364,18 +364,18 @@ class Ajax {
 			$data = $payplug->get_post_data();
 			$options = get_option('woocommerce_payplug_settings', []);
 
-			$options['enabled'] = (Validator::enabled($data['enabled'])) ? $data['enabled'] : "";
-			$options['mode'] = (Validator::mode($data['mode'])) ? $data['mode'] : "";
-			$options['payment_method'] = (Validator::payment_method($data['payment_method'])) ? $data['payment_method'] : "";
-			$options['debug'] = (Validator::debug($data['debug'])) ? $data['debug'] : "";
-			$options['oneclick'] = (Validator::oneclick($data['oneclick'])) ? $data['oneclick'] : "";
-			$options['bancontact'] = (Validator::bancontact($data['bancontact'])) ? $data['bancontact'] : "";
-			$options['apple_pay'] = (Validator::apple_pay($data['apple_pay'])) ? $data['apple_pay'] : "";
-			$options['american_express'] = (Validator::american_express($data['american_express'])) ? $data['american_express'] : "";
-			$options['oney'] = (Validator::oney($data['oney'])) ? $data['oney'] : "";
-			$options['oney_type'] = (Validator::oney_type($data['oney_type'])) ? $data['oney_type'] : "";
-			$options['oney_thresholds_min'] = (Validator::oney_thresholds($data['oney_thresholds_min'], $data['oney_thresholds_max'])) ? $data['oney_thresholds_min'] : "";
-			$options['oney_thresholds_max'] = (Validator::oney_thresholds($data['oney_thresholds_max'], $data['oney_thresholds_max'])) ? $data['oney_thresholds_max'] : "";
+			$options['enabled'] = (Validator::enabled($data['enabled'])) ? $data['enabled'] : $options['enabled'];
+			$options['mode'] = (Validator::mode($data['mode'])) ? $data['mode'] : $options['mode'];
+			$options['payment_method'] = (Validator::payment_method($data['payment_method'])) ? $data['payment_method'] : $options['payment_method'];
+			$options['debug'] = (Validator::debug($data['debug'])) ? $data['debug'] : $options['debug'];
+			$options['oneclick'] = (Validator::oneclick($data['oneclick'])) ? $data['oneclick'] : $options['oneclick'];
+			$options['bancontact'] = (Validator::bancontact($data['bancontact'])) ? $data['bancontact'] : $options['bancontact'];
+			$options['apple_pay'] = (Validator::apple_pay($data['apple_pay'])) ? $data['apple_pay'] : $options['apple_pay'];
+			$options['american_express'] = (Validator::american_express($data['american_express'])) ? $data['american_express'] : $options['american_express'];
+			$options['oney'] = (Validator::oney($data['oney'])) ? $data['oney'] : $options['oney'];
+			$options['oney_type'] = (Validator::oney_type($data['oney_type'])) ? $data['oney_type'] : $options['oney_type'];
+			$options['oney_thresholds_min'] = (Validator::oney_thresholds($data['oney_thresholds_min'], $data['oney_thresholds_max'])) ? $data['oney_thresholds_min'] : $options['oney_thresholds_min'];
+			$options['oney_thresholds_max'] = (Validator::oney_thresholds($data['oney_thresholds_max'], $data['oney_thresholds_max'])) ? $data['oney_thresholds_max'] : $options['oney_thresholds_max'];
 
 
 			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
