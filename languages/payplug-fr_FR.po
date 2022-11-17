@@ -697,7 +697,7 @@ msgstr "Afficher les échéanciers sur la page Produit"
 msgid "payplug_apple_pay_activate_title"
 msgstr "Paiement Apple Pay"
 
-msgid "payplug_apple_pay_testmode_description"
+msgid "payplug_unavailable_testmode_description"
 msgstr "Non disponible en mode test"
 
 msgid "payplug_apple_pay_livemode_description"
@@ -829,3 +829,23 @@ msgstr "Proposer le paiement fractionné garanti pour des montants entre"
 msgid "and"
 msgstr "et"
 
+msgid "payplug_section_bancontact_payment_description"
+msgstr "Permettez à vos clients de payer avec leurs cartes Bancontact."
+
+msgid "payplug_section_american_express_payment_title"
+msgstr "Paiement AmEx"
+
+msgid "payplug_section_american_express_payment_description"
+msgstr "Permettez à vos clients de payer avec leurs cartes American Express."
+
+msgid "payplug_bancontact_access_error"
+msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Bancontact, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=4583813991452' target='_blank'>ce formulaire</a>"
+
+msgid "payplug_amex_access_error"
+msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer American Express, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=6331992459420' target='_blank'>ce formulaire</a>"
+
+msgid "payplug_applepay_access_error"
+msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Apple Pay, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=5965121371548' target='_blank'>ce formulaire</a>"
+
+msgid "payplug_enable_feature"
+msgstr "Activer une fonctionnalité"
