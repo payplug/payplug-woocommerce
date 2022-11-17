@@ -397,7 +397,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'desc_tip'    => false
             ],
             'title_advanced_settings' => [
-                'title'       => __('Advanced Settings', 'payplug'),
+                'title'       => __('payplug_advanced_settings', 'payplug'),
                 'description' => __(
                     'Your current offer does not allow this option. Try it on TEST mode. More information <a href="https://www.payplug.com/pricing" target="_blank">here.</a>',
                     'payplug'
@@ -650,10 +650,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app.js', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('app.css', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/css/app.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_localize_script('app.js', 'payplug_admin_config',
-			array( 'ajax_url' => admin_url('admin-ajax.php'),
-				"img_path" => esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/')
-			)
-		);
+			array(
+				'ajax_url'      => admin_url('admin-ajax.php'),
+				"img_path"		=> esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/')
+			));
 
 		?>
 		<script>window.get_data_url = "<?php echo rest_url('payplug/data'); ?>"</script>

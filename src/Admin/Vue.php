@@ -183,6 +183,7 @@ class Vue {
 	 * @return array
 	 */
 	public function payplug_section_header() {
+		$enable = ( !empty( get_option( 'woocommerce_payplug_settings', [] )['enabled'] ) && get_option( 'woocommerce_payplug_settings', [] )['enabled'] === "yes") ? true : false;
 
 		return [
 			"title"        => __( 'payplug_section_header_title', 'payplug' ),
@@ -203,11 +204,12 @@ class Vue {
 					[
 						"value"   => 1,
 						"label"   => __( 'payplug_section_header_enable_label', 'payplug' ),
-						"checked" => true
+						"checked" => $enable === true ? true : false
 					],
 					[
 						"value" => 0,
 						"label" => __( 'payplug_section_header_disable_label', 'payplug' ),
+						"checked" => $enable === false ? true : false
 					]
 				]
 			]
@@ -265,24 +267,27 @@ class Vue {
 				"checked" => $active,
 				"descriptions" => [
 					"live"    => [
-						"description"      => __( 'payplug_section_bancontact_payment_description', 'payplug' ),
-						"link_know_more" => Component::link(__( 'payplug_section_bancontact_payment_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/360013071080", "_blank"),
+						"description"      => __( 'payplug_section_paylater_description_oney', 'payplug' ),
+						"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), "https://support.payplug.com/hc/fr/articles/4408142346002", "_blank"),
 					],
 					"sandbox" => [
-						"description"      => __( 'payplug_section_applepay_payment_description', 'payplug' ),
-						"link_know_more" => Component::link(__( 'payplug_section_bancontact_payment_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/360013071080", "_blank"),
+						"description"      => __( 'payplug_section_paylater_description_oney', 'payplug' ),
+						"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), "https://support.payplug.com/hc/fr/articles/4408142346002", "_blank"),
+					],
+					"advanced" => [
+						"description" => __( 'payplug_advanced_settings', 'payplug' ),""
 					]
 				],
 				"options" => [
 					[
-						"name" => "payplug_embedded",
+						"name" => "payplug_oney_type",
 						"className" => "_paylaterLabel",
 						"label" => __( 'payplug_label_with_fees', 'payplug' ),
 						"subText" => __( 'payplug_text_with_fees', 'payplug' ),
 						"value" => 1
 					],
 					[
-						"name" => "payplug_embedded",
+						"name" => "payplug_oney_type",
 						"className" => "_paylaterLabel",
 						"label" => __( 'payplug_label_without_fees', 'payplug' ),
 						"subText" => __( 'payplug_text_without_fees', 'payplug' ),
@@ -304,10 +309,10 @@ class Vue {
 	 */
 	public function thresholds_option() {
 		$min_amount = (! empty( get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_min'] )) ? get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_min'] : 100;
-		$max_amount = (! empty( get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_max'] )) ? get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_min'] : 100;
+		$max_amount = (! empty( get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_max'] )) ? get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_max'] : 3000;
 		$thresholds = [
 			"name" => "thresholds",
-			"image_url" => "",
+			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.jpg' ),
 			"title" => __( 'payplug_thresholds_oney_title', 'payplug' ),
 			"descriptions" => [
 				"description" => __( 'payplug_thresholds_oney_description', 'payplug' ),
@@ -317,8 +322,8 @@ class Vue {
 					"placeholder" => $min_amount,
 					"min" => "100"
 				],
-				"inter" => "and",
-				[
+				"inter" => __( 'and', 'payplug' ),
+				"max_amount" => [
 					"name" => "oney_max_amounts",
 					"value" => $max_amount,
 					"placeholder" => $max_amount,
@@ -342,7 +347,7 @@ class Vue {
 	public function show_oney_popup_product($active = false) {
 		return [
 			"name" => "product",
-			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/admin/screen/product.jpg' ),
+			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.jpg' ),
 			"title" => __( 'display_the_oney_installments_pop_up_on_the_product_page', 'payplug' ),
 			"switch" => true,
 			"checked" => $active

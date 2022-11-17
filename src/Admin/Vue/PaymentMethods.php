@@ -14,7 +14,7 @@ class PaymentMethods {
 			"type"         => "payment_method",
 			"name"         => "standard",
 			"title"        => __( 'payplug_section_standard_payment_title', 'payplug' ),
-			"image"        => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/logos_scheme_CB.svg' ),
+			"image"        => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/standard.svg' ),
 			"checked"      => $active,
 			"descriptions" => [
 				"live"    => [
@@ -49,14 +49,14 @@ class PaymentMethods {
 				"live"    => [
 					"description"    => __( 'payplug_section_one_click_option_description', 'payplug' ),
 					"link_know_more" => Component::link(
-						__( 'payplug_section_one_click__know_more', 'payplug' ),
+						__( 'payplug_know_more_label', 'payplug' ),
 						"https://support.payplug.com/hc/en-gb/articles/4409698334098",
 						"_blank" ),
 				],
 				"sandbox" => [
 					"description"    => __( 'payplug_section_one_click_option_description', 'payplug' ),
 					"link_know_more" => Component::link(
-						__( 'payplug_section_one_click__know_more', 'payplug' ),
+						__( 'payplug_know_more_label', 'payplug' ),
 						"https://support.payplug.com/hc/en-gb/articles/4409698334098",
 						"_blank" ),
 				]
@@ -78,6 +78,7 @@ class PaymentMethods {
 	 */
 	public function embeded_option() {
 		$option = (get_option( 'woocommerce_payplug_settings', [] )['payment_method'] != "") ? get_option( 'woocommerce_payplug_settings', [] )['payment_method'] : false;
+
 		return [
 			"type"         => "payment_option",
 			"sub_type"     => "IOptions",
@@ -88,7 +89,7 @@ class PaymentMethods {
 					"description_redirected"    => __( 'payplug_section_standard_payment_redirected_description', 'payplug' ),
 					"description_popup"    => __( 'payplug_section_standard_payment_popup_description', 'payplug' ),
 					"link_know_more" => Component::link(
-						__( 'payplug_section_standard_payment_know_more', 'payplug' ),
+						__( 'payplug_know_more_label', 'payplug' ),
 						"https://support.payplug.com/hc/en-gb/articles/4409698334098",
 						"_blank" ),
 				],
@@ -96,7 +97,7 @@ class PaymentMethods {
 					"description_redirected"    => __( 'payplug_section_standard_payment_redirected_description', 'payplug' ),
 					"description_popup"    => __( 'payplug_section_standard_payment_popup_description', 'payplug' ),
 					"link_know_more" => Component::link(
-						__( 'payplug_section_standard_payment_know_more', 'payplug' ),
+						__( 'payplug_know_more_label', 'payplug' ),
 						"https://support.payplug.com/hc/en-gb/articles/4409698334098",
 						"_blank" ),
 				]
@@ -105,12 +106,14 @@ class PaymentMethods {
 				[
 					"name"  => "payplug_embedded",
 					"label" => __( 'payplug_section_standard_payment_option_popup_label', 'payplug' ),
-					"value" => "popup"
+					"value" => "popup",
+					"checked" => $option === "embedded" ? true : false
 				],
 				[
 					"name"    => "payplug_embedded",
 					"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
-					"value"   => "redirect"
+					"value"   => "redirected",
+					"checked" => $option === "redirect" ? true : false
 				]
 			]
 		];
@@ -126,7 +129,7 @@ class PaymentMethods {
 			"type" => "payment_method",
 			"name" => "applepay",
 			"title" => __( 'payplug_section_applepay_payment_title', 'payplug' ),
-			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/apple-pay-checkout.svg' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/applepay.svg' ),
 			"checked" =>  $active,
 			"descriptions" => [
 				"live"    => [
@@ -134,7 +137,7 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
 				],
 				"sandbox" => [
-					"description"      => __( 'payplug_apple_pay_testmode_description', 'payplug' ),
+					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
 				]
 			],
@@ -151,7 +154,7 @@ class PaymentMethods {
 			"type" => "payment_method",
 			"name" => "bancontact",
 			"title" => __( 'payplug_section_bancontact_payment_title', 'payplug' ),
-			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/lg-bancontact-checkout.png' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/bancontact.svg' ),
 			"checked" =>  $active,
 			"descriptions" => [
 				"live"    => [
@@ -159,7 +162,7 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
 				],
 				"sandbox" => [
-					"description"      => __( 'payplug_section_applepay_payment_description', 'payplug' ),
+					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
 				]
 			],
@@ -176,7 +179,7 @@ class PaymentMethods {
 			"type" => "payment_method",
 			"name" => "american_express",
 			"title" => __( 'payplug_section_american_express_payment_title', 'payplug' ),
-			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/lg-american_express-checkout.png' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/Amex_logo_color.svg' ),
 			"checked" =>  $active,
 			"descriptions" => [
 				"live"    => [
@@ -184,7 +187,7 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
 				],
 				"sandbox" => [
-					"description"      => __( 'payplug_section_applepay_payment_description', 'payplug' ),
+					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
 				]
 			],
