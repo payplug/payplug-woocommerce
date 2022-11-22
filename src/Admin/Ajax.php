@@ -237,7 +237,7 @@ class Ajax {
 		if(!$amex){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_bancontact_access_error', 'payplug' )
+				"msg" => __( 'payplug_amex_access_error', 'payplug' )
 			));
 		}
 
