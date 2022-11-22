@@ -52,6 +52,11 @@ class Vue {
 	 */
 	public function payplug_section_logged() {
 
+		$disabled = false;
+		if( empty(PayplugWoocommerceHelper::get_live_key()) ){
+			$disabled = true;
+		}
+
 		return [
 			"title"        => __( 'payplug_section_logged_title', 'payplug' ),
 			"descriptions" => [
@@ -93,7 +98,7 @@ class Vue {
 					"name"    => "payplug_sandbox",
 					"label"   => "Live",
 					"value"   => "0",
-					"checked" => true
+					"disabled" => $disabled,
 				],
 				[
 					"name"  => "payplug_sandbox",
