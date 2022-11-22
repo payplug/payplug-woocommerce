@@ -9,13 +9,22 @@ class PaymentMethods {
 	 *
 	 * @return array
 	 */
-	public function payment_method_standard( $active = false ) {
+	public function payment_method_standard( ) {
+
+		$option = (get_option( 'woocommerce_payplug_settings', [] )['payment_method'] != "") ? get_option( 'woocommerce_payplug_settings', [] )['payment_method'] : false;
+
+		$redirect = true;
+		if($option === "embedded"){
+			$redirect = false;
+		}
+
 		return [
 			"type"         => "payment_method",
 			"name"         => "standard",
 			"title"        => __( 'payplug_section_standard_payment_title', 'payplug' ),
 			"image"        => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/standard.svg' ),
-			"checked"      => $active,
+			"checked"      => true,
+			"hide"		=> true,
 			"descriptions" => [
 				"live"    => [
 					"description"      => __( 'payplug_section_standard_payment_description', 'payplug' ),
@@ -27,7 +36,7 @@ class PaymentMethods {
 				]
 			],
 			"options"      => [
-				$this->embeded_option(),
+				$this->embeded_option($redirect),
 				$this->one_click_option(),
 			]
 		];
@@ -76,8 +85,7 @@ class PaymentMethods {
 	/**
 	 * @return array
 	 */
-	public function embeded_option() {
-		$option = (get_option( 'woocommerce_payplug_settings', [] )['payment_method'] != "") ? get_option( 'woocommerce_payplug_settings', [] )['payment_method'] : false;
+	public function embeded_option($redirect) {
 
 		return [
 			"type"         => "payment_option",
@@ -107,13 +115,13 @@ class PaymentMethods {
 					"name"  => "payplug_embedded",
 					"label" => __( 'payplug_section_standard_payment_option_popup_label', 'payplug' ),
 					"value" => "popup",
-					"checked" => $option === "embedded" ? true : false
+					"checked" => $redirect ? false : true
 				],
 				[
 					"name"    => "payplug_embedded",
 					"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
 					"value"   => "redirected",
-					"checked" => $option === "redirect" ? true : false
+					"checked" => $redirect ? true : false
 				]
 			]
 		];
