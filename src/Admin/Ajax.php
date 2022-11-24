@@ -35,6 +35,7 @@ class Ajax {
 	const CHECK_AMERICAN_EXPRESS_PERMISSIONS = 'check_american_express_permissions';
 	const PAYPLUG_LOGIN = 'payplug_login';
 	const PAYPLUG_INIT = 'payplug_init';
+	const PAYPLUG_SAVE_DATA = 'payplug_save_data';
 	const PAYPLUG_LOGOUT = 'payplug_logout';
 	const API_CHECK_BANCONTACT_PERMISSIONS = 'api_check_bancontact_permissions';
 	const API_CHECK_APPLEPAY_PERMISSIONS = 'api_check_applepay_permissions';
@@ -49,6 +50,7 @@ class Ajax {
 		add_action( 'wp_ajax_' . self::PAYPLUG_LOGIN, [ $this, 'payplug_login' ] );
 		add_action( 'wp_ajax_' . self::PAYPLUG_INIT, [ $this, 'payplug_init' ] );
 		add_action( 'wp_ajax_' . self::PAYPLUG_LOGOUT, [ $this, 'payplug_logout' ] );
+		add_action( 'wp_ajax_' . self::PAYPLUG_SAVE_DATA, [ $this, 'payplug_save_data' ] );
 		add_action( 'wp_ajax_' . self::API_CHECK_BANCONTACT_PERMISSIONS, [ $this, 'api_check_bancontact_permissions' ] );
 		add_action( 'wp_ajax_' . self::API_CHECK_APPLEPAY_PERMISSIONS, [ $this, 'api_check_applepay_permissions' ] );
 		add_action( 'wp_ajax_' . self::API_CHECK_AMERICAN_EXPRESS_PERMISSIONS, [ $this, 'api_check_american_express_permissions' ] );
@@ -155,7 +157,11 @@ class Ajax {
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => $e->getMessage(),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
 			return false;
 		}
 
@@ -167,7 +173,8 @@ class Ajax {
 
 		wp_send_json_error(array(
 			"title" => __( 'payplug_enable_feature', 'payplug' ),
-			"msg" => __( 'payplug_bancontact_access_error', 'payplug' )
+			"msg" => __( 'payplug_bancontact_access_error', 'payplug' ),
+			"close" => __( 'payplug_ok', 'payplug' )
 		));
 
 	}
@@ -185,7 +192,11 @@ class Ajax {
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => $e->getMessage(),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
 			return false;
 		}
 
@@ -203,7 +214,8 @@ class Ajax {
 		if(!$applepay){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_apple_pay_unauthorized_error', 'payplug' )
+				"msg" => __( 'payplug_applepay_access_error', 'payplug' ),
+				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
 
@@ -222,7 +234,11 @@ class Ajax {
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => $e->getMessage(),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
 			return false;
 		}
 
@@ -237,7 +253,8 @@ class Ajax {
 		if(!$amex){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_amex_access_error', 'payplug' )
+				"msg" => __( 'payplug_amex_access_error', 'payplug' ),
+				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
 
@@ -463,7 +480,8 @@ class Ajax {
 		if(empty($like_key)){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __('Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug')
+				"msg" => __('Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug'),
+				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
 	}
@@ -473,6 +491,42 @@ class Ajax {
 			"title" => __( 'payplug_enable_feature', 'payplug' ),
 			"msg" => __( 'payplug_unavailable_testmode_description', 'payplug' )
 		));
+	}
+
+	public function payplug_save_data() {
+
+		$payplug = new PayplugGateway();
+
+		if ($payplug->user_logged_in()) {
+
+			$data = $payplug->get_post_data();
+			$options = get_option('woocommerce_payplug_settings', []);
+
+			$options['enabled'] = (Validator::enabled($data['enabled'])) ? $data['enabled'] : $options['enabled'];
+			$options['mode'] = (Validator::mode($data['mode'])) ? $data['mode'] : $options['mode'];
+			$options['payment_method'] = (Validator::payment_method($data['payment_method'])) ? $data['payment_method'] : $options['payment_method'];
+			$options['debug'] = (Validator::debug($data['debug'])) ? $data['debug'] : $options['debug'];
+			$options['oneclick'] = (Validator::oneclick($data['oneclick'])) ? $data['oneclick'] : $options['oneclick'];
+			$options['bancontact'] = (Validator::bancontact($data['bancontact'])) ? $data['bancontact'] : $options['bancontact'];
+			$options['apple_pay'] = (Validator::apple_pay($data['apple_pay'])) ? $data['apple_pay'] : $options['apple_pay'];
+			$options['american_express'] = (Validator::american_express($data['american_express'])) ? $data['american_express'] : $options['american_express'];
+			$options['oney'] = (Validator::oney($data['oney'])) ? $data['oney'] : $options['oney'];
+			$options['oney_type'] = (Validator::oney_type($data['oney_type'])) ? $data['oney_type'] : $options['oney_type'];
+			$options['oney_thresholds_min'] = (Validator::oney_thresholds($data['oney_thresholds_min'], $data['oney_thresholds_max'])) ? $data['oney_thresholds_min'] : $options['oney_thresholds_min'];
+			$options['oney_thresholds_max'] = (Validator::oney_thresholds($data['oney_thresholds_max'], $data['oney_thresholds_max'])) ? $data['oney_thresholds_max'] : $options['oney_thresholds_max'];
+
+
+			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+
+			http_response_code(200);
+
+			return wp_send_json_success();
+		} else {
+			http_response_code(403);
+			return wp_send_json("You are not logged in !");
+		}
+
+
 	}
 
 }
