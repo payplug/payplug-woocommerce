@@ -851,3 +851,24 @@ msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Apple Pay,
 
 msgid "payplug_enable_feature"
 msgstr "Attivare una funzionalità"
+
+msgid "payplug_section_login_description"
+msgstr "Connettiti al tuo account PayPlug."
+
+msgid "payplug_section_login_email_label"
+msgstr "Indirizzo E-mail"
+
+msgid "payplug_section_login_connect"
+msgstr "Accedi al tuo conto"
+
+msgid "payplug_section_subscribe_description"
+msgstr "Iscrizione"
+
+msgid "payplug_section_subscribe_content_description"
+msgstr "Crea il tuo account per poter utilizzare il modulo."
+
+msgid "payplug_section_subscribe_link_create_account"
+msgstr "Crea un account PayPlug"
+
+msgid "payplug_section_subscribe_already_have_account"
+msgstr "Ho già un account PayPlug"
