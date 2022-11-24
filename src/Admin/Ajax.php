@@ -153,7 +153,7 @@ class Ajax {
 		$this->accountIsNotValid();
 
 		try{
-			$account = Authentication::getKeysByLogin(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');

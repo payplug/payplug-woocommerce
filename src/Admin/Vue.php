@@ -30,10 +30,11 @@ class Vue {
 
 			return [
 				"payplug_wooc_settings" => $payplug_wooc_settings,
-				"header"           => $header,
-				"logged"           => $logged,
-				"payment_methods"  => $this->payplug_section_payment_methods(),
-				"payment_paylater"  => $this->payplug_section_paylater(),
+				"header"           		=> $header,
+				"login"     			=> $this->payplug_section_login(),
+				"logged"           		=> $logged,
+				"payment_methods"  		=> $this->payplug_section_payment_methods(),
+				"payment_paylater"  	=> $this->payplug_section_paylater(),
 			];
 		}
 
