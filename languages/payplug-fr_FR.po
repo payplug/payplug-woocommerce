@@ -794,7 +794,7 @@ msgid "payplug_error_wrong_credentials"
 msgstr "L'e-mail ou le mot de passe saisi est incorrect."
 
 msgid "payplug_section_login_forgot_password"
-msgstr "Mot de passe oublié?"
+msgstr "Mot de passe oublié ?"
 
 msgid "payplug_section_paylater_title"
 msgstr "PayLater"
@@ -849,3 +849,6 @@ msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer App
 
 msgid "payplug_enable_feature"
 msgstr "Activer une fonctionnalité"
+
+msgid "payplug_ok"
+msgstr "OK"

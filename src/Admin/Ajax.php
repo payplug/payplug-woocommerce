@@ -6,11 +6,11 @@ namespace Payplug\PayplugWoocommerce\Admin;
 use Payplug\Exception\HttpException;
 use Payplug\Payplug;
 use Payplug\Authentication;
+use Payplug\PayplugWoocommerce\Admin\Vue;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Exception\PayplugException;
-use Payplug\PayplugWoocommerce\Admin\Vue;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -37,6 +37,9 @@ class Ajax {
 	const PAYPLUG_INIT = 'payplug_init';
 	const PAYPLUG_SAVE_DATA = 'payplug_save_data';
 	const PAYPLUG_LOGOUT = 'payplug_logout';
+	const API_CHECK_BANCONTACT_PERMISSIONS = 'api_check_bancontact_permissions';
+	const API_CHECK_APPLEPAY_PERMISSIONS = 'api_check_applepay_permissions';
+	const API_CHECK_AMERICAN_EXPRESS_PERMISSIONS = 'api_check_american_express_permissions';
 
 	public function __construct() {
 		add_action( 'wp_ajax_' . self::REFRESH_KEY_ACTION, [ $this, 'handle_refresh_keys' ] );
@@ -48,6 +51,9 @@ class Ajax {
 		add_action( 'wp_ajax_' . self::PAYPLUG_INIT, [ $this, 'payplug_init' ] );
 		add_action( 'wp_ajax_' . self::PAYPLUG_LOGOUT, [ $this, 'payplug_logout' ] );
 		add_action( 'wp_ajax_' . self::PAYPLUG_SAVE_DATA, [ $this, 'payplug_save_data' ] );
+		add_action( 'wp_ajax_' . self::API_CHECK_BANCONTACT_PERMISSIONS, [ $this, 'api_check_bancontact_permissions' ] );
+		add_action( 'wp_ajax_' . self::API_CHECK_APPLEPAY_PERMISSIONS, [ $this, 'api_check_applepay_permissions' ] );
+		add_action( 'wp_ajax_' . self::API_CHECK_AMERICAN_EXPRESS_PERMISSIONS, [ $this, 'api_check_american_express_permissions' ] );
 	}
 
 	public function handle_refresh_keys() {
@@ -138,6 +144,122 @@ class Ajax {
 		wp_send_json_success($permissions);
 	}
 
+	public function api_check_bancontact_permissions() {
+
+		if($_POST['env']) {
+			$this->optionUnnavailableInTestMode();
+		}
+
+		$this->accountIsNotValid();
+
+		try{
+			$account = Authentication::getKeysByLogin(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+
+		}  catch (PayplugException $e){
+			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => $e->getMessage(),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+			return false;
+		}
+
+		PayplugWoocommerceHelper::set_transient_data($account);
+
+		if(isset($account['httpResponse']['payment_methods']['bancontact']['enabled']) && $account['httpResponse']['payment_methods']['bancontact']['enabled']){
+			wp_send_json_success(true);
+		}
+
+		wp_send_json_error(array(
+			"title" => __( 'payplug_enable_feature', 'payplug' ),
+			"msg" => __( 'payplug_bancontact_access_error', 'payplug' ),
+			"close" => __( 'payplug_ok', 'payplug' )
+		));
+
+	}
+
+	public function api_check_applepay_permissions() {
+
+		if($_POST['env']) {
+			$this->optionUnnavailableInTestMode();
+		}
+
+		$this->accountIsNotValid();
+
+		try{
+			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+
+		}  catch (PayplugException $e){
+			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => $e->getMessage(),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+			return false;
+		}
+
+		PayplugWoocommerceHelper::set_transient_data($account);
+		$applepay = false;
+
+		if ($account['httpResponse']['payment_methods']['apple_pay']['enabled']) {
+			if (in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['httpResponse']['payment_methods']['apple_pay']['allowed_domain_names'])) {
+				wp_send_json_success(true);
+			}
+
+		}
+
+
+		if(!$applepay){
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => __( 'payplug_applepay_access_error', 'payplug' ),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+		}
+
+	}
+
+	public function api_check_american_express_permissions() {
+
+		if($_POST['env']) {
+			$this->optionUnnavailableInTestMode();
+		}
+
+		$this->accountIsNotValid();
+
+		try{
+			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+
+		}  catch (PayplugException $e){
+			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => $e->getMessage(),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+			return false;
+		}
+
+		PayplugWoocommerceHelper::set_transient_data($account);
+
+		if(isset($account['httpResponse']['payment_methods']['american_express']['enabled']) && $account['httpResponse']['payment_methods']['american_express']['enabled']){
+			wp_send_json_success(true);
+		}
+
+		$amex = isset($account['httpResponse']['payment_methods']['american_express']['enabled']) ? $account['httpResponse']['payment_methods']['american_express']['enabled']: false;
+
+		if(!$amex){
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => __( 'payplug_amex_access_error', 'payplug' ),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+		}
+
+		wp_send_json_success($amex);
+	}
 
 	public function check_bancontact_permissions() {
 		try{
@@ -237,7 +359,7 @@ class Ajax {
 		$wp_loginaction = $_POST['_loginaction'];
 
 		try {
-			$response = Authentication::getPermissionsByLogin($email, $password);
+			$response = Authentication::getKeysByLogin($email, $password);
 			if (empty($response) || !isset($response)) {
 				http_response_code(401);
 				return wp_send_json_error(array(
@@ -295,9 +417,7 @@ class Ajax {
 				]
 			];
 
-			return wp_send_json_success( [
-				                             "settings" => $user + $response + $wp
-			                             ] + ( new Vue )->init() );
+			return wp_send_json_success( ["settings" => $user + $response + $wp] + ( new Vue )->init() );
 		} catch (HttpException $e) {
 
 			//TODO:: error handler, Authentication::getPermissionsByLogin comes here
@@ -354,6 +474,24 @@ class Ajax {
 
 	}
 
+
+	private function accountIsNotValid(){
+		$like_key = PayplugWoocommerceHelper::get_live_key();
+		if(empty($like_key)){
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => __('Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug'),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+		}
+	}
+
+	private function optionUnnavailableInTestMode(){
+		wp_send_json_error(array(
+			"title" => __( 'payplug_enable_feature', 'payplug' ),
+			"msg" => __( 'payplug_unavailable_testmode_description', 'payplug' )
+		));
+	}
 
 	public function payplug_save_data() {
 
