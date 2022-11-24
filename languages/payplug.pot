@@ -773,12 +773,8 @@ msgstr ""
 msgid "payplug_section_status_account"
 msgstr ""
 
-
-
-
-
-
-
+msgid "payplug_oney_product_page_description"
+msgstr ""
 
 
 
