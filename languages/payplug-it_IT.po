@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -854,3 +854,30 @@ msgstr "Attivare una funzionalità"
 
 msgid "payplug_ok"
 msgstr "OK"
+
+msgid "payplug_section_login_description"
+msgstr "Connettiti al tuo account PayPlug."
+
+msgid "payplug_section_login_email_label"
+msgstr "Indirizzo E-mail"
+
+msgid "payplug_section_login_password_label"
+msgstr "Password"
+
+msgid "payplug_section_login_connect"
+msgstr "Accedi al tuo conto"
+
+msgid "payplug_section_subscribe_description"
+msgstr "Iscrizione"
+
+msgid "payplug_section_subscribe_content_description"
+msgstr "Crea il tuo account per poter utilizzare il modulo."
+
+msgid "payplug_section_subscribe_link_create_account"
+msgstr "Crea un account PayPlug"
+
+msgid "payplug_section_subscribe_already_have_account"
+msgstr "Ho già un account PayPlug"
+
+msgid "payplug_section_login_not_registered"
+msgstr "Non hai ancora un account PayPlug?"

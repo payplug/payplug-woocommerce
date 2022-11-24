@@ -165,7 +165,7 @@ class Vue {
 					"description"          => __( 'payplug_section_subscribe_description', 'payplug' ),
 					"link_create_account"  => [
 						"text"   => __( 'payplug_section_subscribe_link_create_account', 'payplug' ),
-						"url"    => "https://portal.payplug.com",
+						"url"    => "https://portal.payplug.com/signup",
 						"target" => "_blank"
 					],
 					"content_description"  => __( 'payplug_section_subscribe_content_description', 'payplug' ),
@@ -175,7 +175,7 @@ class Vue {
 					"description"          => __( 'payplug_section_subscribe_description', 'payplug' ),
 					"link_create_account"  => [
 						"text"   => __( 'payplug_section_subscribe_link_create_account', 'payplug' ),
-						"url"    => "https://portal.payplug.com",
+						"url"    => "https://portal.payplug.com/signup",
 						"target" => "_blank"
 					],
 					"content_description"  => __( 'payplug_section_subscribe_content_description', 'payplug' ),
