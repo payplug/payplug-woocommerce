@@ -788,7 +788,7 @@ msgid "payplug_section_bancontact_payment_title"
 msgstr "Paiement Bancontact"
 
 msgid "payplug_know_more_label"
-msgstr "En savoir plus"
+msgstr "En savoir plus."
 
 msgid "payplug_error_wrong_credentials"
 msgstr "L'e-mail ou le mot de passe saisi est incorrect."
@@ -800,13 +800,13 @@ msgid "payplug_section_paylater_title"
 msgstr "PayLater"
 
 msgid "payplug_section_paylater_description"
-msgstr "Permettez à vos client de payer en plusieurs fois."
+msgstr "Permettez à vos clients de payer en plusieurs fois."
 
 msgid "payplug_section_oney_title"
 msgstr "Paiements 3x 4x Oney"
 
 msgid "payplug_section_paylater_description_oney"
-msgstr "Vos clients pourront choisir de payer leurs commandes en 3 ou 4 échéances. Vous pouvez prendre (ou non) l'ensemble des frais à votre charge."
+msgstr "Vos clients pourront choisir de payer leurs commandes en 3 ou 4 échéances. Vous pouvez prendre\n (ou non) l'ensemble des frais à votre charge."
 
 msgid "payplug_label_with_fees"
 msgstr "Avec frais"
@@ -849,3 +849,6 @@ msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer App
 
 msgid "payplug_enable_feature"
 msgstr "Activer une fonctionnalité"
+
+msgid "payplug_oney_product_page_description"
+msgstr "Vos clients pourront voir le détail de leurs échéances en 3 ou 4 fois."

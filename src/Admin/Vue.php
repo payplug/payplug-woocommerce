@@ -354,6 +354,10 @@ class Vue {
 			"name" => "product",
 			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.jpg' ),
 			"title" => __( 'display_the_oney_installments_pop_up_on_the_product_page', 'payplug' ),
+			"descriptions" => [[
+				"description" => __( 'payplug_oney_product_page_description', 'payplug' ),
+				"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), "https://support.payplug.com/hc/fr/articles/4408142346002", "_blank")
+				]],
 			"switch" => true,
 			"checked" => $active
 		];

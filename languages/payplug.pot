@@ -749,6 +749,9 @@ msgstr ""
 msgid "and"
 msgstr ""
 
+msgid "payplug_oney_product_page_description"
+msgstr ""
+
 
 
 

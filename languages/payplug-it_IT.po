@@ -790,7 +790,7 @@ msgid "payplug_section_bancontact_payment_title"
 msgstr "Pagamento Bancontact"
 
 msgid "payplug_know_more_label"
-msgstr "Sapere di più"
+msgstr "Per saperne di più."
 
 msgid "payplug_error_wrong_credentials"
 msgstr "L'indirizzo mail e/o la password sono errati."
@@ -851,3 +851,6 @@ msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Apple Pay,
 
 msgid "payplug_enable_feature"
 msgstr "Attivare una funzionalità"
+
+msgid "payplug_oney_product_page_description"
+msgstr "I tuoi clienti potranno visualizzare i dettagli dei loro pagamenti in 3 o 4 rate."

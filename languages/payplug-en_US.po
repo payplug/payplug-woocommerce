@@ -205,7 +205,7 @@ msgid "payplug_section_bancontact_payment_title"
 msgstr "Bancontact payment"
 
 msgid "payplug_know_more_label"
-msgstr "Know more"
+msgstr "Find out more."
 
 msgid "payplug_error_wrong_credentials"
 msgstr "The email and/or password is incorrect."
@@ -263,3 +263,6 @@ msgstr "You do not have access to this feature yet. To activate Apple Pay, pleas
 
 msgid "payplug_enable_feature"
 msgstr "Enable feature"
+
+msgid "payplug_oney_product_page_description"
+msgstr "Your customers can see the details of their 3 or 4 installments."
