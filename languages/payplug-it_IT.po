@@ -851,3 +851,6 @@ msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Apple Pay,
 
 msgid "payplug_enable_feature"
 msgstr "Attivare una funzionalità"
+
+msgid "payplug_ok"
+msgstr "OK"

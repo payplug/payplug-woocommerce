@@ -155,7 +155,11 @@ class Ajax {
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => $e->getMessage(),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
 			return false;
 		}
 
@@ -167,7 +171,8 @@ class Ajax {
 
 		wp_send_json_error(array(
 			"title" => __( 'payplug_enable_feature', 'payplug' ),
-			"msg" => __( 'payplug_bancontact_access_error', 'payplug' )
+			"msg" => __( 'payplug_bancontact_access_error', 'payplug' ),
+			"close" => __( 'payplug_ok', 'payplug' )
 		));
 
 	}
@@ -185,7 +190,11 @@ class Ajax {
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => $e->getMessage(),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
 			return false;
 		}
 
@@ -203,7 +212,8 @@ class Ajax {
 		if(!$applepay){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_apple_pay_unauthorized_error', 'payplug' )
+				"msg" => __( 'payplug_applepay_access_error', 'payplug' ),
+				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
 
@@ -222,7 +232,11 @@ class Ajax {
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => $e->getMessage(),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
 			return false;
 		}
 
@@ -237,7 +251,8 @@ class Ajax {
 		if(!$amex){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_amex_access_error', 'payplug' )
+				"msg" => __( 'payplug_amex_access_error', 'payplug' ),
+				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
 
@@ -463,7 +478,8 @@ class Ajax {
 		if(empty($like_key)){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __('Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug')
+				"msg" => __('Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug'),
+				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
 	}
