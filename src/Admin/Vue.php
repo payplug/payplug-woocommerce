@@ -296,7 +296,8 @@ class Vue {
 						"className" => "_paylaterLabel",
 						"label" => __( 'payplug_label_with_fees', 'payplug' ),
 						"subText" => __( 'payplug_text_with_fees', 'payplug' ),
-						"value" => 1
+						"value" => 1,
+						"checked" => true
 					],
 					[
 						"name" => "payplug_oney_type",
