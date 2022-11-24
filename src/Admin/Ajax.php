@@ -212,7 +212,7 @@ class Ajax {
 		if(!$applepay){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_apple_pay_unauthorized_error', 'payplug' ),
+				"msg" => __( 'payplug_applepay_access_error', 'payplug' ),
 				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
