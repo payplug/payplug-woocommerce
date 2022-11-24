@@ -850,6 +850,9 @@ msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer App
 msgid "payplug_enable_feature"
 msgstr "Activer une fonctionnalité"
 
+msgid "payplug_ok"
+msgstr "OK"
+
 msgid "payplug_section_login_description"
 msgstr "Connectez-vous à votre compte PayPlug."
 
