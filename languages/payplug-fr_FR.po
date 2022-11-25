@@ -882,3 +882,6 @@ msgstr "J'ai déjà un compte PayPlug"
 
 msgid "payplug_learn_more"
 msgstr "En savoir plus"
+
+msgid "payplug_mode_learn_more_url"
+msgstr "https://support.payplug.com/hc/fr/articles/360021142492"
