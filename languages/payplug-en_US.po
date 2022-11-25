@@ -266,3 +266,12 @@ msgstr "Enable feature"
 
 msgid "payplug_oney_product_page_description"
 msgstr "Your customers can see the details of their 3 or 4 installments."
+
+msgid "payplug_oney_error_title"
+msgstr "Mode LIVE"
+
+msgid "payplug_oney_error_description"
+msgstr "You do not have access to this feature yet. To activate Oney, please go to your "
+
+msgid "payplug_oney_error_link"
+msgstr "Payplug portal"

@@ -752,6 +752,15 @@ msgstr ""
 msgid "payplug_oney_product_page_description"
 msgstr ""
 
+msgid "payplug_oney_error_title"
+msgstr ""
+
+msgid "payplug_oney_error_description"
+msgstr ""
+
+msgid "payplug_oney_error_link"
+msgstr ""
+
 
 
 
