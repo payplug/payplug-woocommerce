@@ -408,7 +408,7 @@ class Ajax {
 			$user = [
 				"logged" => true,
 				"email" => $email,
-				"mode" => 0
+				"mode" => PayplugWoocommerceHelper::check_mode()
 			];
 			$wp = [
 				"WP" => [

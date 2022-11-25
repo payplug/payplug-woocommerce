@@ -98,13 +98,15 @@ class Vue {
 				[
 					"name"     => "payplug_sandbox",
 					"label"    => "Live",
-					"value"    => "0",
+					"value"    => 1,
 					"disabled" => $disabled,
+					"checked" => PayplugWoocommerceHelper::check_mode()
 				],
 				[
 					"name"    => "payplug_sandbox",
 					"label"   => "Test",
-					"value"   => "1"
+					"value"   => 0,
+					"checked" => !PayplugWoocommerceHelper::check_mode()
 				],
 			]
 		];
