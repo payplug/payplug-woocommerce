@@ -41,6 +41,7 @@ class Ajax {
 	const API_CHECK_BANCONTACT_PERMISSIONS = 'api_check_bancontact_permissions';
 	const API_CHECK_APPLEPAY_PERMISSIONS = 'api_check_applepay_permissions';
 	const API_CHECK_AMERICAN_EXPRESS_PERMISSIONS = 'api_check_american_express_permissions';
+	const API_CHECK_ONEY_PERMISSIONS = 'api_check_oney_permissions';
 
 	public function __construct() {
 		add_action( 'wp_ajax_' . self::REFRESH_KEY_ACTION, [ $this, 'handle_refresh_keys' ] );
@@ -56,6 +57,7 @@ class Ajax {
 		add_action( 'wp_ajax_' . self::API_CHECK_BANCONTACT_PERMISSIONS, [ $this, 'api_check_bancontact_permissions' ] );
 		add_action( 'wp_ajax_' . self::API_CHECK_APPLEPAY_PERMISSIONS, [ $this, 'api_check_applepay_permissions' ] );
 		add_action( 'wp_ajax_' . self::API_CHECK_AMERICAN_EXPRESS_PERMISSIONS, [ $this, 'api_check_american_express_permissions' ] );
+		add_action( 'wp_ajax_' . self::API_CHECK_ONEY_PERMISSIONS, [ $this, 'api_check_oney_permissions' ] );
 	}
 
 	public function handle_refresh_keys() {
@@ -261,6 +263,48 @@ class Ajax {
 		}
 
 		wp_send_json_success($amex);
+	}
+
+	public function api_check_oney_permissions() {
+
+		// In Test mode Oney is available
+		if($_POST['env']) {
+			wp_send_json_success(true);
+			return;
+		}
+
+		$this->accountIsNotValid();
+
+		// Checking in Live Mode
+		try{
+			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+
+		}  catch (PayplugException $e){
+			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
+			wp_send_json_error(["error" => $e->getMessage()]);
+			return false;
+		}
+
+		PayplugWoocommerceHelper::set_transient_data($account);
+
+		if(isset($account['httpResponse']['permissions']['can_use_oney']) && $account['httpResponse']['permissions']['can_use_oney']){
+			wp_send_json_success(true);
+		}
+
+		$oney = isset($account['httpResponse']['permissions']['can_use_oney']) ? $account['httpResponse']['permissions']['can_use_oney']: false;
+
+		if(!$oney){
+			$anchor_text = __( 'payplug_oney_error_link', 'payplug' );
+			$anchor_url = "https://portal.payplug.com/login";
+			$anchor   = sprintf(  ' <a href="https://%s" target="_blank">%s</a>', $anchor_url, $anchor_text );
+			$message = __( 'payplug_oney_error_description', 'payplug' ) . $anchor;
+			wp_send_json_error(array(
+				"title" => __( 'payplug_oney_error_title', 'payplug' ),
+				"msg" => $message
+			));
+		}
+
+		wp_send_json_success($oney);
 	}
 
 	public function check_bancontact_permissions() {
@@ -478,8 +522,8 @@ class Ajax {
 
 
 	private function accountIsNotValid(){
-		$like_key = PayplugWoocommerceHelper::get_live_key();
-		if(empty($like_key)){
+		$live_key = PayplugWoocommerceHelper::get_live_key();
+		if(empty($live_key)){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
 				"msg" => __('Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug'),

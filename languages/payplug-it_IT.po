@@ -914,3 +914,12 @@ msgstr "Devi connetterti al tuo conto PayPlug."
 
 msgid "payplug_oney_product_page_description"
 msgstr "I tuoi clienti potranno visualizzare i dettagli dei loro pagamenti in 3 o 4 rate."
+
+msgid "payplug_oney_error_title"
+msgstr "Mode LIVE"
+
+msgid "payplug_oney_error_description"
+msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Oney, "
+
+msgid "payplug_oney_error_link"
+msgstr "clicca qui"
