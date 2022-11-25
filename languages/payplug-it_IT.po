@@ -727,7 +727,7 @@ msgid "payplug_section_logged_test_description"
 msgstr "Pagamenti in modalità TEST, sono simulazioni e non generano transazioni reali."
 
 msgid "payplug_section_logged_live_description"
-msgstr "In LIVE mode, the payments will generate real transactions."
+msgstr "In modalità LIVE, i pagamenti generano transazioni reali."
 
 msgid "payplug_section_logged_link_access_portal"
 msgstr "Accesso al mio portale PayPlug"
@@ -881,3 +881,6 @@ msgstr "Ho già un account PayPlug"
 
 msgid "payplug_section_login_not_registered"
 msgstr "Non hai ancora un account PayPlug?"
+
+msgid "payplug_learn_more"
+msgstr "Per saperne di più"

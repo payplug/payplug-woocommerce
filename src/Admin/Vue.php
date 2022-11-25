@@ -53,6 +53,20 @@ class Vue {
 	 */
 	public function payplug_section_logged() {
 
+		$lang = get_bloginfo('language');
+
+		switch ($lang) {
+			case "en-US":
+				$lang = "en-gb";
+				break;
+			case "fr-FR":
+				$lang = "fr";
+				break;
+			case "it-IT":
+				$lang = "it";
+				break;
+		}
+
 		$disabled = false;
 		if( empty(PayplugWoocommerceHelper::get_live_key()) ){
 			$disabled = true;
@@ -67,8 +81,8 @@ class Vue {
 					"mode"               => __( 'payplug_section_logged_mode', 'payplug' ),
 					"mode_description"   => __( 'payplug_section_logged_live_description', 'payplug' ),
 					"link_learn_more"    => [
-						"text"   => "Learn more",
-						"url"    => "https://support.payplug.com/hc/en-gb/articles/360021142492",
+						"text"   => __( 'payplug_learn_more', 'payplug' ),
+						"url"    => "https://support.payplug.com/hc/".$lang."/articles/360021142492",
 						"target" => "_blank"
 					],
 					"link_access_portal" => [
@@ -83,8 +97,8 @@ class Vue {
 					"mode"               => __( 'payplug_section_logged_mode', 'payplug' ),
 					"mode_description"   => __( 'payplug_section_logged_test_description', 'payplug' ),
 					"link_learn_more"    => [
-						"text"   => "Learn more",
-						"url"    => "https://support.payplug.com/hc/en-gb/articles/360021142492",
+						"text"   => __( 'payplug_learn_more', 'payplug' ),
+						"url"    => "https://support.payplug.com/hc/".$lang."/articles/360021142492",
 						"target" => "_blank"
 					],
 					"link_access_portal" => [
@@ -96,15 +110,15 @@ class Vue {
 			],
 			"options"      => [
 				[
-					"name"    => "payplug_sandbox",
-					"label"   => "Live",
-					"value"   => "0",
+					"name"     => "payplug_sandbox",
+					"label"    => "Live",
+					"value"    => "0",
 					"disabled" => $disabled,
 				],
 				[
-					"name"  => "payplug_sandbox",
-					"label" => "Test",
-					"value" => "1"
+					"name"    => "payplug_sandbox",
+					"label"   => "Test",
+					"value"   => "1"
 				],
 			]
 		];
