@@ -377,6 +377,7 @@ class Vue {
 	 */
 	public function payplug_section_status() {
 		$payplug_requirements = new PayplugGatewayRequirements(new PayplugGateway());
+		$debug = get_option( 'woocommerce_payplug_settings', [] )['debug'];
 
 		$status = [
 			"error" => $this->payplug_requirements(),
@@ -405,7 +406,8 @@ class Vue {
 				$payplug_requirements->account_requirement(),
 			],
 
-			"enable_debug_checked" => false
+			"enable_debug_name" => "payplug_debug",
+			"enable_debug_checked" => !empty($debug) && $debug === "yes" ? true : false
 		];
 
 		return $status;
