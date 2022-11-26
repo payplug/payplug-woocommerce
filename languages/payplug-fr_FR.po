@@ -923,3 +923,12 @@ msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer One
 
 msgid "payplug_oney_error_link"
 msgstr "votre portail Payplug."
+
+msgid "payplug_applepay_more_url"
+msgstr "https://support.payplug.com/hc/fr/articles/5149384347292-Encaisser-des-paiements-Apple-Pay-avec-PayPlug"
+
+msgid "payplug_bancontact_more_url"
+msgstr "https://support.payplug.com/hc/fr/articles/4408157435794-Encaisser-des-paiements-Bancontact-avec-PayPlug"
+
+msgid "payplug_amex_more_url"
+msgstr "https://support.payplug.com/hc/fr/articles/5701208563996-Encaisser-des-paiements-Amex-avec-PayPlug"
