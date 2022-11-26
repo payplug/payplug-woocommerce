@@ -887,3 +887,27 @@ msgstr "Per saperne di più"
 
 msgid "payplug_mode_learn_more_url"
 msgstr "https://support.payplug.com/hc/it/articles/360021142492"
+
+msgid "payplug_section_status_title"
+msgstr "Stato"
+
+msgid "payplug_section_status_description"
+msgstr "Controlla il tuo ambiente per garantire il buon funzionamento del modulo."
+
+msgid "payplug_section_status_errorMessage"
+msgstr "I requisiti richiesti per l'utilizzo del modulo PayPlug non sono soddisfatti. Dopo aver risolto questo inconveniente, aggiorna la pagina o clicca su verifica."
+
+msgid "payplug_section_status_check"
+msgstr "Verifica"
+
+msgid "payplug_section_status_curl"
+msgstr "L'estensione PHP cURL deve essere abilitata sul tuo server."
+
+msgid "payplug_section_status_php"
+msgstr "La versione PHP del tuo server è compatibile con l'estensione."
+
+msgid "payplug_section_status_ssl"
+msgstr "OpenSSL è stato aggiornato."
+
+msgid "payplug_section_status_account"
+msgstr "Devi connetterti al tuo conto PayPlug."
