@@ -296,7 +296,7 @@ class Ajax {
 		if(!$oney){
 			$anchor_text = __( 'payplug_oney_error_link', 'payplug' );
 			$anchor_url = "https://portal.payplug.com/login";
-			$anchor   = sprintf(  ' <a href="https://%s" target="_blank">%s</a>', $anchor_url, $anchor_text );
+			$anchor   = sprintf(  ' <a href="%s" target="_blank">%s</a>', $anchor_url, $anchor_text );
 			$message = __( 'payplug_oney_error_description', 'payplug' ) . $anchor;
 			wp_send_json_error(array(
 				"title" => __( 'payplug_oney_error_title', 'payplug' ),
@@ -304,7 +304,7 @@ class Ajax {
 			));
 		}
 
-		wp_send_json_success($oney);
+		wp_send_json_success(true);
 	}
 
 	public function check_bancontact_permissions() {
