@@ -932,3 +932,9 @@ msgstr "https://support.payplug.com/hc/fr/articles/4408157435794-Encaisser-des-p
 
 msgid "payplug_amex_more_url"
 msgstr "https://support.payplug.com/hc/fr/articles/5701208563996-Encaisser-des-paiements-Amex-avec-PayPlug"
+
+msgid "payplug_section_status_debug_label"
+msgstr "Activer le mode debug"
+
+msgid "payplug_section_status_debug_description"
+msgstr "Debug mode saves additional information on your server for each operation done via PayPlug plugin (Developer setting)."
