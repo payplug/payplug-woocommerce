@@ -29,6 +29,13 @@ class Vue {
 			unset($payplug_wooc_settings["payplug_live_key"]);
 
 			foreach ($payplug_wooc_settings as $key => $payplug_wooc_setting) {
+				if ($key == "mode") {
+					if ($payplug_wooc_settings["mode"] == "yes")
+						$payplug_wooc_settings["mode"] = 1;
+					elseif ($payplug_wooc_settings["mode"] == "no")
+						$payplug_wooc_settings["mode"] = 0;
+					continue;
+				}
 				if (in_array($payplug_wooc_setting, ['0','no', "false"]))
 					$payplug_wooc_settings[$key] = false;
 				elseif (in_array($payplug_wooc_setting, ['1','yes', "true"]))

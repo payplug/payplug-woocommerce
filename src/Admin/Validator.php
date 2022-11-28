@@ -16,10 +16,10 @@ class Validator {
 	}
 
 	public static function mode($value) {
-		if (isset($value) && !empty($value)) {
-			if ($value === "true")
+		if ((isset($value)) && (!empty($value)) || ($value == 0)) {
+			if ($value == 1)
 				return "yes";
-			elseif ($value === "false")
+			elseif ($value == 0)
 				return "no";
 		}
 		http_response_code(400);
