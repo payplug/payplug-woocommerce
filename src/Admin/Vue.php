@@ -377,6 +377,7 @@ class Vue {
 	 */
 	public function payplug_section_status() {
 		$payplug_requirements = new PayplugGatewayRequirements(new PayplugGateway());
+		$debug = get_option( 'woocommerce_payplug_settings', [] )['debug'];
 
 		$status = [
 			"error" => $this->payplug_requirements(),
@@ -393,8 +394,8 @@ class Vue {
 					"description" => __("payplug_section_status_description", "payplug"),
 					"errorMessage" => __("payplug_section_status_errorMessage", "payplug"),
 					"check" => __("payplug_section_status_check", "payplug"),
-					"enable_debug_label" => __("payplug_section_status_debug_label", "payplug"),
-					"enable_debug_description" => __("payplug_section_status_debug_description", "payplug"),
+					"enable_debug_label" => __("Activate debug mode", "payplug"),
+					"enable_debug_description" => __("Debug mode saves additional information on your server for each operation done via the PayPlug plugin (Developer setting).", "payplug"),
 				]
 			],
 			"requirements" => [
@@ -405,7 +406,8 @@ class Vue {
 				$payplug_requirements->account_requirement(),
 			],
 
-			"enable_debug_checked" => false
+			"enable_debug_name" => "payplug_debug",
+			"enable_debug_checked" => !empty($debug) && $debug === "yes" ? true : false
 		];
 
 		return $status;
