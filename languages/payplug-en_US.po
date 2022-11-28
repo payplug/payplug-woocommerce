@@ -5,14 +5,14 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2022-11-25 11:29+0000\n"
+"PO-Revision-Date: 2022-11-28 16:26+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "payplug_advanced_settings"
 msgstr "Advanced Settings"
@@ -205,7 +205,7 @@ msgid "payplug_section_bancontact_payment_title"
 msgstr "Bancontact payment"
 
 msgid "payplug_know_more_label"
-msgstr "Know more"
+msgstr "Find out more."
 
 msgid "payplug_error_wrong_credentials"
 msgstr "The email and/or password is incorrect."
@@ -296,3 +296,15 @@ msgstr "OpenSSL is up to date."
 
 msgid "payplug_section_status_account"
 msgstr "You must connect your PayPlug account."
+
+msgid "payplug_oney_product_page_description"
+msgstr "Your customers can see the details of their 3 or 4 installments."
+
+msgid "payplug_oney_error_title"
+msgstr "Enable feature"
+
+msgid "payplug_oney_error_description"
+msgstr "You do not have access to this feature yet. To activate Oney, please go to your "
+
+msgid "payplug_oney_error_link"
+msgstr "Payplug portal"

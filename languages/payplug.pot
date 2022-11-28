@@ -773,12 +773,17 @@ msgstr ""
 msgid "payplug_section_status_account"
 msgstr ""
 
+msgid "payplug_oney_product_page_description"
+msgstr ""
 
+msgid "payplug_oney_error_title"
+msgstr "Enable feature"
 
+msgid "payplug_oney_error_description"
+msgstr ""
 
-
-
-
+msgid "payplug_oney_error_link"
+msgstr ""
 
 
 
