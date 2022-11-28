@@ -6,9 +6,9 @@ class Validator {
 
 	public static function enabled($value) {
 		if (isset($value) && !empty($value)) {
-			if ($value)
+			if ($value === "true")
 				return true;
-			elseif ($value == false)
+			elseif ($value === "false")
 				return false;
 		}
 		http_response_code(400);
@@ -17,10 +17,10 @@ class Validator {
 
 	public static function mode($value) {
 		if (isset($value) && !empty($value)) {
-			if ($value)
-				return true;
-			elseif ($value == false)
-				return false;
+			if ($value === "true")
+				return "yes";
+			elseif ($value === "false")
+				return "no";
 		}
 		http_response_code(400);
 		wp_send_json_error(['error' => 'mode is missing']);
@@ -32,15 +32,16 @@ class Validator {
 				return true;
 			}
 		}
-		return false;
+		http_response_code(400);
+		wp_send_json_error(['error' => 'payment_method is missing']);
 	}
 
 	public static function debug($value) {
 		if (isset($value) && !empty($value)) {
-			if ($value)
-				return true;
-			elseif ($value == false)
-				return false;
+			if ($value === "true")
+				return "yes";
+			elseif ($value === "false")
+				return "no";
 		}
 		http_response_code(400);
 		wp_send_json_error(['error' => 'debug is missing']);
@@ -48,10 +49,10 @@ class Validator {
 
 	public static function oneclick($value) {
 		if (isset($value) && !empty($value)) {
-			if ($value)
-				return true;
-			elseif ($value == false)
-				return false;
+			if ($value === "true")
+				return "yes";
+			elseif ($value === "false")
+				return "no";
 		}
 		http_response_code(400);
 		wp_send_json_error(['error' => 'oneclick is missing']);
@@ -59,10 +60,10 @@ class Validator {
 
 	public static function bancontact($value) {
 		if (isset($value) && !empty($value)) {
-			if ($value)
-				return true;
-			elseif ($value == false)
-				return false;
+			if ($value === "true")
+				return "yes";
+			elseif ($value === "false")
+				return "no";
 		}
 		http_response_code(400);
 		wp_send_json_error(['error' => 'bancntact is missing']);
@@ -70,10 +71,10 @@ class Validator {
 
 	public static function apple_pay($value) {
 		if (isset($value) && !empty($value)) {
-			if ($value)
-				return true;
-			elseif ($value == false)
-				return false;
+			if ($value === "true")
+				return "yes";
+			elseif ($value === "false")
+				return "no";
 		}
 		http_response_code(400);
 		wp_send_json_error(['error' => 'apple pay is missing']);
@@ -81,19 +82,20 @@ class Validator {
 
 	public static function american_express($value) {
 		if (isset($value) && !empty($value)) {
-			if (in_array($value, ['yes', 'no'])) {
-				return true;
-			}
+			if ($value === "true")
+				return "yes";
+			elseif ($value === "false")
+				return "no";
 		}
 		return false;
 	}
 
 	public static function oney($value) {
 		if (isset($value) && !empty($value)) {
-			if ($value)
-				return true;
-			elseif ($value == false)
-				return false;
+			if ($value === "true")
+				return "yes";
+			elseif ($value === "false")
+				return "no";
 		}
 		http_response_code(400);
 		wp_send_json_error(['error' => 'oney is missing']);
