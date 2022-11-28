@@ -790,7 +790,7 @@ msgid "payplug_section_bancontact_payment_title"
 msgstr "Pagamento Bancontact"
 
 msgid "payplug_know_more_label"
-msgstr "Sapere di più"
+msgstr "Per saperne di più."
 
 msgid "payplug_error_wrong_credentials"
 msgstr "L'indirizzo mail e/o la password sono errati."
@@ -887,6 +887,57 @@ msgstr "Per saperne di più"
 
 msgid "payplug_mode_learn_more_url"
 msgstr "https://support.payplug.com/hc/it/articles/360021142492"
+
+msgid "payplug_section_status_title"
+msgstr "Stato"
+
+msgid "payplug_section_status_description"
+msgstr "Controlla il tuo ambiente per garantire il buon funzionamento del modulo."
+
+msgid "payplug_section_status_errorMessage"
+msgstr "I requisiti richiesti per l'utilizzo del modulo PayPlug non sono soddisfatti. Dopo aver risolto questo inconveniente, aggiorna la pagina o clicca su verifica."
+
+msgid "payplug_section_status_check"
+msgstr "Verifica"
+
+msgid "payplug_section_status_curl"
+msgstr "L'estensione PHP cURL deve essere abilitata sul tuo server."
+
+msgid "payplug_section_status_php"
+msgstr "La versione PHP del tuo server è compatibile con l'estensione."
+
+msgid "payplug_section_status_ssl"
+msgstr "OpenSSL è stato aggiornato."
+
+msgid "payplug_section_status_account"
+msgstr "Devi connetterti al tuo conto PayPlug."
+
+msgid "payplug_oney_product_page_description"
+msgstr "I tuoi clienti potranno visualizzare i dettagli dei loro pagamenti in 3 o 4 rate."
+
+msgid "payplug_oney_error_title"
+msgstr "Attivare una funzionalità"
+
+msgid "payplug_oney_error_description"
+msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Oney, "
+
+msgid "payplug_oney_error_link"
+msgstr "clicca qui"
+
+msgid "payplug_applepay_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/5149384347292-Incassare-pagamenti-Apple-Pay-con-PayPlug"
+
+msgid "payplug_bancontact_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/4408157435794-Incassare-dei-pagamenti-tramite-Bancontact-con-PayPlug"
+
+msgid "payplug_amex_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/5701208563996-Incassare-pagamenti-American-Express-con-PayPlug"
+
+msgid "payplug_section_status_debug_label"
+msgstr "Activer le mode debug"
+
+msgid "payplug_section_status_debug_description"
+msgstr "Debug mode saves additional information on your server for each operation done via PayPlug plugin (Developer setting)."
 
 msgid "payplug_standard_payment_title_title"
 msgstr "Titolo"

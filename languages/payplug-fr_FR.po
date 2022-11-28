@@ -788,7 +788,7 @@ msgid "payplug_section_bancontact_payment_title"
 msgstr "Paiement Bancontact"
 
 msgid "payplug_know_more_label"
-msgstr "En savoir plus"
+msgstr "En savoir plus."
 
 msgid "payplug_error_wrong_credentials"
 msgstr "L'e-mail ou le mot de passe saisi est incorrect."
@@ -800,13 +800,15 @@ msgid "payplug_section_paylater_title"
 msgstr "PayLater"
 
 msgid "payplug_section_paylater_description"
-msgstr "Permettez à vos client de payer en plusieurs fois."
+msgstr "Permettez à vos clients de payer en plusieurs fois."
 
 msgid "payplug_section_oney_title"
 msgstr "Paiements 3x 4x Oney"
 
 msgid "payplug_section_paylater_description_oney"
-msgstr "Vos clients pourront choisir de payer leurs commandes en 3 ou 4 échéances. Vous pouvez prendre (ou non) l'ensemble des frais à votre charge."
+msgstr ""
+"Vos clients pourront choisir de payer leurs commandes en 3 ou 4 échéances. Vous pouvez prendre\n"
+" (ou non) l'ensemble des frais à votre charge."
 
 msgid "payplug_label_with_fees"
 msgstr "Avec frais"
@@ -885,6 +887,57 @@ msgstr "En savoir plus"
 
 msgid "payplug_mode_learn_more_url"
 msgstr "https://support.payplug.com/hc/fr/articles/360021142492"
+
+msgid "payplug_section_status_title"
+msgstr "État"
+
+msgid "payplug_section_status_description"
+msgstr "Contrôlez votre environnement pour assurer le fonctionnement optimal du module."
+
+msgid "payplug_section_status_errorMessage"
+msgstr "La configuration requise pour utiliser le module PayPlug n’est pas satisfaite. Une fois les problèmes corrigés, actualisez la page ou cliquez sur vérifier."
+
+msgid "payplug_section_status_check"
+msgstr "Vérifier"
+
+msgid "payplug_section_status_curl"
+msgstr "L'extension PHP cURL est installée et activée."
+
+msgid "payplug_section_status_php"
+msgstr "La version PHP de votre serveur est compatible avec l’extension."
+
+msgid "payplug_section_status_ssl"
+msgstr "OpenSSL est à jour."
+
+msgid "payplug_section_status_account"
+msgstr "Votre compte PayPlug doit être connecté."
+
+msgid "payplug_oney_product_page_description"
+msgstr "Vos clients pourront voir le détail de leurs échéances en 3 ou 4 fois."
+
+msgid "payplug_oney_error_title"
+msgstr "Activer une fonctionnalité"
+
+msgid "payplug_oney_error_description"
+msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Oney, rendez-vous sur "
+
+msgid "payplug_oney_error_link"
+msgstr "votre portail Payplug."
+
+msgid "payplug_applepay_more_url"
+msgstr "https://support.payplug.com/hc/fr/articles/5149384347292-Encaisser-des-paiements-Apple-Pay-avec-PayPlug"
+
+msgid "payplug_bancontact_more_url"
+msgstr "https://support.payplug.com/hc/fr/articles/4408157435794-Encaisser-des-paiements-Bancontact-avec-PayPlug"
+
+msgid "payplug_amex_more_url"
+msgstr "https://support.payplug.com/hc/fr/articles/5701208563996-Encaisser-des-paiements-Amex-avec-PayPlug"
+
+msgid "payplug_section_status_debug_label"
+msgstr "Activer le mode debug"
+
+msgid "payplug_section_status_debug_description"
+msgstr "Debug mode saves additional information on your server for each operation done via PayPlug plugin (Developer setting)."
 
 msgid "payplug_standard_payment_title_title"
 msgstr "Titre"

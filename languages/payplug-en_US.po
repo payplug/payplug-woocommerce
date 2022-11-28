@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2022-11-26 16:20+0000\n"
+"PO-Revision-Date: 2022-11-28 16:52+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -205,7 +205,7 @@ msgid "payplug_section_bancontact_payment_title"
 msgstr "Bancontact payment"
 
 msgid "payplug_know_more_label"
-msgstr "Know more"
+msgstr "Find out more."
 
 msgid "payplug_error_wrong_credentials"
 msgstr "The email and/or password is incorrect."
@@ -272,6 +272,57 @@ msgstr "Learn more"
 
 msgid "payplug_mode_learn_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/360021142492"
+
+msgid "payplug_section_status_title"
+msgstr "Status"
+
+msgid "payplug_section_status_description"
+msgstr "Control your environment to ensure that the module is in perfect working order."
+
+msgid "payplug_section_status_errorMessage"
+msgstr "The configuration requirements for using the PayPlug module are not met. Once you have corrected the problems, please refresh the page or click on verify."
+
+msgid "payplug_section_status_check"
+msgstr "Check"
+
+msgid "payplug_section_status_curl"
+msgstr "PHP cURL extension must be enabled on your server."
+
+msgid "payplug_section_status_php"
+msgstr "The PHP version on your server is valid."
+
+msgid "payplug_section_status_ssl"
+msgstr "OpenSSL is up to date."
+
+msgid "payplug_section_status_account"
+msgstr "You must connect your PayPlug account."
+
+msgid "payplug_oney_product_page_description"
+msgstr "Your customers can see the details of their 3 or 4 installments."
+
+msgid "payplug_oney_error_title"
+msgstr "Enable feature"
+
+msgid "payplug_oney_error_description"
+msgstr "You do not have access to this feature yet. To activate Oney, please go to your "
+
+msgid "payplug_oney_error_link"
+msgstr "Payplug portal"
+
+msgid "payplug_applepay_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/5149384347292"
+
+msgid "payplug_bancontact_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/4408157435794"
+
+msgid "payplug_amex_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/5701208563996-Collecting-American-Express-Payments-with-PayPlug"
+
+msgid "payplug_section_status_debug_label"
+msgstr "Activer le mode debug"
+
+msgid "payplug_section_status_debug_description"
+msgstr "Debug mode saves additional information on your server for each operation done via PayPlug plugin (Developer setting)."
 
 msgid "payplug_standard_payment_title_title"
 msgstr "Title"

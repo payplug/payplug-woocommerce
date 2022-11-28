@@ -64,50 +64,54 @@ class PayplugGatewayRequirements {
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
 	public function curl_requirement() {
-		return ( $this->valid_curl() )
-			? '<p class="success">' . __( 'payplug_PayplugGatewayRequirements_curl_requirement_curlinstalled', 'payplug' ) . '</p>'
-			: '<p class="failed">' . __( 'The PHP cURL extension must be installed and activated on your server.', 'payplug' ) . '</p>';
+		return array(
+			"status" => $this->valid_curl(),
+			"text" => __("payplug_section_status_curl", "payplug")
+		);
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
 	public function php_requirement() {
-		return ( $this->valid_php() )
-			? '<p class="success">' . __( 'The PHP version on your server is valid.', 'payplug' ) . '</p>'
-			/* translators: %s: minimum required PHP version */
-			: '<p class="failed">' . sprintf( __( 'The PHP version on your server is not supported. Your server must run PHP %s or greater.', 'payplug' ), self::PHP_MIN ) . '</p>';
+		return array(
+			"status" => $this->valid_curl(),
+			"text" => __("payplug_section_status_php", "payplug")
+		);
+
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
 	public function openssl_requirement() {
-		return ( $this->valid_openssl() )
-			? '<p class="success">' . __( 'OpenSSL is up to date.', 'payplug' ) . '</p>'
-			/* translators: %s: minimum required OpenSSL version */
-			: '<p class="failed">' . sprintf( __( 'OpenSSL is not up to date. Please update to OpenSSL %s or later.', 'payplug' ), self::OPENSSL_MIN . ' ( ' . self::OPENSSL_MIN_TEXT . ' )' ) . '</p>';
+		return array(
+			"status" => $this->valid_curl(),
+			"text" => __("payplug_section_status_ssl", "payplug")
+		);
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
 	public function currency_requirement() {
-		return ( $this->valid_currency() )
-			? '<p class="success">' . __( 'Your shop currency has been set up with Euro.', 'payplug' ) . '</p>'
-			: '<p class="failed">' . __( 'Your shop currency must be set up with Euro.', 'payplug' ) . '</p>';
+		return array(
+			"status" => $this->valid_curl(),
+			"text" => __("payplug_section_status_currency", "payplug")
+		);
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
 	public function account_requirement() {
-		return ( $this->valid_account() )
-			? '<p class="success">' . __( 'You are logged in with your PayPlug account.', 'payplug' ) . '</p>'
-			: '<p class="failed">' . __( 'You must be logged in with your PayPlug account.', 'payplug' ) . '</p>';
+		return array(
+			"status" => $this->valid_curl(),
+			"text" => __("payplug_section_status_account", "payplug")
+		);
 	}
 
 	/**

@@ -749,6 +749,41 @@ msgstr ""
 msgid "and"
 msgstr ""
 
+msgid "payplug_section_status_title"
+msgstr ""
+
+msgid "payplug_section_status_description"
+msgstr ""
+
+msgid "payplug_section_status_errorMessage"
+msgstr ""
+
+msgid "payplug_section_status_check"
+msgstr ""
+
+msgid "payplug_section_status_curl"
+msgstr ""
+
+msgid "payplug_section_status_php"
+msgstr ""
+
+msgid "payplug_section_status_ssl"
+msgstr ""
+
+msgid "payplug_section_status_account"
+msgstr ""
+
+msgid "payplug_oney_product_page_description"
+msgstr ""
+
+msgid "payplug_oney_error_title"
+msgstr "Enable feature"
+
+msgid "payplug_oney_error_description"
+msgstr ""
+
+msgid "payplug_oney_error_link"
+msgstr ""
 
 
 

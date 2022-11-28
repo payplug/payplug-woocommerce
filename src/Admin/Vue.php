@@ -35,6 +35,7 @@ class Vue {
 				"logged"           		=> $logged,
 				"payment_methods"  		=> $this->payplug_section_payment_methods(),
 				"payment_paylater"  	=> $this->payplug_section_paylater(),
+				"status" => $this->payplug_section_status()
 			];
 		}
 
@@ -98,13 +99,15 @@ class Vue {
 				[
 					"name"     => "payplug_sandbox",
 					"label"    => "Live",
-					"value"    => "0",
+					"value"    => 1,
 					"disabled" => $disabled,
+					"checked" => PayplugWoocommerceHelper::check_mode()
 				],
 				[
 					"name"    => "payplug_sandbox",
 					"label"   => "Test",
-					"value"   => "1"
+					"value"   => 0,
+					"checked" => !PayplugWoocommerceHelper::check_mode()
 				],
 			]
 		];
@@ -190,6 +193,8 @@ class Vue {
 	 */
 	public function payplug_section_header() {
 		$enable = ( !empty( get_option( 'woocommerce_payplug_settings', [] )['enabled'] ) && get_option( 'woocommerce_payplug_settings', [] )['enabled'] === "yes") ? true : false;
+		$enable = $enable && $this->payplug_requirements();
+		$disabled = !$this->payplug_requirements();
 
 		return [
 			"title"        => __( 'payplug_section_header_title', 'payplug' ),
@@ -206,6 +211,7 @@ class Vue {
 			"options"      => [
 				"type"    => "select",
 				"name"    => "payplug_enable",
+				"disabled" => $disabled,
 				"options" => [
 					[
 						"value"   => 1,
@@ -290,7 +296,8 @@ class Vue {
 						"className" => "_paylaterLabel",
 						"label" => __( 'payplug_label_with_fees', 'payplug' ),
 						"subText" => __( 'payplug_text_with_fees', 'payplug' ),
-						"value" => 1
+						"value" => 1,
+						"checked" => true
 					],
 					[
 						"name" => "payplug_oney_type",
@@ -355,6 +362,10 @@ class Vue {
 			"name" => "product",
 			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.jpg' ),
 			"title" => __( 'display_the_oney_installments_pop_up_on_the_product_page', 'payplug' ),
+			"descriptions" => [[
+				"description" => __( 'payplug_oney_product_page_description', 'payplug' ),
+				"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), "https://support.payplug.com/hc/fr/articles/4408142346002", "_blank")
+				]],
 			"switch" => true,
 			"checked" => $active
 		];
@@ -366,8 +377,10 @@ class Vue {
 	 */
 	public function payplug_section_status() {
 		$payplug_requirements = new PayplugGatewayRequirements(new PayplugGateway());
+		$debug = get_option( 'woocommerce_payplug_settings', [] )['debug'];
 
 		$status = [
+			"error" => $this->payplug_requirements(),
 			"title" => __("payplug_section_status_title", "payplug"),
 			"descriptions" => [
 				"live" => [
@@ -381,41 +394,32 @@ class Vue {
 					"description" => __("payplug_section_status_description", "payplug"),
 					"errorMessage" => __("payplug_section_status_errorMessage", "payplug"),
 					"check" => __("payplug_section_status_check", "payplug"),
-					"enable_debug_label" => __("payplug_section_status_debug_label", "payplug"),
-					"enable_debug_description" => __("payplug_section_status_debug_description", "payplug"),
+					"enable_debug_label" => __("Activate debug mode", "payplug"),
+					"enable_debug_description" => __("Debug mode saves additional information on your server for each operation done via the PayPlug plugin (Developer setting).", "payplug"),
 				]
 			],
-			"options" => [
-				"type" => "-warning",
-				"name" => "requirements",
-				"options" => [
-					[
-						"status" => $payplug_requirements->valid_curl(),
-						"text" => __("payplug_section_status_curl", "payplug")
-					],
-					[
-						"status" => $payplug_requirements->valid_php(),
-						"text" => __("payplug_section_status_php", "payplug")
-					],
-					[
-						"status" => $payplug_requirements->valid_openssl(),
-						"text" => __("payplug_section_status_ssl", "payplug")
-					],
-					[
-						"status" => $payplug_requirements->valid_currency(),
-						"text" => __("payplug_section_status_currency", "payplug")
-					],
-					[
-						"status" => $payplug_requirements->valid_account(),
-						"text" => __("payplug_section_status_account", "payplug")
-					]
-				]
+			"requirements" => [
+				$payplug_requirements->curl_requirement(),
+				$payplug_requirements->php_requirement(),
+				$payplug_requirements->openssl_requirement(),
+				$payplug_requirements->currency_requirement(), //MISSING THIS MESSAGES
+				$payplug_requirements->account_requirement(),
 			],
+
 			"enable_debug_name" => "payplug_debug",
-			"enable_debug_checked" => false
+			"enable_debug_checked" => !empty($debug) && $debug === "yes" ? true : false
 		];
 
 		return $status;
+	}
+
+	/**
+	 * check if there's any requirement missing
+	 * @return bool
+	 */
+	private function payplug_requirements() {
+		$payplug_requirements = new PayplugGatewayRequirements(new PayplugGateway());
+		return $payplug_requirements->satisfy_requirements();
 	}
 
 }

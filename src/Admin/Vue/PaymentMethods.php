@@ -24,7 +24,8 @@ class PaymentMethods {
 			"title"        => __( 'payplug_section_standard_payment_title', 'payplug' ),
 			"image"        => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/standard.svg' ),
 			"checked"      => true,
-			"hide"		=> true,
+			"hide"			=> true,
+			"available_test_mode" => true,
 			"descriptions" => [
 				"live"    => [
 					"description"      => __( 'payplug_section_standard_payment_description', 'payplug' ),
@@ -181,14 +182,15 @@ class PaymentMethods {
 			"title" => __( 'payplug_section_applepay_payment_title', 'payplug' ),
 			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/applepay.svg' ),
 			"checked" =>  $active,
+			"available_test_mode" => false,
 			"descriptions" => [
 				"live"    => [
 					"description"      => __( 'payplug_section_applepay_payment_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_applepay_more_url', 'payplug' ), "_blank"),
 				],
 				"sandbox" => [
 					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_applepay_more_url', 'payplug' ), "_blank"),
 				]
 			],
 		];
@@ -206,14 +208,15 @@ class PaymentMethods {
 			"title" => __( 'payplug_section_bancontact_payment_title', 'payplug' ),
 			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/bancontact.svg' ),
 			"checked" =>  $active,
+			"available_test_mode" => false,
 			"descriptions" => [
 				"live"    => [
 					"description"      => __( 'payplug_section_bancontact_payment_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_bancontact_more_url', 'payplug' ), "_blank"),
 				],
 				"sandbox" => [
 					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_bancontact_more_url', 'payplug' ), "_blank"),
 				]
 			],
 		];
@@ -231,14 +234,15 @@ class PaymentMethods {
 			"title" => __( 'payplug_section_american_express_payment_title', 'payplug' ),
 			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/Amex_logo_color.svg' ),
 			"checked" =>  $active,
+			"available_test_mode" => false,
 			"descriptions" => [
 				"live"    => [
 					"description"      => __( 'payplug_section_american_express_payment_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_amex_more_url', 'payplug' ), "_blank"),
 				],
 				"sandbox" => [
 					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_amex_more_url', 'payplug' ), "_blank"),
 				]
 			],
 		];
