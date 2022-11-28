@@ -35,6 +35,7 @@ class Vue {
 				"logged"           		=> $logged,
 				"payment_methods"  		=> $this->payplug_section_payment_methods(),
 				"payment_paylater"  	=> $this->payplug_section_paylater(),
+				"status" => $this->payplug_section_status()
 			];
 		}
 
@@ -192,6 +193,8 @@ class Vue {
 	 */
 	public function payplug_section_header() {
 		$enable = ( !empty( get_option( 'woocommerce_payplug_settings', [] )['enabled'] ) && get_option( 'woocommerce_payplug_settings', [] )['enabled'] === "yes") ? true : false;
+		$enable = $enable && $this->payplug_requirements();
+		$disabled = !$this->payplug_requirements();
 
 		return [
 			"title"        => __( 'payplug_section_header_title', 'payplug' ),
@@ -208,6 +211,7 @@ class Vue {
 			"options"      => [
 				"type"    => "select",
 				"name"    => "payplug_enable",
+				"disabled" => $disabled,
 				"options" => [
 					[
 						"value"   => 1,
@@ -370,6 +374,7 @@ class Vue {
 		$payplug_requirements = new PayplugGatewayRequirements(new PayplugGateway());
 
 		$status = [
+			"error" => $this->payplug_requirements(),
 			"title" => __("payplug_section_status_title", "payplug"),
 			"descriptions" => [
 				"live" => [
@@ -387,37 +392,27 @@ class Vue {
 					"enable_debug_description" => __("payplug_section_status_debug_description", "payplug"),
 				]
 			],
-			"options" => [
-				"type" => "-warning",
-				"name" => "requirements",
-				"options" => [
-					[
-						"status" => $payplug_requirements->valid_curl(),
-						"text" => __("payplug_section_status_curl", "payplug")
-					],
-					[
-						"status" => $payplug_requirements->valid_php(),
-						"text" => __("payplug_section_status_php", "payplug")
-					],
-					[
-						"status" => $payplug_requirements->valid_openssl(),
-						"text" => __("payplug_section_status_ssl", "payplug")
-					],
-					[
-						"status" => $payplug_requirements->valid_currency(),
-						"text" => __("payplug_section_status_currency", "payplug")
-					],
-					[
-						"status" => $payplug_requirements->valid_account(),
-						"text" => __("payplug_section_status_account", "payplug")
-					]
-				]
+			"requirements" => [
+				$payplug_requirements->curl_requirement(),
+				$payplug_requirements->php_requirement(),
+				$payplug_requirements->openssl_requirement(),
+				$payplug_requirements->currency_requirement(), //MISSING THIS MESSAGES
+				$payplug_requirements->account_requirement(),
 			],
-			"enable_debug_name" => "payplug_debug",
+
 			"enable_debug_checked" => false
 		];
 
 		return $status;
+	}
+
+	/**
+	 * check if there's any requirement missing
+	 * @return bool
+	 */
+	private function payplug_requirements() {
+		$payplug_requirements = new PayplugGatewayRequirements(new PayplugGateway());
+		return $payplug_requirements->satisfy_requirements();
 	}
 
 }

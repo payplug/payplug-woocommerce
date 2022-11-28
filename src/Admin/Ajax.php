@@ -37,6 +37,7 @@ class Ajax {
 	const PAYPLUG_INIT = 'payplug_init';
 	const PAYPLUG_SAVE_DATA = 'payplug_save_data';
 	const PAYPLUG_LOGOUT = 'payplug_logout';
+	const PAYPLUG_CHECK_REQUIREMENTS = 'payplug_check_requirements';
 	const API_CHECK_BANCONTACT_PERMISSIONS = 'api_check_bancontact_permissions';
 	const API_CHECK_APPLEPAY_PERMISSIONS = 'api_check_applepay_permissions';
 	const API_CHECK_AMERICAN_EXPRESS_PERMISSIONS = 'api_check_american_express_permissions';
@@ -51,6 +52,7 @@ class Ajax {
 		add_action( 'wp_ajax_' . self::PAYPLUG_INIT, [ $this, 'payplug_init' ] );
 		add_action( 'wp_ajax_' . self::PAYPLUG_LOGOUT, [ $this, 'payplug_logout' ] );
 		add_action( 'wp_ajax_' . self::PAYPLUG_SAVE_DATA, [ $this, 'payplug_save_data' ] );
+		add_action( 'wp_ajax_' . self::PAYPLUG_CHECK_REQUIREMENTS, [ $this, 'payplug_check_requirements' ] );
 		add_action( 'wp_ajax_' . self::API_CHECK_BANCONTACT_PERMISSIONS, [ $this, 'api_check_bancontact_permissions' ] );
 		add_action( 'wp_ajax_' . self::API_CHECK_APPLEPAY_PERMISSIONS, [ $this, 'api_check_applepay_permissions' ] );
 		add_action( 'wp_ajax_' . self::API_CHECK_AMERICAN_EXPRESS_PERMISSIONS, [ $this, 'api_check_american_express_permissions' ] );
@@ -527,6 +529,12 @@ class Ajax {
 		}
 
 
+	}
+
+	public function payplug_check_requirements() {
+		wp_send_json_success(array(
+			"status" => ( new Vue )->payplug_section_status()
+		));
 	}
 
 }
