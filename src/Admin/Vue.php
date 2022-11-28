@@ -372,7 +372,7 @@ class Vue {
 		$payplug_requirements = new PayplugGatewayRequirements(new PayplugGateway());
 
 		$status = [
-			"error" => in_array(false, $payplug_requirements),
+			"error" => $this->payplug_requirements(),
 			"title" => __("payplug_section_status_title", "payplug"),
 			"descriptions" => [
 				"live" => [
