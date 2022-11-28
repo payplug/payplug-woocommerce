@@ -777,7 +777,7 @@ msgid "payplug_oney_product_page_description"
 msgstr ""
 
 msgid "payplug_oney_error_title"
-msgstr ""
+msgstr "Enable feature"
 
 msgid "payplug_oney_error_description"
 msgstr ""

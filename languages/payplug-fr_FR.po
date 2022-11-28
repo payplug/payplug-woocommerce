@@ -916,7 +916,7 @@ msgid "payplug_oney_product_page_description"
 msgstr "Vos clients pourront voir le détail de leurs échéances en 3 ou 4 fois."
 
 msgid "payplug_oney_error_title"
-msgstr "Mode LIVE"
+msgstr "Activer une fonctionnalité"
 
 msgid "payplug_oney_error_description"
 msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Oney, rendez-vous sur "
