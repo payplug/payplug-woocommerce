@@ -37,10 +37,52 @@ class PaymentMethods {
 				]
 			],
 			"options"      => [
+				$this->title_field(),
+				$this->description_field(),
 				$this->embeded_option($redirect),
 				$this->one_click_option(),
 			]
 		];
+	}
+
+	private function description_field(){
+		return array(
+			"type"         => "payment_option",
+			"sub_type"     => "input",
+			"name"     	   => "standard_payment_description",
+			"title"		   => __("payplug_standard_payment_description_title", "payplug"),
+			"value"		   => null,
+			"descriptions" => [
+				"live"    => [
+					"description"      => __("payplug_standard_payment_description_description", "payplug"),
+					"placeholder"      => __("payplug_standard_payment_description_placeholder", "payplug"),
+				],
+				"sandbox" => [
+					"description"      => __("payplug_standard_payment_description_description", "payplug"),
+					"placeholder"      => __("payplug_standard_payment_description_placeholder", "payplug"),
+				]
+			]
+		);
+	}
+	private function title_field(){
+		$title = get_option( 'woocommerce_payplug_settings', [] )['title'];
+		return array(
+				"type"         => "payment_option",
+				"sub_type"     => "input",
+				"name"     	   => "standard_payment_title",
+				"title"		   => __("payplug_standard_payment_title_title", "payplug"),
+				"value"		   => !empty($title) ? $title : __("payplug_standard_payment_title_placeholder", "payplug"),
+				"descriptions" => [
+					"live"    => [
+						"description"      => __("payplug_standard_payment_title_description", "payplug"),
+						"placeholder"      => __("payplug_standard_payment_title_placeholder", "payplug"),
+					],
+					"sandbox" => [
+						"description"      => __("payplug_standard_payment_title_description", "payplug"),
+						"placeholder"      => __("payplug_standard_payment_title_placeholder", "payplug"),
+					]
+				],
+		);
 	}
 
 
