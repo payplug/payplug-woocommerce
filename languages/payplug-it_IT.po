@@ -923,3 +923,12 @@ msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Oney, "
 
 msgid "payplug_oney_error_link"
 msgstr "clicca qui"
+
+msgid "payplug_applepay_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/5149384347292-Incassare-pagamenti-Apple-Pay-con-PayPlug"
+
+msgid "payplug_bancontact_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/4408157435794-Incassare-dei-pagamenti-tramite-Bancontact-con-PayPlug"
+
+msgid "payplug_amex_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/5701208563996-Incassare-pagamenti-American-Express-con-PayPlug"

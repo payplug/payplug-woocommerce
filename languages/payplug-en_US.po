@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2022-11-28 16:26+0000\n"
+"PO-Revision-Date: 2022-11-28 16:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -308,3 +308,12 @@ msgstr "You do not have access to this feature yet. To activate Oney, please go 
 
 msgid "payplug_oney_error_link"
 msgstr "Payplug portal"
+
+msgid "payplug_applepay_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/5149384347292"
+
+msgid "payplug_bancontact_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/4408157435794"
+
+msgid "payplug_amex_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/5701208563996-Collecting-American-Express-Payments-with-PayPlug"

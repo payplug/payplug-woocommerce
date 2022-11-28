@@ -144,11 +144,11 @@ class PaymentMethods {
 			"descriptions" => [
 				"live"    => [
 					"description"      => __( 'payplug_section_applepay_payment_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_applepay_more_url', 'payplug' ), "_blank"),
 				],
 				"sandbox" => [
 					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/5149384347292", "_blank"),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_applepay_more_url', 'payplug' ), "_blank"),
 				]
 			],
 		];
@@ -170,11 +170,11 @@ class PaymentMethods {
 			"descriptions" => [
 				"live"    => [
 					"description"      => __( 'payplug_section_bancontact_payment_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_bancontact_more_url', 'payplug' ), "_blank"),
 				],
 				"sandbox" => [
 					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_bancontact_more_url', 'payplug' ), "_blank"),
 				]
 			],
 		];
@@ -196,11 +196,11 @@ class PaymentMethods {
 			"descriptions" => [
 				"live"    => [
 					"description"      => __( 'payplug_section_american_express_payment_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_amex_more_url', 'payplug' ), "_blank"),
 				],
 				"sandbox" => [
 					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ),"https://support.payplug.com/hc/en-gb/articles/4408157435794", "_blank"),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_amex_more_url', 'payplug' ), "_blank"),
 				]
 			],
 		];
