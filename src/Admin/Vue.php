@@ -28,6 +28,13 @@ class Vue {
 			$payplug_wooc_settings = get_option( 'woocommerce_payplug_settings', [] );
 			unset($payplug_wooc_settings["payplug_live_key"]);
 
+			foreach ($payplug_wooc_settings as $key => $payplug_wooc_setting) {
+				if (in_array($payplug_wooc_setting, ['0','no', "false"]))
+					$payplug_wooc_settings[$key] = false;
+				elseif (in_array($payplug_wooc_setting, ['1','yes', "true"]))
+					$payplug_wooc_settings[$key] = true;
+			}
+
 			return [
 				"payplug_wooc_settings" => $payplug_wooc_settings,
 				"header"           		=> $header,
