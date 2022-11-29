@@ -380,7 +380,7 @@ class Vue {
 		$debug = get_option( 'woocommerce_payplug_settings', [] )['debug'];
 
 		$status = [
-			"error" => $this->payplug_requirements(),
+			"error" => !$this->payplug_requirements(),
 			"title" => __("payplug_section_status_title", "payplug"),
 			"descriptions" => [
 				"live" => [
