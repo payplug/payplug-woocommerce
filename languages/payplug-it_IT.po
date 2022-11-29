@@ -956,3 +956,6 @@ msgstr "La descrizione della soluzione di pagamento che vedranno i tuoi clienti 
 
 msgid "payplug_standard_payment_description_placeholder"
 msgstr "Descrizione"
+
+msgid "payplug_section_status_currency"
+msgstr "L'euro è stato impostato come valuta di pagamento sul tuo e-commerce."

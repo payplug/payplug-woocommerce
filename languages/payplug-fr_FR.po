@@ -956,3 +956,6 @@ msgstr "Description de la solution de paiement présentée à vos clients sur la
 
 msgid "payplug_standard_payment_description_placeholder"
 msgstr "Description"
+
+msgid "payplug_section_status_currency"
+msgstr "Votre boutique utilise l’euro comme monnaie de paiement."
