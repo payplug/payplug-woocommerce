@@ -405,8 +405,16 @@ class Vue {
 				$payplug_requirements->currency_requirement(), //MISSING THIS MESSAGES
 				$payplug_requirements->account_requirement(),
 			],
-
-			"enable_debug_name" => "payplug_debug",
+			"debug" => [
+				"live" => [
+					"title" => __("payplug_section_status_debug_label", "payplug"),
+					"description" => __("payplug_section_status_debug_description", "payplug"),
+				],
+				"sandbox" => [
+					"title" => __("payplug_section_status_debug_label", "payplug"),
+					"description" => __("payplug_section_status_debug_description", "payplug"),
+				]
+			],
 			"enable_debug_checked" => !empty($debug) && $debug === "yes" ? true : false
 		];
 
