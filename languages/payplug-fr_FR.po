@@ -937,7 +937,7 @@ msgid "payplug_section_status_debug_label"
 msgstr "Activer le mode debug"
 
 msgid "payplug_section_status_debug_description"
-msgstr "Debug mode saves additional information on your server for each operation done via PayPlug plugin (Developer setting)."
+msgstr "Le mode debug permet de sauvegarder des informations complémentaires sur votre serveur pour chaque opération effectuée via le module PayPlug (Option pour développeur)."
 
 msgid "payplug_standard_payment_title_title"
 msgstr "Titre"

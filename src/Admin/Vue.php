@@ -387,15 +387,11 @@ class Vue {
 					"description" => __("payplug_section_status_description", "payplug"),
 					"errorMessage" => __("payplug_section_status_errorMessage", "payplug"),
 					"check" => __("payplug_section_status_check", "payplug"),
-					"enable_debug_label" => __("payplug_section_status_debug_label", "payplug"),
-					"enable_debug_description" => __("payplug_section_status_debug_description", "payplug"),
 				],
 				"sandbox" => [
 					"description" => __("payplug_section_status_description", "payplug"),
 					"errorMessage" => __("payplug_section_status_errorMessage", "payplug"),
 					"check" => __("payplug_section_status_check", "payplug"),
-					"enable_debug_label" => __("Activate debug mode", "payplug"),
-					"enable_debug_description" => __("Debug mode saves additional information on your server for each operation done via the PayPlug plugin (Developer setting).", "payplug"),
 				]
 			],
 			"requirements" => [
@@ -405,8 +401,16 @@ class Vue {
 				$payplug_requirements->currency_requirement(), //MISSING THIS MESSAGES
 				$payplug_requirements->account_requirement(),
 			],
-
-			"enable_debug_name" => "payplug_debug",
+			"debug" => [
+				"live" => [
+					"title" => __("payplug_section_status_debug_label", "payplug"),
+					"description" => __("payplug_section_status_debug_description", "payplug"),
+				],
+				"sandbox" => [
+					"title" => __("payplug_section_status_debug_label", "payplug"),
+					"description" => __("payplug_section_status_debug_description", "payplug"),
+				]
+			],
 			"enable_debug_checked" => !empty($debug) && $debug === "yes" ? true : false
 		];
 
