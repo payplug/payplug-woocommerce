@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2022-11-29 14:59+0000\n"
+"PO-Revision-Date: 2022-11-29 15:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -341,3 +341,6 @@ msgstr "The payment solution description displayed to your customers during chec
 
 msgid "payplug_standard_payment_description_placeholder"
 msgstr "Description"
+
+msgid "payplug_section_status_currency"
+msgstr "Your shop currency has been set up with Euro."
