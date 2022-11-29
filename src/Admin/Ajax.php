@@ -150,7 +150,7 @@ class Ajax {
 
 	public function api_check_bancontact_permissions() {
 
-		if($_POST['env']) {
+		if($_POST['env'] == 0) {
 			$this->optionUnnavailableInTestMode();
 		}
 
@@ -185,7 +185,7 @@ class Ajax {
 
 	public function api_check_applepay_permissions() {
 
-		if($_POST['env']) {
+		if($_POST['env'] == 0) {
 			$this->optionUnnavailableInTestMode();
 		}
 
@@ -227,7 +227,7 @@ class Ajax {
 
 	public function api_check_american_express_permissions() {
 
-		if($_POST['env']) {
+		if($_POST['env'] == 0) {
 			$this->optionUnnavailableInTestMode();
 		}
 
