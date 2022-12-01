@@ -660,7 +660,11 @@ class Ajax {
 			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
 			http_response_code(200);
 
-			wp_send_json_success( get_option('woocommerce_payplug_settings', []) );
+			wp_send_json_success( array(
+				"title" => null,
+				"msg" => __( 'payplug_save_success_message', 'payplug' ),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
 		} else {
 			http_response_code(403);
 			wp_send_json_error("You are not logged in !");

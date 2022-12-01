@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -959,3 +959,6 @@ msgstr "Descrizione"
 
 msgid "payplug_section_status_currency"
 msgstr "L'euro è stato impostato come valuta di pagamento sul tuo e-commerce."
+
+msgid "payplug_save_success_message"
+msgstr "La tua configurazione è stata salvata."
