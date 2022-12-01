@@ -28,28 +28,14 @@ class Vue {
 			$payplug_wooc_settings = get_option( 'woocommerce_payplug_settings', [] );
 			unset($payplug_wooc_settings["payplug_live_key"]);
 
-			foreach ($payplug_wooc_settings as $key => $payplug_wooc_setting) {
-				if ($key == "mode") {
-					if ($payplug_wooc_settings["mode"] == "yes")
-						$payplug_wooc_settings["mode"] = 1;
-					elseif ($payplug_wooc_settings["mode"] == "no")
-						$payplug_wooc_settings["mode"] = 0;
-					continue;
-				}
-				if (in_array($payplug_wooc_setting, ['0','no', "false"]))
-					$payplug_wooc_settings[$key] = false;
-				elseif (in_array($payplug_wooc_setting, ['1','yes', "true"]))
-					$payplug_wooc_settings[$key] = true;
-			}
-
 			return [
 				"payplug_wooc_settings" => $payplug_wooc_settings,
 				"header"           		=> $header,
 				"login"     			=> $this->payplug_section_login(),
 				"logged"           		=> $logged,
-				"payment_methods"  		=> $this->payplug_section_payment_methods(),
-				"payment_paylater"  	=> $this->payplug_section_paylater(),
-				"status" => $this->payplug_section_status()
+				"payment_methods"  		=> $this->payplug_section_payment_methods($payplug_wooc_settings),
+				"payment_paylater"  	=> $this->payplug_section_paylater($payplug_wooc_settings),
+				"status" => $this->payplug_section_status($payplug_wooc_settings)
 			];
 		}
 
@@ -113,14 +99,14 @@ class Vue {
 				[
 					"name"     => "payplug_sandbox",
 					"label"    => "Live",
-					"value"    => 1,
+					"value"    => 0, //live
 					"disabled" => $disabled,
 					"checked" => PayplugWoocommerceHelper::check_mode()
 				],
 				[
 					"name"    => "payplug_sandbox",
 					"label"   => "Test",
-					"value"   => 0,
+					"value"   => 1, //test
 					"checked" => !PayplugWoocommerceHelper::check_mode()
 				],
 			]
@@ -246,7 +232,8 @@ class Vue {
 	/**
 	 * @return array
 	 */
-	public function payplug_section_payment_methods() {
+	public function payplug_section_payment_methods($options = array()) {
+
 		$section = [
 			"name"         => "paymentMethodsBlock",
 			"title"        => __( 'payplug_section_payment_methods_title', 'payplug' ),
@@ -260,9 +247,9 @@ class Vue {
 			],
 			"options"      => [
 				(new PaymentMethods())->payment_method_standard(),
-				PaymentMethods::payment_method_applepay(),
-				PaymentMethods::payment_method_bancontact(),
-				PaymentMethods::payment_method_amex()
+				PaymentMethods::payment_method_applepay(!empty($options) && $options['apple_pay'] === 'yes'),
+				PaymentMethods::payment_method_bancontact(!empty($options) &&$options['bancontact'] === 'yes'),
+				PaymentMethods::payment_method_amex(!empty($options) && $options['american_express'] === 'yes')
 			]
 		];
 
@@ -274,7 +261,12 @@ class Vue {
 	 *
 	 * @return array
 	 */
-	public function payplug_section_paylater($active = false) {
+	public function payplug_section_paylater($options = array() ) {
+
+		$max = !empty($options['oney_thresholds_max']) ? $options['oney_thresholds_max'] : 3000;
+		$min = !empty($options['oney_thresholds_min']) ? $options['oney_thresholds_min'] : 100;
+		$product_page = !empty($options['oney_product_animation']) && $options['oney_product_animation'] === 'yes' ? true : false;
+
 		$section = [
 			"name"         => "paymentMethodsBlock",
 			"title"        => __( 'payplug_section_paylater_title', 'payplug' ),
@@ -290,7 +282,7 @@ class Vue {
 				"name" => "oney",
 				"title" => __( 'payplug_section_oney_title', 'payplug' ),
 				"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/lg-oney.png' ),
-				"checked" => $active,
+				"checked" => !empty($options) && $options['oney'] === 'yes',
 				"descriptions" => [
 					"live"    => [
 						"description"      => __( 'payplug_section_paylater_description_oney', 'payplug' ),
@@ -310,20 +302,21 @@ class Vue {
 						"className" => "_paylaterLabel",
 						"label" => __( 'payplug_label_with_fees', 'payplug' ),
 						"subText" => __( 'payplug_text_with_fees', 'payplug' ),
-						"value" => 1,
-						"checked" => true
+						"value" => "with_fees",
+						"checked" => !empty($options) && $options['oney_type'] === 'with_fees',
 					],
 					[
 						"name" => "payplug_oney_type",
 						"className" => "_paylaterLabel",
 						"label" => __( 'payplug_label_without_fees', 'payplug' ),
 						"subText" => __( 'payplug_text_without_fees', 'payplug' ),
-						"value" => 0
+						"value" => "without_fees",
+						"checked" => !empty($options) && $options['oney_type'] === 'without_fees',
 					]
 				],
 				"advanced_options" => [
-					$this->thresholds_option(),
-					$this->show_oney_popup_product()
+					$this->thresholds_option($max, $min),
+					$this->show_oney_popup_product($product_page)
 				]
 			]
 		];
@@ -334,9 +327,8 @@ class Vue {
 	/**
 	 * @return array
 	 */
-	public function thresholds_option() {
-		$min_amount = (! empty( get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_min'] )) ? get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_min'] : 100;
-		$max_amount = (! empty( get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_max'] )) ? get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_max'] : 3000;
+	public function thresholds_option($max, $min) {
+
 		$thresholds = [
 			"name" => "thresholds",
 			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.jpg' ),
@@ -345,16 +337,14 @@ class Vue {
 				"description" => __( 'payplug_thresholds_oney_description', 'payplug' ),
 				"min_amount" => [
 					"name" => "oney_min_amounts",
-					"value" => $min_amount,
-					"placeholder" => $min_amount,
-					"min" => "100"
+					"value" => $min,
+					"placeholder" => $min,
 				],
 				"inter" => __( 'and', 'payplug' ),
 				"max_amount" => [
 					"name" => "oney_max_amounts",
-					"value" => $max_amount,
-					"placeholder" => $max_amount,
-					"min" => "3000"
+					"value" => $max,
+					"placeholder" => $max,
 				],
 				"error" => [
 					"text" => __( 'payplug_thresholds_error_msg', 'payplug' )
@@ -373,7 +363,7 @@ class Vue {
 	 */
 	public function show_oney_popup_product($active = false) {
 		return [
-			"name" => "product",
+			"name" => "oney_product_animation",
 			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.jpg' ),
 			"title" => __( 'display_the_oney_installments_pop_up_on_the_product_page', 'payplug' ),
 			"descriptions" => [[
@@ -389,9 +379,9 @@ class Vue {
 	/**
 	 * @return array
 	 */
-	public function payplug_section_status() {
+	public function payplug_section_status( $options = [] ) {
 		$payplug_requirements = new PayplugGatewayRequirements(new PayplugGateway());
-		$debug = get_option( 'woocommerce_payplug_settings', [] )['debug'];
+		$checked = !empty($options['debug']) && $options['debug'] === 'yes' ? true : false;
 
 		$status = [
 			"error" => !$this->payplug_requirements(),
@@ -425,7 +415,7 @@ class Vue {
 					"description" => __("payplug_section_status_debug_description", "payplug"),
 				]
 			],
-			"enable_debug_checked" => !empty($debug) && $debug === "yes" ? true : false
+			"enable_debug_check" => $checked
 		];
 
 		return $status;

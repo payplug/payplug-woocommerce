@@ -13,9 +13,9 @@ class PaymentMethods {
 
 		$option = (get_option( 'woocommerce_payplug_settings', [] )['payment_method'] != "") ? get_option( 'woocommerce_payplug_settings', [] )['payment_method'] : false;
 
-		$redirect = true;
-		if($option === "embedded"){
-			$redirect = false;
+		$redirect = false;
+		if($option === "redirect"){
+			$redirect = true;
 		}
 
 		return [
@@ -46,12 +46,13 @@ class PaymentMethods {
 	}
 
 	private function description_field(){
+		$description = get_option( 'woocommerce_payplug_settings', [] )['description'];
 		return array(
 			"type"         => "payment_option",
 			"sub_type"     => "input",
 			"name"     	   => "standard_payment_description",
 			"title"		   => __("payplug_standard_payment_description_title", "payplug"),
-			"value"		   => null,
+			"value"		   => $description ?: null,
 			"descriptions" => [
 				"live"    => [
 					"description"      => __("payplug_standard_payment_description_description", "payplug"),
@@ -84,7 +85,6 @@ class PaymentMethods {
 				],
 		);
 	}
-
 
 	/**
 	 * @param $active
@@ -163,7 +163,7 @@ class PaymentMethods {
 				[
 					"name"    => "payplug_embedded",
 					"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
-					"value"   => "redirected",
+					"value"   => "redirect",
 					"checked" => $redirect ? true : false
 				]
 			]
