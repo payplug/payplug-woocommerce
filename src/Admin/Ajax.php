@@ -45,40 +45,49 @@ class Ajax {
 			//Path to REST route and the callback function
 			register_rest_route( 'payplug_api', '/save/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'payplug_save_data' ]
+				'callback' => [ $this, 'payplug_save_data' ],
+				'permission_callback' => '__return_true'
 			) );
 
 			register_rest_route( 'payplug_api', '/init/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'payplug_init' ]
+				'callback' => [ $this, 'payplug_init' ],
+				'permission_callback' => '__return_true'
 			) );
 			register_rest_route( 'payplug_api', '/login/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'payplug_login' ]
+				'callback' => [ $this, 'payplug_login' ],
+				'permission_callback' => '__return_true'
 			) );
 			register_rest_route( 'payplug_api', '/logout/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'payplug_logout' ]
+				'callback' => [ $this, 'payplug_logout' ],
+				'permission_callback' => '__return_true'
 			) );
 			register_rest_route( 'payplug_api', '/check_requirements/', array(
 				'methods' => 'GET',
-				'callback' => [ $this, 'payplug_check_requirements' ]
+				'callback' => [ $this, 'payplug_check_requirements' ],
+				'permission_callback' => '__return_true'
 			) );
 			register_rest_route( 'payplug_api', '/bancontact_permissions/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'api_check_bancontact_permissions' ]
+				'callback' => [ $this, 'api_check_bancontact_permissions' ],
+				'permission_callback' => '__return_true'
 			) );
 			register_rest_route( 'payplug_api', '/applepay_permissions/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'api_check_applepay_permissions' ]
+				'callback' => [ $this, 'api_check_applepay_permissions' ],
+				'permission_callback' => '__return_true'
 			) );
 			register_rest_route( 'payplug_api', '/american_express_permissions/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'api_check_american_express_permissions' ]
+				'callback' => [ $this, 'api_check_american_express_permissions' ],
+				'permission_callback' => '__return_true'
 			) );
 			register_rest_route( 'payplug_api', '/oney_permissions/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'api_check_oney_permissions' ]
+				'callback' => [ $this, 'api_check_oney_permissions' ],
+				'permission_callback' => '__return_true'
 			) );
 		});
 
@@ -473,7 +482,6 @@ class Ajax {
 		$email = sanitize_email($data['payplug_email']);
 		$password = wp_unslash($data['payplug_password']);
 		$wp_nonce = $data['_wpnonce'];
-		$wp_loginaction = $data['_loginaction'];
 
 
 		try {
@@ -531,7 +539,6 @@ class Ajax {
 			$wp = [
 				"WP" => [
 					"_wpnonce" => $wp_nonce,
-					"_loginaction" => $wp_loginaction
 				]
 			];
 
@@ -556,14 +563,12 @@ class Ajax {
 	public function payplug_init() {
 
 		$wp_nonce = wp_create_nonce();
-		$wp_loginaction = $_POST['_loginaction'];
 
 		$wp = [
 			"logged" => PayplugWoocommerceHelper::user_logged_in(),
 			"mode" => PayplugWoocommerceHelper::check_mode() ? 0 : 1,
 			"WP" =>  [
 				"_wpnonce" => $wp_nonce,
-				"_loginaction" => $wp_loginaction
 			]
 		];
 
