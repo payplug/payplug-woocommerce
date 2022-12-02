@@ -654,7 +654,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		wp_enqueue_style('app.css', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/css/app.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_localize_script('app.js', 'payplug_admin_config',
 			array(
-				'ajax_url'      => admin_url('admin-ajax.php'),
+				'ajax_url'      => get_rest_url(null, "payplug_api"),
 				"img_path"		=> esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/')
 			));
 
