@@ -76,52 +76,54 @@ class PayplugResponse {
 			return;
 		}
 
-		// Save Logs of the payment for the different payment gateways:
-		// For Oney 4 gateways & Bancontact gateway: "$resource->payment_method" exists and is an array
-		// but not for Payplug credit card gateway (in this case we check the payment_method from the order itself not the $resource)
-		if (isset($resource->payment_method) && is_array($resource->payment_method)) {
-			$gateway_id = $resource->payment_method['type'];
+		if ($gateway_id == $this->gateway->id) {
+			// Save Logs of the payment for the different payment gateways:
+			// For Oney 4 gateways & Bancontact gateway: "$resource->payment_method" exists and is an array
+			// but not for Payplug credit card gateway (in this case we check the payment_method from the order itself not the $resource)
+			if (isset($resource->payment_method) && is_array($resource->payment_method)) {
+				$gateway_id = $resource->payment_method['type'];
 
-			switch ($gateway_id) {
-				case substr( $gateway_id, 0, 5 ) === "oney_" :
-					$this->oney_ipn($resource);
-					break;
-				case "bancontact" :
-					$this->bancontact_ipn($resource);
-					break;
-				case "apple_pay" :
-					$this->apple_pay_ipn($resource);
-					break;
-				case "american_express" :
-					$this->amex_ipn($resource);
-					break;
+				switch ($gateway_id) {
+					case substr( $gateway_id, 0, 5 ) === "oney_" :
+						$this->oney_ipn($resource);
+						break;
+					case "bancontact" :
+						$this->bancontact_ipn($resource);
+						break;
+					case "apple_pay" :
+						$this->apple_pay_ipn($resource);
+						break;
+					case "american_express" :
+						$this->amex_ipn($resource);
+						break;
+				}
+
+			} elseif ($gateway_id == "payplug") {
+				$this->payplug_ipn($resource);
 			}
 
-		} elseif ($gateway_id == "payplug") {
-			$this->payplug_ipn($resource);
-		}
-
-        // Handle successful payments
-		if (($resource->is_paid) && ($gateway_id == $this->gateway->id)) {
-			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
-			if (!$is_payment_with_token) {
-				$this->maybe_save_card($resource);
+			// Handle successful payments
+			if ($resource->is_paid) {
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
+				if (!$is_payment_with_token) {
+					$this->maybe_save_card($resource);
+				}
+				$this->maybe_save_address_hash($resource);
+				$order->add_order_note(sprintf(__('PayPlug IPN OK | Transaction %s', 'payplug'), wc_clean($resource->id)));
+				$order->payment_complete(wc_clean($resource->id));
+				if (PayplugWoocommerceHelper::is_pre_30()) {
+					$order->reduce_order_stock();
+				}
+				/**
+				 * Fires once a payment response has been processed.
+				 *
+				 * @param int $order_id Order ID
+				 * @param PaymentResource $resource Payment resource
+				 */
+				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
+				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed successfully.', $order_id, $resource->id));
 			}
-			$this->maybe_save_address_hash($resource);
-			$order->add_order_note(sprintf(__('PayPlug IPN OK | Transaction %s', 'payplug'), wc_clean($resource->id)));
-			$order->payment_complete(wc_clean($resource->id));
-			if (PayplugWoocommerceHelper::is_pre_30()) {
-				$order->reduce_order_stock();
-			}
-			/**
-			 * Fires once a payment response has been processed.
-			 *
-			 * @param int $order_id Order ID
-			 * @param PaymentResource $resource Payment resource
-			 */
-			\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
-			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
-			PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed successfully.', $order_id, $resource->id));
 		}
 	}
 
