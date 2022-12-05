@@ -36,13 +36,15 @@ class PayplugResponse {
 	 * @return void
 	 * @throws \WC_Data_Exception
 	 */
-	public function process_payment($resource, $is_payment_with_token = false)
+	public function process_payment($resource, $source, $is_payment_with_token = false)
 	{
 		$order_id = wc_clean($resource->metadata['order_id']);
 		$order = wc_get_order($order_id);
 		$gateway_id = $order->get_payment_method();
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($resource);
 
+		PayplugGateway::log( $source );
+		PayplugGateway::log( $gateway_id );
 
 		// Ignore undefined orders
 		if (!$order) {
@@ -108,7 +110,11 @@ class PayplugResponse {
 				$this->maybe_save_card($resource);
 			}
 			$this->maybe_save_address_hash($resource);
-			$order->add_order_note(sprintf(__('PayPlug IPN OK | Transaction %s', 'payplug'), wc_clean($resource->id)));
+
+			PayplugGateway::log( sprintf(__('PayPlug IPN OK | ' . $source . ' | Transaction %s', 'payplug'), wc_clean($resource->id)) );
+
+
+			$order->add_order_note(sprintf(__('PayPlug IPN OK | ' . $source . ' | Transaction %s', 'payplug'), wc_clean($resource->id)));
 			$order->payment_complete(wc_clean($resource->id));
 			if (PayplugWoocommerceHelper::is_pre_30()) {
 				$order->reduce_order_stock();

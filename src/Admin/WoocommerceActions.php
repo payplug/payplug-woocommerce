@@ -78,7 +78,10 @@ class WoocommerceActions {
 			PayplugGateway::log( sprintf( 'Order #%s : Retrieve payment data for transaction %s.', $order_id, $transaction_id ), 'info' );
 			$payment = $gateway->api->payment_retrieve( $transaction_id );
 			PayplugGateway::log( sprintf( 'Order #%s : Process payment data.', $order_id ), 'info' );
-			$gateway->response->process_payment( $payment );
+
+			$source = "custom action";
+			$gateway->response->process_payment( $payment, $source );
+
 		} catch ( \Exception $e ) {
 			PayplugGateway::log(
 				sprintf( 'Order #%s : An error occurred while retrieving the payment data with the message : %s',

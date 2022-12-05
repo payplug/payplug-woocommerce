@@ -62,6 +62,10 @@ class PayplugIpnResponse {
 		return isset( $resource->object ) && in_array( $resource->object, [ 'payment', 'refund' ] );
 	}
 
+
+
+
+
 	/**
 	 * Process payment notification.
 	 *
@@ -71,7 +75,14 @@ class PayplugIpnResponse {
 	 * @throws \WC_Data_Exception
 	 */
 	public function process_payment_resource( $resource ) {
-		$this->gateway->response->process_payment( $resource );
+
+		$source = "Process payment notification.";
+		$this->gateway->response->process_payment( $resource, $source );
+
+
+
+
+
 	}
 
 	/**

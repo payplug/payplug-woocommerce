@@ -197,6 +197,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         return $total_rows;
     }
 
+
+
+
+
+
     /**
      * Validate order payment when the user is redirected to the success confirmation page.
      *
@@ -251,7 +256,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			return;
 		}
 
-        $this->response->process_payment($payment);
+		$source = "confirmation page";
+
+        $this->response->process_payment($payment, $source);
     }
 
     /**
@@ -1079,6 +1086,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         }
     }
 
+
+
+
     /**
      * @param \WC_Order $order
      * @param int $amount
@@ -1134,7 +1144,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             /** This action is documented in src/Gateway/PayplugGateway */
             \do_action('payplug_gateway_payment_created', $order_id, $payment);
 
-            $this->response->process_payment($payment, true);
+			$source = "process payment with token";
+
+            $this->response->process_payment($payment, $source, true);
 
             PayplugGateway::log(sprintf('Payment process complete for order #%s', $order_id));
 
