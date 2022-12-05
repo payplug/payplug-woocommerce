@@ -102,7 +102,7 @@ class PayplugResponse {
 		}
 
         // Handle successful payments
-		if ($resource->is_paid) {
+		if (($resource->is_paid) && ($gateway_id == $this->gateway->id)) {
 			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
 			if (!$is_payment_with_token) {
 				$this->maybe_save_card($resource);
