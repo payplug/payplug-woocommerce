@@ -46,7 +46,7 @@ msgid "Activate debug mode"
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:357
-msgid "Advanced Settings"
+msgid "payplug_advanced_settings"
 msgstr ""
 
 #: src/Gateway/PayplugGateway.php:377
@@ -712,3 +712,87 @@ msgstr "Allow your customers to pay with their American Express cards. Display t
 
 msgid "payplug_amex_unauthorized_message"
 msgstr "You don't have access to this feature yet. To activate American Express, please fill in the following form <a href='https://support.payplug.com/hc/en-gb/requests/new' target='_blank'>Submit a request – Help Center</a>"
+
+msgid "payplug_error_wrong_credentials"
+msgstr ""
+
+msgid "payplug_section_paylater_title"
+msgstr ""
+
+msgid "payplug_section_paylater_description"
+msgstr ""
+
+msgid "payplug_section_oney_title"
+msgstr ""
+
+msgid "payplug_section_paylater_description_oney"
+msgstr ""
+
+msgid "payplug_label_with_fees"
+msgstr ""
+
+msgid "payplug_text_with_fees"
+msgstr ""
+
+msgid "payplug_label_without_fees"
+msgstr ""
+
+msgid "payplug_text_without_fees"
+msgstr ""
+
+msgid "payplug_thresholds_oney_title"
+msgstr ""
+
+msgid "payplug_thresholds_oney_description"
+msgstr ""
+
+msgid "and"
+msgstr ""
+
+msgid "payplug_section_status_title"
+msgstr ""
+
+msgid "payplug_section_status_description"
+msgstr ""
+
+msgid "payplug_section_status_errorMessage"
+msgstr ""
+
+msgid "payplug_section_status_check"
+msgstr ""
+
+msgid "payplug_section_status_curl"
+msgstr ""
+
+msgid "payplug_section_status_php"
+msgstr ""
+
+msgid "payplug_section_status_ssl"
+msgstr ""
+
+msgid "payplug_section_status_account"
+msgstr ""
+
+msgid "payplug_oney_product_page_description"
+msgstr ""
+
+msgid "payplug_oney_error_title"
+msgstr "Enable feature"
+
+msgid "payplug_oney_error_description"
+msgstr ""
+
+msgid "payplug_oney_error_link"
+msgstr ""
+
+
+
+
+
+
+
+
+
+
+
+

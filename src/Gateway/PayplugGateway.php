@@ -105,6 +105,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function __construct()
     {
+
+		$GLOBALS['hide_save_button'] = true;
+
         $this->id                 = 'payplug';
         $this->icon               = '';
         $this->has_fields         = false;
@@ -397,7 +400,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'desc_tip'    => false
             ],
             'title_advanced_settings' => [
-                'title'       => __('Advanced Settings', 'payplug'),
+                'title'       => __('payplug_advanced_settings', 'payplug'),
                 'description' => __(
                     'Your current offer does not allow this option. Try it on TEST mode. More information <a href="https://www.payplug.com/pricing" target="_blank">here.</a>',
                     'payplug'
@@ -644,7 +647,28 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function admin_options()
     {
-        wp_enqueue_style(
+		/************ VUE Code *************/
+
+		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_style('app.css', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/css/app.css', [], PAYPLUG_GATEWAY_VERSION);
+		wp_localize_script('app.js', 'payplug_admin_config',
+			array(
+				'ajax_url'      => get_rest_url(null, "payplug_api"),
+				"img_path"		=> esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/')
+			));
+
+		?>
+		<script>window.get_data_url = "<?php echo rest_url('payplug/data'); ?>"</script>
+		<script>window.set_data_url = "<?php echo rest_url('payplug/save_data'); ?>"</script>
+		<div id="payplug_admin"></div>
+
+		<?php
+
+		/*********** End VUE Code ***********/
+
+
+		wp_enqueue_style(
             'payplug-gateway-style',
             PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/app.css',
             [],
@@ -712,91 +736,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	        'oney_thresholds_max' => $this->oney_thresholds_max,
         ));
 
-        if ($this->user_logged_in() && false === $this->has_api_key('live')) {
-            add_action('admin_footer', function () {
-                $email = $this->get_option('email');
-?>
-                <div id="payplug-refresh-keys-modal" title="<?php echo esc_attr_x('Mode LIVE', 'modal', 'payplug'); ?>">
-                    <form id="payplug-refresh-keys-modal__form">
-                        <p id="dialog-msg"></p>
-                        <p><?php echo esc_html_x('Please enter your PayPlug account password', 'modal', 'payplug'); ?></p>
-                        <input type="password" name="password" required title="<?php echo esc_attr_x('Enter your PayPlug account password', 'modal', 'payplug'); ?>" />
-                        <input type="hidden" name="email" value="<?php echo esc_attr($email); ?>">
-                        <input type="hidden" name="action" value="<?php echo esc_attr(Ajax::REFRESH_KEY_ACTION); ?>">
-                        <?php wp_nonce_field(sprintf('%s_%s', $email, Ajax::REFRESH_KEY_ACTION)); ?>
-                        <input class="ui-dialog-sronly" type="submit" tabindex="-1">
-                    </form>
-                </div>
-        <?php
-            });
-        }
-
-        $payplug_requirements = new PayplugGatewayRequirements($this); ?>
-
-        <h2 class="title--logo"><?php esc_html($this->get_method_title()) ?></h2>
-        <p><?php _e(sprintf('Version %s', PAYPLUG_GATEWAY_VERSION)); ?></p>
-        <div class="payplug-requirements">
-            <?php echo $payplug_requirements->curl_requirement(); ?>
-            <?php echo $payplug_requirements->php_requirement(); ?>
-            <?php echo $payplug_requirements->openssl_requirement(); ?>
-            <?php echo $payplug_requirements->account_requirement(); ?>
-            <?php echo $payplug_requirements->currency_requirement(); ?>
-            <?php echo $payplug_requirements->oney_requirement(); ?>
-        </div>
-        <?php echo wp_kses_post(wpautop($this->get_method_description())); ?>
-
-        <?php if ($this->user_logged_in()) : ?>
-            <table class="form-table">
-                <?php $this->generate_settings_html($this->get_form_fields()); ?>
-            </table>
-        <?php else :
-            $GLOBALS['hide_save_button'] = true; ?>
-            <h3 class="wc-settings-sub-title"><?php _e('Connection', 'payplug'); ?></h3>
-            <table class="form-table">
-                <tbody>
-                    <tr valign="top">
-                        <th scope="row" class="titledesc">
-                            <label for="payplug_email"><?php _e('Email', 'payplug'); ?></label>
-                        </th>
-                        <td class="forminp">
-                            <fieldset>
-                                <legend class="screen-reader-text"><span><?php _e('Email', 'payplug'); ?></span></legend>
-                                <input class="input-text regular-input" type="text" name="payplug_email" id="payplug_email" value="" placeholder="<?php _e('your@email.com', 'payplug'); ?>" />
-                            </fieldset>
-                        </td>
-                    </tr>
-                    <tr valign="top">
-                        <th scope="row" class="titledesc">
-                            <label for="payplug_password"><?php _e('Password', 'payplug'); ?></label>
-                        </th>
-                        <td class="forminp">
-                            <fieldset>
-                                <legend class="screen-reader-text"><span><?php _e('Password', 'payplug'); ?></span>
-                                </legend>
-                                <input class="input-text regular-input" type="password" name="payplug_password" id="payplug_password" value="" />
-                            </fieldset>
-                        </td>
-                    </tr>
-                    <tr valign="top">
-                        <td class="forminp">
-                            <input id="payplug-login" class="button" type="submit" value="<?php _e('Login', 'payplug'); ?>">
-                            <input type="hidden" name="save" value="login">
-                            <?php wp_nonce_field('payplug_user_login', '_loginaction'); ?>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        <?php
-        endif;
-        ?>
-        <div id="payplug-oney-modal" title="<?php echo esc_attr_x('Mode LIVE', 'modal', 'payplug'); ?>">
-            <p>
-                <?php echo esc_html_x('Attention, pour utiliser la méthode de paiement Oney en mode LIVE merci de nous contacter à', 'modal', 'payplug'); ?>
-                <br/>
-                <a href="mailto:support@payplug.com">support@payplug.com</a>
-            </p>
-        </div>
-        <?php
     }
 
     /**
@@ -819,18 +758,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 $this->permissions->clear_permissions();
             }
 
-            $data                        = get_option($this->get_option_key());
-            $data['payplug_test_key']    = '';
-            $data['payplug_live_key']    = '';
-            $data['payplug_merchant_id'] = '';
-            $data['enabled']             = 'no';
-            $data['mode']                = 'no';
-            $data['oneclick']            = 'no';
-            update_option(
-                $this->get_option_key(),
-                apply_filters('woocommerce_settings_api_sanitized_fields_' . $this->id, $data)
-            );
-            if("payplug" === $this->id) {
+            if(PayplugWoocommerceHelper::payplug_logout($this)) {
                 \WC_Admin_Settings::add_message(__('Successfully logged out.', 'payplug'));
             }
 
