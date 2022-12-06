@@ -109,6 +109,13 @@ class Vue {
 					"value"   => 1, //test
 					"checked" => !PayplugWoocommerceHelper::check_mode()
 				],
+			],
+			"modal"		   => [
+				"title" => __( 'payplug_live_mode', 'payplug' ),
+				"description" => __( 'payplug_section_logged_modal_description', 'payplug' ),
+				"password_label" => __( 'payplug_section_login_password_label', 'payplug' ),
+				"cancel" => __( 'payplug_cancel', 'payplug' ),
+				"ok" => __( 'payplug_ok', 'payplug' ),
 			]
 		];
 	}

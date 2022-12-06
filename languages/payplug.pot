@@ -785,6 +785,15 @@ msgstr ""
 msgid "payplug_oney_error_link"
 msgstr ""
 
+msgid "payplug_cancel"
+msgstr ""
+
+msgid "payplug_live_mode"
+msgstr ""
+
+msgid "payplug_section_logged_modal_description"
+msgstr ""
+
 
 
 

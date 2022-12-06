@@ -965,3 +965,12 @@ msgstr "Votre configuration a bien été enregistrée."
 
 msgid "payplug_embeded_option_url"
 msgstr "https://support.payplug.com/hc/fr/articles/4409698334098-Configuration-de-la-page-de-paiement"
+
+msgid "payplug_cancel"
+msgstr "Annuler"
+
+msgid "payplug_live_mode"
+msgstr "Mode LIVE"
+
+msgid "payplug_section_logged_modal_description"
+msgstr "Veuillez saisir le mot de passe de votre compte PayPlug."
