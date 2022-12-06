@@ -54,9 +54,9 @@ class Vue {
 	 */
 	public function payplug_section_logged() {
 
-		$disabled = false;
+		$inactive = false;
 		if( empty(PayplugWoocommerceHelper::get_live_key()) ){
-			$disabled = true;
+			$inactive = true;
 		}
 
 		return [
@@ -100,7 +100,6 @@ class Vue {
 					"name"     => "payplug_sandbox",
 					"label"    => "Live",
 					"value"    => 0, //live
-					"disabled" => $disabled,
 					"checked" => PayplugWoocommerceHelper::check_mode()
 				],
 				[
@@ -111,6 +110,7 @@ class Vue {
 				],
 			],
 			"modal"		   => [
+				"inactive" => $inactive,
 				"title" => __( 'payplug_live_mode', 'payplug' ),
 				"description" => __( 'payplug_section_logged_modal_description', 'payplug' ),
 				"password_label" => __( 'payplug_section_login_password_label', 'payplug' ),
