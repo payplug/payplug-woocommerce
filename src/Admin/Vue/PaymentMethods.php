@@ -141,7 +141,7 @@ class PaymentMethods {
 					"description_popup"    => __( 'payplug_section_standard_payment_popup_description', 'payplug' ),
 					"link_know_more" => Component::link(
 						__( 'payplug_know_more_label', 'payplug' ),
-						"https://support.payplug.com/hc/en-gb/articles/4409698334098",
+						__( 'payplug_embeded_option_url', 'payplug' ),
 						"_blank" ),
 				],
 				"sandbox" => [
@@ -149,7 +149,7 @@ class PaymentMethods {
 					"description_popup"    => __( 'payplug_section_standard_payment_popup_description', 'payplug' ),
 					"link_know_more" => Component::link(
 						__( 'payplug_know_more_label', 'payplug' ),
-						"https://support.payplug.com/hc/en-gb/articles/4409698334098",
+						__( 'payplug_embeded_option_url', 'payplug' ),
 						"_blank" ),
 				]
 			],

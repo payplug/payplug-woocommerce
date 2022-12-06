@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -761,7 +761,7 @@ msgid "payplug_section_standard_payment_option_title"
 msgstr "Présentation de la page de paiement"
 
 msgid "payplug_section_standard_payment_redirected_description"
-msgstr "Vos clients verront apparaître le formulaire de paiement directement dans la page de checkout de votre boutique."
+msgstr "Vos clients seront redirigés vers une page de paiement personnalisable hébergée par PayPlug."
 
 msgid "payplug_section_standard_payment_popup_description"
 msgstr "Vos clients verront apparaître une pop-up de paiement personnalisable sur la page de checkout de votre boutique."
@@ -962,3 +962,6 @@ msgstr "Votre boutique utilise l’euro comme monnaie de paiement."
 
 msgid "payplug_save_success_message"
 msgstr "Votre configuration a bien été enregistrée."
+
+msgid "payplug_embeded_option_url"
+msgstr "https://support.payplug.com/hc/fr/articles/4409698334098-Configuration-de-la-page-de-paiement"
