@@ -50,33 +50,34 @@ class PayplugResponse {
 			return;
 		}
 
-		// Ignore cancelled orders
-		if ($order->has_status('refunded')) {
-			PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order has been refunded. Ignoring IPN', $order_id));
-			return;
-		}
-
-		// Ignore paid orders
-		if ($order->is_paid()) {
-			PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order is already complete. Ignoring IPN.', $order_id));
-			return;
-		}
-
-		// Handle failed payments
-		if (!empty($resource->failure)) {
-			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
-			$order->update_status(
-				'failed',
-				sprintf(__('PayPlug IPN OK | Transaction %s failed : %s', 'payplug'), $resource->id, wc_clean($resource->failure->message))
-			);
-			/** This action is documented in src/Gateway/PayplugResponse */
-			\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
-			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
-			PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed but failed.', $order_id, $resource->id));
-			return;
-		}
-
 		if ($gateway_id == $this->gateway->id) {
+
+			// Ignore cancelled orders
+			if ($order->has_status('refunded')) {
+				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order has been refunded. Ignoring IPN', $order_id));
+				return;
+			}
+
+			// Ignore paid orders
+			if ($order->is_paid()) {
+				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order is already complete. Ignoring IPN.', $order_id));
+				return;
+			}
+
+			// Handle failed payments
+			if (!empty($resource->failure)) {
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
+				$order->update_status(
+					'failed',
+					sprintf(__('PayPlug IPN OK | Transaction %s failed : %s', 'payplug'), $resource->id, wc_clean($resource->failure->message))
+				);
+				/** This action is documented in src/Gateway/PayplugResponse */
+				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
+				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed but failed.', $order_id, $resource->id));
+				return;
+			}
+
 			// Save Logs of the payment for the different payment gateways:
 			// For Oney 4 gateways & Bancontact gateway: "$resource->payment_method" exists and is an array
 			// but not for Payplug credit card gateway (in this case we check the payment_method from the order itself not the $resource)
