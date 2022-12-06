@@ -36,7 +36,7 @@ class PayplugResponse {
 	 * @return void
 	 * @throws \WC_Data_Exception
 	 */
-	public function process_payment($resource, $is_payment_with_token = false)
+	public function process_payment($resource, $is_payment_with_token = false, $source = null)
 	{
 		$order_id = wc_clean($resource->metadata['order_id']);
 		$order = wc_get_order($order_id);
@@ -50,7 +50,13 @@ class PayplugResponse {
 			return;
 		}
 
-		if ($gateway_id == $this->gateway->id) {
+		/**
+		 *
+		 * Checking if it is coming from the order confirmation page or the IPN
+		 *
+		 */
+
+		if (($gateway_id == $this->gateway->id) || (!empty($source) && ($source === "ipn"))) {
 
 			// Ignore cancelled orders
 			if ($order->has_status('refunded')) {

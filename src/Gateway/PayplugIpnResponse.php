@@ -71,7 +71,7 @@ class PayplugIpnResponse {
 	 * @throws \WC_Data_Exception
 	 */
 	public function process_payment_resource( $resource ) {
-		$this->gateway->response->process_payment( $resource );
+		$this->gateway->response->process_payment( $resource, false, "ipn" );
 	}
 
 	/**
