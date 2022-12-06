@@ -36,7 +36,7 @@ class PayplugResponse {
 	 * @return void
 	 * @throws \WC_Data_Exception
 	 */
-	public function process_payment($resource, $is_payment_with_token = false)
+	public function process_payment($resource, $is_payment_with_token = false, $source = null)
 	{
 		$order_id = wc_clean($resource->metadata['order_id']);
 		$order = wc_get_order($order_id);
@@ -50,78 +50,87 @@ class PayplugResponse {
 			return;
 		}
 
-		// Ignore cancelled orders
-		if ($order->has_status('refunded')) {
-			PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order has been refunded. Ignoring IPN', $order_id));
-			return;
-		}
+		/**
+		 *
+		 * Checking if it is coming from the order confirmation page or the IPN
+		 *
+		 */
 
-		// Ignore paid orders
-		if ($order->is_paid()) {
-			PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order is already complete. Ignoring IPN.', $order_id));
-			return;
-		}
+		if (($gateway_id == $this->gateway->id) || (!empty($source) && ($source === "ipn"))) {
 
-		// Handle failed payments
-		if (!empty($resource->failure)) {
-			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
-			$order->update_status(
-				'failed',
-				sprintf(__('PayPlug IPN OK | Transaction %s failed : %s', 'payplug'), $resource->id, wc_clean($resource->failure->message))
-			);
-			/** This action is documented in src/Gateway/PayplugResponse */
-			\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
-			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
-			PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed but failed.', $order_id, $resource->id));
-			return;
-		}
-
-		// Save Logs of the payment for the different payment gateways:
-		// For Oney 4 gateways & Bancontact gateway: "$resource->payment_method" exists and is an array
-		// but not for Payplug credit card gateway (in this case we check the payment_method from the order itself not the $resource)
-		if (isset($resource->payment_method) && is_array($resource->payment_method)) {
-			$gateway_id = $resource->payment_method['type'];
-
-			switch ($gateway_id) {
-				case substr( $gateway_id, 0, 5 ) === "oney_" :
-					$this->oney_ipn($resource);
-					break;
-				case "bancontact" :
-					$this->bancontact_ipn($resource);
-					break;
-				case "apple_pay" :
-					$this->apple_pay_ipn($resource);
-					break;
-				case "american_express" :
-					$this->amex_ipn($resource);
-					break;
+			// Ignore cancelled orders
+			if ($order->has_status('refunded')) {
+				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order has been refunded. Ignoring IPN', $order_id));
+				return;
 			}
 
-		} elseif ($gateway_id == "payplug") {
-			$this->payplug_ipn($resource);
-		}
+			// Ignore paid orders
+			if ($order->is_paid()) {
+				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order is already complete. Ignoring IPN.', $order_id));
+				return;
+			}
 
-        // Handle successful payments
-		if ($resource->is_paid) {
-			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
-			if (!$is_payment_with_token) {
-				$this->maybe_save_card($resource);
+			// Handle failed payments
+			if (!empty($resource->failure)) {
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
+				$order->update_status(
+					'failed',
+					sprintf(__('PayPlug IPN OK | Transaction %s failed : %s', 'payplug'), $resource->id, wc_clean($resource->failure->message))
+				);
+				/** This action is documented in src/Gateway/PayplugResponse */
+				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
+				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed but failed.', $order_id, $resource->id));
+				return;
 			}
-			$this->maybe_save_address_hash($resource);
-			$order->add_order_note(sprintf(__('PayPlug IPN OK | Transaction %s', 'payplug'), wc_clean($resource->id)));
-			$order->payment_complete(wc_clean($resource->id));
-			if (PayplugWoocommerceHelper::is_pre_30()) {
-				$order->reduce_order_stock();
+
+			// Save Logs of the payment for the different payment gateways:
+			// For Oney 4 gateways & Bancontact gateway: "$resource->payment_method" exists and is an array
+			// but not for Payplug credit card gateway (in this case we check the payment_method from the order itself not the $resource)
+			if (isset($resource->payment_method) && is_array($resource->payment_method)) {
+				$gateway_id = $resource->payment_method['type'];
+
+				switch ($gateway_id) {
+					case substr( $gateway_id, 0, 5 ) === "oney_" :
+						$this->oney_ipn($resource);
+						break;
+					case "bancontact" :
+						$this->bancontact_ipn($resource);
+						break;
+					case "apple_pay" :
+						$this->apple_pay_ipn($resource);
+						break;
+					case "american_express" :
+						$this->amex_ipn($resource);
+						break;
+				}
+
+			} elseif ($gateway_id == "payplug") {
+				$this->payplug_ipn($resource);
 			}
-			/**
-			 * Fires once a payment response has been processed.
-			 *
-			 * @param int $order_id Order ID
-			 * @param PaymentResource $resource Payment resource
-			 */
-			\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
-			PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
-			PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed successfully.', $order_id, $resource->id));
+
+			// Handle successful payments
+			if ($resource->is_paid) {
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
+				if (!$is_payment_with_token) {
+					$this->maybe_save_card($resource);
+				}
+				$this->maybe_save_address_hash($resource);
+				$order->add_order_note(sprintf(__('PayPlug IPN OK | Transaction %s', 'payplug'), wc_clean($resource->id)));
+				$order->payment_complete(wc_clean($resource->id));
+				if (PayplugWoocommerceHelper::is_pre_30()) {
+					$order->reduce_order_stock();
+				}
+				/**
+				 * Fires once a payment response has been processed.
+				 *
+				 * @param int $order_id Order ID
+				 * @param PaymentResource $resource Payment resource
+				 */
+				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
+				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed successfully.', $order_id, $resource->id));
+			}
 		}
 	}
 
