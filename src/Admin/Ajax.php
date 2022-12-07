@@ -143,6 +143,7 @@ class Ajax {
 			wp_send_json_error(
 				array(
 					'message' => __( 'Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug' ),
+					'still_inactive' => true
 				)
 			);
 		}
