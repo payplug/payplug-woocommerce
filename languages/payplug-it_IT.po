@@ -974,3 +974,21 @@ msgstr "Modalità LIVE"
 
 msgid "payplug_section_logged_modal_description"
 msgstr "Si prega di inserire la password del tuo conto PayPlug."
+
+msgid "payplug_inactive_account_warning_title"
+msgstr "Congratulazioni, il tuo account è già connesso!"
+
+msgid "payplug_inactive_account_warning_description1"
+msgstr "Mentre il tuo dossier è in fase di elaborazione, puoi utilizzare la"
+
+msgid "payplug_inactive_account_warning_description2"
+msgstr " <a href='https://support.payplug.com/hc/it/articles/360021142492' target='_blank'>modalità TEST</a> "
+
+msgid "payplug_inactive_account_warning_description3"
+msgstr "per scoprire il nostro modulo. <span id='inactiveModalClick'>Clicca qui</span> per passare alla modalità LIVE e iniziare ad incassare i pagamenti dei tuoi clienti."
+
+msgid "payplug_inactive_account_error_title"
+msgstr "Il tuo dossier è in fase di elaborazione."
+
+msgid "payplug_inactive_account_error_description"
+msgstr "Per ricevere ulteriori informazioni, contattaci al seguente indirizzo e-mail: supporto@payplug.com"

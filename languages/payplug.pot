@@ -794,6 +794,27 @@ msgstr ""
 msgid "payplug_section_logged_modal_description"
 msgstr ""
 
+msgid "payplug_section_logged_modal_description"
+msgstr ""
+
+msgid "payplug_inactive_account_warning_title"
+msgstr ""
+
+msgid "payplug_inactive_account_warning_description1"
+msgstr ""
+
+msgid "payplug_inactive_account_warning_description2"
+msgstr ""
+
+msgid "payplug_inactive_account_warning_description3"
+msgstr ""
+
+msgid "payplug_inactive_account_error_title"
+msgstr ""
+
+msgid "payplug_inactive_account_error_description"
+msgstr ""
+
 
 
 

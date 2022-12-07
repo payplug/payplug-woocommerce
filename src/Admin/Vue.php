@@ -116,7 +116,19 @@ class Vue {
 				"password_label" => __( 'payplug_section_login_password_label', 'payplug' ),
 				"cancel" => __( 'payplug_cancel', 'payplug' ),
 				"ok" => __( 'payplug_ok', 'payplug' ),
-			]
+			],
+			"inactive_account" => [
+				"warning" => [
+					"title" => __( 'payplug_inactive_account_warning_title', 'payplug' ),
+					"description" => __( 'payplug_inactive_account_warning_description1', 'payplug' ) .
+						__( 'payplug_inactive_account_warning_description2', 'payplug' ) .
+						__( 'payplug_inactive_account_warning_description3', 'payplug' ),
+				],
+				"error" => [
+					"title" => __( 'payplug_inactive_account_error_title', 'payplug' ),
+					"description" => __( 'payplug_inactive_account_error_description', 'payplug' ),
+				]
+			],
 		];
 	}
 

@@ -974,3 +974,21 @@ msgstr "Mode LIVE"
 
 msgid "payplug_section_logged_modal_description"
 msgstr "Veuillez saisir le mot de passe de votre compte PayPlug."
+
+msgid "payplug_inactive_account_warning_title"
+msgstr "Félicitations, votre compte est connecté !"
+
+msgid "payplug_inactive_account_warning_description1"
+msgstr "Pendant l'étude de votre dossier, vous pouvez utiliser le"
+
+msgid "payplug_inactive_account_warning_description2"
+msgstr " <a href='https://support.payplug.com/hc/fr/articles/360021142492' target='_blank'>mode TEST</a> "
+
+msgid "payplug_inactive_account_warning_description3"
+msgstr "pour découvrir notre module. <span id='inactiveModalClick'>Cliquez-ici</span> pour passer au mode LIVE et encaisser les paiements de vos clients."
+
+msgid "payplug_inactive_account_error_title"
+msgstr "Votre dossier est en cours de traitement."
+
+msgid "payplug_inactive_account_error_description"
+msgstr "Si vous souhaitez plus d'informations, contactez-nous à l'adresse support@payplug.com"
