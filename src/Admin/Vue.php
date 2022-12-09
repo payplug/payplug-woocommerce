@@ -109,7 +109,7 @@ class Vue {
 					"checked" => !PayplugWoocommerceHelper::check_mode()
 				],
 			],
-			"modal"		   => [
+			"inactive_modal"		   => [
 				"inactive" => $inactive,
 				"title" => __( 'payplug_live_mode', 'payplug' ),
 				"description" => __( 'payplug_section_logged_modal_description', 'payplug' ),
