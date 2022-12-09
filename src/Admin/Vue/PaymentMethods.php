@@ -137,7 +137,7 @@ class PaymentMethods {
 			"title"        => __( 'payplug_section_standard_payment_option_title', 'payplug' ),
 			"descriptions" => [
 				"live"    => [
-					"description_redirected"    => __( 'payplug_section_standard_payment_redirected_description', 'payplug' ),
+					"description_redirect"    => __( 'payplug_section_standard_payment_redirected_description', 'payplug' ),
 					"description_popup"    => __( 'payplug_section_standard_payment_popup_description', 'payplug' ),
 					"link_know_more" => Component::link(
 						__( 'payplug_know_more_label', 'payplug' ),
@@ -145,7 +145,7 @@ class PaymentMethods {
 						"_blank" ),
 				],
 				"sandbox" => [
-					"description_redirected"    => __( 'payplug_section_standard_payment_redirected_description', 'payplug' ),
+					"description_redirect"    => __( 'payplug_section_standard_payment_redirected_description', 'payplug' ),
 					"description_popup"    => __( 'payplug_section_standard_payment_popup_description', 'payplug' ),
 					"link_know_more" => Component::link(
 						__( 'payplug_know_more_label', 'payplug' ),
