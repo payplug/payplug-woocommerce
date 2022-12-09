@@ -350,3 +350,30 @@ msgstr "Your configuration have been saved."
 
 msgid "payplug_embeded_option_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/4409698334098"
+
+msgid "payplug_cancel"
+msgstr "Cancel"
+
+msgid "payplug_live_mode"
+msgstr "LIVE mode"
+
+msgid "payplug_section_logged_modal_description"
+msgstr "Please enter your PayPlug account password."
+
+msgid "payplug_inactive_account_warning_title"
+msgstr "Congratulations, your account is connected!"
+
+msgid "payplug_inactive_account_warning_description1"
+msgstr "While your application is being reviewed, you can use the"
+
+msgid "payplug_inactive_account_warning_description2"
+msgstr " <a href='https://support.payplug.com/hc/en-gb/articles/360021142492' target='_blank'>TEST mode</a> "
+
+msgid "payplug_inactive_account_warning_description3"
+msgstr "to discover our module. <span id='inactiveModalClick'>Click here</span> to switch to LIVE mode and collect payments from your customers."
+
+msgid "payplug_inactive_account_error_title"
+msgstr "Your application is being processed."
+
+msgid "payplug_inactive_account_error_description"
+msgstr "For more information, please contact us at support@payplug.com"

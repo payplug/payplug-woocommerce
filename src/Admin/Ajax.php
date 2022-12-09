@@ -29,14 +29,12 @@ class Ajax {
 	 */
 	private $permissions;
 
-	const REFRESH_KEY_ACTION = 'payplug_refresh_keys';
 	const CHECK_LIVE_PERMISSIONS = 'check_live_permissions';
 	const CHECK_BANCONTACT_PERMISSIONS = 'check_bancontact_permissions';
 	const CHECK_APPLEPAY_PERMISSIONS = 'check_applepay_permissions';
 	const CHECK_AMERICAN_EXPRESS_PERMISSIONS = 'check_american_express_permissions';
 
 	public function __construct() {
-		add_action( 'wp_ajax_' . self::REFRESH_KEY_ACTION, [ $this, 'handle_refresh_keys' ] );
 		add_action( 'wp_ajax_' . self::CHECK_LIVE_PERMISSIONS, [ $this, 'check_live_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_BANCONTACT_PERMISSIONS, [ $this, 'check_bancontact_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_APPLEPAY_PERMISSIONS, [ $this, 'check_applepay_permissions' ] );
@@ -62,6 +60,11 @@ class Ajax {
 			register_rest_route( 'payplug_api', '/logout/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'payplug_logout' ],
+				'permission_callback' => '__return_true'
+			) );
+			register_rest_route( 'payplug_api', '/refresh_keys/', array(
+				'methods' => 'POST',
+				'callback' => [ $this, 'refresh_keys' ],
 				'permission_callback' => '__return_true'
 			) );
 			register_rest_route( 'payplug_api', '/check_requirements/', array(
@@ -93,27 +96,18 @@ class Ajax {
 
 	}
 
-	public function handle_refresh_keys() {
+	public function refresh_keys(WP_REST_Request $request) {
+		$data = $request->get_params();
+		$email    = sanitize_text_field( wp_unslash( $data['payplug_email'] ) );
+		$password = sanitize_text_field( wp_unslash( $data['payplug_password'] ) );
 
-		if ( empty( $_POST['_wpnonce'] ) || empty( $_POST['email'] ) || empty( $_POST['password'] ) ) {
+		if ( empty( $email ) || empty( $password ) ) {
 			wp_send_json_error(
 				array(
 					'message' => __( 'Invalid request.', 'payplug' ),
 				)
 			);
 		}
-
-		$action = sprintf( '%s_%s', wp_unslash( $_POST['email'] ), self::REFRESH_KEY_ACTION );
-		if ( ! check_ajax_referer( $action ) ) {
-			wp_send_json_error(
-				array(
-					'message' => __( 'Invalid nonce.', 'payplug' ),
-				)
-			);
-		}
-
-		$email    = sanitize_text_field( wp_unslash( $_POST['email'] ) );
-		$password = sanitize_text_field( wp_unslash( $_POST['password'] ) );
 
 		if ( ! WC()->payment_gateways() ) {
 			wp_send_json_error(
@@ -149,6 +143,7 @@ class Ajax {
 			wp_send_json_error(
 				array(
 					'message' => __( 'Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug' ),
+					'still_inactive' => true
 				)
 			);
 		}
