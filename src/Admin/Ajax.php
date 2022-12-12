@@ -342,7 +342,9 @@ class Ajax {
 	private function getAccount(){
 		// Checking in Live Mode
 		try{
-			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+			// In case the account is inactive use the test key instead of live key
+			$key = PayplugWoocommerceHelper::get_live_key() ? PayplugWoocommerceHelper::get_live_key() : PayplugWoocommerceHelper::get_test_key();
+			$account = Authentication::getAccount(new Payplug($key));
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
