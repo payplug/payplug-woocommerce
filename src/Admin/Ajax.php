@@ -494,6 +494,8 @@ class Ajax {
 
 			$api_keys = $payplug->retrieve_user_api_keys($email, $password);
 
+			$merchant_id = isset($api_keys['test']) ? $payplug->retrieve_merchant_id($api_keys['test']) : '';
+
 			foreach ($form_fields as $key => $field) {
 				if (in_array($field['type'], ['title', 'login'])) {
 					continue;
@@ -511,6 +513,9 @@ class Ajax {
 						break;
 					case 'payplug_live_key':
 						$val = !empty($api_keys['live']) ? esc_attr($api_keys['live']) : null;
+						break;
+					case 'payplug_merchant_id':
+						$val = esc_attr($merchant_id);
 						break;
 					case 'email':
 						$val = esc_html($email);
