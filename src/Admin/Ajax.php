@@ -46,7 +46,6 @@ class Ajax {
 				'callback' => [ $this, 'payplug_save_data' ],
 				'permission_callback' => '__return_true'
 			) );
-
 			register_rest_route( 'payplug_api', '/init/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'payplug_init' ],
@@ -68,7 +67,7 @@ class Ajax {
 				'permission_callback' => '__return_true'
 			) );
 			register_rest_route( 'payplug_api', '/check_requirements/', array(
-				'methods' => 'GET',
+				'methods' => 'POST',
 				'callback' => [ $this, 'payplug_check_requirements' ],
 				'permission_callback' => '__return_true'
 			) );
