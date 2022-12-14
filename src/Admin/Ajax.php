@@ -332,7 +332,8 @@ class Ajax {
 			$message = __( 'payplug_oney_error_description', 'payplug' ) . $anchor;
 			wp_send_json_error(array(
 				"title" => __( 'payplug_oney_error_title', 'payplug' ),
-				"msg" => $message
+				"msg" => $message,
+				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
 

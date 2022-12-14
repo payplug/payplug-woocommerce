@@ -266,9 +266,9 @@ class Vue {
 			],
 			"options"      => [
 				(new PaymentMethods())->payment_method_standard(),
+				PaymentMethods::payment_method_amex(!empty($options) && $options['american_express'] === 'yes'),
 				PaymentMethods::payment_method_applepay(!empty($options) && $options['apple_pay'] === 'yes'),
-				PaymentMethods::payment_method_bancontact(!empty($options) &&$options['bancontact'] === 'yes'),
-				PaymentMethods::payment_method_amex(!empty($options) && $options['american_express'] === 'yes')
+				PaymentMethods::payment_method_bancontact(!empty($options) &&$options['bancontact'] === 'yes')
 			]
 		];
 
