@@ -45,8 +45,8 @@ msgid "Activate debug mode"
 msgstr "Activer le mode debug"
 
 #: src/Gateway/PayplugGateway.php:357
-msgid "Advanced Settings"
-msgstr "Réglages avancés"
+msgid "payplug_advanced_settings"
+msgstr "Paramétrages avancés"
 
 #: src/Gateway/PayplugGateway.php:377
 #, php-format
@@ -692,12 +692,12 @@ msgid "oney_installments_pop_up"
 msgstr "Pop-up des versements Oney"
 
 msgid "display_the_oney_installments_pop_up_on_the_product_page"
-msgstr "Afficher la pop-up des versements Oney sur la page Produit."
+msgstr "Afficher les échéanciers sur la page Produit"
 
 msgid "payplug_apple_pay_activate_title"
 msgstr "Paiement Apple Pay"
 
-msgid "payplug_apple_pay_testmode_description"
+msgid "payplug_unavailable_testmode_description"
 msgstr "Non disponible en mode test"
 
 msgid "payplug_apple_pay_livemode_description"
@@ -709,23 +709,286 @@ msgstr "Payer avec Apple Pay"
 msgid "payplug_apple_pay_unauthorized_error"
 msgstr "Vous n'avez pas accès à cette fonctionnalité. Pour activer Apple Pay, contactez <a href='mailto:support@payplug.com'>support@payplug.com</a>"
 
-msgid "payplug_amex_title"
-msgstr "Payer avec Amex"
+msgid "payplug_section_logged_title"
+msgstr "Général"
 
-msgid "payplug_amex_activate"
-msgstr "Activer"
+msgid "payplug_section_logged_description"
+msgstr "Configurations générales du module"
 
-msgid "payplug_amex_description"
-msgstr "Permettez à vos clients de payer avec leurs cartes American Express en affichant le bouton de paiement Amex sur le checkout de votre boutique."
+msgid "payplug_section_logged_logout"
+msgstr "Se déconnecter"
 
-msgid "payplug_amex_unauthorized_message"
-msgstr "Vous n'avez pas accès à cette fonctionnalité. Pour activer American Express, rendez-vous sur le formulaire suivant <a href='https://support.payplug.com/hc/fr/requests/new' target='_blank'>Envoyer une demande – Centre d'assistance</a>"
+msgid "payplug_section_logged_mode"
+msgstr "Environnement"
 
-msgid "payplug_bancontact_unauthorized_message"
-msgstr "Vous n'avez pas accès à cette fonctionnalité. Pour activer Bancontact, rendez-vous sur le formulaire suivant <a href='https://support.payplug.com/hc/fr/requests/new' target='_blank'>Envoyer une demande – Centre d'assistance</a>"
+msgid "payplug_section_logged_test_description"
+msgstr "En mode TEST, tous les paiements sont des simulations et ne génèreront pas de transactions réelles."
 
-msgid "payplug_amex_livemode_description"
-msgstr "Permettez à vos clients de payer avec leurs cartes American Express en affichant le bouton de paiement Amex sur le checkout de votre boutique."
+msgid "payplug_section_logged_live_description"
+msgstr "En mode LIVE, vous acceptez des paiements réels."
 
-msgid "payplug_amex_testmode_description"
-msgstr "American Express n’est pas disponible en mode TEST. Pour l’activer, passez votre module PayPlug en mode LIVE."
+msgid "payplug_section_logged_link_access_portal"
+msgstr "Accéder à mon portail PayPlug"
+
+msgid "payplug_section_header_title"
+msgstr "La solution de paiement qui augmente vos ventes."
+
+msgid "payplug_section_header_live_description"
+msgstr "PayPlug, c'est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main."
+
+msgid "payplug_section_header_test_description"
+msgstr "PayPlug, c'est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main."
+
+msgid "payplug_section_header_enable_label"
+msgstr "Module activé"
+
+msgid "payplug_section_header_disable_label"
+msgstr "Module désactivé"
+
+msgid "payplug_section_payment_methods_title"
+msgstr "Moyens de paiement"
+
+msgid "payplug_section_payment_methods_description"
+msgstr "Choisissez les moyens de paiement que vous souhaitez proposer à vos clients."
+
+msgid "payplug_section_standard_payment_title"
+msgstr "Paiement par carte"
+
+msgid "payplug_section_standard_payment_description"
+msgstr "Proposez le paiement par carte bancaire à vos clients. La passerelle de paiement PayPlug ne peut être activée que pour des paiements en euros."
+
+msgid "payplug_section_standard_payment_option_title"
+msgstr "Présentation de la page de paiement"
+
+msgid "payplug_section_standard_payment_redirected_description"
+msgstr "Vos clients seront redirigés vers une page de paiement personnalisable hébergée par PayPlug."
+
+msgid "payplug_section_standard_payment_popup_description"
+msgstr "Vos clients verront apparaître une pop-up de paiement personnalisable sur la page de checkout de votre boutique."
+
+msgid "payplug_section_standard_payment_option_popup_label"
+msgstr "Pop-up"
+
+msgid "payplug_section_standard_payment_option_redirected_label"
+msgstr "Redirigée"
+
+msgid "payplug_section_one_click_option_title"
+msgstr "Activer le paiement en un clic"
+
+msgid "payplug_section_one_click_option_description"
+msgstr "Vos clients pourront enregistrer leur carte et effectuer leurs prochains achats en un clic."
+
+msgid "payplug_section_applepay_payment_title"
+msgstr "Paiement Apple Pay"
+
+msgid "payplug_section_applepay_payment_description"
+msgstr "Afficher le bouton de paiement Apple Pay sur votre boutique"
+
+msgid "payplug_section_bancontact_payment_title"
+msgstr "Paiement Bancontact"
+
+msgid "payplug_know_more_label"
+msgstr "En savoir plus."
+
+msgid "payplug_error_wrong_credentials"
+msgstr "L'e-mail ou le mot de passe saisi est incorrect."
+
+msgid "payplug_section_login_forgot_password"
+msgstr "Mot de passe oublié ?"
+
+msgid "payplug_section_paylater_title"
+msgstr "PayLater"
+
+msgid "payplug_section_paylater_description"
+msgstr "Permettez à vos clients de payer en plusieurs fois."
+
+msgid "payplug_section_oney_title"
+msgstr "Paiements 3x 4x Oney"
+
+msgid "payplug_section_paylater_description_oney"
+msgstr ""
+"Vos clients pourront choisir de payer leurs commandes en 3 ou 4 échéances. Vous pouvez prendre\n"
+" (ou non) l'ensemble des frais à votre charge."
+
+msgid "payplug_label_with_fees"
+msgstr "Avec frais"
+
+msgid "payplug_text_with_fees"
+msgstr "Les frais sont répartis entre vous et vos clients."
+
+msgid "payplug_label_without_fees"
+msgstr "Sans frais"
+
+msgid "payplug_text_without_fees"
+msgstr "Les frais sont à votre charge."
+
+msgid "payplug_thresholds_oney_title"
+msgstr "Personnalisez votre offre de paiement fractionné"
+
+msgid "payplug_thresholds_oney_description"
+msgstr "Proposer le paiement fractionné garanti pour des montants entre"
+
+msgid "and"
+msgstr "et"
+
+msgid "payplug_section_bancontact_payment_description"
+msgstr "Permettez à vos clients de payer avec leurs cartes Bancontact."
+
+msgid "payplug_section_american_express_payment_title"
+msgstr "Paiement AmEx"
+
+msgid "payplug_section_american_express_payment_description"
+msgstr "Permettez à vos clients de payer avec leurs cartes American Express."
+
+msgid "payplug_bancontact_access_error"
+msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Bancontact, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=4583813991452' target='_blank'>ce formulaire</a>"
+
+msgid "payplug_amex_access_error"
+msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer American Express, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=6331992459420' target='_blank'>ce formulaire</a>"
+
+msgid "payplug_applepay_access_error"
+msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Apple Pay, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=5965121371548' target='_blank'>ce formulaire</a>"
+
+msgid "payplug_enable_feature"
+msgstr "Activer une fonctionnalité"
+
+msgid "payplug_ok"
+msgstr "OK"
+
+msgid "payplug_section_login_description"
+msgstr "Connectez-vous à votre compte PayPlug."
+
+msgid "payplug_section_login_email_label"
+msgstr "Adresse E-mail"
+
+msgid "payplug_section_login_password_label"
+msgstr "Mot de passe"
+
+msgid "payplug_section_login_not_registered"
+msgstr "Pas encore de compte PayPlug ?"
+
+msgid "payplug_section_login_connect"
+msgstr "Connexion"
+
+msgid "payplug_section_subscribe_description"
+msgstr "Inscription"
+
+msgid "payplug_section_subscribe_content_description"
+msgstr "Créez votre compte pour pouvoir utiliser le module."
+
+msgid "payplug_section_subscribe_link_create_account"
+msgstr "Inscription PayPlug"
+
+msgid "payplug_section_subscribe_already_have_account"
+msgstr "J'ai déjà un compte PayPlug"
+
+msgid "payplug_learn_more"
+msgstr "En savoir plus"
+
+msgid "payplug_mode_learn_more_url"
+msgstr "https://support.payplug.com/hc/fr/articles/360021142492"
+
+msgid "payplug_section_status_title"
+msgstr "État"
+
+msgid "payplug_section_status_description"
+msgstr "Contrôlez votre environnement pour assurer le fonctionnement optimal du module."
+
+msgid "payplug_section_status_errorMessage"
+msgstr "La configuration requise pour utiliser le module PayPlug n’est pas satisfaite. Une fois les problèmes corrigés, actualisez la page ou cliquez sur vérifier."
+
+msgid "payplug_section_status_check"
+msgstr "Vérifier"
+
+msgid "payplug_section_status_curl"
+msgstr "L'extension PHP cURL est installée et activée."
+
+msgid "payplug_section_status_php"
+msgstr "La version PHP de votre serveur est compatible avec l’extension."
+
+msgid "payplug_section_status_ssl"
+msgstr "OpenSSL est à jour."
+
+msgid "payplug_section_status_account"
+msgstr "Votre compte PayPlug doit être connecté."
+
+msgid "payplug_oney_product_page_description"
+msgstr "Vos clients pourront voir le détail de leurs échéances en 3 ou 4 fois."
+
+msgid "payplug_oney_error_title"
+msgstr "Activer une fonctionnalité"
+
+msgid "payplug_oney_error_description"
+msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Oney, rendez-vous sur "
+
+msgid "payplug_oney_error_link"
+msgstr "votre portail Payplug."
+
+msgid "payplug_applepay_more_url"
+msgstr "https://support.payplug.com/hc/fr/articles/5149384347292-Encaisser-des-paiements-Apple-Pay-avec-PayPlug"
+
+msgid "payplug_bancontact_more_url"
+msgstr "https://support.payplug.com/hc/fr/articles/4408157435794-Encaisser-des-paiements-Bancontact-avec-PayPlug"
+
+msgid "payplug_amex_more_url"
+msgstr "https://support.payplug.com/hc/fr/articles/5701208563996-Encaisser-des-paiements-Amex-avec-PayPlug"
+
+msgid "payplug_section_status_debug_label"
+msgstr "Activer le mode debug"
+
+msgid "payplug_section_status_debug_description"
+msgstr "Le mode debug permet de sauvegarder des informations complémentaires sur votre serveur pour chaque opération effectuée via le module PayPlug (Option pour développeur)."
+
+msgid "payplug_standard_payment_title_title"
+msgstr "Titre"
+
+msgid "payplug_standard_payment_title_description"
+msgstr "Nom de la solution de paiement présenté à vos clients sur la boutique"
+
+msgid "payplug_standard_payment_title_placeholder"
+msgstr "Payer par carte bancaire"
+
+msgid "payplug_standard_payment_description_title"
+msgstr "Description"
+
+msgid "payplug_standard_payment_description_description"
+msgstr "Description de la solution de paiement présentée à vos clients sur la boutique"
+
+msgid "payplug_standard_payment_description_placeholder"
+msgstr "Description"
+
+msgid "payplug_section_status_currency"
+msgstr "Votre boutique utilise l’euro comme monnaie de paiement."
+
+msgid "payplug_save_success_message"
+msgstr "Votre configuration a bien été enregistrée."
+
+msgid "payplug_embeded_option_url"
+msgstr "https://support.payplug.com/hc/fr/articles/4409698334098-Configuration-de-la-page-de-paiement"
+
+msgid "payplug_cancel"
+msgstr "Annuler"
+
+msgid "payplug_live_mode"
+msgstr "Mode LIVE"
+
+msgid "payplug_section_logged_modal_description"
+msgstr "Veuillez saisir le mot de passe de votre compte PayPlug."
+
+msgid "payplug_inactive_account_warning_title"
+msgstr "Félicitations, votre compte est connecté !"
+
+msgid "payplug_inactive_account_warning_description1"
+msgstr "Pendant l'étude de votre dossier, vous pouvez utiliser le"
+
+msgid "payplug_inactive_account_warning_description2"
+msgstr " <a href='https://support.payplug.com/hc/fr/articles/360021142492' target='_blank'>mode TEST</a> "
+
+msgid "payplug_inactive_account_warning_description3"
+msgstr "pour découvrir notre module. <span id='inactiveModalClick'>Cliquez-ici</span> pour passer au mode LIVE et encaisser les paiements de vos clients."
+
+msgid "payplug_inactive_account_error_title"
+msgstr "Votre dossier est en cours de traitement."
+
+msgid "payplug_inactive_account_error_description"
+msgstr "Si vous souhaitez plus d'informations, contactez-nous à l'adresse support@payplug.com"
