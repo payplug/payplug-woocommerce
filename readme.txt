@@ -84,6 +84,8 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 = 2.0.0 =
 * BO redesign
 * Version 1.0.0 of the Payplug VueJS library
+* Tested up to Woocommerce 7.1.0
+* Tested up to Wordpress 6.1.0
 
 = 1.10.1 =
 * Order notes and logs duplication fix
