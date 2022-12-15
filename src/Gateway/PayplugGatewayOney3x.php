@@ -37,11 +37,6 @@ class PayplugGatewayOney3x extends PayplugGateway
         $this->method_description = __('Enable PayPlug Oney 3x for your customers.', 'payplug');
         $this->title              = __('Pay by card in 3x with Oney', 'payplug');
 
-        if (is_admin()) {
-            wp_register_style('payplug-admin-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-admin-oney.css', [], PAYPLUG_GATEWAY_VERSION);
-            wp_enqueue_style('payplug-admin-oney');
-        }
-
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'oney_refund_text']);
 
         if (is_checkout()) {

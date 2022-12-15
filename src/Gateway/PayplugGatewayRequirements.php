@@ -78,7 +78,7 @@ class PayplugGatewayRequirements {
 	 */
 	public function php_requirement() {
 		return array(
-			"status" => $this->valid_curl(),
+			"status" => $this->valid_php(),
 			"text" => __("payplug_section_status_php", "payplug")
 		);
 
@@ -89,7 +89,7 @@ class PayplugGatewayRequirements {
 	 */
 	public function openssl_requirement() {
 		return array(
-			"status" => $this->valid_curl(),
+			"status" => $this->valid_openssl(),
 			"text" => __("payplug_section_status_ssl", "payplug")
 		);
 	}
@@ -99,7 +99,7 @@ class PayplugGatewayRequirements {
 	 */
 	public function currency_requirement() {
 		return array(
-			"status" => $this->valid_curl(),
+			"status" => $this->valid_currency(),
 			"text" => __("payplug_section_status_currency", "payplug")
 		);
 	}
@@ -109,7 +109,7 @@ class PayplugGatewayRequirements {
 	 */
 	public function account_requirement() {
 		return array(
-			"status" => $this->valid_curl(),
+			"status" => $this->valid_account(),
 			"text" => __("payplug_section_status_account", "payplug")
 		);
 	}
