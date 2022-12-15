@@ -377,3 +377,13 @@ msgstr "Your application is being processed."
 
 msgid "payplug_inactive_account_error_description"
 msgstr "For more information, please contact us at support@payplug.com"
+
+msgid "payplug_section_help_description"
+msgstr "Any questions or concerns?\n"
+"Please visit "
+
+msgid "payplug_section_help_link_help_text"
+msgstr "our helpdesk"
+
+msgid "payplug_section_help_link_help_url"
+msgstr "https://support.payplug.com/hc/en-gb/requests/new"
