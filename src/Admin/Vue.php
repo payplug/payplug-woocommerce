@@ -35,7 +35,8 @@ class Vue {
 				"logged"           		=> $logged,
 				"payment_methods"  		=> $this->payplug_section_payment_methods($payplug_wooc_settings),
 				"payment_paylater"  	=> $this->payplug_section_paylater($payplug_wooc_settings),
-				"status" => $this->payplug_section_status($payplug_wooc_settings)
+				"status" => $this->payplug_section_status($payplug_wooc_settings),
+				"help" => $this->payplug_section_help()
 			];
 		}
 
