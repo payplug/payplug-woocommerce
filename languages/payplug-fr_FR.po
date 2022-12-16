@@ -993,9 +993,11 @@ msgstr "Votre dossier est en cours de traitement."
 msgid "payplug_inactive_account_error_description"
 msgstr "Si vous souhaitez plus d'informations, contactez-nous à l'adresse support@payplug.com"
 
-msgid "payplug_section_help_description"
-msgstr "Un problème ? Une question ?\n"
-"Rendez-vous sur notre "
+msgid "payplug_section_help_description1"
+msgstr "Un problème ? Une question ?"
+
+msgid "payplug_section_help_description2"
+msgstr "Rendez-vous sur notre "
 
 msgid "payplug_section_help_link_help_text"
 msgstr "centre d'assistance"

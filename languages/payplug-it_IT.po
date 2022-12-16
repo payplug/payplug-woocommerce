@@ -993,9 +993,11 @@ msgstr "Il tuo dossier è in fase di elaborazione."
 msgid "payplug_inactive_account_error_description"
 msgstr "Per ricevere ulteriori informazioni, contattaci al seguente indirizzo e-mail: supporto@payplug.com"
 
-msgid "payplug_section_help_description"
-msgstr "Un Problema? Una Domanda?\n"
-"Rendez-vous sul nostro"
+msgid "payplug_section_help_description1"
+msgstr "Un Problema? Una Domanda?"
+
+msgid "payplug_section_help_description2"
+msgstr "Rendez-vous sul nostro "
 
 msgid "payplug_section_help_link_help_text"
 msgstr "centro assistenza"

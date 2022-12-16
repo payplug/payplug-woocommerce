@@ -458,7 +458,8 @@ class Vue {
 	public function payplug_section_help( ) {
 
 		$help = [
-			"description" => __("payplug_section_help_description", "payplug"),
+			"description1" => __("payplug_section_help_description1", "payplug"),
+			"description2" => __("payplug_section_help_description2", "payplug"),
 			"link_help" => Component::link(
 				__( 'payplug_section_help_link_help_text', 'payplug' ),
 				__( 'payplug_section_help_link_help_url', 'payplug' ),
