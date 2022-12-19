@@ -1004,3 +1004,6 @@ msgstr "centre d'assistance"
 
 msgid "payplug_section_help_link_help_url"
 msgstr "https://support.payplug.com/hc/fr/requests/new"
+
+msgid "payplug_section_status_check_success"
+msgstr "La vérification a été réalisée avec succès."
