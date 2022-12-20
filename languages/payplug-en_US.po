@@ -389,3 +389,6 @@ msgstr "our helpdesk"
 
 msgid "payplug_section_help_link_help_url"
 msgstr "https://support.payplug.com/hc/en-gb/requests/new"
+
+msgid "payplug_save_changes_text"
+msgstr "Update settings"
