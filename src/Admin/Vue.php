@@ -459,6 +459,7 @@ class Vue {
 	public function payplug_section_help( ) {
 
 		$help = [
+			"save_changes_text" => __("payplug_save_changes_text", "payplug"),
 			"description1" => __("payplug_section_help_description1", "payplug"),
 			"description2" => __("payplug_section_help_description2", "payplug"),
 			"link_help" => Component::link(

@@ -392,3 +392,6 @@ msgstr "https://support.payplug.com/hc/en-gb/requests/new"
 
 msgid "payplug_section_status_check_success"
 msgstr "The verification was successfully completed."
+
+msgid "payplug_save_changes_text"
+msgstr "Update settings"
