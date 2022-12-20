@@ -536,7 +536,7 @@ class Ajax {
 			$user = [
 				"logged" => true,
 				"email" => $email,
-				"mode" => PayplugWoocommerceHelper::check_mode()
+				"mode" => PayplugWoocommerceHelper::check_mode() ? 0 : 1
 			];
 			$wp = [
 				"WP" => [
