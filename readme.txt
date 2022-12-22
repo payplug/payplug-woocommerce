@@ -82,7 +82,7 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 
 == Changelog ==
 = 2.0.1 =
-* Minor fix
+* WooCommerce Save button minor fix
 
 = 2.0.0 =
 * BO redesign
