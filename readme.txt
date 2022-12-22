@@ -81,6 +81,9 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 2.0.1 =
+* Minor fix
+
 = 2.0.0 =
 * BO redesign
 * Version 1.0.0 of the Payplug VueJS library
