@@ -1007,3 +1007,6 @@ msgstr "https://support.payplug.com/hc/fr/requests/new"
 
 msgid "payplug_section_status_check_success"
 msgstr "La vérification a été réalisée avec succès."
+
+msgid "payplug_amex_title"
+msgstr "Payer avec Amex"
