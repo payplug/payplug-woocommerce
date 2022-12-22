@@ -412,11 +412,13 @@ class Vue {
 					"description" => __("payplug_section_status_description", "payplug"),
 					"errorMessage" => __("payplug_section_status_errorMessage", "payplug"),
 					"check" => __("payplug_section_status_check", "payplug"),
+					"check_success" => __("payplug_section_status_check_success", "payplug"),
 				],
 				"sandbox" => [
 					"description" => __("payplug_section_status_description", "payplug"),
 					"errorMessage" => __("payplug_section_status_errorMessage", "payplug"),
 					"check" => __("payplug_section_status_check", "payplug"),
+					"check_success" => __("payplug_section_status_check_success", "payplug"),
 				]
 			],
 			"requirements" => [
