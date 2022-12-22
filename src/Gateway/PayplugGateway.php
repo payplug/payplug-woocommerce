@@ -105,8 +105,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function __construct()
     {
-
-		$GLOBALS['hide_save_button'] = true;
+		if ((!empty($_GET['section'])) && ($_GET['section'] == 'payplug')) {
+			$GLOBALS['hide_save_button'] = true;
+		}
 
         $this->id                 = 'payplug';
         $this->icon               = '';
