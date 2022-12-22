@@ -36,7 +36,8 @@ class Vue {
 				"payment_methods"  		=> $this->payplug_section_payment_methods($payplug_wooc_settings),
 				"payment_paylater"  	=> $this->payplug_section_paylater($payplug_wooc_settings),
 				"status" 				=> $this->payplug_section_status($payplug_wooc_settings),
-				"help" 					=> $this->payplug_section_help()
+				"footer" 				=> $this->payplug_section_footer(),
+				"help" 					=> $this->payplug_section_help(),
 			];
 		}
 
@@ -47,7 +48,8 @@ class Vue {
 			"payment_methods"  => $this->payplug_section_payment_methods(),
 			"payment_paylater"  => $this->payplug_section_paylater(),
 			"status" => $this->payplug_section_status(),
-			"help" => $this->payplug_section_help()
+			"footer" => $this->payplug_section_footer(),
+			"help" => $this->payplug_section_help(),
 		];
 	}
 
@@ -456,10 +458,16 @@ class Vue {
 	/**
 	 * @return array
 	 */
+	public function payplug_section_footer( ) {
+		return ["save_changes_text" => __("payplug_save_changes_text", "payplug")];
+	}
+
+	/**
+	 * @return array
+	 */
 	public function payplug_section_help( ) {
 
 		$help = [
-			"save_changes_text" => __("payplug_save_changes_text", "payplug"),
 			"description1" => __("payplug_section_help_description1", "payplug"),
 			"description2" => __("payplug_section_help_description2", "payplug"),
 			"link_help" => Component::link(

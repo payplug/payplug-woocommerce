@@ -1000,7 +1000,7 @@ msgid "payplug_section_help_description2"
 msgstr "Rendez-vous sur notre "
 
 msgid "payplug_section_help_link_help_text"
-msgstr "centre d'assistance"
+msgstr "centre d'assistance."
 
 msgid "payplug_section_help_link_help_url"
 msgstr "https://support.payplug.com/hc/fr/requests/new"
