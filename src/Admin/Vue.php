@@ -459,8 +459,10 @@ class Vue {
 	public function payplug_section_footer( ) {
 		return [
 			"save_changes_text" => __("payplug_save_changes_text", "payplug"),
-			"description1" => __("payplug_section_help_description1", "payplug"),
-			"description2" => __("payplug_section_help_description2", "payplug"),
+			"description" => [
+				__("payplug_section_help_description1", "payplug"),
+				__("payplug_section_help_description2", "payplug")
+			],
 			"link_help" => Component::link(
 				__( 'payplug_section_help_link_help_text', 'payplug' ),
 				__( 'payplug_section_help_link_help_url', 'payplug' ),
