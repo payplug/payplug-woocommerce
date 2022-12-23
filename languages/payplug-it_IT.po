@@ -1000,7 +1000,7 @@ msgid "payplug_section_help_description2"
 msgstr "Rendez-vous sul nostro "
 
 msgid "payplug_section_help_link_help_text"
-msgstr "centro assistenza"
+msgstr "centro assistenza."
 
 msgid "payplug_section_help_link_help_url"
 msgstr "https://support.payplug.com/hc/it/requests/new"
@@ -1010,3 +1010,6 @@ msgstr "La verifica è stata effettuata con successo."
 
 msgid "payplug_amex_title"
 msgstr "Paga con Amex"
+
+msgid "payplug_save_changes_text"
+msgstr "Aggiorna le impostazioni"
