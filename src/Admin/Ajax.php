@@ -589,7 +589,10 @@ class Ajax {
 
 		if (PayplugWoocommerceHelper::payplug_logout($payplug)) {
 			http_response_code(200);
-			return wp_send_json_success(__('Successfully logged out.', 'payplug'));
+			return wp_send_json_success(array(
+				"message" => __('Successfully logged out.', 'payplug'),
+				"status" => ( new Vue )->payplug_section_status() // When Logging out the Status Block needs to be updated
+			));
 		} else {
 			http_response_code(400);
 			return wp_send_json_error(__('Already logged out.', 'payplug'));
