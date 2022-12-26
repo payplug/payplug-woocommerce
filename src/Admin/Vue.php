@@ -99,17 +99,17 @@ class Vue {
 			],
 			"options"      => [
 				[
-					"name"     => "payplug_sandbox",
-					"label"    => "Live",
-					"value"    => 0, //live
-					"checked" => PayplugWoocommerceHelper::check_mode()
-				],
-				[
 					"name"    => "payplug_sandbox",
 					"label"   => "Test",
 					"value"   => 1, //test
 					"checked" => !PayplugWoocommerceHelper::check_mode()
 				],
+				[
+					"name"     => "payplug_sandbox",
+					"label"    => "Live",
+					"value"    => 0, //live
+					"checked" => PayplugWoocommerceHelper::check_mode()
+				]
 			],
 			"inactive_modal"		   => [
 				"inactive" => $inactive,
