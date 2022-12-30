@@ -41,6 +41,111 @@ class PaymentMethods {
 				$this->description_field(),
 				$this->embeded_option($redirect),
 				$this->one_click_option(),
+			],
+			"advanced_settings"  => [
+				"title" => "Advanced configuration",
+				"options" => [
+					[
+						"title" => "Activate non-guaranteed fractional payments",
+						"class" => "-installment",
+						"switch_enable" => [
+							"name" => "payplug_inst",
+							"checked" => false
+						],
+						"installements_descriptions" => [
+							[
+								"text" => "You can view all your payment deadlines (past and future) in this ",
+								"links" => [
+									[
+										"text" => "dedicated menu. ",
+										"url" => "#some_url",
+										"target" => "_blank"
+									],
+									[
+										"text" => "Find out more.",
+										"url" => "#some_url",
+										"target" => "_blank"
+									]
+								]
+							]
+						],
+						"installements" => [
+							"description" => "Offer your customers the option to pay for their orders in",
+							"text_from" => "from",
+							"options_installment_name" => "payplug_inst_mode",
+							"options_installment_disabled" => true,
+							"options_installment" => [
+								[
+									"value" => 2,
+									"label" => "2 instalments",
+									"checked" => true
+								],
+								[
+									"value" => 3,
+									"label" => "3 instalments",
+									"checked" => false
+								],
+								[
+									"value" => 4,
+									"label" => "4 instalments",
+									"checked" => false
+								]
+							],
+							"input_amount" => [
+								"name" => "payplug_inst_min_amount",
+								"value" => 150,
+								"min" => 4,
+								"step" => 1,
+								"max" => 20000
+							],
+							"input_amount_error" => "Amount must be greater than 4€ and lower than 20000€."
+						],
+						"notes" => [
+							"type" => "-warning",
+							"description" => "Please note => this type of payment is not guaranteed.<br/\\>If a default affects one of the future instalments, this amount will be lost."
+						]
+					],
+					[
+						"title" => "Defer the payment",
+						"class" => "-deferred",
+						"switch_enable" => [
+							"name" => "payplug_deferred",
+							"checked" => false
+						],
+						"deferred_descriptions" => [
+							[
+								"text" => "You have a maximum of 7 days to capture the payment (from the date of authorisation).",
+								"links" => [
+									[
+										"text" => "Find out more.",
+										"url" => "https =>//support.payplug.com/hc/en-gb/articles/360010088420",
+										"target" => "_blank"
+									]
+								]
+							]
+						],
+						"deferred_description" => "How do you want to trigger the payment capture?",
+						"capture_disabled" => true,
+						"capture_name" => "payplug_deferred_state",
+						"capture" => [
+							[
+								"value" => "1",
+								"label" => "Manual capture",
+								"checked" => true
+							],
+							[
+								"value" => "2",
+								"label" => "Automatic capture at status => Awaiting check payment",
+								"checked" => false
+							],
+							[
+								"value" => "3",
+								"label" => "Automatic capture at status => Payment accepted",
+								"checked" => false
+							]
+						]
+					]
+				]
 			]
 		];
 	}
