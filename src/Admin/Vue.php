@@ -337,12 +337,39 @@ class Vue {
 				],
 				"advanced_options" => [
 					$this->thresholds_option($max, $min),
-					$this->show_oney_popup_product($product_page)
+					$this->show_oney_popup_checkout(true),
+					$this->show_oney_popup_product($product_page),
+					$this->show_oney_popup_cart($product_page)
 				]
 			]
 		];
 
 		return $section;
+	}
+
+	public function show_oney_popup_checkout($active = false) {
+		return [
+			"name" => "payplug_oney_optimized",
+			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.jpg' ),
+			"title" => "Show payment schedule on the checkout page",
+			"descriptions" => [[
+				"description" => "Your customers can choose to pay for their orders in 3 or 4 instalments. Choose whether or not you want to pay all the fees.",
+				"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), "https://support.payplug.com/hc/en-gb/articles/360013071080#h_2595dd3d-a281-43ab-a51a-4986fecde5ee", "_blank")
+			]],
+			"switch" => true,
+			"checked" => $active
+		];
+	}
+
+	public function show_oney_popup_cart($active = false) {
+		return [
+			"name" => "oney_product_animation",
+			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/payplug-cartOneyCta.jpg' ),
+			"title" => "Display the Oney logo on the shopping cart page",
+			"descriptions" => [],
+			"switch" => true,
+			"checked" => $active
+		];
 	}
 
 	/**
@@ -385,12 +412,9 @@ class Vue {
 	public function show_oney_popup_product($active = false) {
 		return [
 			"name" => "oney_product_animation",
-			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.jpg' ),
-			"title" => __( 'display_the_oney_installments_pop_up_on_the_product_page', 'payplug' ),
-			"descriptions" => [[
-				"description" => __( 'payplug_oney_product_page_description', 'payplug' ),
-				"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), "https://support.payplug.com/hc/fr/articles/4408142346002", "_blank")
-				]],
+			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/payplug-productOneyCta.jpg' ),
+			"title" => "Display the Oney logo on the product page",
+			"descriptions" => [],
 			"switch" => true,
 			"checked" => $active
 		];
