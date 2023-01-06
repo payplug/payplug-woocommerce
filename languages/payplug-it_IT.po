@@ -784,7 +784,7 @@ msgid "payplug_section_applepay_payment_title"
 msgstr "Pagamento Apple Pay"
 
 msgid "payplug_section_applepay_payment_description"
-msgstr "Visualizza il pulsante di pagamento Apple Pay sul tuo negozio"
+msgstr "Visualizza il pulsante di pagamento Apple Pay sul tuo negozio."
 
 msgid "payplug_section_bancontact_payment_title"
 msgstr "Pagamento Bancontact"
@@ -943,7 +943,7 @@ msgid "payplug_standard_payment_title_title"
 msgstr "Titolo"
 
 msgid "payplug_standard_payment_title_description"
-msgstr "Il nome della soluzione di pagamento che vedranno i tuoi clienti durante il checkout"
+msgstr "Il nome della soluzione di pagamento che vedranno i tuoi clienti durante il checkout."
 
 msgid "payplug_standard_payment_title_placeholder"
 msgstr "Pagamento con carta di credito"
@@ -952,7 +952,7 @@ msgid "payplug_standard_payment_description_title"
 msgstr "Descrizione"
 
 msgid "payplug_standard_payment_description_description"
-msgstr "La descrizione della soluzione di pagamento che vedranno i tuoi clienti durante il checkout"
+msgstr "La descrizione della soluzione di pagamento che vedranno i tuoi clienti durante il checkout."
 
 msgid "payplug_standard_payment_description_placeholder"
 msgstr "Descrizione"
