@@ -782,7 +782,7 @@ msgid "payplug_section_applepay_payment_title"
 msgstr "Paiement Apple Pay"
 
 msgid "payplug_section_applepay_payment_description"
-msgstr "Afficher le bouton de paiement Apple Pay sur votre boutique"
+msgstr "Afficher le bouton de paiement Apple Pay sur votre boutique."
 
 msgid "payplug_section_bancontact_payment_title"
 msgstr "Paiement Bancontact"
@@ -943,7 +943,7 @@ msgid "payplug_standard_payment_title_title"
 msgstr "Titre"
 
 msgid "payplug_standard_payment_title_description"
-msgstr "Nom de la solution de paiement présenté à vos clients sur la boutique"
+msgstr "Nom de la solution de paiement présenté à vos clients sur la boutique."
 
 msgid "payplug_standard_payment_title_placeholder"
 msgstr "Payer par carte bancaire"
@@ -952,7 +952,7 @@ msgid "payplug_standard_payment_description_title"
 msgstr "Description"
 
 msgid "payplug_standard_payment_description_description"
-msgstr "Description de la solution de paiement présentée à vos clients sur la boutique"
+msgstr "Description de la solution de paiement présentée à vos clients sur la boutique."
 
 msgid "payplug_standard_payment_description_placeholder"
 msgstr "Description"
