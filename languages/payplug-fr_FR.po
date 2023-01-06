@@ -800,7 +800,7 @@ msgid "payplug_section_paylater_title"
 msgstr "PayLater"
 
 msgid "payplug_section_paylater_description"
-msgstr "Permettez à vos clients de payer en plusieurs fois."
+msgstr "Sélectionnez vos préférences de paramétrage du PayLater pour afficher le 3x 4x Oney sur votre boutique."
 
 msgid "payplug_section_oney_title"
 msgstr "Paiements 3x 4x Oney"
