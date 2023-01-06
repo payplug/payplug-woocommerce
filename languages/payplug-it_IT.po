@@ -802,7 +802,7 @@ msgid "payplug_section_paylater_title"
 msgstr "PayLater"
 
 msgid "payplug_section_paylater_description"
-msgstr "Offri ai tuoi clienti la possibilità di pagare a rate."
+msgstr "Seleziona le impostazioni del PayLater per visualizzare il 3x 4x Oney sul tuo negozio."
 
 msgid "payplug_section_oney_title"
 msgstr "Pagamenti rateali 3x 4x Oney"
