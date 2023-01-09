@@ -477,7 +477,7 @@ class Ajax {
 
 		$data = $request->get_params();
 		$email = sanitize_email($data['payplug_email']);
-		$password = wp_unslash($data['payplug_password']);
+		$password = base64_decode(wp_unslash($data['payplug_password']));
 		$wp_nonce = $data['_wpnonce'];
 
 
