@@ -189,7 +189,7 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_applepay_more_url', 'payplug' ), "_blank"),
 				],
 				"sandbox" => [
-					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
+					"description"      => __( 'payplug_applepay_unavailable_testmode_description', 'payplug' ),
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_applepay_more_url', 'payplug' ), "_blank"),
 				]
 			],
@@ -215,7 +215,7 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_bancontact_more_url', 'payplug' ), "_blank"),
 				],
 				"sandbox" => [
-					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
+					"description"      => __( 'payplug_bancontact_unavailable_testmode_description', 'payplug' ),
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_bancontact_more_url', 'payplug' ), "_blank"),
 				]
 			],
@@ -241,7 +241,7 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_amex_more_url', 'payplug' ), "_blank"),
 				],
 				"sandbox" => [
-					"description"      => __( 'payplug_unavailable_testmode_description', 'payplug' ),
+					"description"      => __( 'payplug_amex_unavailable_testmode_description', 'payplug' ),
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_amex_more_url', 'payplug' ), "_blank"),
 				]
 			],
