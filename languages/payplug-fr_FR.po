@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -699,6 +699,15 @@ msgstr "Paiement Apple Pay"
 
 msgid "payplug_unavailable_testmode_description"
 msgstr "Non disponible en mode test"
+
+msgid "payplug_applepay_unavailable_testmode_description"
+msgstr "Apple Pay n’est pas disponible en mode TEST. Pour l’activer, passez votre module PayPlug en mode LIVE."
+
+msgid "payplug_bancontact_unavailable_testmode_description"
+msgstr "Bancontact n’est pas disponible en mode TEST. Pour l’activer, passez votre module PayPlug en mode LIVE."
+
+msgid "payplug_amex_unavailable_testmode_description"
+msgstr "American Express n’est pas disponible en mode TEST. Pour l’activer, passez votre module PayPlug en mode LIVE."
 
 msgid "payplug_apple_pay_livemode_description"
 msgstr "Afficher le bouton de paiement Apple Pay sur votre boutique, sur le checkout. Le bouton ne sera visible que depuis un navigateur Safari."
