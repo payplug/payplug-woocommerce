@@ -255,6 +255,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			return;
 		}
 
+		// Prevent the hook "the_post" from being called multiple times
+		if (did_action("the_post") >= 2)
+			return;
+
         $this->response->process_payment($payment);
     }
 
