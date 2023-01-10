@@ -96,10 +96,6 @@ class Ajax {
 
 	}
 
-	public function admin_loggedin() {
-		return ;
-	}
-
 	public function refresh_keys(WP_REST_Request $request) {
 		$data = $request->get_params();
 		$email    = sanitize_text_field( wp_unslash( $data['payplug_email'] ) );
