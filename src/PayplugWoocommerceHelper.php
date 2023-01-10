@@ -485,12 +485,13 @@ class PayplugWoocommerceHelper {
 			$account['oneyEnabled'] = (isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
 			$account['bancontact'] = !empty($options['bancontact']) ? $options['bancontact'] : '';
 			$account['american_express'] = !empty($options['american_express']) ? $options['american_express'] : '';
+			$apple_pay_enabled = !empty($options['apple_pay']) ? $options['apple_pay'] : '';
 
 			if( !isset($account['payment_methods']['apple_pay']) )
 				$account['payment_methods']['apple_pay'] = [ 'enabled' => false ];
 
 			if ($account['payment_methods']['apple_pay']['enabled']) {
-				if (in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
+				if ($apple_pay_enabled == "yes" && in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
 					$account['apple_pay'] = "yes";
 				} else {
 					$account['apple_pay'] = "no";
