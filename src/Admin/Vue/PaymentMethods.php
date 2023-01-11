@@ -46,15 +46,18 @@ class PaymentMethods {
 				"title" => "Advanced configuration",
 				"options" => [
 					[
+						"name" => "fractional",
 						"title" => "Activate non-guaranteed fractional payments",
 						"class" => "-installment",
-						"switch_enable" => [
+						"enabled" => [
 							"name" => "payplug_inst",
 							"checked" => false
 						],
-						"installements_descriptions" => [
-							[
-								"text" => "You can view all your payment deadlines (past and future) in this ",
+						"descriptions" => [
+							"live"    => [
+								"description_1" => "Offer your customers the option to pay for their orders in",
+								"text_from" => "from",
+								"description_2" => "You can view all your payment deadlines (past and future) in this ",
 								"links" => [
 									[
 										"text" => "dedicated menu. ",
@@ -66,39 +69,67 @@ class PaymentMethods {
 										"url" => "#some_url",
 										"target" => "_blank"
 									]
+								],
+								"notes" => [
+									"type" => "-warning",
+									"description" => "Please note => this type of payment is not guaranteed.<br/\\>If a default affects one of the future instalments, this amount will be lost."
+								]
+							],
+							"sandbox"    => [
+								"description_1" => "Offer your customers the option to pay for their orders in",
+								"text_from" => "from",
+								"description_2" => "You can view all your payment deadlines (past and future) in this ",
+								"links" => [
+									[
+										"text" => "dedicated menu. ",
+										"url" => "#some_url",
+										"target" => "_blank"
+									],
+									[
+										"text" => "Find out more.",
+										"url" => "#some_url",
+										"target" => "_blank"
+									]
+								],
+								"notes" => [
+									"type" => "-warning",
+									"description" => "Please note => this type of payment is not guaranteed.<br/\\>If a default affects one of the future instalments, this amount will be lost."
 								]
 							]
 						],
-						"installements" => [
-							"description" => "Offer your customers the option to pay for their orders in",
-							"text_from" => "from",
-							"options_installment_name" => "payplug_inst_mode",
-							"options_installment_disabled" => true,
-							"options_installment" => [
-								[
-									"value" => 2,
-									"label" => "2 instalments",
-									"checked" => true
+						"options" => [
+							[
+								"name" => "payplug_inst_mode",
+								"type" => "select",
+								"disabled" => true,
+								"options" => [
+									[
+										"value" => 2,
+										"label" => "2 instalments",
+										"checked" => true
+									],
+									[
+										"value" => 3,
+										"label" => "3 instalments",
+										"checked" => false
+									],
+									[
+										"value" => 4,
+										"label" => "4 instalments",
+										"checked" => false
+									]
 								],
-								[
-									"value" => 3,
-									"label" => "3 instalments",
-									"checked" => false
-								],
-								[
-									"value" => 4,
-									"label" => "4 instalments",
-									"checked" => false
-								]
 							],
-							"input_amount" => [
+							[
+								"type" => "input",
 								"name" => "payplug_inst_min_amount",
+								"disabled" => true,
 								"value" => 150,
 								"min" => 4,
 								"step" => 1,
-								"max" => 20000
-							],
-							"input_amount_error" => "Amount must be greater than 4€ and lower than 20000€."
+								"max" => 20000,
+								"out_of_bound_msg" => "Amount must be greater than 4€ and lower than 20000€."
+							]
 						],
 						"notes" => [
 							"type" => "-warning",
@@ -106,15 +137,28 @@ class PaymentMethods {
 						]
 					],
 					[
+						"name" => "deferred",
 						"title" => "Defer the payment",
 						"class" => "-deferred",
-						"switch_enable" => [
+						"enabled" => [
 							"name" => "payplug_deferred",
 							"checked" => false
 						],
-						"deferred_descriptions" => [
-							[
-								"text" => "You have a maximum of 7 days to capture the payment (from the date of authorisation).",
+						"descriptions" => [
+							"live"    => [
+								"description_1" => "You have a maximum of 7 days to capture the payment (from the date of authorisation).",
+								"description_2" => "How do you want to trigger the payment capture?",
+								"links" => [
+									[
+										"text" => "Find out more.",
+										"url" => "https =>//support.payplug.com/hc/en-gb/articles/360010088420",
+										"target" => "_blank"
+									]
+								]
+							],
+							"sandbox" => [
+								"description_1" => "You have a maximum of 7 days to capture the payment (from the date of authorisation).",
+								"description_2" => "How do you want to trigger the payment capture?",
 								"links" => [
 									[
 										"text" => "Find out more.",
@@ -124,24 +168,50 @@ class PaymentMethods {
 								]
 							]
 						],
-						"deferred_description" => "How do you want to trigger the payment capture?",
-						"capture_disabled" => true,
-						"capture_name" => "payplug_deferred_state",
-						"capture" => [
-							[
-								"value" => "1",
-								"label" => "Manual capture",
-								"checked" => true
-							],
-							[
-								"value" => "2",
-								"label" => "Automatic capture at status => Awaiting check payment",
-								"checked" => false
-							],
-							[
-								"value" => "3",
-								"label" => "Automatic capture at status => Payment accepted",
-								"checked" => false
+						"options" => [
+							"disabled" => true,
+							"name" => "payplug_deferred_state",
+							"type" => "select",
+							"options" => [
+								[
+									"value" => "1",
+									"label" => "Manual capture",
+									"checked" => true
+								],
+								[
+									"value" => "2",
+									"label" => "Automatic capture at status: Awaiting check payment",
+									"checked" => false
+								],
+								[
+									"value" => "3",
+									"label" => "Automatic capture at status => Payment accepted",
+									"checked" => false
+								],
+								[
+									"value" => "Processing",
+									"label" => "Automatic capture at status: Processing in progress",
+									"checked" => false,
+									"warning_msg" => "Please note: Delayed orders that are currently in 'Processing' status will need to be captured manually."
+								],
+								[
+									"value" => "Shipped",
+									"label" => "Automatic capture at status: Shipped",
+									"checked" => false,
+									"warning_msg" => "Please note: Delayed orders that are currently in 'Shipped' status will need to be captured manually."
+								],
+								[
+									"value" => "Delivered",
+									"label" => "Automatic capture at status: Delivered",
+									"checked" => false,
+									"warning_msg" => "Please note: Delayed orders that are currently in 'Delivered' status will need to be captured manually."
+								],
+								[
+									"value" => "Canceled",
+									"label" => "Automatic capture at status: Canceled",
+									"checked" => false,
+									"warning_msg" => "Please note: Delayed orders that are currently in 'Canceled' status will need to be captured manually."
+								]
 							]
 						]
 					]
