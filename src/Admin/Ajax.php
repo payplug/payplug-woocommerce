@@ -45,52 +45,62 @@ class Ajax {
 			register_rest_route( 'payplug_api', '/save/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'payplug_save_data' ],
-				'permission_callback' => function () use ($permission)  {return $permission ;}
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/init/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'payplug_init' ],
-				'permission_callback' => function () use ($permission)  {return $permission ;}
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/login/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'payplug_login' ],
-				'permission_callback' => function () use ($permission)  {return $permission ;}
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/logout/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'payplug_logout' ],
-				'permission_callback' => function () use ($permission)  {return $permission ;}
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/refresh_keys/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'refresh_keys' ],
-				'permission_callback' => function () use ($permission)  {return $permission ;}
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/check_requirements/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'payplug_check_requirements' ],
-				'permission_callback' => function () use ($permission)  {return $permission ;}
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/bancontact_permissions/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'api_check_bancontact_permissions' ],
-				'permission_callback' => function () use ($permission)  {return $permission ;}
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/applepay_permissions/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'api_check_applepay_permissions' ],
-				'permission_callback' => function () use ($permission)  {return $permission ;}
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/american_express_permissions/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'api_check_american_express_permissions' ],
-				'permission_callback' => function () use ($permission)  {return $permission ;}
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/oney_permissions/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'api_check_oney_permissions' ],
-				'permission_callback' => function () use ($permission)  {return $permission ;}
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 		});
 
