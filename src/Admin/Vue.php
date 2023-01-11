@@ -27,6 +27,9 @@ class Vue {
 			$logged = $this->payplug_section_logged();
 			$payplug_wooc_settings = get_option( 'woocommerce_payplug_settings', [] );
 			unset($payplug_wooc_settings["payplug_live_key"]);
+			unset($payplug_wooc_settings["payplug_test_key"]);
+			unset($payplug_wooc_settings["payplug_password"]);
+			unset($payplug_wooc_settings["payplug_merchant_id"]);
 
 			return [
 				"payplug_wooc_settings" => $payplug_wooc_settings,
@@ -35,7 +38,8 @@ class Vue {
 				"logged"           		=> $logged,
 				"payment_methods"  		=> $this->payplug_section_payment_methods($payplug_wooc_settings),
 				"payment_paylater"  	=> $this->payplug_section_paylater($payplug_wooc_settings),
-				"status" => $this->payplug_section_status($payplug_wooc_settings)
+				"status" 				=> $this->payplug_section_status($payplug_wooc_settings),
+				"footer" 				=> $this->payplug_section_footer(),
 			];
 		}
 
@@ -45,7 +49,8 @@ class Vue {
 			"subscribe" => $this->payplug_section_subscribe(),
 			"payment_methods"  => $this->payplug_section_payment_methods(),
 			"payment_paylater"  => $this->payplug_section_paylater(),
-			"status" => $this->payplug_section_status()
+			"status" => $this->payplug_section_status(),
+			"footer" => $this->payplug_section_footer(),
 		];
 	}
 
@@ -97,17 +102,17 @@ class Vue {
 			],
 			"options"      => [
 				[
-					"name"     => "payplug_sandbox",
-					"label"    => "Live",
-					"value"    => 0, //live
-					"checked" => PayplugWoocommerceHelper::check_mode()
-				],
-				[
 					"name"    => "payplug_sandbox",
 					"label"   => "Test",
 					"value"   => 1, //test
 					"checked" => !PayplugWoocommerceHelper::check_mode()
 				],
+				[
+					"name"     => "payplug_sandbox",
+					"label"    => "Live",
+					"value"    => 0, //live
+					"checked" => PayplugWoocommerceHelper::check_mode()
+				]
 			],
 			"inactive_modal"		   => [
 				"inactive" => $inactive,
@@ -410,11 +415,13 @@ class Vue {
 					"description" => __("payplug_section_status_description", "payplug"),
 					"errorMessage" => __("payplug_section_status_errorMessage", "payplug"),
 					"check" => __("payplug_section_status_check", "payplug"),
+					"check_success" => __("payplug_section_status_check_success", "payplug"),
 				],
 				"sandbox" => [
 					"description" => __("payplug_section_status_description", "payplug"),
 					"errorMessage" => __("payplug_section_status_errorMessage", "payplug"),
 					"check" => __("payplug_section_status_check", "payplug"),
+					"check_success" => __("payplug_section_status_check_success", "payplug"),
 				]
 			],
 			"requirements" => [
@@ -447,6 +454,24 @@ class Vue {
 	private function payplug_requirements() {
 		$payplug_requirements = new PayplugGatewayRequirements(new PayplugGateway());
 		return $payplug_requirements->satisfy_requirements();
+	}
+
+	/**
+	 * @return array
+	 */
+	public function payplug_section_footer( ) {
+		return [
+			"save_changes_text" => __("payplug_save_changes_text", "payplug"),
+			"description" => [
+				__("payplug_section_help_description1", "payplug"),
+				__("payplug_section_help_description2", "payplug")
+			],
+			"link_help" => Component::link(
+				__( 'payplug_section_help_link_help_text', 'payplug' ),
+				__( 'payplug_section_help_link_help_url', 'payplug' ),
+				"_blank"
+			),
+		];
 	}
 
 }
