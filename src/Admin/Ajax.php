@@ -109,7 +109,7 @@ class Ajax {
 	public function refresh_keys(WP_REST_Request $request) {
 		$data = $request->get_params();
 		$email    = sanitize_text_field( wp_unslash( $data['payplug_email'] ) );
-		$password = sanitize_text_field( wp_unslash( $data['payplug_password'] ) );
+		$password = base64_decode(wp_unslash($data['payplug_password']));
 
 		if ( empty( $email ) || empty( $password ) ) {
 			wp_send_json_error(
