@@ -27,6 +27,9 @@ class Vue {
 			$logged = $this->payplug_section_logged();
 			$payplug_wooc_settings = get_option( 'woocommerce_payplug_settings', [] );
 			unset($payplug_wooc_settings["payplug_live_key"]);
+			unset($payplug_wooc_settings["payplug_test_key"]);
+			unset($payplug_wooc_settings["payplug_password"]);
+			unset($payplug_wooc_settings["payplug_merchant_id"]);
 
 			return [
 				"payplug_wooc_settings" => $payplug_wooc_settings,
