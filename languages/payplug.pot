@@ -815,6 +815,20 @@ msgstr ""
 msgid "payplug_inactive_account_error_description"
 msgstr ""
 
+msgid "payplug_section_help_description1"
+msgstr ""
+
+msgid "payplug_section_help_description2"
+msgstr ""
+
+msgid "payplug_section_help_link_help_text"
+msgstr ""
+
+msgid "payplug_section_help_link_help_url"
+msgstr ""
+
+msgid "payplug_save_changes_text"
+msgstr ""
 
 
 

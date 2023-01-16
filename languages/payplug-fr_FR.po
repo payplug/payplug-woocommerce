@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -700,6 +700,15 @@ msgstr "Paiement Apple Pay"
 msgid "payplug_unavailable_testmode_description"
 msgstr "Non disponible en mode test"
 
+msgid "payplug_applepay_unavailable_testmode_description"
+msgstr "Apple Pay n’est pas disponible en mode TEST. Pour l’activer, passez votre module PayPlug en mode LIVE."
+
+msgid "payplug_bancontact_unavailable_testmode_description"
+msgstr "Bancontact n’est pas disponible en mode TEST. Pour l’activer, passez votre module PayPlug en mode LIVE."
+
+msgid "payplug_amex_unavailable_testmode_description"
+msgstr "American Express n’est pas disponible en mode TEST. Pour l’activer, passez votre module PayPlug en mode LIVE."
+
 msgid "payplug_apple_pay_livemode_description"
 msgstr "Afficher le bouton de paiement Apple Pay sur votre boutique, sur le checkout. Le bouton ne sera visible que depuis un navigateur Safari."
 
@@ -782,7 +791,7 @@ msgid "payplug_section_applepay_payment_title"
 msgstr "Paiement Apple Pay"
 
 msgid "payplug_section_applepay_payment_description"
-msgstr "Afficher le bouton de paiement Apple Pay sur votre boutique"
+msgstr "Afficher le bouton de paiement Apple Pay sur votre boutique."
 
 msgid "payplug_section_bancontact_payment_title"
 msgstr "Paiement Bancontact"
@@ -800,7 +809,7 @@ msgid "payplug_section_paylater_title"
 msgstr "PayLater"
 
 msgid "payplug_section_paylater_description"
-msgstr "Permettez à vos clients de payer en plusieurs fois."
+msgstr "Sélectionnez vos préférences de paramétrage du PayLater pour afficher le 3x 4x Oney sur votre boutique."
 
 msgid "payplug_section_oney_title"
 msgstr "Paiements 3x 4x Oney"
@@ -943,7 +952,7 @@ msgid "payplug_standard_payment_title_title"
 msgstr "Titre"
 
 msgid "payplug_standard_payment_title_description"
-msgstr "Nom de la solution de paiement présenté à vos clients sur la boutique"
+msgstr "Nom de la solution de paiement présenté à vos clients sur la boutique."
 
 msgid "payplug_standard_payment_title_placeholder"
 msgstr "Payer par carte bancaire"
@@ -952,7 +961,7 @@ msgid "payplug_standard_payment_description_title"
 msgstr "Description"
 
 msgid "payplug_standard_payment_description_description"
-msgstr "Description de la solution de paiement présentée à vos clients sur la boutique"
+msgstr "Description de la solution de paiement présentée à vos clients sur la boutique."
 
 msgid "payplug_standard_payment_description_placeholder"
 msgstr "Description"
@@ -992,3 +1001,24 @@ msgstr "Votre dossier est en cours de traitement."
 
 msgid "payplug_inactive_account_error_description"
 msgstr "Si vous souhaitez plus d'informations, contactez-nous à l'adresse support@payplug.com"
+
+msgid "payplug_section_help_description1"
+msgstr "Un problème ? Une question ?"
+
+msgid "payplug_section_help_description2"
+msgstr "Rendez-vous sur notre "
+
+msgid "payplug_section_help_link_help_text"
+msgstr "centre d'assistance."
+
+msgid "payplug_section_help_link_help_url"
+msgstr "https://support.payplug.com/hc/fr/requests/new"
+
+msgid "payplug_section_status_check_success"
+msgstr "La vérification a été réalisée avec succès."
+
+msgid "payplug_amex_title"
+msgstr "Payer avec Amex"
+
+msgid "payplug_save_changes_text"
+msgstr "Mettre à jour les paramètres"

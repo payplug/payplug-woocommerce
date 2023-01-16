@@ -5,14 +5,14 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2022-12-06 11:36+0000\n"
+"PO-Revision-Date: 2023-01-09 09:33+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "payplug_advanced_settings"
 msgstr "Advanced Settings"
@@ -83,6 +83,15 @@ msgstr "Apple Pay payments"
 
 msgid "payplug_unavailable_testmode_description"
 msgstr "Unavailable in test mode"
+
+msgid "payplug_applepay_unavailable_testmode_description"
+msgstr "Apple Pay is unavailable in TEST mode. Please switch your PayPlug module to LIVE mode to activate it."
+
+msgid "payplug_bancontact_unavailable_testmode_description"
+msgstr "Bancontact is unavailable in TEST mode. Please switch your PayPlug module to LIVE mode to activate it."
+
+msgid "payplug_amex_unavailable_testmode_description"
+msgstr "American Express is unavailable in TEST mode. Please switch your PayPlug module to LIVE mode to activate it."
 
 msgid "payplug_apple_pay_livemode_description"
 msgstr "Display the Apple Pay payment button on your store, on the checkout. This button will only be seen on a Safari browser."
@@ -214,7 +223,7 @@ msgid "payplug_section_paylater_title"
 msgstr "PayLater"
 
 msgid "payplug_section_paylater_description"
-msgstr "Allow your customers to pay in installments."
+msgstr "Select your PayLater settings to display the 3x 4x Oney on your shop."
 
 msgid "payplug_section_oney_title"
 msgstr "3x 4x Oney payments"
@@ -377,3 +386,24 @@ msgstr "Your application is being processed."
 
 msgid "payplug_inactive_account_error_description"
 msgstr "For more information, please contact us at support@payplug.com"
+
+msgid "payplug_section_help_description1"
+msgstr "Any questions or concerns?"
+
+msgid "payplug_section_help_description2"
+msgstr "Please visit "
+
+msgid "payplug_section_help_link_help_text"
+msgstr "our helpdesk."
+
+msgid "payplug_section_help_link_help_url"
+msgstr "https://support.payplug.com/hc/en-gb/requests/new"
+
+msgid "payplug_section_status_check_success"
+msgstr "The verification was successfully completed."
+
+msgid "payplug_amex_title"
+msgstr "Pay with Amex"
+
+msgid "payplug_save_changes_text"
+msgstr "Update settings"

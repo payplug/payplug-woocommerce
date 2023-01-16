@@ -35,61 +35,72 @@ class Ajax {
 	const CHECK_AMERICAN_EXPRESS_PERMISSIONS = 'check_american_express_permissions';
 
 	public function __construct() {
+		$permission = ( current_user_can('editor') || current_user_can('administrator') );
 		add_action( 'wp_ajax_' . self::CHECK_LIVE_PERMISSIONS, [ $this, 'check_live_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_BANCONTACT_PERMISSIONS, [ $this, 'check_bancontact_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_APPLEPAY_PERMISSIONS, [ $this, 'check_applepay_permissions' ] );
 		add_action( 'wp_ajax_' . self::CHECK_AMERICAN_EXPRESS_PERMISSIONS, [ $this, 'check_american_express_permissions' ] );
-		add_action( 'rest_api_init', function () {
+		add_action( 'rest_api_init', function () use ($permission) {
 			//Path to REST route and the callback function
 			register_rest_route( 'payplug_api', '/save/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'payplug_save_data' ],
-				'permission_callback' => '__return_true'
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/init/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'payplug_init' ],
-				'permission_callback' => '__return_true'
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/login/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'payplug_login' ],
-				'permission_callback' => '__return_true'
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/logout/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'payplug_logout' ],
-				'permission_callback' => '__return_true'
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/refresh_keys/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'refresh_keys' ],
-				'permission_callback' => '__return_true'
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/check_requirements/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'payplug_check_requirements' ],
-				'permission_callback' => '__return_true'
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/bancontact_permissions/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'api_check_bancontact_permissions' ],
-				'permission_callback' => '__return_true'
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/applepay_permissions/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'api_check_applepay_permissions' ],
-				'permission_callback' => '__return_true'
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/american_express_permissions/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'api_check_american_express_permissions' ],
-				'permission_callback' => '__return_true'
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/oney_permissions/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'api_check_oney_permissions' ],
-				'permission_callback' => '__return_true'
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 		});
 
@@ -98,7 +109,7 @@ class Ajax {
 	public function refresh_keys(WP_REST_Request $request) {
 		$data = $request->get_params();
 		$email    = sanitize_text_field( wp_unslash( $data['payplug_email'] ) );
-		$password = sanitize_text_field( wp_unslash( $data['payplug_password'] ) );
+		$password = base64_decode(wp_unslash($data['payplug_password']));
 
 		if ( empty( $email ) || empty( $password ) ) {
 			wp_send_json_error(
@@ -477,7 +488,7 @@ class Ajax {
 
 		$data = $request->get_params();
 		$email = sanitize_email($data['payplug_email']);
-		$password = wp_unslash($data['payplug_password']);
+		$password = base64_decode(wp_unslash($data['payplug_password']));
 		$wp_nonce = $data['_wpnonce'];
 
 
@@ -536,7 +547,7 @@ class Ajax {
 			$user = [
 				"logged" => true,
 				"email" => $email,
-				"mode" => PayplugWoocommerceHelper::check_mode()
+				"mode" => PayplugWoocommerceHelper::check_mode() ? 0 : 1
 			];
 			$wp = [
 				"WP" => [
@@ -589,7 +600,10 @@ class Ajax {
 
 		if (PayplugWoocommerceHelper::payplug_logout($payplug)) {
 			http_response_code(200);
-			return wp_send_json_success(__('Successfully logged out.', 'payplug'));
+			return wp_send_json_success(array(
+				"message" => __('Successfully logged out.', 'payplug'),
+				"status" => ( new Vue )->payplug_section_status() // When Logging out the Status Block needs to be updated
+			));
 		} else {
 			http_response_code(400);
 			return wp_send_json_error(__('Already logged out.', 'payplug'));
