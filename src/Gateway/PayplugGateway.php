@@ -166,7 +166,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
         add_action('wp_enqueue_scripts', [$this, 'scripts']);
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
-        add_action('the_post', [$this, 'validate_payment']);
+		add_action('woocommerce_thankyou', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
     }
 
@@ -235,31 +235,36 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return;
         }
 
-        try {
-            $payment = $this->api->payment_retrieve($transaction_id);
-        } catch (\Exception $e) {
-            PayplugGateway::log(
-                sprintf(
-                    'Order #%s : An error occurred while retrieving the payment data with the message : %s',
-                    $order_id,
-                    $e->getMessage()
-                )
-            );
+		if($payment_method === $this->id) {
 
-            return;
-        }
+			
+			// Prevent the hook "woocommerce_thankyou" from being called multiple times
+			if (did_action("woocommerce_thankyou") >= 2)
+				return;
 
-		//FIXME:: this is being runned 1 time for each gateway,
-		// this comparisson is only needed to only run the process_method one time
-		if($payment_method != $this->id){
-			return;
+
+			try {
+				$payment = $this->api->payment_retrieve($transaction_id);
+			} catch (\Exception $e) {
+				PayplugGateway::log(
+					sprintf(
+						'Order #%s : An error occurred while retrieving the payment data with the message : %s',
+						$order_id,
+						$e->getMessage()
+					)
+				);
+
+				return;
+			}
+
+			//FIXME:: this is being runned 1 time for each gateway,
+			// this comparisson is only needed to only run the process_method one time
+			if($payment_method != $this->id){
+				return;
+			}
+
+			$this->response->process_payment($payment);
 		}
-
-		// Prevent the hook "the_post" from being called multiple times
-		if (did_action("the_post") >= 2)
-			return;
-
-        $this->response->process_payment($payment);
     }
 
     /**
