@@ -2527,7 +2527,7 @@ button.payplugLink:hover {
   display: block;
   width: 40px;
   height: 5px;
-  background: #00AB7A;
+  background: #FFD908;
 }
 .bootstrap .payplugUiBlock > ._description {
   margin: 0 0 24px;
@@ -3438,7 +3438,7 @@ button.payplugLink:hover {
   }
 }
 .payplugConfiguration .descriptionBlock {
-  background: #00474A;
+  background: #FFD908;
   padding: 64px;
   box-sizing: border-box;
 }
@@ -3457,7 +3457,7 @@ button.payplugLink:hover {
   height: 36px;
 }
 .payplugConfiguration .descriptionBlock ._header ._version > p {
-  color: #fff;
+  color: #000;
   opacity: 0.8;
   margin: 0 36px 0 0;
 }
@@ -3465,7 +3465,7 @@ button.payplugLink:hover {
   width: 155px;
 }
 .payplugConfiguration .descriptionBlock ._descriptionTitle {
-  color: #fff;
+  color: #000;
   font-family: 'Inter', sans-serif;
   font-size: 20px;
   font-weight: 700;
@@ -3477,7 +3477,7 @@ button.payplugLink:hover {
   margin: 0 0 16px;
 }
 .payplugConfiguration .descriptionBlock ._descriptionText {
-  color: #fff;
+  color: #000;
   opacity: 0.8;
   margin: 0px;
 }
@@ -3853,7 +3853,7 @@ button.payplugLink:hover {
   max-width: calc(80% - 60px);
 }
 .payplugConfiguration .paymentOption > ._text ._title {
-  color: #00AB7A;
+  color: #FFD908;
   margin: 0;
 }
 .payplugConfiguration .paymentOption > ._text p {
