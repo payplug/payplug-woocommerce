@@ -1,11 +1,11 @@
-# Copyright (C) 2019 PayPlug pour WooCommerce (Officiel)
+# Copyright (C) 2019 Payplug pour WooCommerce (Officiel)
 # This file is distributed under the same license as the PayPlug pour WooCommerce (Officiel) package.
 msgid ""
 msgstr ""
-"Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
+"Project-Id-Version: Payplug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2023-01-09 09:33+0000\n"
+"PO-Revision-Date: 2023-01-20 11:22+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -85,13 +85,13 @@ msgid "payplug_unavailable_testmode_description"
 msgstr "Unavailable in test mode"
 
 msgid "payplug_applepay_unavailable_testmode_description"
-msgstr "Apple Pay is unavailable in TEST mode. Please switch your PayPlug module to LIVE mode to activate it."
+msgstr "Apple Pay is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
 
 msgid "payplug_bancontact_unavailable_testmode_description"
-msgstr "Bancontact is unavailable in TEST mode. Please switch your PayPlug module to LIVE mode to activate it."
+msgstr "Bancontact is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
 
 msgid "payplug_amex_unavailable_testmode_description"
-msgstr "American Express is unavailable in TEST mode. Please switch your PayPlug module to LIVE mode to activate it."
+msgstr "American Express is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
 
 msgid "payplug_apple_pay_livemode_description"
 msgstr "Display the Apple Pay payment button on your store, on the checkout. This button will only be seen on a Safari browser."
@@ -124,16 +124,16 @@ msgid "payplug_section_logged_live_description"
 msgstr "In LIVE mode, the payments will generate real transactions."
 
 msgid "payplug_section_logged_link_access_portal"
-msgstr "Access my PayPlug portal"
+msgstr "Access my Payplug portal"
 
 msgid "payplug_section_header_title"
 msgstr "The payment solution that increases your turnover."
 
 msgid "payplug_section_header_live_description"
-msgstr "PayPlug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools."
+msgstr "Payplug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools."
 
 msgid "payplug_section_header_test_description"
-msgstr "PayPlug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools."
+msgstr "Payplug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools."
 
 msgid "payplug_section_header_enable_label"
 msgstr "Enabled plugin"
@@ -142,10 +142,10 @@ msgid "payplug_section_header_disable_label"
 msgstr "Disabled Plugin"
 
 msgid "payplug_section_login_description"
-msgstr "Log in to your PayPlug account."
+msgstr "Log in to your Payplug account."
 
 msgid "payplug_section_login_not_registered"
-msgstr "Not registered to PayPlug yet?"
+msgstr "Not registered to Payplug yet?"
 
 msgid "payplug_section_login_connect"
 msgstr "Connect account"
@@ -181,13 +181,13 @@ msgid "payplug_section_standard_payment_title"
 msgstr "Payment by card"
 
 msgid "payplug_section_standard_payment_description"
-msgstr "Offer payment by credit card to your customers. Only Euro payments can be processed with PayPlug."
+msgstr "Offer payment by credit card to your customers. Only Euro payments can be processed with Payplug."
 
 msgid "payplug_section_standard_payment_option_title"
 msgstr "Presentation of the payment page"
 
 msgid "payplug_section_standard_payment_redirected_description"
-msgstr "Your customers will be redirected to a customizable payment page hosted by PayPlug."
+msgstr "Your customers will be redirected to a customizable payment page hosted by Payplug."
 
 msgid "payplug_section_standard_payment_popup_description"
 msgstr "Your customers will see a customizable payment pop-up window appear on the checkout page of your store."
@@ -289,7 +289,7 @@ msgid "payplug_section_status_description"
 msgstr "Control your environment to ensure that the module is in perfect working order."
 
 msgid "payplug_section_status_errorMessage"
-msgstr "The configuration requirements for using the PayPlug module are not met. Once you have corrected the problems, please refresh the page or click on verify."
+msgstr "The configuration requirements for using the Payplug module are not met. Once you have corrected the problems, please refresh the page or click on verify."
 
 msgid "payplug_section_status_check"
 msgstr "Check"
@@ -304,7 +304,7 @@ msgid "payplug_section_status_ssl"
 msgstr "OpenSSL is up to date."
 
 msgid "payplug_section_status_account"
-msgstr "You must connect your PayPlug account."
+msgstr "You must connect your Payplug account."
 
 msgid "payplug_oney_product_page_description"
 msgstr "Your customers can see the details of their 3 or 4 installments."
@@ -331,7 +331,7 @@ msgid "payplug_section_status_debug_label"
 msgstr "Activate debug mode"
 
 msgid "payplug_section_status_debug_description"
-msgstr "Debug mode saves additional information on your server for each operation done via PayPlug plugin (Developer setting)."
+msgstr "Debug mode saves additional information on your server for each operation done via Payplug plugin (Developer setting)."
 
 msgid "payplug_standard_payment_title_title"
 msgstr "Title"
@@ -367,7 +367,7 @@ msgid "payplug_live_mode"
 msgstr "LIVE mode"
 
 msgid "payplug_section_logged_modal_description"
-msgstr "Please enter your PayPlug account password."
+msgstr "Please enter your Payplug account password."
 
 msgid "payplug_inactive_account_warning_title"
 msgstr "Congratulations, your account is connected!"

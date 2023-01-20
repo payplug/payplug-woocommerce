@@ -69,15 +69,15 @@ msgstr "Montant"
 #: src/Admin/WoocommerceActions.php:74 src/Admin/Ajax.php:61
 #: src/Admin/Ajax.php:70
 msgid "An error occured with PayPlug gateway. Please make sure PayPlug settings are correct."
-msgstr "Une erreur est survenue avec PayPlug. Veuillez-vous assurer que le portail PayPlug est bien configuré."
+msgstr "Une erreur est survenue avec Payplug. Veuillez-vous assurer que le portail Payplug est bien configuré."
 
 #: src/Admin/WoocommerceActions.php:89
 msgid "An error occurred while collecting payment information from PayPlug."
-msgstr "Une erreur est survenue lors de la récupération des données de paiement depuis PayPlug."
+msgstr "Une erreur est survenue lors de la récupération des données de paiement depuis Payplug."
 
 #: src/Admin/WoocommerceActions.php:109
 msgid "An error occurred while collecting refund information from PayPlug."
-msgstr "Une erreur est survenue lors de la récupération des données de remboursement depuis PayPlug."
+msgstr "Une erreur est survenue lors de la récupération des données de remboursement depuis Payplug."
 
 #: src/Gateway/PayplugGatewayOney4x.php:43
 #: src/Gateway/PayplugGatewayOney3x.php:75 src/Front/PayplugOneyDetail.php:133
@@ -103,7 +103,7 @@ msgstr "Carte de paiement"
 
 #: src/Gateway/PayplugGateway.php:340
 msgid "Customers will be redirected to a PayPlug payment page to finalize the transaction, or payments will be performed in an embeddable payment form on your website."
-msgstr "Vos clients seront redirigés vers une page de paiement hébergée par PayPlug, ou pourrons effectuer le paiement dans un formulaire intégré dans votre boutique."
+msgstr "Vos clients seront redirigés vers une page de paiement hébergée par Payplug, ou pourrons effectuer le paiement dans un formulaire intégré dans votre boutique."
 
 #: src/Gateway/PayplugGateway.php:349
 #, fuzzy
@@ -112,7 +112,7 @@ msgstr "Debug"
 
 #: src/Gateway/PayplugGateway.php:351
 msgid "Debug mode saves additional information on your server for each operation done via the PayPlug plugin (Developer setting)."
-msgstr "Le mode debug permet de sauvegarder des informations complémentaires sur votre serveur pour chaque opération effectuée via le module PayPlug (Option pour développeur)."
+msgstr "Le mode debug permet de sauvegarder des informations complémentaires sur votre serveur pour chaque opération effectuée via le module Payplug (Option pour développeur)."
 
 #: src/Gateway/PayplugGateway.php:285
 msgctxt "Default gateway title"
@@ -133,19 +133,19 @@ msgstr "Votre panier est vide"
 
 #: src/Gateway/PayplugGateway.php:277
 msgid "Enable PayPlug"
-msgstr "Activer PayPlug"
+msgstr "Activer Payplug"
 
 #: src/Gateway/PayplugGateway.php:98
 msgid "Enable PayPlug for your customers."
-msgstr "Permettez à vos clients de payer avec PayPlug."
+msgstr "Permettez à vos clients de payer avec Payplug."
 
 #: src/Gateway/PayplugGatewayOney3x.php:36
 msgid "Enable PayPlug Oney 3x for your customers."
-msgstr "Activer PayPlug Oney 3x pour vos clients."
+msgstr "Activer Payplug Oney 3x pour vos clients."
 
 #: src/Gateway/PayplugGatewayOney4x.php:23
 msgid "Enable PayPlug Oney 4x for your customers."
-msgstr "Activer PayPlug Oney 4x pour vos clients."
+msgstr "Activer Payplug Oney 4x pour vos clients."
 
 #: src/Gateway/PayplugGateway.php:275
 msgid "Enable/Disable"
@@ -158,21 +158,21 @@ msgstr "Date d'expiration"
 #: src/Gateway/PayplugGateway.php:97
 msgctxt "Gateway method title"
 msgid "PayPlug"
-msgstr "PayPlug"
+msgstr "Payplug"
 
 #: src/Gateway/PayplugGatewayOney3x.php:35
 msgctxt "Gateway method title"
 msgid "PayPlug Oney 3x"
-msgstr "PayPlug Oney 3x"
+msgstr "Payplug Oney 3x"
 
 #: src/Gateway/PayplugGatewayOney4x.php:22
 msgctxt "Gateway method title"
 msgid "PayPlug Oney 4x"
-msgstr "PayPlug Oney 4x"
+msgstr "Payplug Oney 4x"
 
 #: src/Gateway/PayplugGateway.php:1338
 msgid "Go to your PayPlug Portal"
-msgstr "Accéder à mon portail PayPlug"
+msgstr "Accéder à mon portail Payplug"
 
 #. Author URI of the plugin
 msgid "https://www.payplug.com/"
@@ -235,7 +235,7 @@ msgstr "Cancel"
 #: src/Gateway/PayplugGateway.php:583
 msgctxt "modal"
 msgid "Enter your PayPlug account password"
-msgstr "Entrez le mot de passe de votre compte PayPlug"
+msgstr "Entrez le mot de passe de votre compte Payplug"
 
 #: src/Gateway/PayplugGateway.php:579 src/Gateway/PayplugGateway.php:652
 msgctxt "modal"
@@ -250,7 +250,7 @@ msgstr "Ok"
 #: src/Gateway/PayplugGateway.php:582
 msgctxt "modal"
 msgid "Please enter your PayPlug account password"
-msgstr "Veuillez entrer le mot de passe de votre compte PayPlug"
+msgstr "Veuillez entrer le mot de passe de votre compte Payplug"
 
 #: src/Gateway/PayplugGateway.php:561
 msgctxt "modal"
@@ -278,7 +278,7 @@ msgstr "Aucunes informations disponible pour la commande."
 
 #: src/Gateway/PayplugGateway.php:998
 msgid "No PayPlug transaction was found for this order. The refund could not be processed."
-msgstr "Aucune transaction PayPlug ne correspond à cette commande. Aucun remboursement n'a été effectué."
+msgstr "Aucune transaction Payplug ne correspond à cette commande. Aucun remboursement n'a été effectué."
 
 #: src/Admin/WoocommerceActions.php:63
 msgid "No transaction ID was found for this order."
@@ -308,7 +308,7 @@ msgstr "<a href='https://www.oney.fr' target='_empty' > www.oney.fr </a>"
 
 #: src/Admin/Notices.php:107
 msgid "Once your PayPlug account has been validated, please log out and log in again from the configuration page in order to activate LIVE mode."
-msgstr "Une fois votre compte PayPlug validé, veuillez vous déconnecter puis vous connecter à nouveau depuis la page de configuration afin de pouvoir activer le mode LIVE."
+msgstr "Une fois votre compte Payplug validé, veuillez vous déconnecter puis vous connecter à nouveau depuis la page de configuration afin de pouvoir activer le mode LIVE."
 
 #: src/Gateway/PayplugGateway.php:365
 msgid "One Click Payment"
@@ -320,7 +320,7 @@ msgstr "Oney est actif sur votre boutique."
 
 #: src/Gateway/PayplugGateway.php:278
 msgid "Only Euro payments can be processed with PayPlug."
-msgstr "La passerelle de paiement PayPlug ne peut être activée que pour des paiements en euros."
+msgstr "La passerelle de paiement Payplug ne peut être activée que pour des paiements en euros."
 
 #: src/Admin/Notices.php:92
 msgid "Only one step left to activate the plugin on your site !"
@@ -397,37 +397,37 @@ msgstr "En mode TEST, tous les paiements sont des simulations et ne génèreront
 
 #. Author of the plugin
 msgid "PayPlug"
-msgstr "PayPlug"
+msgstr "Payplug"
 
 #: src/Gateway/PayplugResponse.php:75
 #, php-format
 msgid "PayPlug IPN OK | Transaction %s"
-msgstr "PayPlug IPN OK | Transaction %s"
+msgstr "Payplug IPN OK | Transaction %s"
 
 #: src/Gateway/PayplugResponse.php:97
 #, php-format
 msgid "PayPlug IPN OK | Transaction %s failed : %s"
-msgstr "PayPlug IPN OK | Transaction %s échouée : %s"
+msgstr "Payplug IPN OK | Transaction %s échouée : %s"
 
 #: src/Admin/Notices.php:106
 msgid "PayPlug is in TEST mode"
-msgstr "PayPlug est en mode TEST"
+msgstr "Payplug est en mode TEST"
 
 #: src/Admin/Metabox.php:51
 msgid "PayPlug payment details"
-msgstr "Détails du paiement PayPlug"
+msgstr "Détails du paiement Payplug"
 
 #: src/Admin/Metabox.php:76
 msgid "PayPlug Payment ID"
-msgstr "PayPlug ID"
+msgstr "Payplug ID"
 
 #. Name of the plugin
 msgid "PayPlug pour WooCommerce (Officiel)"
-msgstr "PayPlug pour WooCommerce (Officiel)"
+msgstr "Payplug pour WooCommerce (Officiel)"
 
 #: src/PayplugWoocommerce.php:91
 msgid "PayPlug requires an active version of WooCommerce"
-msgstr "PayPlug nécessite que WooCommerce soit installé pour fonctionner"
+msgstr "Payplug nécessite que WooCommerce soit installé pour fonctionner"
 
 #: src/Gateway/PayplugGateway.php:1121
 msgid "Please fill all login fields"
@@ -488,7 +488,7 @@ msgstr "Test"
 
 #: src/Admin/Notices.php:90
 msgid "Thank you for installing PayPlug as your online payment solution."
-msgstr "Merci d'avoir installé PayPlug, votre solution de paiement en ligne."
+msgstr "Merci d'avoir installé Payplug, votre solution de paiement en ligne."
 
 #. Description of the plugin
 msgid "The online payment solution combining simplicity and first-rate support to boost your sales."
@@ -555,7 +555,7 @@ msgstr "Indisponible pour le pays spécifié"
 
 #: src/Admin/WoocommerceActions.php:40
 msgid "Update PayPlug transaction data"
-msgstr "Mettre à jour les informations de la transaction PayPlug"
+msgstr "Mettre à jour les informations de la transaction Payplug"
 
 #: src/Admin/Metabox.php:98
 msgid "Yes"
@@ -567,11 +567,11 @@ msgstr "Vous êtes en mode TEST. En mode test, vous pouvez utiliser la carte 424
 
 #: src/Gateway/PayplugGatewayRequirements.php:109
 msgid "You are logged in with your PayPlug account."
-msgstr "Votre compte PayPlug est connecté."
+msgstr "Votre compte Payplug est connecté."
 
 #: src/Gateway/PayplugGatewayRequirements.php:110
 msgid "You must be logged in with your PayPlug account."
-msgstr "Votre compte PayPlug doit-être connecté."
+msgstr "Votre compte Payplug doit-être connecté."
 
 #: src/Gateway/PayplugGateway.php:768 src/Admin/Ajax.php:91
 msgid "Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again."
@@ -701,13 +701,13 @@ msgid "payplug_unavailable_testmode_description"
 msgstr "Non disponible en mode test"
 
 msgid "payplug_applepay_unavailable_testmode_description"
-msgstr "Apple Pay n’est pas disponible en mode TEST. Pour l’activer, passez votre module PayPlug en mode LIVE."
+msgstr "Apple Pay n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
 
 msgid "payplug_bancontact_unavailable_testmode_description"
-msgstr "Bancontact n’est pas disponible en mode TEST. Pour l’activer, passez votre module PayPlug en mode LIVE."
+msgstr "Bancontact n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
 
 msgid "payplug_amex_unavailable_testmode_description"
-msgstr "American Express n’est pas disponible en mode TEST. Pour l’activer, passez votre module PayPlug en mode LIVE."
+msgstr "American Express n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
 
 msgid "payplug_apple_pay_livemode_description"
 msgstr "Afficher le bouton de paiement Apple Pay sur votre boutique, sur le checkout. Le bouton ne sera visible que depuis un navigateur Safari."
@@ -737,16 +737,16 @@ msgid "payplug_section_logged_live_description"
 msgstr "En mode LIVE, vous acceptez des paiements réels."
 
 msgid "payplug_section_logged_link_access_portal"
-msgstr "Accéder à mon portail PayPlug"
+msgstr "Accéder à mon portail Payplug"
 
 msgid "payplug_section_header_title"
 msgstr "La solution de paiement qui augmente vos ventes."
 
 msgid "payplug_section_header_live_description"
-msgstr "PayPlug, c'est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main."
+msgstr "Payplug, c'est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main."
 
 msgid "payplug_section_header_test_description"
-msgstr "PayPlug, c'est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main."
+msgstr "Payplug, c'est la solution de paiement française des PME. Faites décoller votre performance grâce à nos outils orientés conversion parfaitement clés en main."
 
 msgid "payplug_section_header_enable_label"
 msgstr "Module activé"
@@ -764,13 +764,13 @@ msgid "payplug_section_standard_payment_title"
 msgstr "Paiement par carte"
 
 msgid "payplug_section_standard_payment_description"
-msgstr "Proposez le paiement par carte bancaire à vos clients. La passerelle de paiement PayPlug ne peut être activée que pour des paiements en euros."
+msgstr "Proposez le paiement par carte bancaire à vos clients. La passerelle de paiement Payplug ne peut être activée que pour des paiements en euros."
 
 msgid "payplug_section_standard_payment_option_title"
 msgstr "Présentation de la page de paiement"
 
 msgid "payplug_section_standard_payment_redirected_description"
-msgstr "Vos clients seront redirigés vers une page de paiement personnalisable hébergée par PayPlug."
+msgstr "Vos clients seront redirigés vers une page de paiement personnalisable hébergée par Payplug."
 
 msgid "payplug_section_standard_payment_popup_description"
 msgstr "Vos clients verront apparaître une pop-up de paiement personnalisable sur la page de checkout de votre boutique."
@@ -865,7 +865,7 @@ msgid "payplug_ok"
 msgstr "OK"
 
 msgid "payplug_section_login_description"
-msgstr "Connectez-vous à votre compte PayPlug."
+msgstr "Connectez-vous à votre compte Payplug."
 
 msgid "payplug_section_login_email_label"
 msgstr "Adresse E-mail"
@@ -874,7 +874,7 @@ msgid "payplug_section_login_password_label"
 msgstr "Mot de passe"
 
 msgid "payplug_section_login_not_registered"
-msgstr "Pas encore de compte PayPlug ?"
+msgstr "Pas encore de compte Payplug ?"
 
 msgid "payplug_section_login_connect"
 msgstr "Connexion"
@@ -886,10 +886,10 @@ msgid "payplug_section_subscribe_content_description"
 msgstr "Créez votre compte pour pouvoir utiliser le module."
 
 msgid "payplug_section_subscribe_link_create_account"
-msgstr "Inscription PayPlug"
+msgstr "Inscription Payplug"
 
 msgid "payplug_section_subscribe_already_have_account"
-msgstr "J'ai déjà un compte PayPlug"
+msgstr "J'ai déjà un compte Payplug"
 
 msgid "payplug_learn_more"
 msgstr "En savoir plus"
@@ -904,7 +904,7 @@ msgid "payplug_section_status_description"
 msgstr "Contrôlez votre environnement pour assurer le fonctionnement optimal du module."
 
 msgid "payplug_section_status_errorMessage"
-msgstr "La configuration requise pour utiliser le module PayPlug n’est pas satisfaite. Une fois les problèmes corrigés, actualisez la page ou cliquez sur vérifier."
+msgstr "La configuration requise pour utiliser le module Payplug n’est pas satisfaite. Une fois les problèmes corrigés, actualisez la page ou cliquez sur vérifier."
 
 msgid "payplug_section_status_check"
 msgstr "Vérifier"
@@ -919,7 +919,7 @@ msgid "payplug_section_status_ssl"
 msgstr "OpenSSL est à jour."
 
 msgid "payplug_section_status_account"
-msgstr "Votre compte PayPlug doit être connecté."
+msgstr "Votre compte Payplug doit être connecté."
 
 msgid "payplug_oney_product_page_description"
 msgstr "Vos clients pourront voir le détail de leurs échéances en 3 ou 4 fois."
@@ -946,7 +946,7 @@ msgid "payplug_section_status_debug_label"
 msgstr "Activer le mode debug"
 
 msgid "payplug_section_status_debug_description"
-msgstr "Le mode debug permet de sauvegarder des informations complémentaires sur votre serveur pour chaque opération effectuée via le module PayPlug (Option pour développeur)."
+msgstr "Le mode debug permet de sauvegarder des informations complémentaires sur votre serveur pour chaque opération effectuée via le module Payplug (Option pour développeur)."
 
 msgid "payplug_standard_payment_title_title"
 msgstr "Titre"
@@ -982,7 +982,7 @@ msgid "payplug_live_mode"
 msgstr "Mode LIVE"
 
 msgid "payplug_section_logged_modal_description"
-msgstr "Veuillez saisir le mot de passe de votre compte PayPlug."
+msgstr "Veuillez saisir le mot de passe de votre compte Payplug."
 
 msgid "payplug_inactive_account_warning_title"
 msgstr "Félicitations, votre compte est connecté !"
