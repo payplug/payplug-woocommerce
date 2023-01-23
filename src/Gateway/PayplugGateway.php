@@ -168,7 +168,20 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
 		add_action('woocommerce_thankyou', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
-    }
+		add_action( 'woocommerce_admin_order_item_values', [$this, 'editable_order_custom_field'], 10, 3 );
+
+	}
+
+	/**
+	 * return proper round value for the refund value box
+	 *
+	 * @param $_product
+	 * @param $item
+	 * @param $item_id
+	 */
+	function editable_order_custom_field( $_product, &$item, $item_id = null ){
+		$item->set_total(wc_price( $item->get_total() ));
+	}
 
     /**
      * Customize gateway title in emails.
