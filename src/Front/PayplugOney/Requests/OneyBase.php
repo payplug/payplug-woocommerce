@@ -33,7 +33,7 @@ Abstract class OneyBase
 	{
 		add_action( 'wp_ajax_simulate_oney_payment', [ $this, 'simulateOneyPayment' ]);
 		add_action( 'wp_ajax_nopriv_simulate_oney_payment', [ $this, 'simulateOneyPayment' ]);
-		add_action( 'template_redirect', [ $this, 'showOneyAnimation' ] );
+		add_action('woocommerce_cart_totals_after_order_total', [$this, 'showOneyAnimationCart']);
 
 		$options = get_option('woocommerce_payplug_settings', []);
 
@@ -86,14 +86,14 @@ HTML;
 	}
 
 	/**
-	 * Button to show oney popup
+	 * Button to show oney popup cart page
 	 *
 	 * @return void
 	 */
-	public function showOneyAnimation()
+	public function showOneyAnimationCart()
 	{
 
-		if ( ( is_cart() || is_checkout()) && PayplugWoocommerceHelper::is_oney_available()) {
+		if ( ( is_cart() ) && PayplugWoocommerceHelper::is_oney_available()) {
 			global $product;
 
 			$total_price = (is_numeric( floatval(WC()->cart->total))) ? floatval(WC()->cart->total) : (float)($product->get_price());
@@ -104,7 +104,7 @@ HTML;
 				$this->oney->setDisable(true);
 			}
 
-			add_action('woocommerce_cart_totals_after_order_total', [$this, 'oneyGeneratePopup']);
+			$this->oneyGeneratePopup();
 		}
 
 	}
