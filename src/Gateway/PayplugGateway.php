@@ -179,7 +179,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 * @param $item
 	 * @param $item_id
 	 */
-	function editable_order_custom_field( $_product, &$item, $item_id = null ){
+	function editable_order_custom_field( $_product, $item, $item_id = null ){
 		$item->set_total(wc_price( $item->get_total() ));
 	}
 
