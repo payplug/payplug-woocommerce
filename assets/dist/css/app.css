@@ -3720,7 +3720,7 @@ button.payplugLink:hover {
 }
 .payplugConfiguration ._paylaterAdvancedOption ._img img {
   display: block;
-  width: inherit;
+  width: 100%;
 }
 @media (max-width: 767px) {
   .payplugConfiguration ._paylaterAdvancedOption ._img {
