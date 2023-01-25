@@ -4,3 +4,19 @@
 #payment .payment_methods li .payplug-oney-flex div:first-child {
     width: 78%;
 }
+
+#payment .payment_methods li.payment_method_payplug img.payplug-payment-icon,
+#payment .payment_methods li.payment_method_bancontact img.payplug-payment-icon,
+#payment .payment_methods li.payment_method_american_express img.payplug-payment-icon,
+#payment .payment_methods li.payment_method_oney_x3_with_fees img.payplug-payment-icon,
+#payment .payment_methods li.payment_method_oney_x4_with_fees img.payplug-payment-icon,
+#payment .payment_methods li.payment_method_oney_x3_without_fees img.payplug-payment-icon,
+#payment .payment_methods li.payment_method_oney_x4_without_fees img.payplug-payment-icon
+{
+	width: auto;
+	max-height: 40px;
+}
+
+.disable-checkout-icons{
+	filter: grayscale(100%);
+}

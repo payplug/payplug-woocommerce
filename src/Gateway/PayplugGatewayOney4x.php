@@ -63,9 +63,15 @@ HTML;
                 $this->description = $this->oney_response;
             }
         }
-        $available_img = ($this->check_oney_is_available() === true) ? 'lg-4xoney-checkout.png' : 'lg-4xoney-checkout-disabled.png';
+        $available_img = 'x4_with_fees.svg';
+
+		$disable='';
+		if($this->check_oney_is_available() != true){
+			$disable='disable-checkout-icons';
+		}
+
         $icons = apply_filters('payplug_payment_icons', [
-            'payplug' => sprintf('<img src="%s" alt="Oney 4x" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/' . $available_img)),
+            'payplug' => sprintf('<img src="%s" alt="Oney 4x" class="payplug-payment-icon ' . $disable . '" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $available_img)),
         ]);
         $icons_str = '';
         foreach ($icons as $icon) {

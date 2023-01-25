@@ -181,7 +181,7 @@ class ApplePay extends PayplugGateway
 	{
 		$available_img = 'apple-pay-checkout.svg';
 		$icons = apply_filters('payplug_payment_icons', [
-			'payplug' => sprintf('<img src="%s" alt="Apple Pay" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/' . $available_img)),
+			'payplug' => sprintf('<img src="%s" alt="Apple Pay" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $available_img)),
 		]);
 		$icons_str = '';
 		foreach ($icons as $icon) {
