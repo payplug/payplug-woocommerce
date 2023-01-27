@@ -33,6 +33,7 @@ class PayplugGatewayOney3xWithoutFees extends PayplugGatewayOney3x
      */
     public function get_icon()
     {
+		$disable='';
         if ($this->check_oney_is_available() === true) {
 	        $total_price = floatval(WC()->cart->total);
 	        $this->oney_response = $this->api->simulate_oney_payment($total_price,'without_fees');
@@ -60,15 +61,20 @@ HTML;
             } else {
                 $this->description = $this->oney_response;
             }
-        }
+        }else{
+			$disable='disable-checkout-icons';
+		}
 
 		$country = PayplugWoocommerceHelper::getISOCountryCode();
-		$available_img = file_exists(PAYPLUG_GATEWAY_PLUGIN_DIR . 'assets/images/Oney3x-' .  $country . '.png') ? 'Oney3x-' . $country . '.png' : 'Oney3x.png';
-		$disable_img = file_exists(PAYPLUG_GATEWAY_PLUGIN_DIR . 'assets/images/Oney3x_grey-' .  $country . '.png') ? 'Oney3x_grey-' . $country . '.png' : 'Oney3x_grey.png';
-		$image = ($this->check_oney_is_available() === true) ? $available_img : $disable_img;
+
+		if( file_exists(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/checkout/x3_without_fees_' .  $country . '.svg') ){
+			$image = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/checkout/x3_without_fees_' .  $country . '.svg';
+		}else{
+			$image = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/checkout/x3_without_fees_FR.svg';
+		}
 
         $icons = apply_filters('payplug_payment_icons', [
-            'payplug' => sprintf('<img src="%s" alt="Oney 3x" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/' . $image)),
+            'payplug' => sprintf('<img src="%s" alt="Oney 3x" class="payplug-payment-icon ' . $disable . '" />', esc_url($image)),
         ]);
         $icons_str = '';
         foreach ($icons as $icon) {
