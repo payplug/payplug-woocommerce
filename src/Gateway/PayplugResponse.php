@@ -81,7 +81,10 @@ class PayplugResponse {
 				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
 				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
 				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed but failed.', $order_id, $resource->id));
+				wc_increase_stock_levels($order);
 				return;
+			} elseif (( $resource->failure == null ) && ( $resource->payment_method['is_pending'] == true )) {
+				$this->handle_pending_oney( $order, $resource );
 			}
 
 			// Save Logs of the payment for the different payment gateways:
@@ -130,8 +133,6 @@ class PayplugResponse {
 				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
 				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
 				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed successfully.', $order_id, $resource->id));
-			} elseif (( $resource->failure == null ) && ( $resource->payment_method['is_pending'] == true )) {
-				$this->handle_pending_oney( $order, $resource );
 			}
 		}
 	}
