@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2023-01-30 16:09+0000\n"
+"PO-Revision-Date: 2023-01-31 10:28+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -32,7 +32,7 @@ msgstr ""
 
 #. Plugin Name of the plugin
 msgid "PayPlug pour WooCommerce (Officiel)"
-msgstr "PayPlug for WooCommerce"
+msgstr "Payplug for WooCommerce"
 
 msgid "payplug_oneyIT_popup-title"
 msgstr ""

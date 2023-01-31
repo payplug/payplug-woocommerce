@@ -423,7 +423,7 @@ msgstr "PayPlug ID"
 
 #. Name of the plugin
 msgid "PayPlug pour WooCommerce (Officiel)"
-msgstr "PayPlug pour WooCommerce"
+msgstr "Payplug pour WooCommerce"
 
 #: src/PayplugWoocommerce.php:91
 msgid "PayPlug requires an active version of WooCommerce"
