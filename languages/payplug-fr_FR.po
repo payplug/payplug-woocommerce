@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1022,3 +1022,6 @@ msgstr "Payer avec Amex"
 
 msgid "payplug_save_changes_text"
 msgstr "Mettre à jour les paramètres"
+
+msgid "payplug_thresholds_error_msg"
+msgstr "Le montant doit être compris entre 100€ et 3000€."
