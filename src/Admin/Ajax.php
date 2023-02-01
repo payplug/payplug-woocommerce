@@ -8,6 +8,7 @@ use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Admin\Vue;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Exception\PayplugException;
@@ -543,6 +544,18 @@ class Ajax {
 				$payplug->get_option_key(),
 				apply_filters('woocommerce_settings_api_sanitized_fields_' . $payplug->id, $data)
 			);
+
+			$options = get_option('woocommerce_payplug_settings', []);
+			$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
+			$account = get_transient($transient_key);
+
+			$oney_min = $account['configuration']['oney']['min_amounts']['EUR']/100;
+			$oney_max = $account['configuration']['oney']['max_amounts']['EUR']/100;
+			$options['oney_thresholds'] = [$oney_min, $oney_max];
+
+
+
+			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug',$options ) );
 
 			$user = [
 				"logged" => true,
