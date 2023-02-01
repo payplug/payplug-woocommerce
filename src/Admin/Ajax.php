@@ -549,8 +549,11 @@ class Ajax {
 			$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
 			$account = get_transient($transient_key);
 
-			$options['oney_thresholds_default_min'] = $account['configuration']['oney']['min_amounts']['EUR']/100;
-			$options['oney_thresholds_default_max'] = $account['configuration']['oney']['max_amounts']['EUR']/100;
+			$oney_min = $account['configuration']['oney']['min_amounts']['EUR']/100;
+			$oney_max = $account['configuration']['oney']['max_amounts']['EUR']/100;
+			$options['oney_thresholds'] = [$oney_min, $oney_max];
+
+
 
 			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug',$options ) );
 
