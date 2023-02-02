@@ -54,9 +54,9 @@ class Bancontact extends PayplugGateway
 	 */
 	public function get_icon()
 	{
-		$available_img = 'lg-bancontact-checkout.png';
+		$available_img = 'lg-bancontact-checkout.svg';
 		$icons = apply_filters('payplug_payment_icons', [
-			'payplug' => sprintf('<img src="%s" alt="Oney 4x" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/' . $available_img)),
+			'payplug' => sprintf('<img src="%s" alt="Oney 4x" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $available_img)),
 		]);
 		$icons_str = '';
 		foreach ($icons as $icon) {

@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2023-01-09 09:33+0000\n"
+"PO-Revision-Date: 2023-01-31 10:28+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -29,6 +29,10 @@ msgstr "3x 4x Oney payments"
 
 msgid "payplug_oneyIT_paywith"
 msgstr ""
+
+#. Plugin Name of the plugin
+msgid "PayPlug pour WooCommerce (Officiel)"
+msgstr "Payplug for WooCommerce"
 
 msgid "payplug_oneyIT_popup-title"
 msgstr ""
@@ -112,7 +116,7 @@ msgid "payplug_section_logged_description"
 msgstr "General settings of the module"
 
 msgid "payplug_section_logged_logout"
-msgstr "Disconnect"
+msgstr "Log out"
 
 msgid "payplug_section_logged_mode"
 msgstr "Environment"
@@ -208,7 +212,7 @@ msgid "payplug_section_applepay_payment_title"
 msgstr "Apple Pay payment"
 
 msgid "payplug_section_applepay_payment_description"
-msgstr "Display the Apple Pay payment button on your store"
+msgstr "Display the Apple Pay payment button on your store."
 
 msgid "payplug_section_bancontact_payment_title"
 msgstr "Bancontact payment"
@@ -337,7 +341,7 @@ msgid "payplug_standard_payment_title_title"
 msgstr "Title"
 
 msgid "payplug_standard_payment_title_description"
-msgstr "The payment solution title displayed to your customers during checkout"
+msgstr "The payment solution title displayed to your customers during checkout."
 
 msgid "payplug_standard_payment_title_placeholder"
 msgstr "Pay by credit card"
@@ -346,7 +350,7 @@ msgid "payplug_standard_payment_description_title"
 msgstr "Description"
 
 msgid "payplug_standard_payment_description_description"
-msgstr "The payment solution description displayed to your customers during checkout"
+msgstr "The payment solution description displayed to your customers during checkout."
 
 msgid "payplug_standard_payment_description_placeholder"
 msgstr "Description"

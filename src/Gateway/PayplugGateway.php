@@ -105,7 +105,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function __construct()
     {
-		if ((!empty($_GET['section'])) && ($_GET['section'] == 'payplug')) {
+		$payplug_gateways = array('payplug', 'american_express', 'apple_pay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees');
+
+		if ((!empty($_GET['section'])) && (in_array($_GET['section'], $payplug_gateways))) {
 			$GLOBALS['hide_save_button'] = true;
 		}
 
@@ -166,7 +168,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
         add_action('wp_enqueue_scripts', [$this, 'scripts']);
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
-        add_action('the_post', [$this, 'validate_payment']);
+		add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
     }
 
@@ -235,27 +237,30 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return;
         }
 
-        try {
-            $payment = $this->api->payment_retrieve($transaction_id);
-        } catch (\Exception $e) {
-            PayplugGateway::log(
-                sprintf(
-                    'Order #%s : An error occurred while retrieving the payment data with the message : %s',
-                    $order_id,
-                    $e->getMessage()
-                )
-            );
+		if($payment_method === $this->id) {
 
-            return;
-        }
+			try {
+				$payment = $this->api->payment_retrieve($transaction_id);
+			} catch (\Exception $e) {
+				PayplugGateway::log(
+					sprintf(
+						'Order #%s : An error occurred while retrieving the payment data with the message : %s',
+						$order_id,
+						$e->getMessage()
+					)
+				);
 
-		//FIXME:: this is being runned 1 time for each gateway,
-		// this comparisson is only needed to only run the process_method one time
-		if($payment_method != $this->id){
-			return;
+				return;
+			}
+
+			//FIXME:: this is being runned 1 time for each gateway,
+			// this comparisson is only needed to only run the process_method one time
+			if($payment_method != $this->id){
+				return;
+			}
+
+			$this->response->process_payment($payment);
 		}
-
-        $this->response->process_payment($payment);
     }
 
     /**
@@ -267,8 +272,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 
         $src = ('it_IT' === get_locale())
-            ? PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/logos_scheme_PostePay.svg'
-            : PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/logos_scheme_CB.svg';
+            ? PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_PostePay.svg'
+            : PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_CB.svg';
 
         $icons = apply_filters('payplug_payment_icons', [
             'payplug' => sprintf('<img src="%s" alt="Visa & Mastercard" class="payplug-payment-icon" />', esc_url($src)),
@@ -650,12 +655,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 		/************ VUE Code *************/
 
-		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-1.0.0.js', [], PAYPLUG_GATEWAY_VERSION);
-		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.0.0.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-1.1.0.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.1.0.js', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('app.css', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/css/app.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_localize_script('app.js', 'payplug_admin_config',
 			array(
-				'ajax_url'      => get_rest_url(null, "payplug_api"),
 				"img_path"		=> esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/')
 			));
 

@@ -599,10 +599,17 @@ class Ajax {
 		$payplug = new PayplugGateway();
 
 		if (PayplugWoocommerceHelper::payplug_logout($payplug)) {
+			$wp = [
+				"logged" => PayplugWoocommerceHelper::user_logged_in(),
+				"mode" => PayplugWoocommerceHelper::check_mode() ? 0 : 1
+			];
+
 			http_response_code(200);
 			return wp_send_json_success(array(
 				"message" => __('Successfully logged out.', 'payplug'),
-				"status" => ( new Vue )->payplug_section_status() // When Logging out the Status Block needs to be updated
+				"status" => ( new Vue )->payplug_section_status(),
+				"settings" => $wp,
+				"subscribe" => ( new Vue )->payplug_section_subscribe() // When Logging out the Status Block needs to be updated
 			));
 		} else {
 			http_response_code(400);

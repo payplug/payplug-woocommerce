@@ -1507,11 +1507,7 @@ p.payplugInterpanel {
 }
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease-out;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+  transition-timing-function: ease-out;
 }
 /* Payplug Admin Switch */
 .payplugSwitch {
@@ -3724,7 +3720,7 @@ button.payplugLink:hover {
 }
 .payplugConfiguration ._paylaterAdvancedOption ._img img {
   display: block;
-  width: 100%;
+  width: inherit;
 }
 @media (max-width: 767px) {
   .payplugConfiguration ._paylaterAdvancedOption ._img {
