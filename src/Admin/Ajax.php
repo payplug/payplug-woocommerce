@@ -555,7 +555,7 @@ class Ajax {
 				]
 			];
 
-			return wp_send_json_success( ["settings" => $user + $response + $wp] + ( new Vue )->init() );
+			return wp_send_json_success( ["settings" => $user + $wp] + ( new Vue )->init() );
 		} catch (HttpException $e) {
 
 			//TODO:: error handler, Authentication::getPermissionsByLogin comes here
