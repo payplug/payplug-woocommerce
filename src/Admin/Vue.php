@@ -25,7 +25,17 @@ class Vue {
 		if ( PayplugWoocommerceHelper::user_logged_in() ) {
 			$header = $this->payplug_section_header();
 			$logged = $this->payplug_section_logged();
+			$payplug = (new PayplugGateway());
 			$payplug_wooc_settings = get_option( 'woocommerce_payplug_settings', [] );
+
+			if ((empty($payplug_wooc_settings['oney_thresholds_default_min'])) && (empty($payplug_wooc_settings['oney_thresholds_default_max']))) {
+
+				$payplug_wooc_settings['oney_thresholds_default_min'] = $payplug->min_oney_price;
+				$payplug_wooc_settings['oney_thresholds_default_max'] = $payplug->max_oney_price;
+
+				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug',$payplug_wooc_settings ) );
+			}
+
 			unset($payplug_wooc_settings["payplug_live_key"]);
 			unset($payplug_wooc_settings["payplug_test_key"]);
 			unset($payplug_wooc_settings["payplug_password"]);

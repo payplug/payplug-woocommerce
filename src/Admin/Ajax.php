@@ -492,7 +492,6 @@ class Ajax {
 		$password = base64_decode(wp_unslash($data['payplug_password']));
 		$wp_nonce = $data['_wpnonce'];
 
-
 		try {
 			$response = Authentication::getKeysByLogin($email, $password);
 			if (empty($response) || !isset($response)) {
@@ -544,15 +543,6 @@ class Ajax {
 				$payplug->get_option_key(),
 				apply_filters('woocommerce_settings_api_sanitized_fields_' . $payplug->id, $data)
 			);
-
-			$options = get_option('woocommerce_payplug_settings', []);
-			$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
-			$account = get_transient($transient_key);
-
-			$options['oney_thresholds_default_min'] = $account['configuration']['oney']['min_amounts']['EUR']/100;
-			$options['oney_thresholds_default_max'] = $account['configuration']['oney']['max_amounts']['EUR']/100;
-
-			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug',$options ) );
 
 			$user = [
 				"logged" => true,
