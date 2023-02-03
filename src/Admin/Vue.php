@@ -363,12 +363,14 @@ class Vue {
 					"name" => "oney_min_amounts",
 					"value" => $min,
 					"placeholder" => $min,
+					"default" => get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_min']
 				],
 				"inter" => __( 'and', 'payplug' ),
 				"max_amount" => [
 					"name" => "oney_max_amounts",
 					"value" => $max,
 					"placeholder" => $max,
+					"default" => get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_max']
 				],
 				"error" => [
 					"text" => __( 'payplug_thresholds_error_msg', 'payplug' )
