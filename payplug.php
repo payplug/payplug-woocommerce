@@ -52,6 +52,7 @@ function init() {
 }
 
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
+register_deactivation_hook( __FILE__,  __NAMESPACE__ .'\\PayplugWoocommerceHelper::plugin_deactivation' );
 
 /**
  * A fail-safe in case a transltion does not exist shows the default translation (English)
