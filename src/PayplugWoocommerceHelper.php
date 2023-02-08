@@ -672,12 +672,17 @@ class PayplugWoocommerceHelper {
 				$options['mode'] = "no";
 			}
 
-			if (isset($key))
+			if (isset($key)){
 				$response = Authentication::getAccount(new Payplug($key));
+			}
 
 			if (isset($response['httpResponse']['country'])) {
 				$options['payplug_merchant_country'] = $response['httpResponse']['country'];
 				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+			}else{
+
+				//default value for merchant country
+				$options['payplug_merchant_country'] = 'FR';
 			}
 
 		} catch (ForbiddenException $e) {
