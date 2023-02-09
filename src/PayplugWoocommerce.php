@@ -162,7 +162,7 @@ class PayplugWoocommerce {
 		}
 
 		//failsafe
-		if( empty($options['payplug_merchant_country']) ){
+		if( empty($options['payplug_merchant_country']) || empty($options['oney_type']) ){
 			return ;
 		}
 

@@ -148,7 +148,7 @@ HTML;
 	 * @return void
 	 */
 	public function setCountry($options){
-		$this->country = $options["payplug_merchant_country"] ? $options["payplug_merchant_country"] : ["payplug_merchant_country" => "FR"];
+		$this->country = !empty($options["payplug_merchant_country"]) ? $options["payplug_merchant_country"] : ["payplug_merchant_country" => "FR"];
 	}
 
 	/**
