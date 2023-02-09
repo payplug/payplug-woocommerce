@@ -365,7 +365,7 @@ class Vue {
 
 		$thresholds = [
 			"name" => "thresholds",
-			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.jpg' ),
+			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.png' ),
 			"title" => __( 'payplug_thresholds_oney_title', 'payplug' ),
 			"descriptions" => [
 				"description" => __( 'payplug_thresholds_oney_description', 'payplug' ),
@@ -400,7 +400,7 @@ class Vue {
 	public function show_oney_popup_product($active = false) {
 		return [
 			"name" => "oney_product_animation",
-			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.jpg' ),
+			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.png' ),
 			"title" => __( 'display_the_oney_installments_pop_up_on_the_product_page', 'payplug' ),
 			"descriptions" => [[
 				"description" => __( 'payplug_oney_product_page_description', 'payplug' ),
