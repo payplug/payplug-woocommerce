@@ -744,4 +744,11 @@ class PayplugWoocommerceHelper {
 		}
 	}
 
+	public static function plugin_deactivation(){
+		$option_name = 'woocommerce_payplug_settings';
+		delete_option( $option_name );
+		// for site options in Multisite
+		delete_site_option( $option_name );
+	}
+
 }
