@@ -73,8 +73,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	private $payplug_merchant_country = 'FR';
 
 	protected $oney_response;
-	protected $min_oney_price, $oney_thresholds_min;
-	protected $max_oney_price, $oney_thresholds_max;
+	public $min_oney_price, $oney_thresholds_min;
+	public $max_oney_price, $oney_thresholds_max;
 
     /**
      * Logging method.

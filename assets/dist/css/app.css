@@ -3702,6 +3702,17 @@ button.payplugLink:hover {
 .paylaterBlock ._paylaterOptions ._paylaterLabel div {
   padding: 10px 50px 10px 10px;
 }
+.paylaterBlock ._paylaterAdvanced ._paylaterAdvancedOption ._statement {
+  padding: 2px 0 0;
+  width: 100%;
+  display: flex;
+  color: #D5343C;
+  font-size: 14px;
+  margin-bottom: 8.5px;
+}
+.paylaterBlock ._paylaterAdvanced ._paylaterAdvancedOption ._statement .installmentErrorIcon {
+  margin-right: 5.67px;
+}
 .paylaterBlock ._paylaterTitle {
   margin: 16px 0 8px;
 }
