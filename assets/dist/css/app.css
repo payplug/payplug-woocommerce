@@ -431,8 +431,8 @@
   text-align: center;
 }
 .payplugIntegratedPayment_error {
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-family: 'Gantari', sans-serif;
+  font-size: 14px;
   font-weight: 400;
   color: #E91932;
   font-size: 12px;
@@ -460,7 +460,7 @@
 .payplugIntegratedPayment_error.-payment,
 .payplugIntegratedPayment_error.-fields,
 .payplugIntegratedPayment_error.-api {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Gantari', sans-serif;
   font-size: 14px;
   font-weight: 400;
   display: none;
@@ -583,8 +583,8 @@
   max-width: 100%;
 }
 .payplugOneyCta_button {
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-family: 'Gantari', sans-serif;
+  font-size: 14px;
   font-weight: 400;
   transition: color 0.4s;
   display: flex;
@@ -660,8 +660,8 @@
 }
 /* Oney Error */
 .payplugOneyError {
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-family: 'Gantari', sans-serif;
+  font-size: 14px;
   font-weight: 400;
   width: 100%;
   color: #a91526;
@@ -799,8 +799,8 @@
 }
 /* Oney popin */
 .payplugOneyPopin {
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-family: 'Gantari', sans-serif;
+  font-size: 14px;
   font-weight: 400;
   transition: opacity 0.4s;
   color: #777;
@@ -1398,46 +1398,25 @@ ul.payplugOneyPopin_navigation li.selected {
   margin: 5px 0px 15px -8px;
 }
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Gantari';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZg.ttf) format('truetype');
+  src: url(https://fonts.gstatic.com/s/gantari/v1/jVyV7nvyB2HL8iZyDk4GVvSZ5MtC9g0gOj3w.ttf) format('truetype');
 }
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Gantari';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fMZg.ttf) format('truetype');
+  src: url(https://fonts.gstatic.com/s/gantari/v1/jVyV7nvyB2HL8iZyDk4GVvSZ5MtC9g0SOj3w.ttf) format('truetype');
 }
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Gantari';
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYMZg.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Roboto';
-  font-style: italic;
-  font-weight: 500;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOjCnqEu92Fr1Mu51S7ABc9.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5Q.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlvAw.ttf) format('truetype');
+  src: url(https://fonts.gstatic.com/s/gantari/v1/jVyV7nvyB2HL8iZyDk4GVvSZ5MtC9g3-PT3w.ttf) format('truetype');
 }
 /* Payplug Admin */
 body {
@@ -2234,7 +2213,7 @@ button.payplugLink:hover {
   padding: 0 0 36px;
 }
 .payplugUIComponentsList section:not(.payplugUiBlock) > ._title {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Gantari', sans-serif;
   font-size: 18px;
   font-weight: 700;
   margin: 0 0 1em;
@@ -2244,7 +2223,7 @@ button.payplugLink:hover {
   font-size: 16px;
 }
 .payplugUIComponentsList section:not(.payplugUiBlock) ._subtitle {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Gantari', sans-serif;
   font-size: 13px;
   font-weight: 700;
   width: 100%;
@@ -2272,7 +2251,7 @@ button.payplugLink:hover {
   width: 200px;
   padding: 16px;
   margin: 0;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Gantari', sans-serif;
   font-size: 13px;
   font-weight: 500;
 }
@@ -2317,7 +2296,7 @@ button.payplugLink:hover {
   mask-image: url(../img/arrow_down.32cffecd.svg);
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
-  background-color: #697180;
+  background-color: #909192;
 }
 .bootstrap .payplugUIAccordion > label.active:after {
   transform: translateY(-50%) rotate(-180deg);
@@ -2342,7 +2321,7 @@ button.payplugLink:hover {
 .bootstrap .payplugUIAction:focus,
 .bootstrap .payplugUIAction:active {
   transition: color 0.4s, background 0.4s;
-  color: #363A41;
+  color: #212225;
   background: transparent;
   text-decoration: none;
 }
@@ -2356,7 +2335,7 @@ button.payplugLink:hover {
 .bootstrap .payplugUIAction[disabled="disabled"] {
   opacity: 0.3;
   cursor: default;
-  color: #363A41;
+  color: #212225;
   background: transparent;
 }
 .bootstrap .payplugUIAlert {
@@ -2506,12 +2485,12 @@ button.payplugLink:hover {
   }
 }
 .bootstrap .payplugUiBlock > ._title {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Gantari', sans-serif;
   font-size: 20px;
   font-weight: 700;
   letter-spacing: calc(-0.33em / 20);
   line-height: calc(29em/20);
-  color: #363A41;
+  color: #212225;
   position: relative;
   margin: 0 0 21px;
 }
@@ -2533,6 +2512,9 @@ button.payplugLink:hover {
   flex-direction: column;
   width: 100%;
   position: relative;
+}
+.bootstrap .payplugUiBlock > ._content p.payplugUIParagraph {
+  color: #4D4E51;
 }
 .bootstrap .payplugUiBlock.-disabled:before {
   display: block;
@@ -2560,7 +2542,7 @@ button.payplugLink:hover {
   background: #0555EB;
   border-radius: 4px;
   border: none;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Gantari', sans-serif;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: calc(1em / 14);
@@ -2609,7 +2591,7 @@ button.payplugLink:hover {
 .bootstrap .payplugUIButton.-tertiary,
 .bootstrap .payplugUIButton.-tertiary:focus,
 .bootstrap .payplugUIButton.-tertiary:active {
-  color: #363A41;
+  color: #212225;
 }
 .bootstrap .payplugUIButton.-tertiary:hover,
 .bootstrap .payplugUIButton.-tertiary.-hover {
@@ -2632,7 +2614,7 @@ button.payplugLink:hover {
   background: #0555EB;
   border-radius: 4px;
   border: none;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Gantari', sans-serif;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: calc(1em / 14);
@@ -2681,7 +2663,7 @@ button.payplugLink:hover {
 .bootstrap .payplugUIButtonLink.-tertiary,
 .bootstrap .payplugUIButtonLink.-tertiary:focus,
 .bootstrap .payplugUIButtonLink.-tertiary:active {
-  color: #363A41;
+  color: #212225;
 }
 .bootstrap .payplugUIButtonLink.-tertiary:hover,
 .bootstrap .payplugUIButtonLink.-tertiary.-hover {
@@ -2718,18 +2700,18 @@ button.payplugLink:hover {
 }
 .bootstrap .payplugUIButtonLink.-tertiary.-hover,
 .bootstrap .payplugUIButtonLink.-tertiary:hover {
-  color: #363A41;
+  color: #212225;
 }
 .bootstrap .payplugUIButtonLink.-tertiary.-icon svg {
-  fill: #363A41;
+  fill: #212225;
 }
 .bootstrap .payplugUIButtonLink.-tertiary.-icon.-hover svg,
 .bootstrap .payplugUIButtonLink.-tertiary.-icon:hover svg {
-  fill: #363A41;
+  fill: #212225;
 }
 .bootstrap .payplugUIIcon svg {
   transition: fill 0.4s;
-  fill: #363A41;
+  fill: #212225;
 }
 .bootstrap .payplugUIImage {
   border: 1px solid #D2D4D9;
@@ -2757,7 +2739,7 @@ button.payplugLink:hover {
 .bootstrap .payplugUIInput label {
   font-weight: 700;
   margin: 0 0 4px;
-  color: #363A41;
+  color: #212225;
 }
 .bootstrap .payplugUIInput input[type=text],
 .bootstrap .payplugUIInput input[type=email],
@@ -2772,14 +2754,14 @@ button.payplugLink:hover {
   cursor: pointer;
 }
 .bootstrap .payplugUIInput input[type=text]::-moz-placeholder, .bootstrap .payplugUIInput input[type=email]::-moz-placeholder, .bootstrap .payplugUIInput input[type=password]::-moz-placeholder, .bootstrap .payplugUIInput input[type=number]::-moz-placeholder {
-  color: rgba(54, 58, 65, 0.8);
+  color: rgba(33, 34, 37, 0.8);
   opacity: 1;
 }
 .bootstrap .payplugUIInput input[type=text]::placeholder,
 .bootstrap .payplugUIInput input[type=email]::placeholder,
 .bootstrap .payplugUIInput input[type=password]::placeholder,
 .bootstrap .payplugUIInput input[type=number]::placeholder {
-  color: rgba(54, 58, 65, 0.8);
+  color: rgba(33, 34, 37, 0.8);
   opacity: 1;
 }
 .bootstrap .payplugUIInput input[type=text]:focus,
@@ -2836,7 +2818,7 @@ button.payplugLink:hover {
 }
 .bootstrap .payplugUIInput.-icon:before {
   transform: translateY(-50%);
-  background-color: #697180;
+  background-color: #909192;
   content: "";
   display: block;
   position: absolute;
@@ -2973,7 +2955,7 @@ button.payplugLink:hover {
 }
 .bootstrap .payplugUIModal ._modal ._close svg {
   transition: fill 0.4s;
-  fill: #363A41;
+  fill: #212225;
 }
 .bootstrap .payplugUIModal ._modal ._close:hover svg {
   fill: #0555EB;
@@ -3022,7 +3004,7 @@ button.payplugLink:hover {
   display: block;
   box-sizing: border-box;
   width: 100%;
-  color: #363A41;
+  color: #212225;
   background: #EDEEF0;
   padding: 7px 40px 7px 10px;
   font-weight: normal;
@@ -3069,13 +3051,13 @@ button.payplugLink:hover {
   cursor: default;
 }
 .bootstrap .payplugUIIOptions label.-disabled > span {
-  color: #363A41;
+  color: #212225;
   background: #EDEEF0;
   opacity: 0.3;
 }
 .bootstrap .payplugUIIOptions label.-disabled:hover div,
 .bootstrap .payplugUIIOptions label.-disabled.-hover div {
-  color: #363A41;
+  color: #212225;
   background: #EDEEF0;
 }
 .bootstrap .payplugUIParagraph {
@@ -3115,7 +3097,7 @@ button.payplugLink:hover {
   mask-image: url(../img/arrow_down.32cffecd.svg);
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
-  background-color: #697180;
+  background-color: #909192;
 }
 .bootstrap .payplugUISelect ._current:focus:after {
   transform: translateY(-50%) rotate(-180deg);
@@ -3139,7 +3121,7 @@ button.payplugLink:hover {
 .bootstrap .payplugUISelect ._text {
   display: none;
   margin: 0;
-  color: #363A41;
+  color: #212225;
   white-space: nowrap;
 }
 .bootstrap .payplugUISelect ._list {
@@ -3201,7 +3183,7 @@ button.payplugLink:hover {
   cursor: pointer;
   z-index: 1;
   font-weight: 400;
-  color: #363A41;
+  color: #212225;
   white-space: nowrap;
 }
 .bootstrap .payplugUISelect ._option:hover {
@@ -3242,7 +3224,7 @@ button.payplugLink:hover {
 }
 .bootstrap .payplugUISwitch ._slider {
   -webkit-transition: 0.4s;
-  background-color: #697180;
+  background-color: #909192;
   bottom: 0;
   cursor: pointer;
   left: 0;
@@ -3279,7 +3261,7 @@ button.payplugLink:hover {
 }
 .bootstrap .payplugUITitle {
   font-weight: 700;
-  color: #363A41;
+  color: #212225;
   margin: 0 0 8px;
 }
 .bootstrap .payplugUITitle.-disabled {
@@ -3329,7 +3311,7 @@ button.payplugLink:hover {
   cursor: pointer;
 }
 .bootstrap .payplugUITooltip ._icon svg {
-  fill: #363A41;
+  fill: #212225;
 }
 .bootstrap .payplugUITooltip ._icon:hover svg {
   fill: #0555EB;
@@ -3340,7 +3322,7 @@ button.payplugLink:hover {
 }
 .bootstrap .payplugUICheckbox .checkbox-label span {
   font-weight: 700;
-  color: #363A41;
+  color: #212225;
 }
 .bootstrap .payplugUICheckbox .checkbox-label input[type="checkbox"] {
   border-radius: 0.15em;
@@ -3403,12 +3385,12 @@ button.payplugLink:hover {
   width: 100%;
 }
 .payplugConfiguration {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Gantari', sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: calc(20em / 14);
   letter-spacing: calc(0.25em / 14);
-  color: #697180;
+  color: #909192;
 }
 .payplugConfiguration ._description {
   font-size: 16px;
@@ -3469,7 +3451,7 @@ button.payplugLink:hover {
 }
 .payplugConfiguration .descriptionBlock ._descriptionTitle {
   color: #000;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Gantari', sans-serif;
   font-size: 20px;
   font-weight: 700;
   letter-spacing: calc(-0.33em / 20);
@@ -3542,7 +3524,7 @@ button.payplugLink:hover {
 }
 .generalBlock.-login ._forgotPassword {
   font-size: 13px;
-  color: #697180;
+  color: #909192;
   margin: 0 0 -2px;
 }
 .generalBlock.-logged ._user {
@@ -3569,7 +3551,7 @@ button.payplugLink:hover {
   color: #20272e;
 }
 .generalBlock.-logged ._userPortal {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Gantari', sans-serif;
   font-size: 12px;
   font-weight: 700;
   color: #0555EB;
@@ -3657,7 +3639,7 @@ button.payplugLink:hover {
 .modalCheckonboarding ._content .payplugUIParagraph a:hover,
 .modalCheckonboarding ._content .payplugUIParagraph a:visited,
 .modalCheckonboarding ._content .payplugUIParagraph a:active {
-  color: #697180;
+  color: #909192;
   text-decoration: underline;
 }
 .modalCheckonboarding ._content.-center {
@@ -4134,7 +4116,7 @@ button.payplugLink:hover {
 }
 .payplugConfiguration .standardPaymentOption ._text ._title,
 .payplugConfiguration .paymentMethodOption ._text ._title {
-  color: #363A41;
+  color: #212225;
   margin: 0 0 10px;
 }
 .payplugConfiguration .standardPaymentOption ._text a,
