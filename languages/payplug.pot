@@ -1,9 +1,9 @@
-# Copyright (C) 2019 PayPlug pour WooCommerce (Officiel)
-# This file is distributed under the same license as the PayPlug pour WooCommerce (Officiel) package.
+# Copyright (C) 2019 Payplug pour WooCommerce (Officiel)
+# This file is distributed under the same license as the Payplug pour WooCommerce (Officiel) package.
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PayPlug pour WooCommerce (Officiel) 1.0.15\n"
+"Project-Id-Version: Payplug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"

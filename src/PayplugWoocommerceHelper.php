@@ -666,18 +666,25 @@ class PayplugWoocommerceHelper {
 		try {
 
 			//fail safe for non activated account
-			if ((isset($options['mode'])) && $options['payplug_test_key'])
+			if ((isset($options['mode'])) && $options['payplug_test_key']){
 				$key = $options['mode'] === "yes" && !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : $options['payplug_test_key'];
+			}
+
 			if( empty($options['payplug_live_key'] )){
 				$options['mode'] = "no";
 			}
 
-			if (isset($key))
+			if (isset($key)){
 				$response = Authentication::getAccount(new Payplug($key));
+			}
 
 			if (isset($response['httpResponse']['country'])) {
 				$options['payplug_merchant_country'] = $response['httpResponse']['country'];
 				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+			}else{
+
+				//default value for merchant country
+				$options['payplug_merchant_country'] = 'FR';
 			}
 
 		} catch (ForbiddenException $e) {
@@ -735,6 +742,13 @@ class PayplugWoocommerceHelper {
 		} else {
 			return false;
 		}
+	}
+
+	public static function plugin_deactivation(){
+		$option_name = 'woocommerce_payplug_settings';
+		delete_option( $option_name );
+		// for site options in Multisite
+		delete_site_option( $option_name );
 	}
 
 }
