@@ -582,7 +582,8 @@ class Ajax {
 			"mode" => PayplugWoocommerceHelper::check_mode() ? 0 : 1,
 			"WP" =>  [
 				"_wpnonce" => $wp_nonce,
-			]
+			],
+			"show_register" => true
 		];
 
 		return wp_send_json_success([
