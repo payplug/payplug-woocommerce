@@ -8,6 +8,7 @@ use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Admin\Vue;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Exception\PayplugException;
@@ -491,7 +492,6 @@ class Ajax {
 		$password = base64_decode(wp_unslash($data['payplug_password']));
 		$wp_nonce = $data['_wpnonce'];
 
-
 		try {
 			$response = Authentication::getKeysByLogin($email, $password);
 			if (empty($response) || !isset($response)) {
@@ -555,7 +555,7 @@ class Ajax {
 				]
 			];
 
-			return wp_send_json_success( ["settings" => $user + $response + $wp] + ( new Vue )->init() );
+			return wp_send_json_success( ["settings" => $user + $wp] + ( new Vue )->init() );
 		} catch (HttpException $e) {
 
 			//TODO:: error handler, Authentication::getPermissionsByLogin comes here
