@@ -8,6 +8,7 @@ use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Admin\Vue;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Exception\PayplugException;
@@ -490,7 +491,6 @@ class Ajax {
 		$email = sanitize_email($data['payplug_email']);
 		$password = base64_decode(wp_unslash($data['payplug_password']));
 		$wp_nonce = $data['_wpnonce'];
-
 
 		try {
 			$response = Authentication::getKeysByLogin($email, $password);

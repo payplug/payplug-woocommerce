@@ -25,7 +25,17 @@ class Vue {
 		if ( PayplugWoocommerceHelper::user_logged_in() ) {
 			$header = $this->payplug_section_header();
 			$logged = $this->payplug_section_logged();
+			$payplug = (new PayplugGateway());
 			$payplug_wooc_settings = get_option( 'woocommerce_payplug_settings', [] );
+
+			if ((empty($payplug_wooc_settings['oney_thresholds_default_min'])) && (empty($payplug_wooc_settings['oney_thresholds_default_max']))) {
+
+				$payplug_wooc_settings['oney_thresholds_default_min'] = $payplug->min_oney_price;
+				$payplug_wooc_settings['oney_thresholds_default_max'] = $payplug->max_oney_price;
+
+				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug',$payplug_wooc_settings ) );
+			}
+
 			unset($payplug_wooc_settings["payplug_live_key"]);
 			unset($payplug_wooc_settings["payplug_test_key"]);
 			unset($payplug_wooc_settings["payplug_password"]);
@@ -355,7 +365,7 @@ class Vue {
 
 		$thresholds = [
 			"name" => "thresholds",
-			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.jpg' ),
+			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.png' ),
 			"title" => __( 'payplug_thresholds_oney_title', 'payplug' ),
 			"descriptions" => [
 				"description" => __( 'payplug_thresholds_oney_description', 'payplug' ),
@@ -363,12 +373,14 @@ class Vue {
 					"name" => "oney_min_amounts",
 					"value" => $min,
 					"placeholder" => $min,
+					"default" => get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_min']
 				],
 				"inter" => __( 'and', 'payplug' ),
 				"max_amount" => [
 					"name" => "oney_max_amounts",
 					"value" => $max,
 					"placeholder" => $max,
+					"default" => get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_max']
 				],
 				"error" => [
 					"text" => __( 'payplug_thresholds_error_msg', 'payplug' )
@@ -388,7 +400,7 @@ class Vue {
 	public function show_oney_popup_product($active = false) {
 		return [
 			"name" => "oney_product_animation",
-			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.jpg' ),
+			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.png' ),
 			"title" => __( 'display_the_oney_installments_pop_up_on_the_product_page', 'payplug' ),
 			"descriptions" => [[
 				"description" => __( 'payplug_oney_product_page_description', 'payplug' ),
