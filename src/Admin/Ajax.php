@@ -103,6 +103,13 @@ class Ajax {
 				'permission_callback' => function () use ($permission)  {return $permission ;},
 				'show_in_index' => false
 			) );
+			register_rest_route( 'payplug_api', '/one_click_permission/', array(
+				'methods' => 'POST',
+				'callback' => [ $this, 'api_check_one_click_permission' ],
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
+			) );
+
 		});
 
 	}
@@ -185,6 +192,10 @@ class Ajax {
 		PayplugWoocommerceHelper::set_transient_data($account);
 		$permissions = $account['httpResponse']['permissions'];
 		wp_send_json_success($permissions);
+	}
+
+	public function api_check_one_click_permission(WP_REST_Request $request){
+		wp_send_json_success(true);
 	}
 
 	public function api_check_bancontact_permissions(WP_REST_Request $request) {
