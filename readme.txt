@@ -5,7 +5,7 @@ Requires at least: 4.4
 Tested up to: 6.1.1
 Requires PHP: 5.6
 Stable tag: 2.2.1
-VueJs Payplug UI lib tag: 1.2.0
+VueJs Payplug UI lib tag: 1.2.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
