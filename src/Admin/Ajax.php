@@ -103,6 +103,12 @@ class Ajax {
 				'permission_callback' => function () use ($permission)  {return $permission ;},
 				'show_in_index' => false
 			) );
+			register_rest_route( 'payplug_api', '/one_click_permission/', array(
+				'methods' => 'POST',
+				'callback' => [ $this, 'api_check_one_click_permission' ],
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
+			) );
 		});
 
 	}
@@ -705,6 +711,42 @@ class Ajax {
 		wp_send_json_success(array(
 			"status" => ( new Vue )->payplug_section_status()
 		));
+	}
+
+	public function api_check_one_click_permission(WP_REST_Request $request){
+
+		$this->accountIsNotValid();
+
+		try{
+			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+
+		}  catch (PayplugException $e){
+			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => $e->getMessage(),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+			return false;
+		}
+
+		PayplugWoocommerceHelper::set_transient_data($account);
+
+		if(isset($account['httpResponse']['permissions']['can_save_cards']) && $account['httpResponse']['permissions']['can_save_cards']){
+			wp_send_json_success(true);
+		}
+
+		$one_click = isset($account['httpResponse']['permissions']['can_save_cards']) ? $account['httpResponse']['permissions']['can_save_cards']: false;
+
+		if(!$one_click){
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => __( 'payplug_oneclick_access_error', 'payplug' ),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+		}
+
+		wp_send_json_success($one_click);
 	}
 
 }
