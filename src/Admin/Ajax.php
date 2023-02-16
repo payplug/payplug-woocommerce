@@ -673,6 +673,7 @@ class Ajax {
 
 			$options['title'] = wp_strip_all_tags($data['standard_payment_title']);
 			$options['description'] = wp_strip_all_tags($data['standard_payment_description']);
+
 			$options['payment_method'] = (Validator::payment_method($data['payplug_embeded'])) ? $data['payplug_embeded'] : $options['payplug_embeded'];
 			$options['oneclick'] = Validator::oneclick($data['enable_one_click']);
 
@@ -680,7 +681,7 @@ class Ajax {
 			$options['bancontact'] = Validator::bancontact($data['enable_bancontact'], $test_mode);
 			$options['apple_pay'] = Validator::apple_pay($data['enable_applepay'], $test_mode);
 			$options['american_express'] = Validator::american_express($data['enable_american_express'], $test_mode);
-			$options['oney'] = Validator::oney($data['enable_oney']);
+			//$options['oney'] = Validator::oney($data['enable_oney']);
 			//TODO:: add validation for oney -> needed to add modal for error msg
 			/*if($options['oney'] === 'yes'){
 				$oney = $this->check_oney($account, $test_mode);
@@ -689,11 +690,11 @@ class Ajax {
 				}
 			}*/
 
-			$options['oney_type'] = (Validator::oney_type($data['payplug_oney'])) ? $data['payplug_oney'] : 'with_fees';
-			$thresholds = (Validator::oney_thresholds($data['oney_min_amounts'], $data['oney_max_amounts']));
-			$options['oney_thresholds_min'] = $thresholds['min'];
-			$options['oney_thresholds_max'] = $thresholds['max'];
-			$options['oney_product_animation'] = Validator::oney_product_animation($data['enable_oney_product_animation']);
+			//$options['oney_type'] = (Validator::oney_type($data['payplug_oney'])) ? $data['payplug_oney'] : 'with_fees';
+			//$thresholds = (Validator::oney_thresholds($data['oney_min_amounts'], $data['oney_max_amounts']));
+			//$options['oney_thresholds_min'] = $thresholds['min'];
+			//$options['oney_thresholds_max'] = $thresholds['max'];
+			//$options['oney_product_animation'] = Validator::oney_product_animation($data['enable_oney_product_animation']);
 			$options['debug'] = Validator::debug($data['enable_debug']);
 
 			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
