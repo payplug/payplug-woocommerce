@@ -55,8 +55,8 @@ class Vue {
 
 		return [
 			"header"    => $this->payplug_section_header(),
-			"subscribe" => $this->payplug_section_subscribe(),
 			"login"     => $this->payplug_section_login(),
+			"subscribe" => $this->payplug_section_subscribe(),
 			"payment_methods"  => $this->payplug_section_payment_methods(),
 			"payment_paylater"  => $this->payplug_section_paylater(),
 			"status" => $this->payplug_section_status(),
