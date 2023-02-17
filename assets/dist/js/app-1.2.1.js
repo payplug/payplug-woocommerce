@@ -2194,7 +2194,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _nod
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _components_organisms_NavBar__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/organisms/NavBar */ \"./src/components/organisms/NavBar.vue\");\n/* harmony import */ var _pages_LandingPage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./pages/LandingPage */ \"./src/pages/LandingPage.vue\");\n\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  name: 'App',\n  components: {\n    NavBar: _components_organisms_NavBar__WEBPACK_IMPORTED_MODULE_0__[\"default\"],\n    LandingPage: _pages_LandingPage__WEBPACK_IMPORTED_MODULE_1__[\"default\"]\n  },\n  beforeMount() {\n    if (typeof window.payplug_admin_config !== \"undefined\") {\n      // eslint-disable-next-line no-undef\n      __webpack_require__.p = window.payplug_admin_config.img_path;\n    }\n  }\n});\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/App.vue?./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use%5B0%5D!./node_modules/babel-loader/lib/index.js??clonedRuleSet-41.use!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet%5B0%5D.use%5B0%5D");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _components_organisms_NavBar__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/organisms/NavBar */ \"./src/components/organisms/NavBar.vue\");\n/* harmony import */ var _pages_LandingPage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./pages/LandingPage */ \"./src/pages/LandingPage.vue\");\n\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  name: 'App',\n  components: {\n    NavBar: _components_organisms_NavBar__WEBPACK_IMPORTED_MODULE_0__[\"default\"],\n    LandingPage: _pages_LandingPage__WEBPACK_IMPORTED_MODULE_1__[\"default\"]\n  },\n  beforeMount() {\n    if (typeof window.payplug_admin_config !== \"undefined\") {\n      // eslint-disable-next-line no-undef\n      __webpack_require__.p = window.payplug_admin_config.img_path;\n    }\n  },\n  mounted: function () {\n    switch (\"pspaylater\") {\n      case \"pspaylater\":\n        __webpack_require__.e(/*! import() */ \"src_assets_less_pspaylater_less\").then(__webpack_require__.bind(__webpack_require__, /*! ./assets/less/pspaylater.less */ \"./src/assets/less/pspaylater.less\"));\n        break;\n      default:\n        Promise.resolve(/*! import() */).then(__webpack_require__.bind(__webpack_require__, /*! ./assets/less/admin.less */ \"./src/assets/less/admin.less\"));\n        break;\n    }\n  }\n});\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/App.vue?./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use%5B0%5D!./node_modules/babel-loader/lib/index.js??clonedRuleSet-41.use!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet%5B0%5D.use%5B0%5D");
 
 /***/ }),
 
@@ -2480,7 +2480,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony default export */ 
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  name: \"AtomImage\",\n  props: {\n    imgParentClass: {\n      type: String,\n      required: false\n    },\n    imageSrc: {\n      type: String,\n      required: true,\n      default: \"\"\n    },\n    imageAlt: {\n      type: String,\n      required: false,\n      default: \"\"\n    }\n  },\n  data() {\n    return {\n      img: __webpack_require__(\"./src/assets/img sync recursive ^\\\\.\\\\/.*$\")(\"./\" + (this.imageSrc || \"placeholder.png\"))\n    };\n  }\n});\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/components/atoms/AtomImage.vue?./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use%5B0%5D!./node_modules/babel-loader/lib/index.js??clonedRuleSet-41.use!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet%5B0%5D.use%5B0%5D");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  name: \"AtomImage\",\n  props: {\n    imgParentClass: {\n      type: String,\n      required: false\n    },\n    imageSrc: {\n      type: String,\n      required: true,\n      default: \"\"\n    },\n    imageAlt: {\n      type: String,\n      required: false,\n      default: \"\"\n    }\n  },\n  computed: {\n    getImage: {\n      get() {\n        if (this.isURLValid(this.imageSrc)) {\n          return this.imageSrc;\n        }\n        return __webpack_require__(\"./src/assets/img sync recursive ^\\\\.\\\\/.*$\")(\"./\" + (this.imageSrc || \"placeholder.png\"));\n      }\n    }\n  },\n  data() {\n    return {\n      img: __webpack_require__(\"./src/assets/img sync recursive ^\\\\.\\\\/.*$\")(\"./\" + (this.imageSrc || \"placeholder.png\"))\n    };\n  },\n  methods: {\n    isURLValid: function (url) {\n      const regexp = new RegExp('(?:(?:https?|ftp|file):\\\\/\\\\/|www\\\\.|ftp\\\\.)(?:\\\\([-A-Z0-9+&@#\\\\/%=~_|$?!:,.]*\\\\)|[-A-Z0-9+&@#\\\\/%=~_|$?!:,.])*(?:\\\\([-A-Z0-9+&@#\\\\/%=~_|$?!:,.]*\\\\)|[A-Z0-9+&@#\\\\/%=~_|$])', 'i');\n      return regexp.test(url);\n    }\n  }\n});\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/components/atoms/AtomImage.vue?./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use%5B0%5D!./node_modules/babel-loader/lib/index.js??clonedRuleSet-41.use!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet%5B0%5D.use%5B0%5D");
 
 /***/ }),
 
@@ -2964,7 +2964,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _ass
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _components_organisms_OrganismSectionHeader__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/organisms/OrganismSectionHeader */ \"./src/components/organisms/OrganismSectionHeader.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionLogin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/components/organisms/OrganismSectionLogin */ \"./src/components/organisms/OrganismSectionLogin.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionSubscribe__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/components/organisms/OrganismSectionSubscribe */ \"./src/components/organisms/OrganismSectionSubscribe.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionLoggedIn__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/components/organisms/OrganismSectionLoggedIn */ \"./src/components/organisms/OrganismSectionLoggedIn.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionPaylater__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/components/organisms/OrganismSectionPaylater */ \"./src/components/organisms/OrganismSectionPaylater.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionStatus__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/components/organisms/OrganismSectionStatus */ \"./src/components/organisms/OrganismSectionStatus.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionPMethods__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/components/organisms/OrganismSectionPMethods */ \"./src/components/organisms/OrganismSectionPMethods.vue\");\n/* harmony import */ var _components_atoms_AtomLoader__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/components/atoms/AtomLoader */ \"./src/components/atoms/AtomLoader.vue\");\n/* harmony import */ var _store_store__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/store/store */ \"./src/store/store.js\");\n/* harmony import */ var _store_ajax__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/store/ajax */ \"./src/store/ajax.js\");\n/* harmony import */ var _components_molecules_MoleculeModal__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/components/molecules/MoleculeModal */ \"./src/components/molecules/MoleculeModal.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionFooter__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/components/organisms/OrganismSectionFooter */ \"./src/components/organisms/OrganismSectionFooter.vue\");\n\n\n\n\n\n\n\n\n\n\n\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  computed: {\n    plugin_disabled: {\n      get: () => parseInt(_store_store__WEBPACK_IMPORTED_MODULE_8__.store.data.payplug_enable) != 1\n    },\n    logged: {\n      get: () => _store_store__WEBPACK_IMPORTED_MODULE_8__.store.settings.logged\n    },\n    loading: {\n      get: () => _store_store__WEBPACK_IMPORTED_MODULE_8__.store.settings.loading.global\n    },\n    disabled: function () {\n      if (!this.logged || _store_store__WEBPACK_IMPORTED_MODULE_8__.store.settings.save.disabled === true || _store_store__WEBPACK_IMPORTED_MODULE_8__.store.translations.status.error) return true;\n      return false;\n    },\n    modal_data() {\n      let modal_data = _store_store__WEBPACK_IMPORTED_MODULE_8__.store.settings.save.data;\n      if (modal_data.msg) this.showModal();\n      return modal_data;\n    }\n  },\n  name: \"app\",\n  components: {\n    Header: _components_organisms_OrganismSectionHeader__WEBPACK_IMPORTED_MODULE_0__[\"default\"],\n    Login: _components_organisms_OrganismSectionLogin__WEBPACK_IMPORTED_MODULE_1__[\"default\"],\n    Subscribe: _components_organisms_OrganismSectionSubscribe__WEBPACK_IMPORTED_MODULE_2__[\"default\"],\n    LoggedIn: _components_organisms_OrganismSectionLoggedIn__WEBPACK_IMPORTED_MODULE_3__[\"default\"],\n    Status: _components_organisms_OrganismSectionStatus__WEBPACK_IMPORTED_MODULE_5__[\"default\"],\n    PMethods: _components_organisms_OrganismSectionPMethods__WEBPACK_IMPORTED_MODULE_6__[\"default\"],\n    Paylater: _components_organisms_OrganismSectionPaylater__WEBPACK_IMPORTED_MODULE_4__[\"default\"],\n    AtomLoader: _components_atoms_AtomLoader__WEBPACK_IMPORTED_MODULE_7__[\"default\"],\n    Modal: _components_molecules_MoleculeModal__WEBPACK_IMPORTED_MODULE_10__[\"default\"],\n    Foot: _components_organisms_OrganismSectionFooter__WEBPACK_IMPORTED_MODULE_11__[\"default\"]\n  },\n  data() {\n    return {\n      store: _store_store__WEBPACK_IMPORTED_MODULE_8__.store,\n      register: false,\n      showStore: false\n    };\n  },\n  mounted() {\n    (0,_store_ajax__WEBPACK_IMPORTED_MODULE_9__.$init)();\n  },\n  methods: {\n    updateparent(status) {\n      this.register = status;\n    },\n    showLoggedIn() {\n      this.logged = true;\n    },\n    showLogin() {\n      this.logged = false;\n    },\n    saveData() {\n      (0,_store_ajax__WEBPACK_IMPORTED_MODULE_9__.$save)();\n    },\n    showModal() {\n      this.$refs.generalModal.showModal();\n    },\n    closeModlal() {\n      this.$refs.generalModal.closeModal();\n    }\n  }\n});\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/pages/LandingPage.vue?./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use%5B0%5D!./node_modules/babel-loader/lib/index.js??clonedRuleSet-41.use!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet%5B0%5D.use%5B0%5D");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _components_organisms_OrganismSectionHeader__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/organisms/OrganismSectionHeader */ \"./src/components/organisms/OrganismSectionHeader.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionLogin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/components/organisms/OrganismSectionLogin */ \"./src/components/organisms/OrganismSectionLogin.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionSubscribe__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/components/organisms/OrganismSectionSubscribe */ \"./src/components/organisms/OrganismSectionSubscribe.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionLoggedIn__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/components/organisms/OrganismSectionLoggedIn */ \"./src/components/organisms/OrganismSectionLoggedIn.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionPaylater__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/components/organisms/OrganismSectionPaylater */ \"./src/components/organisms/OrganismSectionPaylater.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionStatus__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/components/organisms/OrganismSectionStatus */ \"./src/components/organisms/OrganismSectionStatus.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionPMethods__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/components/organisms/OrganismSectionPMethods */ \"./src/components/organisms/OrganismSectionPMethods.vue\");\n/* harmony import */ var _components_atoms_AtomLoader__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/components/atoms/AtomLoader */ \"./src/components/atoms/AtomLoader.vue\");\n/* harmony import */ var _store_store__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/store/store */ \"./src/store/store.js\");\n/* harmony import */ var _store_ajax__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/store/ajax */ \"./src/store/ajax.js\");\n/* harmony import */ var _components_molecules_MoleculeModal__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/components/molecules/MoleculeModal */ \"./src/components/molecules/MoleculeModal.vue\");\n/* harmony import */ var _components_organisms_OrganismSectionFooter__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/components/organisms/OrganismSectionFooter */ \"./src/components/organisms/OrganismSectionFooter.vue\");\n\n\n\n\n\n\n\n\n\n\n\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  computed: {\n    plugin_disabled: {\n      get: () => parseInt(_store_store__WEBPACK_IMPORTED_MODULE_8__.store.data.payplug_enable) != 1\n    },\n    logged: {\n      get: () => _store_store__WEBPACK_IMPORTED_MODULE_8__.store.settings.logged\n    },\n    loading: {\n      get: () => _store_store__WEBPACK_IMPORTED_MODULE_8__.store.settings.loading.global\n    },\n    disabled: function () {\n      if (!this.logged || _store_store__WEBPACK_IMPORTED_MODULE_8__.store.settings.save.disabled === true || _store_store__WEBPACK_IMPORTED_MODULE_8__.store.translations.status.error) return true;\n      return false;\n    },\n    modal_data() {\n      let modal_data = _store_store__WEBPACK_IMPORTED_MODULE_8__.store.settings.save.data;\n      if (modal_data.msg) this.showModal();\n      return modal_data;\n    },\n    app_name: {\n      get() {\n        return  true ? \"pspaylater\" : 0;\n      }\n    }\n  },\n  name: \"app\",\n  components: {\n    Header: _components_organisms_OrganismSectionHeader__WEBPACK_IMPORTED_MODULE_0__[\"default\"],\n    Login: _components_organisms_OrganismSectionLogin__WEBPACK_IMPORTED_MODULE_1__[\"default\"],\n    Subscribe: _components_organisms_OrganismSectionSubscribe__WEBPACK_IMPORTED_MODULE_2__[\"default\"],\n    LoggedIn: _components_organisms_OrganismSectionLoggedIn__WEBPACK_IMPORTED_MODULE_3__[\"default\"],\n    Status: _components_organisms_OrganismSectionStatus__WEBPACK_IMPORTED_MODULE_5__[\"default\"],\n    PMethods: _components_organisms_OrganismSectionPMethods__WEBPACK_IMPORTED_MODULE_6__[\"default\"],\n    Paylater: _components_organisms_OrganismSectionPaylater__WEBPACK_IMPORTED_MODULE_4__[\"default\"],\n    AtomLoader: _components_atoms_AtomLoader__WEBPACK_IMPORTED_MODULE_7__[\"default\"],\n    Modal: _components_molecules_MoleculeModal__WEBPACK_IMPORTED_MODULE_10__[\"default\"],\n    Foot: _components_organisms_OrganismSectionFooter__WEBPACK_IMPORTED_MODULE_11__[\"default\"]\n  },\n  data() {\n    return {\n      store: _store_store__WEBPACK_IMPORTED_MODULE_8__.store,\n      register: false,\n      showStore: false\n    };\n  },\n  mounted() {\n    (0,_store_ajax__WEBPACK_IMPORTED_MODULE_9__.$init)();\n  },\n  methods: {\n    updateparent(status) {\n      this.register = status;\n    },\n    showLoggedIn() {\n      this.logged = true;\n    },\n    showLogin() {\n      this.logged = false;\n    },\n    saveData() {\n      (0,_store_ajax__WEBPACK_IMPORTED_MODULE_9__.$save)();\n    },\n    showModal() {\n      this.$refs.generalModal.showModal();\n    },\n    closeModlal() {\n      this.$refs.generalModal.closeModal();\n    }\n  }\n});\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/pages/LandingPage.vue?./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use%5B0%5D!./node_modules/babel-loader/lib/index.js??clonedRuleSet-41.use!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet%5B0%5D.use%5B0%5D");
 
 /***/ }),
 
@@ -3041,7 +3041,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"render\": function() { return /* binding */ render; }\n/* harmony export */ });\n/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ \"./node_modules/vue/dist/vue.runtime.esm-bundler.js\");\n\nconst _hoisted_1 = [\"src\", \"alt\"];\nfunction render(_ctx, _cache, $props, $setup, $data, $options) {\n  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(\"div\", {\n    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($props.imgParentClass ? $props.imgParentClass : null)\n  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)(\"img\", {\n    src: $data.img,\n    alt: $props.imageAlt\n  }, null, 8 /* PROPS */, _hoisted_1)], 2 /* CLASS */);\n}\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/components/atoms/AtomImage.vue?./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use%5B0%5D!./node_modules/babel-loader/lib/index.js??clonedRuleSet-41.use!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/templateLoader.js??ruleSet%5B1%5D.rules%5B4%5D!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet%5B0%5D.use%5B0%5D");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"render\": function() { return /* binding */ render; }\n/* harmony export */ });\n/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ \"./node_modules/vue/dist/vue.runtime.esm-bundler.js\");\n\nconst _hoisted_1 = [\"src\", \"alt\"];\nfunction render(_ctx, _cache, $props, $setup, $data, $options) {\n  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(\"div\", {\n    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($props.imgParentClass ? $props.imgParentClass : null)\n  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)(\"img\", {\n    src: $options.getImage,\n    alt: $props.imageAlt\n  }, null, 8 /* PROPS */, _hoisted_1)], 2 /* CLASS */);\n}\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/components/atoms/AtomImage.vue?./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use%5B0%5D!./node_modules/babel-loader/lib/index.js??clonedRuleSet-41.use!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/templateLoader.js??ruleSet%5B1%5D.rules%5B4%5D!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet%5B0%5D.use%5B0%5D");
 
 /***/ }),
 
@@ -3525,7 +3525,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"render\": function() { return /* binding */ render; }\n/* harmony export */ });\n/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ \"./node_modules/vue/dist/vue.runtime.esm-bundler.js\");\n\nconst _hoisted_1 = {\n  class: \"payplugConfiguration\"\n};\nconst _hoisted_2 = {\n  class: \"payplug\"\n};\nconst _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)(\"br\", null, null, -1 /* HOISTED */);\nconst _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)(\"br\", null, null, -1 /* HOISTED */);\nconst _hoisted_5 = {\n  key: 0,\n  class: \"store\",\n  style: {\n    \"z-index\": \"99\"\n  }\n};\nfunction render(_ctx, _cache, $props, $setup, $data, $options) {\n  const _component_Modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Modal\");\n  const _component_AtomLoader = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"AtomLoader\");\n  const _component_Header = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Header\");\n  const _component_Login = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Login\");\n  const _component_Subscribe = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Subscribe\");\n  const _component_LoggedIn = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"LoggedIn\");\n  const _component_PMethods = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"PMethods\");\n  const _component_Paylater = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Paylater\");\n  const _component_Status = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Status\");\n  const _component_Foot = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Foot\");\n  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(\"div\", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)(\"div\", _hoisted_2, [_hoisted_3, _hoisted_4, $data.showStore ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(\"pre\", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.store.data), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(\"v-if\", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Modal, {\n    ref: \"generalModal\",\n    \"modal-content\": $options.modal_data.msg,\n    \"modal-title\": $options.modal_data.title,\n    \"modal-close\": $options.modal_data.close\n  }, null, 8 /* PROPS */, [\"modal-content\", \"modal-title\", \"modal-close\"]), $options.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_AtomLoader, {\n    key: 1,\n    class: \"global-wrapper\"\n  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(\"v-if\", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)(\"div\", {\n    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.loading ? 'blurred' : '')\n  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Header), !$options.logged && !$data.register ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Login, {\n    key: 0,\n    onNotRegisted: $options.updateparent,\n    onShowLoggedIn: $options.showLoggedIn\n  }, null, 8 /* PROPS */, [\"onNotRegisted\", \"onShowLoggedIn\"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(\"v-if\", true), !$options.logged && $data.register ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Subscribe, {\n    key: 1,\n    onNotRegisted: $options.updateparent\n  }, null, 8 /* PROPS */, [\"onNotRegisted\"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(\"v-if\", true), $options.logged ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_LoggedIn, {\n    key: 2,\n    onShowLogin: $options.showLogin\n  }, null, 8 /* PROPS */, [\"onShowLogin\"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(\"v-if\", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_PMethods, {\n    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({\n      '-disabled': !$options.logged || $options.plugin_disabled\n    })\n  }, null, 8 /* PROPS */, [\"class\"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Paylater, {\n    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({\n      '-disabled': !$options.logged || $options.plugin_disabled\n    })\n  }, null, 8 /* PROPS */, [\"class\"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Status, {\n    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({\n      '-disabled': (!$options.logged || $options.plugin_disabled) && (!$options.logged || !$data.store.translations.status.error)\n    })\n  }, null, 8 /* PROPS */, [\"class\"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Foot, {\n    disabled: $options.disabled,\n    onSaveData: $options.saveData\n  }, null, 8 /* PROPS */, [\"disabled\", \"onSaveData\"])], 2 /* CLASS */)])]);\n}\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/pages/LandingPage.vue?./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use%5B0%5D!./node_modules/babel-loader/lib/index.js??clonedRuleSet-41.use!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/templateLoader.js??ruleSet%5B1%5D.rules%5B4%5D!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet%5B0%5D.use%5B0%5D");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"render\": function() { return /* binding */ render; }\n/* harmony export */ });\n/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ \"./node_modules/vue/dist/vue.runtime.esm-bundler.js\");\n\nconst _hoisted_1 = {\n  class: \"payplugConfiguration\"\n};\nconst _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)(\"br\", null, null, -1 /* HOISTED */);\nconst _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)(\"br\", null, null, -1 /* HOISTED */);\nconst _hoisted_4 = {\n  key: 0,\n  class: \"store\",\n  style: {\n    \"z-index\": \"99\"\n  }\n};\nfunction render(_ctx, _cache, $props, $setup, $data, $options) {\n  const _component_Modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Modal\");\n  const _component_AtomLoader = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"AtomLoader\");\n  const _component_Header = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Header\");\n  const _component_Login = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Login\");\n  const _component_Subscribe = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Subscribe\");\n  const _component_LoggedIn = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"LoggedIn\");\n  const _component_PMethods = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"PMethods\");\n  const _component_Paylater = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Paylater\");\n  const _component_Status = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Status\");\n  const _component_Foot = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)(\"Foot\");\n  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(\"div\", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)(\"div\", {\n    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.app_name)\n  }, [_hoisted_2, _hoisted_3, $data.showStore ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(\"pre\", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.store.data), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(\"v-if\", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Modal, {\n    ref: \"generalModal\",\n    \"modal-content\": $options.modal_data.msg,\n    \"modal-title\": $options.modal_data.title,\n    \"modal-close\": $options.modal_data.close\n  }, null, 8 /* PROPS */, [\"modal-content\", \"modal-title\", \"modal-close\"]), $options.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_AtomLoader, {\n    key: 1,\n    class: \"global-wrapper\"\n  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(\"v-if\", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)(\"div\", {\n    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.loading ? 'blurred' : '')\n  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Header), !$options.logged && !$data.register ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Login, {\n    key: 0,\n    onNotRegisted: $options.updateparent,\n    onShowLoggedIn: $options.showLoggedIn\n  }, null, 8 /* PROPS */, [\"onNotRegisted\", \"onShowLoggedIn\"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(\"v-if\", true), !$options.logged && $data.register ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Subscribe, {\n    key: 1,\n    onNotRegisted: $options.updateparent\n  }, null, 8 /* PROPS */, [\"onNotRegisted\"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(\"v-if\", true), $options.logged ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_LoggedIn, {\n    key: 2,\n    onShowLogin: $options.showLogin\n  }, null, 8 /* PROPS */, [\"onShowLogin\"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(\"v-if\", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_PMethods, {\n    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({\n      '-disabled': !$options.logged || $options.plugin_disabled\n    })\n  }, null, 8 /* PROPS */, [\"class\"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Paylater, {\n    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({\n      '-disabled': !$options.logged || $options.plugin_disabled\n    })\n  }, null, 8 /* PROPS */, [\"class\"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Status, {\n    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({\n      '-disabled': (!$options.logged || $options.plugin_disabled) && (!$options.logged || !$data.store.translations.status.error)\n    })\n  }, null, 8 /* PROPS */, [\"class\"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Foot, {\n    disabled: $options.disabled,\n    onSaveData: $options.saveData\n  }, null, 8 /* PROPS */, [\"disabled\", \"onSaveData\"])], 2 /* CLASS */)], 2 /* CLASS */)]);\n}\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/pages/LandingPage.vue?./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use%5B0%5D!./node_modules/babel-loader/lib/index.js??clonedRuleSet-41.use!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/templateLoader.js??ruleSet%5B1%5D.rules%5B4%5D!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet%5B0%5D.use%5B0%5D");
 
 /***/ }),
 
@@ -3547,7 +3547,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ \"./node_modules/vue/dist/vue.runtime.esm-bundler.js\");\n/* harmony import */ var _App_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./App.vue */ \"./src/App.vue\");\n/* harmony import */ var _routes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./routes */ \"./src/routes/index.js\");\n/* harmony import */ var _store_data_json__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./store/data.json */ \"./src/store/data.json\");\n\n\n\n//import routes\n\n//import data from file, to be replaced for request\n\nconst app = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createApp)(_App_vue__WEBPACK_IMPORTED_MODULE_1__[\"default\"]);\napp.use(_routes__WEBPACK_IMPORTED_MODULE_2__[\"default\"]);\napp.config.globalProperties.jsonData = _store_data_json__WEBPACK_IMPORTED_MODULE_3__;\napp.mount(\"#payplug_admin\");\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/main.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ \"./node_modules/vue/dist/vue.runtime.esm-bundler.js\");\n/* harmony import */ var _App_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./App.vue */ \"./src/App.vue\");\n/* harmony import */ var _routes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./routes */ \"./src/routes/index.js\");\n\n\n\n//import routes\n\n//import data from file, to be replaced for request\n//import jsonData from './store/data.json';\n\nconst app = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createApp)(_App_vue__WEBPACK_IMPORTED_MODULE_1__[\"default\"]);\napp.use(_routes__WEBPACK_IMPORTED_MODULE_2__[\"default\"]);\n\n//load default data, from hardcoded JSON file\n//app.config.globalProperties.jsonData = jsonData;\n\napp.mount(\"#payplug_admin\");\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/main.js?");
 
 /***/ }),
 
@@ -5087,17 +5087,6 @@ eval("module.exports = \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPIAAAAyC
 "use strict";
 eval("module.exports = __webpack_require__.p + \"img/option.152a7e8c.jpeg\";\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/assets/img/svg/option.jpeg?");
 
-/***/ }),
-
-/***/ "./src/store/data.json":
-/*!*****************************!*\
-  !*** ./src/store/data.json ***!
-  \*****************************/
-/***/ (function(module) {
-
-"use strict";
-eval("module.exports = JSON.parse('{\"settings\":{\"email\":\"blablabla@blabalabl.com\",\"WP\":{\"ajax_url\":\"http://localhost:9000/\",\"nonce\":\"xxxxxxxxx\",\"login_action\":\"payplug_login\",\"logout_action\":\"payplug_logout\",\"check_permission_action\":\"payplug_check_permission\",\"check_requirements_action\":\"payplug_check_requirements\",\"save_action\":\"payplug_save\"}},\"header\":{\"title\":\"The payment solution that increases your sales.\",\"image\":\"\",\"descriptions\":{\"live\":{\"description\":\"PayPlug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools.\",\"plugin_version\":\"V 3.9.1\"},\"sandbox\":{\"description\":\"TEST MODE PayPlug is the French payment solution for SMEs. Boost your performance thanks to our turnkey, conversion-oriented tools.\",\"plugin_version\":\"V 3.9.1\"}},\"options\":[{\"type\":\"select\",\"name\":\"payplug_enable\",\"options\":[{\"value\":1,\"label\":\"Enable Plugin\",\"checked\":\"true\"},{\"value\":0,\"label\":\"Disable Plugin\"}]}],\"advanced_options\":[]},\"logged\":{\"name\":\"generalLogged\",\"title\":\"General\",\"image\":\"\",\"descriptions\":{\"live\":{\"description\":\"General settings of the module\",\"lougout\":\"Log out\",\"mode\":\"Mode\",\"mode_description\":\"In LIVE mode, the payments will generate real transactions.\",\"link_learn_more\":{\"text\":\"Learn more.\",\"url\":\"https://support.payplug.com/hc/en-gb/articles/360021142492\",\"target\":\"_blank\"},\"link_access_portal\":{\"text\":\"Access my PayPlug portal\",\"url\":\"https://www.payplug.com/portal\",\"target\":\"_blank\"}},\"sandbox\":{\"description\":\"General settings of the module\",\"lougout\":\"Log out\",\"mode\":\"Mode\",\"mode_description\":\"In TEST mode, all payments will be simulations and will not generate real transactions.\",\"link_learn_more\":{\"text\":\"Learn more\",\"url\":\"https://support.payplug.com/hc/en-gb/articles/360021142492\",\"target\":\"_blank\"},\"link_access_portal\":{\"text\":\"Access my PayPlug portal\",\"url\":\"https://www.payplug.com/portal\",\"target\":\"_blank\"}}},\"options\":[{\"name\":\"payplug_sandbox\",\"label\":\"Live\",\"value\":0},{\"name\":\"payplug_sandbox\",\"label\":\"Test\",\"value\":1}],\"advanced_options\":[]},\"payment_methods\":{\"name\":\"paymentMethodsBlock\",\"title\":\"Payment methods\",\"image\":\"\",\"descriptions\":{\"live\":{\"description\":\"Choose the payment methods you wish to offer your customers.\"},\"sandbox\":{\"description\":\"Choose the payment methods you wish to offer your customers.\"}},\"options\":[{\"type\":\"payment_method\",\"name\":\"standard\",\"title\":\"Payment by card\",\"image\":\"standard.svg\",\"checked\":true,\"descriptions\":{\"live\":{\"description\":\"Offer payment by credit card to your customers.\",\"advanced_options\":\"Advanced configuration\"},\"sandbox\":{\"description\":\"Offer payment by credit card to your customers.\",\"advanced_options\":\"Advanced configuration\"}},\"options\":[{\"type\":\"payment_option\",\"sub_type\":\"IOptions\",\"title\":\"Presentation of the payment page\",\"name\":\"embeded\",\"descriptions\":{\"live\":{\"description\":\"Your customers will see the payment form appear directly on the checkout page of your store.\",\"link_know_more\":{\"text\":\"Find out more.\",\"url\":\"https://support.payplug.com/hc/en-gb/articles/4409698334098\",\"target\":\"_blank\"}},\"sandbox\":{\"description\":\"Your customers will see the payment form appear directly on the checkout page of your store.\",\"link_know_more\":{\"text\":\"Find out more.\",\"url\":\"https://support.payplug.com/hc/en-gb/articles/4409698334098\",\"target\":\"_blank\"}}},\"options\":[{\"name\":\"payplug_embedded\",\"label\":\"pop-up\",\"value\":\"popup\"},{\"name\":\"payplug_embedded\",\"label\":\"redirected\",\"value\":\"redirected\",\"checked\":true}]},{\"type\":\"payment_option\",\"sub_type\":\"switch\",\"name\":\"one_click\",\"checked\":true,\"title\":\"Activate one-click payment\",\"descriptions\":{\"live\":{\"description\":\"Your customers will be able to register their card and make their next purchase in one click.\",\"link_know_more\":{\"text\":\"Find out more.\",\"url\":\"https://support.payplug.com/hc/en-gb/articles/360022213892\",\"target\":\"_blank\"}},\"sandbox\":{\"description\":\"Your customers will be able to register their card and make their next purchase in one click.\",\"link_know_more\":{\"text\":\"Find out more.\",\"url\":\"https://support.payplug.com/hc/en-gb/articles/360022213892\",\"target\":\"_blank\"}}},\"options\":[]}],\"advanced_options\":[]},{\"type\":\"payment_method\",\"name\":\"applepay\",\"title\":\"Apple Pay payment\",\"image\":\"applepay.svg\",\"checked\":false,\"descriptions\":{\"live\":{\"description\":\"Display the Apple Pay payment button on your store.\",\"link_know_more\":{\"text\":\"Find out more.\",\"url\":\"hhttps://support.payplug.com/hc/en-gb/articles/5149384347292\",\"target\":\"_blank\"}},\"sandbox\":{\"description\":\"Display the Apple Pay payment button on your store.\",\"link_know_more\":{\"text\":\"Find out more.\",\"url\":\"hhttps://support.payplug.com/hc/en-gb/articles/5149384347292\",\"target\":\"_blank\"}}},\"options\":[],\"advanced_options\":[]},{\"type\":\"payment_method\",\"name\":\"bancontact\",\"title\":\"Bancontact payment\",\"image\":\"bancontact.svg\",\"checked\":false,\"descriptions\":{\"live\":{\"description\":\"Allow your customers to pay with their Bancontact card.\",\"link_know_more\":{\"text\":\"Find out more.\",\"url\":\"https://support.payplug.com/hc/en-gb/articles/4408157435794\",\"target\":\"_blank\"}},\"sandbox\":{\"description\":\"Allow your customers to pay with their Bancontact card.\",\"link_know_more\":{\"text\":\"Find out more.\",\"url\":\"https://support.payplug.com/hc/en-gb/articles/4408157435794\",\"target\":\"_blank\"}}},\"options\":[{\"type\":\"payment_option\",\"sub_type\":\"switch\",\"title\":\"Allow Bancontact payment for your Belgian customers only\",\"name\":\"bancontact_country\",\"image\":\"\",\"descriptions\":{\"live\":{\"description\":\"Only your customers who are residents of Belgium will be allowed to order and pay via Bancontact on your shop.\"},\"sandbox\":{\"description\":\"Only your customers who are residents of Belgium will be allowed to order and pay via Bancontact on your shop.\"}},\"options\":[]}],\"advanced_options\":[]}],\"advanced_options\":[]},\"paylater\":{\"name\":\"paymentMethodsBlock\",\"title\":\"PayLater\",\"image\":\"\",\"descriptions\":{\"live\":{\"description\":\"Select your PayLater settings to display the 3x 4x Oney on your shop.\"},\"sandbox\":{\"description\":\"Select your PayLater settings to display the 3x 4x Oney on your shop.\"}},\"options\":[{\"name\":\"oney\",\"title\":\"3x 4x Oney payments\",\"image\":\"oney.svg\",\"checked\":true,\"descriptions\":{\"live\":{\"description\":\"Your customers can choose to pay for their orders in 3 or 4 installments. Choose below whether or not you want to pay all the fees.\",\"link_know_more\":{\"text\":\"Find out more.\",\"url\":\"hhttps://support.payplug.com/hc/en-gb/articles/360013071080\",\"target\":\"_blank\"}},\"sandbox\":{\"description\":\"Your customers can choose to pay for their orders in 3 or 4 installments. Choose below whether or not you want to pay all the fees.\",\"link_know_more\":{\"text\":\"Find out more.\",\"url\":\"hhttps://support.payplug.com/hc/en-gb/articles/360013071080\",\"target\":\"_blank\"}},\"advanced\":{\"description\":\"Advanced settings\"}},\"options\":[{\"name\":\"payplug_oney_fees\",\"className\":\"_paylaterLabel\",\"label\":\"With fees\",\"subText\":\"The fees are split between you and your customers.\",\"value\":1},{\"name\":\"payplug_oney_fees\",\"className\":\"_paylaterLabel\",\"label\":\"Without fees\",\"subText\":\"You pay the fees\",\"value\":0,\"checked\":true}],\"advanced_options\":[{\"name\":\"thresholds\",\"image_url\":\"admin/screen/thresholds.jpg\",\"title\":\"Customise your split payment offer\",\"descriptions\":{\"description\":\"Offer guaranteed split payments for amounts between\",\"min_amount\":{\"name\":\"oney_min_amounts\",\"value\":\"100\",\"placeholder\":\"100\",\"min\":\"100\",\"max\":\"3000\"},\"inter\":\"and\",\"max_amount\":{\"name\":\"oney_max_amounts\",\"value\":\"3000\",\"placeholder\":\"3000\",\"min\":\"100\",\"max\":\"3000\"},\"error\":{\"text\":\"The amount must be between €100 and €3000.\"}},\"switch\":false},{\"name\":\"optimized\",\"image_url\":\"admin/screen/optimized.jpg\",\"title\":\"Show payment schedule on the checkout page\",\"switch\":true,\"checked\":false,\"descriptions\":[{\"type\":\"text\",\"datas\":{\"text\":\"Your customers can choose to pay for their orders in 3 or 4 instalments. Choose whether or not you want to pay all the fees.\"}},{\"type\":\"anchor\",\"datas\":{\"text\":\"Learn more.\",\"url\":\"https://support.payplug.com/hc/en-gb/articles/360013071080\",\"target\":\"_blank\"}}]},{\"name\":\"product\",\"image_url\":\"admin/screen/product.jpg\",\"title\":\"Display the Oney logo on the product page\",\"switch\":true,\"checked\":false,\"descriptions\":[]},{\"name\":\"cart\",\"image_url\":\"admin/screen/cart.jpg\",\"title\":\"Display the Oney logo on the shopping cart page\",\"switch\":true,\"checked\":false,\"descriptions\":[]}]}],\"advanced_options\":[]},\"status\":{\"title\":\"Status\",\"image\":\"\",\"descriptions\":{\"live\":{\"description\":\"Control your environment to ensure that the module is in perfect working order\",\"errorMessage\":\"Unfortunately at least one issue is preventing you from using PayPlug. Refresh the page or click \\'Check\\' once they are fixed\",\"check\":\"Check\",\"enable_debug_label\":\"Enable debug mode\",\"enable_debug_description\":\"Debug mode saves additional information on your server for each operation done via PayPlug plugin (Developer setting).\"},\"sandbox\":{\"description\":\"Control your environment to ensure that the module is in perfect working order\",\"errorMessage\":\"Unfortunately at least one issue is preventing you from using PayPlug. Refresh the page or click \\'Check\\' once they are fixed\",\"check\":\"Check\",\"enable_debug_label\":\"Enable debug mode\",\"enable_debug_description\":\"Debug mode saves additional information on your server for each operation done via PayPlug plugin (Developer setting).\"}},\"options\":[{\"type\":\"-warning\",\"name\":\"requirements\",\"options\":[{\"status\":false,\"text\":\"PHP cURL extension must be enabled on your server\"},{\"status\":true,\"text\":\"Your server must run PHP 5.6 or greater\"},{\"status\":true,\"text\":\"OpenSSL 1.0.1 or later\"}]}],\"advanced_options\":[],\"enable_debug_name\":\"payplug_debug\",\"enable_debug_checked\":false}}');\n\n//# sourceURL=webpack://payplug-ui-plugins/./src/store/data.json?");
-
 /***/ })
 
 /******/ 	});
@@ -5188,6 +5177,37 @@ eval("module.exports = JSON.parse('{\"settings\":{\"email\":\"blablabla@blabalab
 /******/ 		};
 /******/ 	}();
 /******/ 	
+/******/ 	/* webpack/runtime/ensure chunk */
+/******/ 	!function() {
+/******/ 		__webpack_require__.f = {};
+/******/ 		// This file contains only the entry chunk.
+/******/ 		// The chunk loading function for additional chunks
+/******/ 		__webpack_require__.e = function(chunkId) {
+/******/ 			return Promise.all(Object.keys(__webpack_require__.f).reduce(function(promises, key) {
+/******/ 				__webpack_require__.f[key](chunkId, promises);
+/******/ 				return promises;
+/******/ 			}, []));
+/******/ 		};
+/******/ 	}();
+/******/ 	
+/******/ 	/* webpack/runtime/get javascript chunk filename */
+/******/ 	!function() {
+/******/ 		// This function allow to reference async chunks
+/******/ 		__webpack_require__.u = function(chunkId) {
+/******/ 			// return url for filenames based on template
+/******/ 			return "js/" + chunkId + ".js";
+/******/ 		};
+/******/ 	}();
+/******/ 	
+/******/ 	/* webpack/runtime/get mini-css chunk filename */
+/******/ 	!function() {
+/******/ 		// This function allow to reference async chunks
+/******/ 		__webpack_require__.miniCssF = function(chunkId) {
+/******/ 			// return url for filenames based on template
+/******/ 			return "css/" + chunkId + "-chunk.css";
+/******/ 		};
+/******/ 	}();
+/******/ 	
 /******/ 	/* webpack/runtime/global */
 /******/ 	!function() {
 /******/ 		__webpack_require__.g = (function() {
@@ -5203,6 +5223,51 @@ eval("module.exports = JSON.parse('{\"settings\":{\"email\":\"blablabla@blabalab
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	!function() {
 /******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
+/******/ 	}();
+/******/ 	
+/******/ 	/* webpack/runtime/load script */
+/******/ 	!function() {
+/******/ 		var inProgress = {};
+/******/ 		var dataWebpackPrefix = "payplug-ui-plugins:";
+/******/ 		// loadScript function to load a script via script tag
+/******/ 		__webpack_require__.l = function(url, done, key, chunkId) {
+/******/ 			if(inProgress[url]) { inProgress[url].push(done); return; }
+/******/ 			var script, needAttach;
+/******/ 			if(key !== undefined) {
+/******/ 				var scripts = document.getElementsByTagName("script");
+/******/ 				for(var i = 0; i < scripts.length; i++) {
+/******/ 					var s = scripts[i];
+/******/ 					if(s.getAttribute("src") == url || s.getAttribute("data-webpack") == dataWebpackPrefix + key) { script = s; break; }
+/******/ 				}
+/******/ 			}
+/******/ 			if(!script) {
+/******/ 				needAttach = true;
+/******/ 				script = document.createElement('script');
+/******/ 		
+/******/ 				script.charset = 'utf-8';
+/******/ 				script.timeout = 120;
+/******/ 				if (__webpack_require__.nc) {
+/******/ 					script.setAttribute("nonce", __webpack_require__.nc);
+/******/ 				}
+/******/ 				script.setAttribute("data-webpack", dataWebpackPrefix + key);
+/******/ 				script.src = url;
+/******/ 			}
+/******/ 			inProgress[url] = [done];
+/******/ 			var onScriptComplete = function(prev, event) {
+/******/ 				// avoid mem leaks in IE.
+/******/ 				script.onerror = script.onload = null;
+/******/ 				clearTimeout(timeout);
+/******/ 				var doneFns = inProgress[url];
+/******/ 				delete inProgress[url];
+/******/ 				script.parentNode && script.parentNode.removeChild(script);
+/******/ 				doneFns && doneFns.forEach(function(fn) { return fn(event); });
+/******/ 				if(prev) return prev(event);
+/******/ 			};
+/******/ 			var timeout = setTimeout(onScriptComplete.bind(null, undefined, { type: 'timeout', target: script }), 120000);
+/******/ 			script.onerror = onScriptComplete.bind(null, script.onerror);
+/******/ 			script.onload = onScriptComplete.bind(null, script.onload);
+/******/ 			needAttach && document.head.appendChild(script);
+/******/ 		};
 /******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
@@ -5221,6 +5286,83 @@ eval("module.exports = JSON.parse('{\"settings\":{\"email\":\"blablabla@blabalab
 /******/ 		__webpack_require__.p = "";
 /******/ 	}();
 /******/ 	
+/******/ 	/* webpack/runtime/css loading */
+/******/ 	!function() {
+/******/ 		if (typeof document === "undefined") return;
+/******/ 		var createStylesheet = function(chunkId, fullhref, oldTag, resolve, reject) {
+/******/ 			var linkTag = document.createElement("link");
+/******/ 		
+/******/ 			linkTag.rel = "stylesheet";
+/******/ 			linkTag.type = "text/css";
+/******/ 			var onLinkComplete = function(event) {
+/******/ 				// avoid mem leaks.
+/******/ 				linkTag.onerror = linkTag.onload = null;
+/******/ 				if (event.type === 'load') {
+/******/ 					resolve();
+/******/ 				} else {
+/******/ 					var errorType = event && (event.type === 'load' ? 'missing' : event.type);
+/******/ 					var realHref = event && event.target && event.target.href || fullhref;
+/******/ 					var err = new Error("Loading CSS chunk " + chunkId + " failed.\n(" + realHref + ")");
+/******/ 					err.code = "CSS_CHUNK_LOAD_FAILED";
+/******/ 					err.type = errorType;
+/******/ 					err.request = realHref;
+/******/ 					linkTag.parentNode.removeChild(linkTag)
+/******/ 					reject(err);
+/******/ 				}
+/******/ 			}
+/******/ 			linkTag.onerror = linkTag.onload = onLinkComplete;
+/******/ 			linkTag.href = fullhref;
+/******/ 		
+/******/ 			if (oldTag) {
+/******/ 				oldTag.parentNode.insertBefore(linkTag, oldTag.nextSibling);
+/******/ 			} else {
+/******/ 				document.head.appendChild(linkTag);
+/******/ 			}
+/******/ 			return linkTag;
+/******/ 		};
+/******/ 		var findStylesheet = function(href, fullhref) {
+/******/ 			var existingLinkTags = document.getElementsByTagName("link");
+/******/ 			for(var i = 0; i < existingLinkTags.length; i++) {
+/******/ 				var tag = existingLinkTags[i];
+/******/ 				var dataHref = tag.getAttribute("data-href") || tag.getAttribute("href");
+/******/ 				if(tag.rel === "stylesheet" && (dataHref === href || dataHref === fullhref)) return tag;
+/******/ 			}
+/******/ 			var existingStyleTags = document.getElementsByTagName("style");
+/******/ 			for(var i = 0; i < existingStyleTags.length; i++) {
+/******/ 				var tag = existingStyleTags[i];
+/******/ 				var dataHref = tag.getAttribute("data-href");
+/******/ 				if(dataHref === href || dataHref === fullhref) return tag;
+/******/ 			}
+/******/ 		};
+/******/ 		var loadStylesheet = function(chunkId) {
+/******/ 			return new Promise(function(resolve, reject) {
+/******/ 				var href = __webpack_require__.miniCssF(chunkId);
+/******/ 				var fullhref = __webpack_require__.p + href;
+/******/ 				if(findStylesheet(href, fullhref)) return resolve();
+/******/ 				createStylesheet(chunkId, fullhref, null, resolve, reject);
+/******/ 			});
+/******/ 		}
+/******/ 		// object to store loaded CSS chunks
+/******/ 		var installedCssChunks = {
+/******/ 			"app": 0
+/******/ 		};
+/******/ 		
+/******/ 		__webpack_require__.f.miniCss = function(chunkId, promises) {
+/******/ 			var cssChunks = {"src_assets_less_pspaylater_less":1};
+/******/ 			if(installedCssChunks[chunkId]) promises.push(installedCssChunks[chunkId]);
+/******/ 			else if(installedCssChunks[chunkId] !== 0 && cssChunks[chunkId]) {
+/******/ 				promises.push(installedCssChunks[chunkId] = loadStylesheet(chunkId).then(function() {
+/******/ 					installedCssChunks[chunkId] = 0;
+/******/ 				}, function(e) {
+/******/ 					delete installedCssChunks[chunkId];
+/******/ 					throw e;
+/******/ 				}));
+/******/ 			}
+/******/ 		};
+/******/ 		
+/******/ 		// no hmr
+/******/ 	}();
+/******/ 	
 /******/ 	/* webpack/runtime/jsonp chunk loading */
 /******/ 	!function() {
 /******/ 		// no baseURI
@@ -5232,7 +5374,44 @@ eval("module.exports = JSON.parse('{\"settings\":{\"email\":\"blablabla@blabalab
 /******/ 			"app": 0
 /******/ 		};
 /******/ 		
-/******/ 		// no chunk on demand loading
+/******/ 		__webpack_require__.f.j = function(chunkId, promises) {
+/******/ 				// JSONP chunk loading for javascript
+/******/ 				var installedChunkData = __webpack_require__.o(installedChunks, chunkId) ? installedChunks[chunkId] : undefined;
+/******/ 				if(installedChunkData !== 0) { // 0 means "already installed".
+/******/ 		
+/******/ 					// a Promise means "currently loading".
+/******/ 					if(installedChunkData) {
+/******/ 						promises.push(installedChunkData[2]);
+/******/ 					} else {
+/******/ 						if(true) { // all chunks have JS
+/******/ 							// setup Promise in chunk cache
+/******/ 							var promise = new Promise(function(resolve, reject) { installedChunkData = installedChunks[chunkId] = [resolve, reject]; });
+/******/ 							promises.push(installedChunkData[2] = promise);
+/******/ 		
+/******/ 							// start chunk loading
+/******/ 							var url = __webpack_require__.p + __webpack_require__.u(chunkId);
+/******/ 							// create error before stack unwound to get useful stacktrace later
+/******/ 							var error = new Error();
+/******/ 							var loadingEnded = function(event) {
+/******/ 								if(__webpack_require__.o(installedChunks, chunkId)) {
+/******/ 									installedChunkData = installedChunks[chunkId];
+/******/ 									if(installedChunkData !== 0) installedChunks[chunkId] = undefined;
+/******/ 									if(installedChunkData) {
+/******/ 										var errorType = event && (event.type === 'load' ? 'missing' : event.type);
+/******/ 										var realSrc = event && event.target && event.target.src;
+/******/ 										error.message = 'Loading chunk ' + chunkId + ' failed.\n(' + errorType + ': ' + realSrc + ')';
+/******/ 										error.name = 'ChunkLoadError';
+/******/ 										error.type = errorType;
+/******/ 										error.request = realSrc;
+/******/ 										installedChunkData[1](error);
+/******/ 									}
+/******/ 								}
+/******/ 							};
+/******/ 							__webpack_require__.l(url, loadingEnded, "chunk-" + chunkId, chunkId);
+/******/ 						} else installedChunks[chunkId] = 0;
+/******/ 					}
+/******/ 				}
+/******/ 		};
 /******/ 		
 /******/ 		// no prefetching
 /******/ 		

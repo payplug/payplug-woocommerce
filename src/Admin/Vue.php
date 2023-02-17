@@ -232,6 +232,7 @@ class Vue {
 
 		return [
 			"title"        => __( 'payplug_section_header_title', 'payplug' ),
+			"image"		   => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/paylater.svg' ),
 			"descriptions" => [
 				"live"    => [
 					"description"    => __( 'payplug_section_header_live_description', 'payplug' ),
