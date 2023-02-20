@@ -58,7 +58,7 @@ class Vue {
 			"login"     => $this->payplug_section_login(),
 			"subscribe" => $this->payplug_section_subscribe(),
 			"payment_methods"  => $this->payplug_section_payment_methods(),
-			"payment_paylater"  => $this->payplug_section_paylater(),
+			//"payment_paylater"  => $this->payplug_section_paylater(),
 			"status" => $this->payplug_section_status(),
 			"footer" => $this->payplug_section_footer(),
 		];
