@@ -46,8 +46,8 @@ class Vue {
 				"header"           		=> $header,
 				"login"     			=> $this->payplug_section_login(),
 				"logged"           		=> $logged,
-				"payment_methods"  		=> $this->payplug_section_payment_methods($payplug_wooc_settings),
-				//"payment_paylater"  	=> $this->payplug_section_paylater($payplug_wooc_settings),
+				//"payment_methods"  		=> $this->payplug_section_payment_methods($payplug_wooc_settings),
+				"payment_paylater"  	=> $this->payplug_section_paylater($payplug_wooc_settings),
 				"status" 				=> $this->payplug_section_status($payplug_wooc_settings),
 				"footer" 				=> $this->payplug_section_footer(),
 			];
@@ -57,8 +57,8 @@ class Vue {
 			"header"    => $this->payplug_section_header(),
 			"login"     => $this->payplug_section_login(),
 			"subscribe" => $this->payplug_section_subscribe(),
-			"payment_methods"  => $this->payplug_section_payment_methods(),
-			//"payment_paylater"  => $this->payplug_section_paylater(),
+			//"payment_methods"  => $this->payplug_section_payment_methods(),
+			"payment_paylater"  => $this->payplug_section_paylater(),
 			"status" => $this->payplug_section_status(),
 			"footer" => $this->payplug_section_footer(),
 		];
@@ -316,6 +316,7 @@ class Vue {
 				"name" => "oney",
 				"title" => __( 'payplug_section_oney_title', 'payplug' ),
 				"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/lg-oney.png' ),
+				"switch" => false,
 				"checked" => !empty($options) && $options['oney'] === 'yes',
 				"descriptions" => [
 					"live"    => [
