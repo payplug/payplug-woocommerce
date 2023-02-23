@@ -2,8 +2,6 @@
 
 namespace Payplug\PayplugWoocommerce\Admin\Vue;
 
-use _HumbugBox7eb78fbcc73e\___PHPSTORM_HELPERS\this;
-
 class PaymentMethods {
 
 	/**
