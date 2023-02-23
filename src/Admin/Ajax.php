@@ -549,6 +549,12 @@ class Ajax {
 				$data[$key] = $val;
 			}
 
+			if ($this->check_integrated_payment(!empty($api_keys['live']) ? esc_attr($api_keys['live']) : null) == true) {
+				$data['can_use_integrated_payments'] = true;
+			} else {
+				$data['can_use_integrated_payments'] = false;
+			}
+
 			$payplug->set_post_data($data);
 			update_option(
 				$payplug->get_option_key(),
@@ -716,6 +722,23 @@ class Ajax {
 		wp_send_json_success(array(
 			"status" => ( new Vue )->payplug_section_status()
 		));
+	}
+
+	public function check_integrated_payment($live_key) {
+		try{
+			$account = Authentication::getAccount(new Payplug($live_key));
+
+		}  catch (PayplugException $e){
+			PayplugGateway::log('Error while fetching account : ' . $e->getMessage(), 'error');
+			wp_send_json_error(["error" => $e->getMessage()]);
+			return false;
+		}
+
+		if(isset($account['httpResponse']['permissions']['can_use_integrated_payments']) && ($account['httpResponse']['permissions']['can_use_integrated_payments'] == true)){
+			return true;
+		}
+
+		return false;
 	}
 
 }
