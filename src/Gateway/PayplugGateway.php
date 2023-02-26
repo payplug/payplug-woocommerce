@@ -170,7 +170,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
 		add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
-    }
+	}
 
     /**
      * Customize gateway title in emails.
@@ -270,6 +270,61 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function get_icon()
     {
+
+		$logo = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/logo-payplug.png';
+		$lock = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
+		$privacy_policy_url = __("payplug_integrated_payment_privacy_policy_url", "payplug");
+		$f = function ($fn) {
+			return $fn;
+		};
+
+		//add this to the description
+		$this->description = <<<HTML
+			<form class="payplug IntegratedPayment -loaded">
+				<div class="payplug IntegratedPayment_container -cardHolder cardholder-input-container"></div>
+				<div class="payplug IntegratedPayment_error -cardHolder -hide">
+					<span class="-hide invalidField">[EXAMPLE] INVALID VALUE [EXAMPLE]</span>
+					<span class="-hide emptyField">[EXAMPLE] EMPTY FIELD [EXAMPLE]</span>
+				</div>
+				<div class="payplug IntegratedPayment_container -scheme">
+					<div>{$f(__('payplug_integrated_payment_your_card', 'payplug'))}</div>
+					<div class="payplug IntegratedPayment_schemes">
+						<label class="payplug IntegratedPayment_scheme -visa"><input type="radio" name="schemeOptions" value="visa"/><span></span></label>
+						<label class="payplug IntegratedPayment_scheme -mastercard"><input type="radio" name="schemeOptions" value="mastercard" /><span></span></label>
+						<label class="payplug IntegratedPayment_scheme -cb"><input type="radio" name="schemeOptions" value="cb" /><span></span></label>
+					</div>
+				</div>
+				<div class="payplug IntegratedPayment_container -pan pan-input-container"></div>
+				<div class="payplug IntegratedPayment_error -pan -hide">
+					<span class="-hide invalidField">[EXAMPLE] INVALID VALUE [EXAMPLE]</span>
+					<span class="-hide emptyField">[EXAMPLE] EMPTY FIELD [EXAMPLE]</span>
+				</div>
+				<div class="payplug IntegratedPayment_container -exp exp-input-container"></div>
+				<div class="payplug IntegratedPayment_container -cvv cvv-input-container"></div>
+				<div class="payplug IntegratedPayment_error -exp -hide">
+					<span class="-hide invalidField">[EXAMPLE] INVALID VALUE [EXAMPLE]</span>
+					<span class="-hide emptyField">[EXAMPLE] EMPTY FIELD [EXAMPLE]</span>
+				</div>
+				<div class="payplug IntegratedPayment_error -cvv -hide">
+					<span class="-hide invalidField">[EXAMPLE] INVALID VALUE [EXAMPLE]</span>
+					<span class="-hide emptyField">[EXAMPLE] EMPTY FIELD [EXAMPLE]</span>
+				</div>
+				<div class="payplug IntegratedPayment_container -saveCard">
+					<label><input type="checkbox" name="savecard"><span></span>{$f(__('payplug_integrated_payment_oneClick', 'payplug'))}</label>
+				</div>
+
+				<div class="payplug IntegratedPayment_container -transaction">
+					<img class="lock-icon" src="$lock" /><label class="transaction-label">{$f(__('payplug_integrated_payment_transaction_secure', 'payplug'))}</label><img class="payplug-logo" src="$logo" />
+				</div>
+				<div class="payplug IntegratedPayment_container -privacy-policy">
+					<a href="$privacy_policy_url" target="_blank">{$f(__('payplug_integrated_payment_privacy_policy', 'payplug'))}</a>
+				</div>
+
+				<!-- TODO:: Remove this once form is validated! -->
+				<button onClick="javascript:PayplugIntegrated.showErrors();return false;">Show/Hide Errors</button>
+			</form>
+		HTML;
+
 
         $src = ('it_IT' === get_locale())
             ? PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_PostePay.svg'
@@ -562,7 +617,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
         wp_enqueue_style('payplug-checkout');
 
-        wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
+		//TODO:: if integrated payment is not active please active this and comment the one bellow
+        //wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
         wp_register_script('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [
             'jquery',
             'payplug'
@@ -574,6 +630,26 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             ],
             'is_embedded' => 'redirect' !== $this->payment_method
         ]);
+
+		$translations = array(
+			"cardholder" =>  __('payplug_integrated_payment_cardholder', 'payplug'),
+			"your_card" =>  __('payplug_integrated_payment_your_card', 'payplug'),
+			"card_number" =>  __('payplug_integrated_payment_card_number', 'payplug'),
+			"expiration_date" =>  __('payplug_integrated_payment_expiration_date', 'payplug'),
+			"cvv" =>  __('payplug_integrated_payment_cvv', 'payplug'),
+			"one_click" =>  __('payplug_integrated_payment_oneClick', 'payplug')
+		);
+
+		//TODO:: if integrated payment is active please active form and comment the one above
+		/**
+		 * Integrated payments scripts
+		 */
+		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('payplug-integrated-payments-api', 'https://cdn.payplug.com/js/integrated-payment/v1@1/index.js', [], 'v1.1', true);
+
+		wp_enqueue_script('payplug-integrated-payments', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-integrated-payments.js', ['jquery', 'payplug-integrated-payments-api'], 'v1.1', true);
+		wp_localize_script( 'payplug-integrated-payments', 'payplug_integrated_payment_params', $translations);
+
         wp_enqueue_script('payplug-checkout');
     }
 

@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2023-02-09 11:00+0000\n"
+"PO-Revision-Date: 2023-02-26 01:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -414,3 +414,30 @@ msgstr "Update settings"
 
 msgid "payplug_thresholds_error_msg"
 msgstr "The amount must be between €100 and €3000."
+
+msgid "payplug_integrated_payment_cardholder"
+msgstr "Cardholder name"
+
+msgid "payplug_integrated_payment_your_card"
+msgstr "YOUR CARD"
+
+msgid "payplug_integrated_payment_card_number"
+msgstr "Card number"
+
+msgid "payplug_integrated_payment_expiration_date"
+msgstr "MM/YY"
+
+msgid "payplug_integrated_payment_cvv"
+msgstr "123"
+
+msgid "payplug_integrated_payment_oneClick"
+msgstr "Save my credit card"
+
+msgid "payplug_integrated_payment_transaction_secure"
+msgstr "TRANSACTION SECURED BY"
+
+msgid "payplug_integrated_payment_privacy_policy"
+msgstr "Privacy Policy"
+
+msgid "payplug_integrated_payment_privacy_policy_url"
+msgstr "https://www.payplug.com/privacy-policy"
