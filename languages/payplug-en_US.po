@@ -5,14 +5,14 @@ msgstr ""
 "Project-Id-Version: Payplug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2023-02-23 15:10+0000\n"
+"PO-Revision-Date: 2023-03-31 10:51+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "payplug_advanced_settings"
 msgstr "Advanced Settings"
@@ -420,3 +420,30 @@ msgstr "Embedded"
 
 msgid "payplug_section_standard_payment_integrated_description"
 msgstr "Your customers will see the payment form appear directly on the checkout page of your store."
+
+msgid "payplug_integrated_payment_cardholder"
+msgstr "Cardholder name"
+
+msgid "payplug_integrated_payment_your_card"
+msgstr "YOUR CARD"
+
+msgid "payplug_integrated_payment_card_number"
+msgstr "Card number"
+
+msgid "payplug_integrated_payment_expiration_date"
+msgstr "MM/YY"
+
+msgid "payplug_integrated_payment_cvv"
+msgstr "123"
+
+msgid "payplug_integrated_payment_oneClick"
+msgstr "Save my credit card"
+
+msgid "payplug_integrated_payment_transaction_secure"
+msgstr "TRANSACTION SECURED BY"
+
+msgid "payplug_integrated_payment_privacy_policy"
+msgstr "Privacy Policy"
+
+msgid "payplug_integrated_payment_privacy_policy_url"
+msgstr "https://www.payplug.com/privacy-policy"
