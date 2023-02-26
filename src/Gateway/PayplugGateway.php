@@ -323,7 +323,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				<!-- TODO:: Remove this once form is validated! -->
 				<button onClick="javascript:PayplugIntegrated.showErrors();return false;">Show/Hide Errors</button>
 			</form>
-		HTML;
+HTML;
 
 
         $src = ('it_IT' === get_locale())
