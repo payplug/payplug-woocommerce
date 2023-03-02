@@ -13,6 +13,7 @@ use Payplug\Exception\HttpException;
 use Payplug\Exception\ForbiddenException;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Admin\Ajax;
+use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
@@ -170,7 +171,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
 		add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
-    }
+	}
 
     /**
      * Customize gateway title in emails.
@@ -270,6 +271,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function get_icon()
     {
+
+		//add this to the description
+		$this->description = IntegratedPayment::template_form();
+
 
         $src = ('it_IT' === get_locale())
             ? PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_PostePay.svg'
@@ -562,7 +567,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
         wp_enqueue_style('payplug-checkout');
 
-        wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
+		//TODO:: if integrated payment is not active please active this and comment the one bellow
+        //wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
         wp_register_script('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [
             'jquery',
             'payplug'
@@ -574,6 +580,26 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             ],
             'is_embedded' => 'redirect' !== $this->payment_method
         ]);
+
+		$translations = array(
+			"cardholder" =>  __('payplug_integrated_payment_cardholder', 'payplug'),
+			"your_card" =>  __('payplug_integrated_payment_your_card', 'payplug'),
+			"card_number" =>  __('payplug_integrated_payment_card_number', 'payplug'),
+			"expiration_date" =>  __('payplug_integrated_payment_expiration_date', 'payplug'),
+			"cvv" =>  __('payplug_integrated_payment_cvv', 'payplug'),
+			"one_click" =>  __('payplug_integrated_payment_oneClick', 'payplug')
+		);
+
+		//TODO:: if integrated payment is active please active form and comment the one above
+		/**
+		 * Integrated payments scripts
+		 */
+		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('payplug-integrated-payments-api', 'https://cdn.payplug.com/js/integrated-payment/v1@1/index.js', [], 'v1.1', true);
+
+		wp_enqueue_script('payplug-integrated-payments', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-integrated-payments.js', ['jquery', 'payplug-integrated-payments-api'], 'v1.1', true);
+		wp_localize_script( 'payplug-integrated-payments', 'payplug_integrated_payment_params', $translations);
+
         wp_enqueue_script('payplug-checkout');
     }
 

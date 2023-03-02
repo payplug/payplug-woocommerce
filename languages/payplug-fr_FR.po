@@ -1025,3 +1025,30 @@ msgstr "Mettre à jour les paramètres"
 
 msgid "payplug_thresholds_error_msg"
 msgstr "Le montant doit être compris entre 100€ et 3000€."
+
+msgid "payplug_integrated_payment_cardholder"
+msgstr "Nom du titulaire de la carte"
+
+msgid "payplug_integrated_payment_your_card"
+msgstr "VOTRE CARTE"
+
+msgid "payplug_integrated_payment_card_number"
+msgstr "Numéro de carte"
+
+msgid "payplug_integrated_payment_expiration_date"
+msgstr "MM/AA"
+
+msgid "payplug_integrated_payment_cvv"
+msgstr "123"
+
+msgid "payplug_integrated_payment_oneClick"
+msgstr "Enregistrer ma carte bancaire"
+
+msgid "payplug_integrated_payment_transaction_secure"
+msgstr "TRANSACTION SÉCURISÉE PAR"
+
+msgid "payplug_integrated_payment_privacy_policy"
+msgstr "Politique de confidentialité"
+
+msgid "payplug_integrated_payment_privacy_policy_url"
+msgstr "https://www.payplug.com/fr/politique-de-confidentialite"
