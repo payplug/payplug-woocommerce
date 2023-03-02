@@ -50,6 +50,9 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 			const Integrated = IntegratedPayment.props;
 			document.querySelector('.payment_box.payment_method_payplug br').remove()
 
+			this.manageSaveCard(Integrated);
+
+
 			if( !IntegratedPayment.checkLoaded() ){
 				// Create an instance of Integrated Payments
 				Integrated.api = new Payplug.IntegratedPayment(false);
@@ -72,6 +75,18 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 		},
 		checkLoaded: function(){
 			return jQuery("iframe#cardholder").length ? true : false;
+		},
+		manageSaveCard: function(Integrated){
+			$saveCard = jQuery('.payplug.IntegratedPayment .-saveCard');
+			$saveCard.find('input').on('change', function () {
+				if (jQuery(this).prop('checked')) {
+					Integrated.save_card = true;
+					$saveCard.addClass('-checked');
+				} else {
+					Integrated.save_card = false;
+					$saveCard.removeClass('-checked');
+				}
+			});
 		}
 	}
 
