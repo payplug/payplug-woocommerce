@@ -14,6 +14,22 @@ class IntegratedPayment
 			return $fn;
 		};
 
+		if (isset(get_option( 'woocommerce_payplug_settings', [] )['oneclick']) && get_option( 'woocommerce_payplug_settings', [] )['oneclick'] === "yes") {
+			$save_card = true;
+		} else {
+			$save_card = false;
+		}
+
+		if ($save_card) {
+			$save_card_container = <<<HTML
+				<div class="payplug IntegratedPayment_container -saveCard" data-e2e-name="saveCard">
+					<label><input type="checkbox" name="savecard"><span></span>{$f(__('payplug_integrated_payment_oneClick', 'payplug'))}</label>
+				</div>
+			HTML;
+		} else {
+			$save_card_container = "";
+		}
+
 		return <<<HTML
 			<form class="payplug IntegratedPayment -loaded">
 				<div class="payplug IntegratedPayment_container -cardHolder cardholder-input-container" data-e2e-name="cardHolder"></div>
@@ -44,10 +60,7 @@ class IntegratedPayment
 					<span class="-hide invalidField" data-e2e-error="invalidField">[EXAMPLE] INVALID VALUE [EXAMPLE]</span>
 					<span class="-hide emptyField" data-e2e-error="paymentError">[EXAMPLE] EMPTY FIELD [EXAMPLE]</span>
 				</div>
-				<div class="payplug IntegratedPayment_container -saveCard" data-e2e-name="saveCard">
-					<label><input type="checkbox" name="savecard"><span></span>{$f(__('payplug_integrated_payment_oneClick', 'payplug'))}</label>
-				</div>
-
+				$save_card_container
 				<div class="payplug IntegratedPayment_container -transaction">
 					<img class="lock-icon" src="$lock" /><label class="transaction-label">{$f(__('payplug_integrated_payment_transaction_secure', 'payplug'))}</label><img class="payplug-logo" src="$logo" />
 				</div>
