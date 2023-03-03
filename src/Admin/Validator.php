@@ -33,7 +33,7 @@ class Validator {
 
 	public static function payment_method($value) {
 
-		if ( !empty($value) && in_array($value, ['redirect', 'popup']) ) {
+		if ( !empty($value) && in_array($value, ['redirect', 'popup', 'integrated']) ) {
 			return true;
 		}
 
