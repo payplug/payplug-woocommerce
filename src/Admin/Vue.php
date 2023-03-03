@@ -28,6 +28,12 @@ class Vue {
 			$payplug = (new PayplugGateway());
 			$payplug_wooc_settings = get_option( 'woocommerce_payplug_settings', [] );
 
+			if (!isset($payplug_wooc_settings['can_use_integrated_payments'])) {
+				$payplug_wooc_settings['can_use_integrated_payments'] = (new Ajax())->check_integrated_payment($payplug_wooc_settings["payplug_live_key"]);
+
+				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $payplug_wooc_settings) );
+			}
+
 			if ((empty($payplug_wooc_settings['oney_thresholds_default_min'])) && (empty($payplug_wooc_settings['oney_thresholds_default_max']))) {
 
 				$payplug_wooc_settings['oney_thresholds_default_min'] = $payplug->min_oney_price;
