@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1025,6 +1025,12 @@ msgstr "Aggiorna le impostazioni"
 
 msgid "payplug_thresholds_error_msg"
 msgstr "L'importo deve essere compreso tra 100€ e 3000€."
+
+msgid "payplug_section_standard_payment_option_integrated_label"
+msgstr "Integrata"
+
+msgid "payplug_section_standard_payment_integrated_description"
+msgstr "I tuoi clienti vedranno comparire il modulo di pagamento direttamente nella pagina di check-out del tuo negozio."
 
 msgid "payplug_integrated_payment_cardholder"
 msgstr "Titolare della carta"
