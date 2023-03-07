@@ -38,6 +38,7 @@ class PayplugWoocommerceRequest {
 
 		add_action( 'template_redirect', [ $this, 'set_session' ] );
 		add_action( 'wc_ajax_payplug_create_order', [ $this, 'ajax_create_order' ] );
+		add_action( 'wc_ajax_payplug_create_payment', [ $this, 'ajax_create_payment' ] );
 		add_action( 'wc_ajax_applepay_update_payment', [ $this, 'applepay_update_payment' ] );
 		add_action( 'wc_ajax_applepay_get_order_totals', [ $this, 'applepay_get_order_totals' ] );
 	}
@@ -59,6 +60,37 @@ class PayplugWoocommerceRequest {
 		}
 
 		$wc_session->set_customer_session_cookie( true );
+	}
+
+	/**
+	 * Create the woocommerce order in the BO
+	 *
+	 */
+	public function ajax_create_payment() {
+		if ( WC()->cart->is_empty() ) {
+			wp_send_json_error( __( 'Empty cart', 'payplug' ) );
+		}
+
+		if ( ! defined( 'WOOCOMMERCE_CHECKOUT' ) ) {
+			define( 'WOOCOMMERCE_CHECKOUT', true );
+		}
+
+		//TODO:: CREATEA PAYMENT REQUEST TO PAYPLUG API AND RETURN PAYMENT_ID
+
+		//$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
+		//$payment      = $this->api->payment_create($payment_data);
+		$abc = WC()->checkout()->process_checkout();
+
+		//create order
+		//create payment
+
+		//return payment_id
+
+		wp_send_json_success([ "result" => 'somethit' ]);
+
+		//WC()->checkout()->process_checkout();
+
+		//die( 0 );
 	}
 
 	/**

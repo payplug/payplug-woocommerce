@@ -552,7 +552,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			"card_number" =>  __('payplug_integrated_payment_card_number', 'payplug'),
 			"expiration_date" =>  __('payplug_integrated_payment_expiration_date', 'payplug'),
 			"cvv" =>  __('payplug_integrated_payment_cvv', 'payplug'),
-			"one_click" =>  __('payplug_integrated_payment_oneClick', 'payplug')
+			"one_click" =>  __('payplug_integrated_payment_oneClick', 'payplug'),
+			'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_payment'),
+			'nonce'    =>  wp_create_nonce('woocommerce-process_checkout')
 		);
 
 		//TODO:: if integrated payment is active please active form and comment the one above
