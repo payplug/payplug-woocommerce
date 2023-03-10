@@ -1,4 +1,7 @@
 /* global window, payplug_integrated_payment_params */
+
+const PAYPLUG_DOMAIN = "https://secure.payplug.com";
+
 var IntegratedPayment = {
 	props: {
 		cartId: null,
@@ -9,7 +12,7 @@ var IntegratedPayment = {
 		api: null,
 		integratedPayment: null,
 		token: null,
-		notValid: false,
+		notValid: true,
 		fieldsValid: {
 			cardHolder: false,
 			pan: false,
@@ -43,31 +46,32 @@ var IntegratedPayment = {
 		scheme: null,
 		query: null,
 		submit: null,
+		return_url: null
 	},
 	init: function(){
-		const Integrated = IntegratedPayment.props;
 		document.querySelector('.payment_box.payment_method_payplug br').remove();
-
-		this.manageSaveCard(Integrated);
+		this.manageSaveCard(IntegratedPayment.props);
 
 		if( !IntegratedPayment.checkLoaded() ){
 			// Create an instance of Integrated Payments
-			Integrated.api = new Payplug.IntegratedPayment(false);
+			IntegratedPayment.props.api = new Payplug.IntegratedPayment(false);
 
 			// Add each payments fields
-			Integrated.api.cardHolder(
+			IntegratedPayment.props.api.cardHolder(
 				document.querySelector('.cardholder-input-container'),
-				{default: Integrated.inputStyle.default, placeholder:payplug_integrated_payment_params.cardholder } );
-			Integrated.api.cardNumber(
+				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.cardholder } );
+			IntegratedPayment.props.api.cardNumber(
 				document.querySelector('.pan-input-container'),
-				{default: Integrated.inputStyle.default, placeholder:payplug_integrated_payment_params.card_number } );
-			Integrated.api.cvv(
+				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.card_number } );
+			IntegratedPayment.props.api.cvv(
 				document.querySelector('.cvv-input-container'),
-				{default: Integrated.inputStyle.default, placeholder:payplug_integrated_payment_params.cvv } );
+				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.cvv } );
 			// With one field for expiration date
-			Integrated.api.expiration(
+			IntegratedPayment.props.api.expiration(
 				document.querySelector('.exp-input-container'),
-				{default: Integrated.inputStyle.default, placeholder:payplug_integrated_payment_params.expiration_date } );
+				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.expiration_date } );
+
+			IntegratedPayment.props.scheme = IntegratedPayment.props.api.getSupportedSchemes();
 		}
 	},
 	checkLoaded: function(){
@@ -86,18 +90,17 @@ var IntegratedPayment = {
 		});
 	},
 	onSubmit: function(e){
-
 		jQuery('form.woocommerce-checkout').block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
 		e.stopImmediatePropagation();
 		e.preventDefault();
 
-		var res = IntegratedPayment.getPayment();
+		//validate the form before create payment/submit payment
+		IntegratedPayment.getPayment();
 
 		return;
 
 	},
 	getPayment: function(){
-
 		$data = getFormData(jQuery('form.woocommerce-checkout'));
 		$data.ajax = 1;
 		$data.createIP = 1;
@@ -116,16 +119,13 @@ var IntegratedPayment = {
 				console.log(errorThrown);
 			},
 			success: function (result) {
-				/*if (result && result.payment_id) {
-					integrated.props.paymentId = result.payment_id;
-					integrated.props.cart_id = result.cart_id;
-					integrated.form.submitIntPayment();
+				if (result.success && result.data.payment_id) {
+					IntegratedPayment.props.paymentId = result.data.payment_id;
+					IntegratedPayment.props.return_url = result.data.return_url;
+					IntegratedPayment.SubmitPayment();
 				} else {
-					window[module_name+'Module'].popup.set(integratedPaymentError);
-					integrated.form.clearIntPayment();
-					return false;
-				}*/
-				console.log(result);
+					alert("NOT CREATED")
+				}
 			},
 		});
 
@@ -141,15 +141,26 @@ var IntegratedPayment = {
 		}
 	},
 	SubmitPayment: function(){
+		try {
+			IntegratedPayment.props.api.pay(IntegratedPayment.props.paymentId, Payplug.Scheme.AUTO, {save_card: false});
+		} catch(error) {
+			console.log(error);
+		}
 	}
 };
 
 jQuery( 'body' ).on( 'updated_checkout', function() {
 	IntegratedPayment.init();
+
+	IntegratedPayment.props.api.onCompleted(function (event) {
+		//TODO:: ADD VALIDATION ABOUT THE PAYMENT WAS VALID OR NOT! AND REDIRECT TO THE RIGHT PAGE
+		window.location.href = IntegratedPayment.props.return_url;
+	})
 });
 
 (function ($) {
 
+	$("body").attr("payplug-domain", payplug_integrated_payment_params.secureDomain);
 	//on submit event
 	$('form.woocommerce-checkout').on('submit', IntegratedPayment.onSubmit);
 
