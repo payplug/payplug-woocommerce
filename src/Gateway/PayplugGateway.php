@@ -275,12 +275,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function get_icon()
     {
 
-		//add this to the description
-		if($this->payment_method === 'integrated'){
-			$this->description = IntegratedPayment::template_form();
-		}
-
-
         $src = ('it_IT' === get_locale())
             ? PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_PostePay.svg'
             : PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_CB.svg';
@@ -323,6 +317,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function init_form_fields()
     {
+
+		//add fields of IP to the description
+		if($this->payment_method === 'integrated'){
+			$this->description = IntegratedPayment::template_form();
+		}
+
         $anchor = esc_html_x( __("More informations", 'payplug'), 'modal', 'payplug' );
 		$domain = __( 'support.payplug.com/hc/fr/articles/4408142346002', 'payplug' );
 		$link   = sprintf(  ' <a href="https://%s" target="_blank">%s</a>', $domain, $anchor );
