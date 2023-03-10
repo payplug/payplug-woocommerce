@@ -166,6 +166,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             $this->description = trim($this->description);
         }
 
+		//add fields of IP to the description
+		if($this->payment_method === 'integrated'){
+			$this->has_fields = true;
+		}
+
 		//TODO:: check if integrated payments is enabled
 		add_action('wp_enqueue_scripts', [$this, 'integrated_payments_scripts']);
 
@@ -317,11 +322,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function init_form_fields()
     {
-
-		//add fields of IP to the description
-		if($this->payment_method === 'integrated'){
-			$this->description = IntegratedPayment::template_form();
-		}
 
         $anchor = esc_html_x( __("More informations", 'payplug'), 'modal', 'payplug' );
 		$domain = __( 'support.payplug.com/hc/fr/articles/4408142346002', 'payplug' );
@@ -684,6 +684,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function payment_fields()
     {
         $description = $this->get_description();
+
+		//add fields of IP to the description
+		if($this->payment_method === 'integrated'){
+			$description .= IntegratedPayment::template_form();
+		}
+
         if (!empty($description)) {
             echo wpautop(wptexturize($description));
         }
