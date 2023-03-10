@@ -56,17 +56,17 @@ var IntegratedPayment = {
 			IntegratedPayment.props.api = new Payplug.IntegratedPayment(false);
 
 			// Add each payments fields
-			IntegratedPayment.props.api.cardHolder(
+			IntegratedPayment.props.cardHolder = IntegratedPayment.props.api.cardHolder(
 				document.querySelector('.cardholder-input-container'),
 				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.cardholder } );
-			IntegratedPayment.props.api.cardNumber(
+			IntegratedPayment.props.pan = IntegratedPayment.props.api.cardNumber(
 				document.querySelector('.pan-input-container'),
 				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.card_number } );
-			IntegratedPayment.props.api.cvv(
+			IntegratedPayment.props.cvv = IntegratedPayment.props.api.cvv(
 				document.querySelector('.cvv-input-container'),
 				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.cvv } );
 			// With one field for expiration date
-			IntegratedPayment.props.api.expiration(
+			IntegratedPayment.props.exp = IntegratedPayment.props.api.expiration(
 				document.querySelector('.exp-input-container'),
 				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.expiration_date } );
 
@@ -92,9 +92,17 @@ var IntegratedPayment = {
 		jQuery('form.woocommerce-checkout').block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
 		e.stopImmediatePropagation();
 		e.preventDefault();
-
 		//validate the form before create payment/submit payment
-		IntegratedPayment.getPayment();
+		IntegratedPayment.props.api.validateForm();
+
+		IntegratedPayment.props.api.onValidateForm(({isFormValid}) => {
+			if (isFormValid) {
+				IntegratedPayment.getPayment();
+			} else {
+				console.log("error validation");
+			}
+		});
+
 
 		return;
 
@@ -151,6 +159,62 @@ var IntegratedPayment = {
 jQuery( 'body' ).on( 'updated_checkout', function() {
 	IntegratedPayment.init();
 
+	IntegratedPayment.props.pan.onChange(function(err) {
+		if (err.error) {
+			document.querySelector(".payplug.IntegratedPayment_error.-pan").classList.remove("-hide");
+			document.querySelector('.pan-input-container').classList.add("-invalid");
+			document.querySelector(".payplug.IntegratedPayment_error.-pan").querySelector(".invalidField").classList.remove("-hide");
+		} else {
+			document.querySelector(".payplug.IntegratedPayment_error.-pan").classList.add("-hide");
+			document.querySelector('.pan-input-container').classList.remove("-invalid");
+			document.querySelector(".payplug.IntegratedPayment_error.-pan").querySelector(".invalidField").classList.add("-hide");
+			IntegratedPayment.props.fieldsValid.pan = true;
+			IntegratedPayment.props.fieldsEmpty.pan = false;
+		}
+	});
+
+	IntegratedPayment.props.cvv.onChange(function(err) {
+		if (err.error) {
+			document.querySelector(".payplug.IntegratedPayment_error.-cvv").classList.remove("-hide");
+			document.querySelector('.cvv-input-container').classList.add("-invalid");
+			document.querySelector(".payplug.IntegratedPayment_error.-cvv").querySelector(".invalidField").classList.remove("-hide");
+		} else {
+			document.querySelector(".payplug.IntegratedPayment_error.-cvv").classList.add("-hide");
+			document.querySelector('.cvv-input-container').classList.remove("-invalid");
+			document.querySelector(".payplug.IntegratedPayment_error.-cvv").querySelector(".invalidField").classList.add("-hide");
+			IntegratedPayment.props.fieldsValid.cvv = true;
+			IntegratedPayment.props.fieldsEmpty.cvv = false;
+		}
+	});
+
+	IntegratedPayment.props.cardHolder.onChange(function(err) {
+		if (err.error) {
+			document.querySelector(".payplug.IntegratedPayment_error.-cardHolder").classList.remove("-hide");
+			document.querySelector('.cardholder-input-container').classList.add("-invalid");
+			document.querySelector(".payplug.IntegratedPayment_error.-cardHolder").querySelector(".invalidField").classList.remove("-hide");
+		} else {
+			document.querySelector(".payplug.IntegratedPayment_error.-cardHolder").classList.add("-hide");
+			document.querySelector('.cardholder-input-container').classList.remove("-invalid");
+			document.querySelector(".payplug.IntegratedPayment_error.-cardHolder").querySelector(".invalidField").classList.add("-hide");
+			IntegratedPayment.props.fieldsValid.cardHolder = true;
+			IntegratedPayment.props.fieldsEmpty.cardHolder = false;
+		}
+	});
+
+	IntegratedPayment.props.exp.onChange(function(err) {
+		if (err.error) {
+			document.querySelector(".payplug.IntegratedPayment_error.-exp").classList.remove("-hide");
+			document.querySelector('.exp-input-container').classList.add("-invalid");
+			document.querySelector(".payplug.IntegratedPayment_error.-exp").querySelector(".invalidField").classList.remove("-hide");
+		} else {
+			document.querySelector(".payplug.IntegratedPayment_error.-exp").classList.add("-hide");
+			document.querySelector('.exp-input-container').classList.remove("-invalid");
+			document.querySelector(".payplug.IntegratedPayment_error.-exp").querySelector(".invalidField").classList.add("-hide");
+			IntegratedPayment.props.fieldsValid.exp = true;
+			IntegratedPayment.props.fieldsEmpty.exp = false;
+		}
+	});
+
 	IntegratedPayment.props.api.onCompleted(function (event) {
 		//TODO:: ADD VALIDATION ABOUT THE PAYMENT WAS VALID OR NOT! AND REDIRECT TO THE RIGHT PAGE
 		window.location.href = IntegratedPayment.props.return_url;
@@ -161,6 +225,6 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 
 	$("body").attr("payplug-domain", payplug_integrated_payment_params.secureDomain);
 	//on submit event
-	$('form.woocommerce-checkout').on('submit', IntegratedPayment.onSubmit);
+	$('form.woocommerce-checkout').on('submit', IntegratedPayment.api);
 
 })(jQuery);
