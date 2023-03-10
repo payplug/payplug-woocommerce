@@ -687,7 +687,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		//add fields of IP to the description
 		if($this->payment_method === 'integrated'){
-			$description .= IntegratedPayment::template_form();
+			echo IntegratedPayment::template_form();
 		}
 
         if (!empty($description)) {
