@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2023-03-31 10:52+0100\n"
+"PO-Revision-Date: 2023-03-31 10:54+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -447,3 +447,18 @@ msgstr "Privacy Policy"
 
 msgid "payplug_integrated_payment_privacy_policy_url"
 msgstr "https://www.payplug.com/privacy-policy"
+
+msgid "payplug_integrated_payment_empty"
+msgstr "Mandatory field."
+
+msgid "payplug_integrated_payment_cardHolder_error"
+msgstr "Invalid Name and/or Last Name"
+
+msgid "payplug_integrated_payment_pan_error"
+msgstr "Invalid card number."
+
+msgid "payplug_integrated_payment_cvv_error"
+msgstr "Invalid CVV."
+
+msgid "payplug_integrated_payment_exp_error"
+msgstr "Invalid expiration date."
