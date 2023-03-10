@@ -49,7 +49,6 @@ var IntegratedPayment = {
 		return_url: null
 	},
 	init: function(){
-		document.querySelector('.payment_box.payment_method_payplug br').remove();
 		this.manageSaveCard(IntegratedPayment.props);
 
 		if( !IntegratedPayment.checkLoaded() ){
