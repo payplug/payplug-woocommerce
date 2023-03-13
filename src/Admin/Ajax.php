@@ -549,7 +549,7 @@ class Ajax {
 				$data[$key] = $val;
 			}
 
-			if ($this->check_integrated_payment(!empty($api_keys['live']) ? esc_attr($api_keys['live']) : null) == true) {
+			if ( !empty($api_keys['live']) && $this->check_integrated_payment(!empty($api_keys['live']) ? esc_attr($api_keys['live']) : null) == true) {
 				$data['can_use_integrated_payments'] = true;
 			} else {
 				$data['can_use_integrated_payments'] = false;
