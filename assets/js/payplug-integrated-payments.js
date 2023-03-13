@@ -1,6 +1,6 @@
 /* global window, payplug_integrated_payment_params */
 
-const PAYPLUG_DOMAIN = "https://secure.payplug.com";
+const PAYPLUG_DOMAIN = "https://secure-qa.payplug.com";
 
 var IntegratedPayment = {
 	props: {
@@ -93,16 +93,16 @@ var IntegratedPayment = {
 		e.stopImmediatePropagation();
 		e.preventDefault();
 		//validate the form before create payment/submit payment
-		IntegratedPayment.props.api.validateForm();
 
 		IntegratedPayment.props.api.onValidateForm(({isFormValid}) => {
 			if (isFormValid) {
 				IntegratedPayment.getPayment();
 			} else {
-				console.log("error validation");
+				jQuery('form.woocommerce-checkout').unblock();
 			}
-		});
 
+		});
+		IntegratedPayment.props.api.validateForm();
 
 		return;
 
@@ -163,11 +163,19 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 		if (err.error) {
 			document.querySelector(".payplug.IntegratedPayment_error.-pan").classList.remove("-hide");
 			document.querySelector('.pan-input-container').classList.add("-invalid");
-			document.querySelector(".payplug.IntegratedPayment_error.-pan").querySelector(".invalidField").classList.remove("-hide");
+
+			if (err.error.name === "FIELD_EMPTY") {
+				document.querySelector(".payplug.IntegratedPayment_error.-pan").querySelector(".emptyField").classList.remove("-hide");
+				document.querySelector(".payplug.IntegratedPayment_error.-pan").querySelector(".invalidField").classList.add("-hide");
+			} else {
+				document.querySelector(".payplug.IntegratedPayment_error.-pan").querySelector(".invalidField").classList.remove("-hide");
+				document.querySelector(".payplug.IntegratedPayment_error.-pan").querySelector(".emptyField").classList.add("-hide");
+			}
 		} else {
 			document.querySelector(".payplug.IntegratedPayment_error.-pan").classList.add("-hide");
 			document.querySelector('.pan-input-container').classList.remove("-invalid");
 			document.querySelector(".payplug.IntegratedPayment_error.-pan").querySelector(".invalidField").classList.add("-hide");
+			document.querySelector(".payplug.IntegratedPayment_error.-pan").querySelector(".emptyField").classList.add("-hide");
 			IntegratedPayment.props.fieldsValid.pan = true;
 			IntegratedPayment.props.fieldsEmpty.pan = false;
 		}
@@ -177,11 +185,19 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 		if (err.error) {
 			document.querySelector(".payplug.IntegratedPayment_error.-cvv").classList.remove("-hide");
 			document.querySelector('.cvv-input-container').classList.add("-invalid");
-			document.querySelector(".payplug.IntegratedPayment_error.-cvv").querySelector(".invalidField").classList.remove("-hide");
+
+			if (err.error.name === "FIELD_EMPTY") {
+				document.querySelector(".payplug.IntegratedPayment_error.-cvv").querySelector(".emptyField").classList.remove("-hide");
+				document.querySelector(".payplug.IntegratedPayment_error.-cvv").querySelector(".invalidField").classList.add("-hide");
+			} else {
+				document.querySelector(".payplug.IntegratedPayment_error.-cvv").querySelector(".emptyField").classList.add("-hide");
+				document.querySelector(".payplug.IntegratedPayment_error.-cvv").querySelector(".invalidField").classList.remove("-hide");
+			}
 		} else {
 			document.querySelector(".payplug.IntegratedPayment_error.-cvv").classList.add("-hide");
 			document.querySelector('.cvv-input-container').classList.remove("-invalid");
 			document.querySelector(".payplug.IntegratedPayment_error.-cvv").querySelector(".invalidField").classList.add("-hide");
+			document.querySelector(".payplug.IntegratedPayment_error.-cvv").querySelector(".emptyField").classList.add("-hide");
 			IntegratedPayment.props.fieldsValid.cvv = true;
 			IntegratedPayment.props.fieldsEmpty.cvv = false;
 		}
@@ -191,11 +207,19 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 		if (err.error) {
 			document.querySelector(".payplug.IntegratedPayment_error.-cardHolder").classList.remove("-hide");
 			document.querySelector('.cardholder-input-container').classList.add("-invalid");
-			document.querySelector(".payplug.IntegratedPayment_error.-cardHolder").querySelector(".invalidField").classList.remove("-hide");
+
+			if (err.error.name === "FIELD_EMPTY") {
+				document.querySelector(".payplug.IntegratedPayment_error.-cardHolder").querySelector(".emptyField").classList.remove("-hide");
+				document.querySelector(".payplug.IntegratedPayment_error.-cardHolder").querySelector(".invalidField").classList.add("-hide");
+			} else {
+				document.querySelector(".payplug.IntegratedPayment_error.-cardHolder").querySelector(".invalidField").classList.remove("-hide");
+				document.querySelector(".payplug.IntegratedPayment_error.-cardHolder").querySelector(".emptyField").classList.add("-hide");
+			}
 		} else {
 			document.querySelector(".payplug.IntegratedPayment_error.-cardHolder").classList.add("-hide");
 			document.querySelector('.cardholder-input-container').classList.remove("-invalid");
 			document.querySelector(".payplug.IntegratedPayment_error.-cardHolder").querySelector(".invalidField").classList.add("-hide");
+			document.querySelector(".payplug.IntegratedPayment_error.-cardHolder").querySelector(".emptyField").classList.add("-hide");
 			IntegratedPayment.props.fieldsValid.cardHolder = true;
 			IntegratedPayment.props.fieldsEmpty.cardHolder = false;
 		}
@@ -205,11 +229,19 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 		if (err.error) {
 			document.querySelector(".payplug.IntegratedPayment_error.-exp").classList.remove("-hide");
 			document.querySelector('.exp-input-container').classList.add("-invalid");
-			document.querySelector(".payplug.IntegratedPayment_error.-exp").querySelector(".invalidField").classList.remove("-hide");
+
+			if (err.error.name === "FIELD_EMPTY") {
+				document.querySelector(".payplug.IntegratedPayment_error.-exp").querySelector(".emptyField").classList.remove("-hide");
+				document.querySelector(".payplug.IntegratedPayment_error.-exp").querySelector(".invalidField").classList.add("-hide");
+			} else {
+				document.querySelector(".payplug.IntegratedPayment_error.-exp").querySelector(".invalidField").classList.remove("-hide");
+				document.querySelector(".payplug.IntegratedPayment_error.-exp").querySelector(".emptyField").classList.add("-hide");
+			}
 		} else {
 			document.querySelector(".payplug.IntegratedPayment_error.-exp").classList.add("-hide");
 			document.querySelector('.exp-input-container').classList.remove("-invalid");
 			document.querySelector(".payplug.IntegratedPayment_error.-exp").querySelector(".invalidField").classList.add("-hide");
+			document.querySelector(".payplug.IntegratedPayment_error.-exp").querySelector(".emptyField").classList.add("-hide");
 			IntegratedPayment.props.fieldsValid.exp = true;
 			IntegratedPayment.props.fieldsEmpty.exp = false;
 		}
@@ -225,6 +257,6 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 
 	$("body").attr("payplug-domain", payplug_integrated_payment_params.secureDomain);
 	//on submit event
-	$('form.woocommerce-checkout').on('submit', IntegratedPayment.api);
+	$('form.woocommerce-checkout').on('submit', IntegratedPayment.onSubmit);
 
 })(jQuery);
