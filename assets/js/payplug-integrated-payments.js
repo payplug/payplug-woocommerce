@@ -1,6 +1,6 @@
 /* global window, payplug_integrated_payment_params */
 
-const PAYPLUG_DOMAIN = "https://secure-qa.payplug.com";
+const PAYPLUG_DOMAIN = "https://secure.payplug.com";
 
 var IntegratedPayment = {
 	props: {
@@ -56,17 +56,17 @@ var IntegratedPayment = {
 			IntegratedPayment.props.api = new Payplug.IntegratedPayment(false);
 
 			// Add each payments fields
-			IntegratedPayment.props.cardHolder = IntegratedPayment.props.api.cardHolder(
-				document.querySelector('.cardholder-input-container'),
+			IntegratedPayment.props.form.cardHolder = IntegratedPayment.props.api.cardHolder(
+				document.querySelector('.cardHolder-input-container'),
 				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.cardholder } );
-			IntegratedPayment.props.pan = IntegratedPayment.props.api.cardNumber(
+			IntegratedPayment.props.form.pan = IntegratedPayment.props.api.cardNumber(
 				document.querySelector('.pan-input-container'),
 				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.card_number } );
-			IntegratedPayment.props.cvv = IntegratedPayment.props.api.cvv(
+			IntegratedPayment.props.form.cvv = IntegratedPayment.props.api.cvv(
 				document.querySelector('.cvv-input-container'),
 				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.cvv } );
 			// With one field for expiration date
-			IntegratedPayment.props.exp = IntegratedPayment.props.api.expiration(
+			IntegratedPayment.props.form.exp = IntegratedPayment.props.api.expiration(
 				document.querySelector('.exp-input-container'),
 				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.expiration_date } );
 
@@ -159,7 +159,31 @@ var IntegratedPayment = {
 jQuery( 'body' ).on( 'updated_checkout', function() {
 	IntegratedPayment.init();
 
-	IntegratedPayment.props.pan.onChange(function(err) {
+	jQuery.each(IntegratedPayment.props.form, function (key, field) {
+		field.onChange(function(err) {
+			if (err.error) {
+				document.querySelector(".payplug.IntegratedPayment_error.-"+key).classList.remove("-hide");
+				document.querySelector('.'+key+'-input-container').classList.add("-invalid");
+
+				if (err.error.name === "FIELD_EMPTY") {
+					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".emptyField").classList.remove("-hide");
+					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".invalidField").classList.add("-hide");
+				} else {
+					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".invalidField").classList.remove("-hide");
+					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".emptyField").classList.add("-hide");
+				}
+			} else {
+				document.querySelector(".payplug.IntegratedPayment_error.-"+key).classList.add("-hide");
+				document.querySelector('.'+key+'-input-container').classList.remove("-invalid");
+				document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".invalidField").classList.add("-hide");
+				document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".emptyField").classList.add("-hide");
+				IntegratedPayment.props.fieldsValid[key] = true;
+				IntegratedPayment.props.fieldsEmpty[key] = false;
+			}
+		});
+	});
+
+/*	IntegratedPayment.props.pan.onChange(function(err) {
 		if (err.error) {
 			document.querySelector(".payplug.IntegratedPayment_error.-pan").classList.remove("-hide");
 			document.querySelector('.pan-input-container').classList.add("-invalid");
@@ -245,7 +269,7 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 			IntegratedPayment.props.fieldsValid.exp = true;
 			IntegratedPayment.props.fieldsEmpty.exp = false;
 		}
-	});
+	});*/
 
 	IntegratedPayment.props.api.onCompleted(function (event) {
 		//TODO:: ADD VALIDATION ABOUT THE PAYMENT WAS VALID OR NOT! AND REDIRECT TO THE RIGHT PAGE
