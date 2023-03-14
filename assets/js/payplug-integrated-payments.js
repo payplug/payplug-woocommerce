@@ -55,6 +55,7 @@ var IntegratedPayment = {
 		if( !IntegratedPayment.checkLoaded() ){
 			// Create an instance of Integrated Payments
 			IntegratedPayment.props.api = new Payplug.IntegratedPayment(false);
+			IntegratedPayment.props.api.setDisplayMode3ds(Payplug.DisplayMode3ds.LIGHTBOX)
 
 			// Add each payments fields
 			IntegratedPayment.props.form.cardHolder = IntegratedPayment.props.api.cardHolder(
