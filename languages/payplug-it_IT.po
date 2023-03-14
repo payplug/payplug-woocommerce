@@ -1058,3 +1058,18 @@ msgstr "Politica di confidenzialità"
 
 msgid "payplug_integrated_payment_privacy_policy_url"
 msgstr "https://www.payplug.com/it/politica-di-confidenzialita"
+
+msgid "payplug_integrated_payment_empty"
+msgstr "Campo obbligatorio."
+
+msgid "payplug_integrated_payment_cardHolder_error"
+msgstr "Nome e/o Cognome non valido(i)."
+
+msgid "payplug_integrated_payment_pan_error"
+msgstr "Numero di carta non valido."
+
+msgid "payplug_integrated_payment_cvv_error"
+msgstr "CVV non valido."
+
+msgid "payplug_integrated_payment_exp_error"
+msgstr "Data di scadenza non valida."

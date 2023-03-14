@@ -56,17 +56,17 @@ var IntegratedPayment = {
 			IntegratedPayment.props.api = new Payplug.IntegratedPayment(false);
 
 			// Add each payments fields
-			IntegratedPayment.props.api.cardHolder(
-				document.querySelector('.cardholder-input-container'),
+			IntegratedPayment.props.form.cardHolder = IntegratedPayment.props.api.cardHolder(
+				document.querySelector('.cardHolder-input-container'),
 				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.cardholder } );
-			IntegratedPayment.props.api.cardNumber(
+			IntegratedPayment.props.form.pan = IntegratedPayment.props.api.cardNumber(
 				document.querySelector('.pan-input-container'),
 				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.card_number } );
-			IntegratedPayment.props.api.cvv(
+			IntegratedPayment.props.form.cvv = IntegratedPayment.props.api.cvv(
 				document.querySelector('.cvv-input-container'),
 				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.cvv } );
 			// With one field for expiration date
-			IntegratedPayment.props.api.expiration(
+			IntegratedPayment.props.form.exp = IntegratedPayment.props.api.expiration(
 				document.querySelector('.exp-input-container'),
 				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.expiration_date } );
 
@@ -92,9 +92,17 @@ var IntegratedPayment = {
 		jQuery('form.woocommerce-checkout').block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
 		e.stopImmediatePropagation();
 		e.preventDefault();
-
 		//validate the form before create payment/submit payment
-		IntegratedPayment.getPayment();
+
+		IntegratedPayment.props.api.onValidateForm(({isFormValid}) => {
+			if (isFormValid) {
+				IntegratedPayment.getPayment();
+			} else {
+				jQuery('form.woocommerce-checkout').unblock();
+			}
+
+		});
+		IntegratedPayment.props.api.validateForm();
 
 		return;
 
@@ -150,6 +158,30 @@ var IntegratedPayment = {
 
 jQuery( 'body' ).on( 'updated_checkout', function() {
 	IntegratedPayment.init();
+
+	jQuery.each(IntegratedPayment.props.form, function (key, field) {
+		field.onChange(function(err) {
+			if (err.error) {
+				document.querySelector(".payplug.IntegratedPayment_error.-"+key).classList.remove("-hide");
+				document.querySelector('.'+key+'-input-container').classList.add("-invalid");
+
+				if (err.error.name === "FIELD_EMPTY") {
+					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".emptyField").classList.remove("-hide");
+					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".invalidField").classList.add("-hide");
+				} else {
+					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".invalidField").classList.remove("-hide");
+					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".emptyField").classList.add("-hide");
+				}
+			} else {
+				document.querySelector(".payplug.IntegratedPayment_error.-"+key).classList.add("-hide");
+				document.querySelector('.'+key+'-input-container').classList.remove("-invalid");
+				document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".invalidField").classList.add("-hide");
+				document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".emptyField").classList.add("-hide");
+				IntegratedPayment.props.fieldsValid[key] = true;
+				IntegratedPayment.props.fieldsEmpty[key] = false;
+			}
+		});
+	});
 
 	IntegratedPayment.props.api.onCompleted(function (event) {
 		//TODO:: ADD VALIDATION ABOUT THE PAYMENT WAS VALID OR NOT! AND REDIRECT TO THE RIGHT PAGE
