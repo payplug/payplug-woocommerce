@@ -16,7 +16,7 @@ class IntegratedPayment
 
 		return <<<HTML
 			<form class="payplug IntegratedPayment -loaded">
-				<div class="payplug IntegratedPayment_container -cardHolder cardholder-input-container" data-e2e-name="cardHolder"></div>
+				<div class="payplug IntegratedPayment_container -cardHolder cardHolder-input-container" data-e2e-name="cardHolder"></div>
 				<div class="payplug IntegratedPayment_error -cardHolder -hide">
 					<span class="-hide invalidField" data-e2e-error="invalidField">{$f(__('payplug_integrated_payment_cardHolder_error', 'payplug'))}</span>
 					<span class="-hide emptyField" data-e2e-error="paymentError">{$f(__('payplug_integrated_payment_empty', 'payplug'))}</span>
