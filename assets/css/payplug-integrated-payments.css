@@ -136,11 +136,13 @@
 .IntegratedPayment_container.-saveCard label input {
 	display: none;
 }
-.IntegratedPayment_container.-saveCard label:hover {
-	color: #2b343d;
-}
 .IntegratedPayment_container.-saveCard label:hover span {
 	border-color: #2b343d;
+	transition: 0.1s;
+}
+.IntegratedPayment_container.-saveCard label:hover {
+	color: #2b343d;
+	transition: 0.1s;
 }
 .IntegratedPayment_container.-saveCard.-checked label {
 	color: #2b343d;
