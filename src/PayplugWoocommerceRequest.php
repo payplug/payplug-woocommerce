@@ -40,7 +40,6 @@ class PayplugWoocommerceRequest {
 
 		add_action( 'template_redirect', [ $this, 'set_session' ] );
 		add_action( 'wc_ajax_payplug_create_order', [ $this, 'ajax_create_order' ] );
-		add_action( 'wc_ajax_payplug_create_payment', [ $this, 'ajax_create_payment' ] );
 		add_action( 'wc_ajax_applepay_update_payment', [ $this, 'applepay_update_payment' ] );
 	}
 
@@ -61,71 +60,6 @@ class PayplugWoocommerceRequest {
 		}
 
 		$wc_session->set_customer_session_cookie( true );
-	}
-
-	/**
-	 * Create the woocommerce order in the BO
-	 *
-	 */
-	public function ajax_create_payment() {
-		if ( WC()->cart->is_empty() ) {
-			wp_send_json_error( __( 'Empty cart', 'payplug' ) );
-		}
-
-		if ( ! defined( 'WOOCOMMERCE_CHECKOUT' ) ) {
-			define( 'WOOCOMMERCE_CHECKOUT', true );
-		}
-
-		$gateway = new PayplugGateway();
-		$cart = WC()->cart;
-		$checkout = WC()->checkout();
-		$posted_data = $checkout->get_posted_data();
-
-		$order_id = $checkout->create_order($posted_data);
-		$order = wc_get_order($order_id);
-		$amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total());
-		$amount      = $gateway->validate_order_amount($amount);
-
-		//TODO:: VALIDATE ORDER_ID AND ORDER
-		//FIXME:: WRONG EMAIL
-		//$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
-		$nonce_value    = wc_get_var( $_REQUEST['woocommerce-process-checkout-nonce'], wc_get_var( $_REQUEST['_wpnonce'], '' ) ); // phpcs:ignore
-		if ( empty( $nonce_value ) || ! wp_verify_nonce( $nonce_value, 'woocommerce-process_checkout' ) ) {
-			//CHECK FOR VALID NONCE
-			wp_send_json_error("WTFFFFFFFF");
-		}
-
-		$address_data = PayplugAddressData::from_order($order);
-
-		$return_url = esc_url_raw($order->get_checkout_order_received_url());
-		if (!(substr( $return_url, 0, 4 ) === "http")) {
-			$return_url = get_site_url().$return_url;
-		}
-
-		$payment_data = [
-			'amount'           => $amount,
-			'currency'         => get_woocommerce_currency(),
-			'allow_save_card'  => false,
-			'billing'          => $address_data->get_billing(),
-			'shipping'         => $address_data->get_shipping(),
-			'initiator'        => 'PAYER',
-			'integration'	   => 'INTEGRATED_PAYMENT',
-			'hosted_payment'   => [
-				'return_url' => $return_url,
-			],
-			'notification_url' => esc_url_raw(WC()->api_request_url('PayplugGateway')),
-			'metadata'         => [
-				'order_id'    => $order_id,
-				'customer_id' => ((int) $order->get_customer_id() > 0) ? $order->get_customer_id() : 'guest',
-				'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
-			],
-		];
-
-		/** This filter is documented in src/Gateway/PayplugGateway */
-		$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
-		//create payment
-		$payment      = $gateway->api->payment_create($payment_data);
-		wp_send_json_success( Array( "payment_id" => $payment->id, "return_url" => $return_url ) );
 	}
 
 	/**
