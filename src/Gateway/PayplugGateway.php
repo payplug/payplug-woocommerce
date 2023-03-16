@@ -553,7 +553,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			"expiration_date" =>  __('payplug_integrated_payment_expiration_date', 'payplug'),
 			"cvv" =>  __('payplug_integrated_payment_cvv', 'payplug'),
 			"one_click" =>  __('payplug_integrated_payment_oneClick', 'payplug'),
-			'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_payment'),
+			'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_order'),
 			'nonce'    =>  wp_create_nonce('woocommerce-process_checkout')
 		);
 
@@ -931,7 +931,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				$return_url = get_site_url().$return_url;
 			}
 
-            $payment_data = [
+			$payment_data = [
                 'amount'           => $amount,
                 'currency'         => get_woocommerce_currency(),
                 'allow_save_card'  => $this->oneclick_available() && (int) $customer_id > 0,
@@ -948,6 +948,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                     'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
                 ],
             ];
+
+			if($this->payment_method === 'integrated'){
+				$payment_data['initiator'] = 'PAYER';
+				$payment_data['integration'] = 'INTEGRATED_PAYMENT';
+				unset($payment_data['hosted_payment']['cancel_url']);
+			}
 
             /**
              * Filter the payment data before it's used
@@ -983,10 +989,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             PayplugGateway::log(sprintf('Payment creation complete for order #%s', $order_id));
 
             return [
-                'result'   => 'success',
-                'redirect' => $payment->hosted_payment->payment_url,
-                'cancel'   => $payment->hosted_payment->cancel_url,
-            ];
+				'payment_id' => $payment->id,
+				'result'   => 'success',
+				'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
+				'cancel'   => $payment->hosted_payment->cancel_url,
+			];
+
         } catch (HttpException $e) {
             PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
             throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
