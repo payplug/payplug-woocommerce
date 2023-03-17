@@ -90,12 +90,14 @@ var IntegratedPayment = {
 		});
 	},
 	onSubmit: function(e){
-		e.stopImmediatePropagation();
-		e.preventDefault();
-		//validate the form before create payment/submit payment
-		IntegratedPayment.props.api.validateForm();
+		if (jQuery('form.woocommerce-checkout input[name="payment_method"]:checked').val() === "payplug") {
+			e.stopImmediatePropagation();
+			e.preventDefault();
+			//validate the form before create payment/submit payment
+			IntegratedPayment.props.api.validateForm();
 
-		return;
+			return;
+		}
 
 	},
 	getPayment: function(){
