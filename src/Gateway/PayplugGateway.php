@@ -169,7 +169,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		//add fields of IP to the description
 		if($this->payment_method === 'integrated'){
 			$this->has_fields = true;
-			add_action('wp_enqueue_scripts', [$this, 'integrated_payments_scripts']);
 		}
 
         add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
