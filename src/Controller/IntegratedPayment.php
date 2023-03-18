@@ -5,7 +5,7 @@ namespace Payplug\PayplugWoocommerce\Controller;
 class IntegratedPayment
 {
 
-	static public function template_form(){
+	static public function template_form($oneClick){
 
 		$logo = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/logo-payplug.png';
 		$lock = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
@@ -13,6 +13,15 @@ class IntegratedPayment
 		$f = function ($fn) {
 			return $fn;
 		};
+
+		if($oneClick) {
+			$saved = <<<HTML
+					<div class="payplug IntegratedPayment_container -saveCard" data-e2e-name="saveCard">
+						<label><input type="checkbox" name="savecard"><span></span>{$f(__('payplug_integrated_payment_oneClick', 'payplug'))}</label>
+					</div>
+HTML;
+		}
+
 
 		return <<<HTML
 			<form class="payplug IntegratedPayment -loaded">
@@ -44,10 +53,7 @@ class IntegratedPayment
 					<span class="-hide invalidField" data-e2e-error="invalidField">{$f(__('payplug_integrated_payment_cvv_error', 'payplug'))}</span>
 					<span class="-hide emptyField" data-e2e-error="paymentError">{$f(__('payplug_integrated_payment_empty', 'payplug'))}</span>
 				</div>
-				<div class="payplug IntegratedPayment_container -saveCard" data-e2e-name="saveCard">
-					<label><input type="checkbox" name="savecard"><span></span>{$f(__('payplug_integrated_payment_oneClick', 'payplug'))}</label>
-				</div>
-
+				{$saved}
 				<div class="payplug IntegratedPayment_container -transaction">
 					<img class="lock-icon" src="$lock" /><label class="transaction-label">{$f(__('payplug_integrated_payment_transaction_secure', 'payplug'))}</label><img class="payplug-logo" src="$logo" />
 				</div>
