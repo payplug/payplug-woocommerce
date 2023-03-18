@@ -1066,12 +1066,19 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
             PayplugGateway::log(sprintf('Payment process complete for order #%s', $order_id));
 
+			if(($payment->__get('is_paid'))){
+				$redirect =  $order->get_checkout_order_received_url();
+			}else if(isset($payment->__get('hosted_payment')->payment_url)){
+				$redirect = $payment->__get('hosted_payment')->payment_url;
+			}else{
+				$redirect = $return_url;
+			}
+
             return [
 				'payment_id' => $payment->id,
                 'result'   => 'success',
                 'is_paid'  => $payment->__get('is_paid'), // Use for path redirect before DSP2
-                'redirect' => ($payment->__get('is_paid')) ? $order->get_checkout_order_received_url() :
-					isset($payment->__get('hosted_payment')->payment_url) ? $payment->__get('hosted_payment')->payment_url : $return_url
+                'redirect' => $redirect
             ];
         } catch (HttpException $e) {
             PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
