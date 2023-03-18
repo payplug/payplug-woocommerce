@@ -684,7 +684,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		//add fields of IP to the description
 		if(($this->payment_method === 'integrated') && ($this->id == 'payplug')){
-			echo IntegratedPayment::template_form();
+			echo IntegratedPayment::template_form($this->oneclick);
 		}
 
         if (!empty($description)) {
@@ -1049,6 +1049,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 ],
             ];
 
+			if($this->payment_method === 'integrated'){
+				$payment_data['initiator'] = 'PAYER';
+				$payment_data['integration'] = 'INTEGRATED_PAYMENT';
+				unset($payment_data['hosted_payment']['cancel_url']);
+			}
+
             /** This filter is documented in src/Gateway/PayplugGateway */
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
             $payment      = $this->api->payment_create($payment_data);
@@ -1061,9 +1067,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             PayplugGateway::log(sprintf('Payment process complete for order #%s', $order_id));
 
             return [
+				'payment_id' => $payment->id,
                 'result'   => 'success',
                 'is_paid'  => $payment->__get('is_paid'), // Use for path redirect before DSP2
-                'redirect' => ($payment->__get('is_paid')) ? $order->get_checkout_order_received_url() : $payment->__get('hosted_payment')->payment_url
+                'redirect' => ($payment->__get('is_paid')) ? $order->get_checkout_order_received_url() :
+					isset($payment->__get('hosted_payment')->payment_url) ? $payment->__get('hosted_payment')->payment_url : $return_url
             ];
         } catch (HttpException $e) {
             PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
