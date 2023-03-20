@@ -132,18 +132,6 @@ class PayplugWoocommerceRequest {
 
 		$payment_id = $_POST['payment_id'];
 
-		$order_id = $wpdb->get_var(
-			$wpdb->prepare(
-				"
-				SELECT post_id
-				FROM $wpdb->postmeta
-				WHERE meta_key = '_transaction_id'
-				AND meta_value = %s
-				",
-				$payment_id
-			)
-		);
-
 		try {
 			\Payplug\Payplug::init(array(
 				'secretKey' => PayplugWoocommerceHelper::get_live_key(),
@@ -153,6 +141,19 @@ class PayplugWoocommerceRequest {
 			$payment =\Payplug\Payment::retrieve($payment_id);
 
 		} catch ( \Exception $e ) {
+
+			$order_id = $wpdb->get_var(
+				$wpdb->prepare(
+					"
+				SELECT post_id
+				FROM $wpdb->postmeta
+				WHERE meta_key = '_transaction_id'
+				AND meta_value = %s
+				",
+					$payment_id
+				)
+			);
+
 			PayplugGateway::log(
 				sprintf(
 					'Order #%s : An error occurred while retrieving the payment data with the message : %s',

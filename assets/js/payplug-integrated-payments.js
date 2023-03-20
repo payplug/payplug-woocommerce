@@ -223,7 +223,6 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 				console.log(errorThrown);
 			},
 			success: function (response) {
-				console.log(response);
 				if (response.success === false) {
 					IntegratedPayment.form.unblock();
 					var error_messages = response.data.message || '';
