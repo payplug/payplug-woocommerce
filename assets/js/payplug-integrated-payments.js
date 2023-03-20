@@ -96,7 +96,6 @@ var IntegratedPayment = {
 			e.preventDefault();
 			//validate the form before create payment/submit payment
 			IntegratedPayment.props.api.validateForm();
-
 			return;
 		}
 
@@ -106,11 +105,9 @@ var IntegratedPayment = {
 		$data.ajax = 1;
 		$data.createIP = 1;
 		$data._wpnonce = payplug_integrated_payment_params.nonce;
-		IntegratedPayment.form.block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
 
 		jQuery.ajax({
 			type: 'POST',
-			async: false,
 			url: payplug_integrated_payment_params.ajax_url, //NEED TO HAVE AN ENDPOINT FOR THIS,
 			dataType: 'json',
 			data: $data,
@@ -121,7 +118,6 @@ var IntegratedPayment = {
 				console.log(errorThrown);
 			},
 			success: function (response) {
-
 				if (response.result === "failure") {
 					IntegratedPayment.form.unblock();
 					var error_messages = response.messages || '';
@@ -131,9 +127,10 @@ var IntegratedPayment = {
 
 				IntegratedPayment.props.paymentId = response.payment_id;
 				IntegratedPayment.props.return_url = response.redirect;
-				IntegratedPayment.SubmitPayment();
-
 			},
+			complete: function(){
+				IntegratedPayment.SubmitPayment();
+			}
 		});
 
 		function getFormData($form){
@@ -224,11 +221,9 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 
 		if(IntegratedPayment.oneClickSelected()){
 			IntegratedPayment.resetIntegratedForm();
-			IntegratedPayment.form.block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
 			IntegratedPayment.getPayment();
 
 		}else if (isFormValid) {
-			IntegratedPayment.form.block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
 			IntegratedPayment.getPayment();
 
 		} else {
@@ -241,7 +236,12 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 	$("body").attr("payplug-domain", payplug_integrated_payment_params.secureDomain);
 	//on submit event
 	$('form.woocommerce-checkout').on('submit', function(event){
+		console.log("-> pim");
+		IntegratedPayment.form.block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
+		console.log("-> pam");
 		IntegratedPayment.onSubmit(event);
 	});
+
+	//$(document).ajaxStart(jQuery.blockUI({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } })).ajaxStop($.unblockUI);
 
 })(jQuery);
