@@ -19,7 +19,9 @@ class IntegratedPayment
 					<div class="payplug IntegratedPayment_container -saveCard" data-e2e-name="saveCard">
 						<label><input type="checkbox" name="savecard"><span></span>{$f(__('payplug_integrated_payment_oneClick', 'payplug'))}</label>
 					</div>
-HTML;
+				HTML;
+		} else {
+			$saved = "";
 		}
 
 
@@ -54,6 +56,14 @@ HTML;
 					<span class="-hide emptyField" data-e2e-error="paymentError">{$f(__('payplug_integrated_payment_empty', 'payplug'))}</span>
 				</div>
 				{$saved}
+				<div class="payplug IntegratedPayment_container -saveCard" data-e2e-name="saveCard">
+					<label><input type="checkbox" name="savecard"><span></span>{$f(__('payplug_integrated_payment_oneClick', 'payplug'))}</label>
+				</div>
+
+				 <div class="payplug IntegratedPayment_error -payment">
+					<span>{$f(__('payplug_integrated_payment_error', 'payplug'))}</span>
+    			</div>
+
 				<div class="payplug IntegratedPayment_container -transaction">
 					<img class="lock-icon" src="$lock" /><label class="transaction-label">{$f(__('payplug_integrated_payment_transaction_secure', 'payplug'))}</label><img class="payplug-logo" src="$logo" />
 				</div>

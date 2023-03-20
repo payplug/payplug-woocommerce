@@ -551,11 +551,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			"cvv" =>  __('payplug_integrated_payment_cvv', 'payplug'),
 			"one_click" =>  __('payplug_integrated_payment_oneClick', 'payplug'),
 			'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_order'),
+			'check_payment_url' => \WC_AJAX::get_endpoint('payplug_check_payment'),
 			'nonce'    =>  wp_create_nonce('woocommerce-process_checkout')
 		);
 
 		//TODO:: if integrated payment is active please active form and comment the one above
-		/**
+		/**x
 		 * Integrated payments scripts
 		 */
 		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
