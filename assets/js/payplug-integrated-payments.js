@@ -122,13 +122,6 @@ var IntegratedPayment = {
 			},
 			success: function (response) {
 
-/*
-				if(response.is_paid) {
-					document.location.href = response.redirect;
-					return;
-				}
- */
-
 				if (response.result === "failure") {
 					IntegratedPayment.form.unblock();
 					var error_messages = response.messages || '';
@@ -175,12 +168,22 @@ var IntegratedPayment = {
 			scrollTop: (scrollElement.offset().top - 100)
 		}, 500);
 	},
+	oneClickSelected: function () {
+		var token = jQuery('input[name=wc-payplug-payment-token]:checked');
+		return token.length > 0 && 'new' !== token.val();
+	},
 	SubmitPayment: function(){
 		try {
-			IntegratedPayment.props.api.pay(IntegratedPayment.props.paymentId, Payplug.Scheme.AUTO, {save_card: false});
+			IntegratedPayment.props.api.pay(IntegratedPayment.props.paymentId, Payplug.Scheme.AUTO, {save_card: IntegratedPayment.props.save_card});
 		} catch(error) {
 			console.log(error);
 		}
+	},
+	resetIntegratedForm: function(){
+		IntegratedPayment.props.form.cardHolder.clear();
+		IntegratedPayment.props.form.pan.clear();
+		IntegratedPayment.props.form.cvv.clear();
+		IntegratedPayment.props.form.exp.clear();
 	}
 };
 
@@ -218,9 +221,16 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 
 	//CALLING THE EVENT
 	IntegratedPayment.props.api.onValidateForm(({isFormValid}) => {
-		if (isFormValid) {
+
+		if(IntegratedPayment.oneClickSelected()){
+			IntegratedPayment.resetIntegratedForm();
 			IntegratedPayment.form.block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
 			IntegratedPayment.getPayment();
+
+		}else if (isFormValid) {
+			IntegratedPayment.form.block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
+			IntegratedPayment.getPayment();
+
 		} else {
 			jQuery('form.woocommerce-checkout').unblock();
 		}
