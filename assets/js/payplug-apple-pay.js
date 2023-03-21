@@ -123,12 +123,13 @@
 				})
 			}
 		},
-		getOrderTotals: function(){
 
+		getOrderTotals(){
 			if(!apple_pay.load_order_total){
 				apple_pay.load_order_total = true;
 				return false;
 			}
+			 $('apple-pay-button').addClass("isDisabled")
 
 			jQuery.post(
 				apple_pay_params.ajax_url_applepay_get_order_totals
@@ -136,6 +137,8 @@
 				if(results.success){
 					apple_pay_params.total = results.data;
 				}
+
+				$('apple-pay-button').removeClass("isDisabled")
 			})
 		}
 	}
@@ -159,11 +162,10 @@
 
 	jQuery("[name=payment_method]").prop("checked", false);
 
-	//GET ORDER TOTALS
+	//GET ORDER TOTALS ON SHIPPING METHOD SELECTION
 	jQuery( 'body' ).on( 'updated_checkout', function() {
 		apple_pay.getOrderTotals();
 	})
-
 })(jQuery)
 
 
