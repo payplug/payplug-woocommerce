@@ -1073,3 +1073,6 @@ msgstr "CVV non valido."
 
 msgid "payplug_integrated_payment_exp_error"
 msgstr "Data di scadenza non valida."
+
+msgid "payplug_integrated_payment_error"
+msgstr "La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta."

@@ -148,7 +148,7 @@ var IntegratedPayment = {
 		var parsedHtml = jQuery.parseHTML(error_message, document, false);
 		jQuery('.woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message').remove();
 		jQuery('<div></div>')
-			.addClass('woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout')
+			.addClass('woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout woocommerce-error')
 			.html(parsedHtml)
 			.prependTo(IntegratedPayment.form);
 		IntegratedPayment.form.removeClass('processing').unblock();
@@ -212,9 +212,32 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 	});
 
 	IntegratedPayment.props.api.onCompleted(function (event) {
-		//TODO:: ADD VALIDATION ABOUT THE PAYMENT WAS VALID OR NOT! AND REDIRECT TO THE RIGHT PAGE
-		window.location.href = IntegratedPayment.props.return_url;
-	})
+
+		jQuery.post({
+			async: false,
+			url: payplug_integrated_payment_params.check_payment_url, //NEED TO HAVE AN ENDPOINT FOR THIS,
+			data: {'payment_id' : event.token},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR);
+				console.log(textStatus);
+				console.log(errorThrown);
+			},
+			success: function (response) {
+				if (response.success === false) {
+					IntegratedPayment.form.unblock();
+					var error_messages = response.data.message || '';
+					IntegratedPayment.submit_error(error_messages);
+					jQuery(".payplug.IntegratedPayment_error.-payment").show();
+					return;
+				} else {
+					jQuery(".payplug.IntegratedPayment_error.-payment").hide();
+					window.location.href = IntegratedPayment.props.return_url;
+				}
+
+			}
+		});
+
+	});
 
 	//CALLING THE EVENT
 	IntegratedPayment.props.api.onValidateForm(({isFormValid}) => {
