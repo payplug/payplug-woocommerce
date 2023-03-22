@@ -24,6 +24,7 @@ class AmericanExpress extends PayplugGateway
 
 		$this->title = __('payplug_amex_title', 'payplug');
 		$this->description = '';
+		$this->has_fields = false;
 
 		if(!$this->checkAmericanExpress())
 			$this->enabled = 'no';

@@ -112,6 +112,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$GLOBALS['hide_save_button'] = true;
 		}
 
+		//TODO: this should be properties of the class and implemented an interface on all classes (set values)
         $this->id                 = 'payplug';
         $this->icon               = '';
         $this->has_fields         = false;
@@ -142,6 +143,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $this->oneclick       = 'yes' === $this->get_option('oneclick', 'no');
 		$this->oney_type      = $this->get_option('oney_type', 'with_fees');
 	    $oney_range = PayplugWoocommerceHelper::get_min_max_oney();
+
+		//TODO:: remove this properties from here and add them on Oney classes
 	    $this->min_oney_price = (isset($oney_range['min'])) ? intval($oney_range['min']) : 100;
 	    $this->max_oney_price = (isset($oney_range['max'])) ? intval($oney_range['max']) : 3000;
 	    $this->oney_thresholds_min = $this->get_option('oney_thresholds_min', $this->min_oney_price );

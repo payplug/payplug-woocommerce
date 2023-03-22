@@ -25,6 +25,7 @@ class ApplePay extends PayplugGateway
 		/** @var \WC_Payment_Gateway overwrite for apple pay settings */
 		$this->method_title = __('payplug_apple_pay_title', 'payplug');
 		$this->method_description = "";
+		$this->has_fields = false;
 
 		$this->title = __('payplug_apple_pay_title', 'payplug');
 		$this->description = '<div id="apple-pay-button-wrapper"><apple-pay-button buttonstyle="black" type="pay" locale="'. get_locale() .'"></apple-pay-button></div>';
