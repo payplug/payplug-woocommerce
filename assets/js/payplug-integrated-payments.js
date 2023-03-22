@@ -194,6 +194,7 @@ var IntegratedPayment = {
 		var parsedHtml = jQuery.parseHTML(error_message, document, false);
 		jQuery('#woocommerce-NoticeGroup').remove();
 		jQuery('<div></div>')
+			.addClass('woocommerce-error')
 			.attr('id', 'woocommerce-NoticeGroup')
 			.html(parsedHtml)
 			.prependTo(IntegratedPayment.form());
