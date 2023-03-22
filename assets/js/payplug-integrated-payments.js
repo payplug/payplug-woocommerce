@@ -99,6 +99,15 @@ var IntegratedPayment = {
 
 			});
 
+			//event to hide show form if token is already done
+			jQuery("[name=wc-payplug-payment-token]").on('change', function(event){
+				if( jQuery(this).val() === "new" ){
+					jQuery(".payplug.IntegratedPayment").show()
+				}else{
+					jQuery(".payplug.IntegratedPayment").hide()
+				}
+			});
+
 
 			IntegratedPayment.props.api.onCompleted(function (event) {
 				jQuery.post({
