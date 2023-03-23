@@ -686,14 +686,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
         $description = $this->get_description();
 
-		//add fields of IP to the description
+		if (!empty($description)) {
+			echo wpautop(wptexturize($description));
+		}
+
 		if(($this->payment_method === 'integrated') && ($this->id == 'payplug')){
 			echo IntegratedPayment::template_form($this->oneclick);
 		}
-
-        if (!empty($description)) {
-            echo wpautop(wptexturize($description));
-        }
 
         if ($this->oneclick_available()) {
             $this->tokenization_script();
