@@ -113,6 +113,7 @@ class PayplugWoocommerceRequest {
 			wp_send_json_success( WC()->cart->total );
 
 		}catch (\Exception $e){
+			PayplugGateway::log($e->getMessage());
 			wp_send_json_error($e->getMessage());
 		}
 	}

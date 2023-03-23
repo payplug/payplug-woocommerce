@@ -168,7 +168,6 @@ class ApplePay extends PayplugGateway
 				'countryCode' => WC()->customer->get_billing_country(),
 				'currencyCode' => get_woocommerce_currency(),
 				'total'  => WC()->cart->total,
-				//'shipping_costs' => WC()->cart->get_shipping_total(),
 				'apple_pay_domain' => $this->domain_name
 			)
 		);
