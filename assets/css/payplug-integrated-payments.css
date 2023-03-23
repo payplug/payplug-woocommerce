@@ -7,6 +7,7 @@
 }
 .IntegratedPayment.-loaded {
 	display: flex;
+	margin-top: 20px;
 }
 .IntegratedPayment_select {
 	border: 1px solid #ccc;
