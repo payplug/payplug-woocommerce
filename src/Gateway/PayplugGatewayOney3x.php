@@ -34,6 +34,7 @@ class PayplugGatewayOney3x extends PayplugGateway
         $this->method_title       = _x('PayPlug Oney 3x', 'Gateway method title', 'payplug');
         $this->method_description = __('Enable PayPlug Oney 3x for your customers.', 'payplug');
         $this->title              = __('Pay by card in 3x with Oney', 'payplug');
+		$this->has_fields = false;
 
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'oney_refund_text']);
 

@@ -48,7 +48,16 @@ var IntegratedPayment = {
 		submit: null,
 		return_url: null
 	},
-	form: jQuery('form.woocommerce-checkout'),
+	form: function(){
+		if(jQuery('form.woocommerce-checkout').length){
+			return jQuery('form.woocommerce-checkout');
+		}
+
+		if(jQuery('form#order_review').length){
+			return jQuery('form#order_review');
+		}
+
+	},
 	init: function(){
 		this.manageSaveCard(IntegratedPayment.props);
 
@@ -73,6 +82,59 @@ var IntegratedPayment = {
 				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.expiration_date } );
 
 			IntegratedPayment.props.scheme = IntegratedPayment.props.api.getSupportedSchemes();
+
+			//EVENTS TO VALIDATE
+			IntegratedPayment.props.api.onValidateForm(({isFormValid}) => {
+
+				if(IntegratedPayment.oneClickSelected()){
+					IntegratedPayment.resetIntegratedForm();
+					IntegratedPayment.getPayment();
+
+				}else if (isFormValid) {
+					IntegratedPayment.getPayment();
+
+				} else {
+					IntegratedPayment.form().unblock();
+				}
+
+			});
+
+			//event to hide show form if token is already done
+			jQuery("[name=wc-payplug-payment-token]").on('change', function(event){
+				if( jQuery(this).val() === "new" ){
+					jQuery(".payplug.IntegratedPayment").show()
+				}else{
+					jQuery(".payplug.IntegratedPayment").hide()
+				}
+			});
+
+
+			IntegratedPayment.props.api.onCompleted(function (event) {
+				jQuery.post({
+					async: false,
+					url: payplug_integrated_payment_params.check_payment_url, //NEED TO HAVE AN ENDPOINT FOR THIS,
+					data: {'payment_id' : event.token},
+					error: function (jqXHR, textStatus, errorThrown) {
+						console.log(jqXHR);
+						console.log(textStatus);
+						console.log(errorThrown);
+					},
+					success: function (response) {
+						if (response.success === false) {
+							IntegratedPayment.form().unblock();
+							var error_messages = response.data.message || '';
+							IntegratedPayment.submit_error(error_messages);
+							jQuery(".payplug.IntegratedPayment_error.-payment").show();
+							return;
+						} else {
+							jQuery(".payplug.IntegratedPayment_error.-payment").hide();
+							window.location.href = IntegratedPayment.props.return_url;
+						}
+
+					}
+				});
+			});
+
 		}
 	},
 	checkLoaded: function(){
@@ -91,7 +153,7 @@ var IntegratedPayment = {
 		});
 	},
 	onSubmit: function(e){
-		if (jQuery('form.woocommerce-checkout input[name="payment_method"]:checked').val() === "payplug") {
+		if ( jQuery('#payment_method_payplug').is(':checked') ) {
 			e.stopImmediatePropagation();
 			e.preventDefault();
 			//validate the form before create payment/submit payment
@@ -101,16 +163,11 @@ var IntegratedPayment = {
 
 	},
 	getPayment: function(){
-		$data = getFormData(jQuery('form.woocommerce-checkout'));
-		$data.ajax = 1;
-		$data.createIP = 1;
-		$data._wpnonce = payplug_integrated_payment_params.nonce;
-
 		jQuery.ajax({
 			type: 'POST',
 			url: payplug_integrated_payment_params.ajax_url, //NEED TO HAVE AN ENDPOINT FOR THIS,
 			dataType: 'json',
-			data: $data,
+			data: IntegratedPayment.form().serialize(),
 			error: function (jqXHR, textStatus, errorThrown) {
 				//integrated.form.clearIntPayment();
 				console.log(jqXHR);
@@ -119,7 +176,7 @@ var IntegratedPayment = {
 			},
 			success: function (response) {
 				if (response.result === "failure") {
-					IntegratedPayment.form.unblock();
+					IntegratedPayment.form().unblock();
 					var error_messages = response.messages || '';
 					IntegratedPayment.submit_error(error_messages);
 					return;
@@ -132,35 +189,20 @@ var IntegratedPayment = {
 				IntegratedPayment.SubmitPayment();
 			}
 		});
-
-		function getFormData($form){
-			var unindexed_array = $form.serializeArray();
-			var indexed_array = {};
-
-			jQuery.map(unindexed_array, function(n, i){
-				indexed_array[n['name']] = n['value'];
-			});
-
-			return indexed_array;
-		}
 	},
 	submit_error: function (error_message) {
 		var parsedHtml = jQuery.parseHTML(error_message, document, false);
-		jQuery('.woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message').remove();
+		jQuery('#woocommerce-NoticeGroup').remove();
 		jQuery('<div></div>')
-			.addClass('woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout woocommerce-error')
+			.addClass('woocommerce-error')
+			.attr('id', 'woocommerce-NoticeGroup')
 			.html(parsedHtml)
-			.prependTo(IntegratedPayment.form);
-		IntegratedPayment.form.removeClass('processing').unblock();
-		IntegratedPayment.form.find('.input-text, select, input:checkbox').trigger('validate').blur();
+			.prependTo(IntegratedPayment.form());
+		IntegratedPayment.form().unblock();
 		IntegratedPayment.scroll_to_notices();
-		jQuery(document.body).trigger('checkout_error');
 	},
 	scroll_to_notices: function () {
-		var scrollElement = jQuery('.woocommerce-NoticeGroup-updateOrderReview, .woocommerce-NoticeGroup-checkout');
-		if (!scrollElement.length) {
-			scrollElement = jQuery('.form.checkout');
-		}
+		var scrollElement = jQuery('#woocommerce-NoticeGroup');
 		jQuery('html, body').animate({
 			scrollTop: (scrollElement.offset().top - 100)
 		}, 500);
@@ -181,90 +223,48 @@ var IntegratedPayment = {
 		IntegratedPayment.props.form.pan.clear();
 		IntegratedPayment.props.form.cvv.clear();
 		IntegratedPayment.props.form.exp.clear();
+	},
+	showValidationErrorMessages: function(){
+		jQuery.each(IntegratedPayment.props.form, function (key, field) {
+			field.onChange(function(err) {
+				if (err.error) {
+					document.querySelector(".payplug.IntegratedPayment_error.-"+key).classList.remove("-hide");
+					document.querySelector('.'+key+'-input-container').classList.add("-invalid");
+
+					if (err.error.name === "FIELD_EMPTY") {
+						document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".emptyField").classList.remove("-hide");
+						document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".invalidField").classList.add("-hide");
+					} else {
+						document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".invalidField").classList.remove("-hide");
+						document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".emptyField").classList.add("-hide");
+					}
+				} else {
+					document.querySelector(".payplug.IntegratedPayment_error.-"+key).classList.add("-hide");
+					document.querySelector('.'+key+'-input-container').classList.remove("-invalid");
+					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".invalidField").classList.add("-hide");
+					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".emptyField").classList.add("-hide");
+					IntegratedPayment.props.fieldsValid[key] = true;
+					IntegratedPayment.props.fieldsEmpty[key] = false;
+				}
+			});
+		});
 	}
 };
 
 jQuery( 'body' ).on( 'updated_checkout', function() {
 	IntegratedPayment.init();
-
-	jQuery.each(IntegratedPayment.props.form, function (key, field) {
-		field.onChange(function(err) {
-			if (err.error) {
-				document.querySelector(".payplug.IntegratedPayment_error.-"+key).classList.remove("-hide");
-				document.querySelector('.'+key+'-input-container').classList.add("-invalid");
-
-				if (err.error.name === "FIELD_EMPTY") {
-					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".emptyField").classList.remove("-hide");
-					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".invalidField").classList.add("-hide");
-				} else {
-					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".invalidField").classList.remove("-hide");
-					document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".emptyField").classList.add("-hide");
-				}
-			} else {
-				document.querySelector(".payplug.IntegratedPayment_error.-"+key).classList.add("-hide");
-				document.querySelector('.'+key+'-input-container').classList.remove("-invalid");
-				document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".invalidField").classList.add("-hide");
-				document.querySelector(".payplug.IntegratedPayment_error.-"+key).querySelector(".emptyField").classList.add("-hide");
-				IntegratedPayment.props.fieldsValid[key] = true;
-				IntegratedPayment.props.fieldsEmpty[key] = false;
-			}
-		});
-	});
-
-	IntegratedPayment.props.api.onCompleted(function (event) {
-
-		jQuery.post({
-			async: false,
-			url: payplug_integrated_payment_params.check_payment_url, //NEED TO HAVE AN ENDPOINT FOR THIS,
-			data: {'payment_id' : event.token},
-			error: function (jqXHR, textStatus, errorThrown) {
-				console.log(jqXHR);
-				console.log(textStatus);
-				console.log(errorThrown);
-			},
-			success: function (response) {
-				if (response.success === false) {
-					IntegratedPayment.form.unblock();
-					var error_messages = response.data.message || '';
-					IntegratedPayment.submit_error(error_messages);
-					jQuery(".payplug.IntegratedPayment_error.-payment").show();
-					return;
-				} else {
-					jQuery(".payplug.IntegratedPayment_error.-payment").hide();
-					window.location.href = IntegratedPayment.props.return_url;
-				}
-
-			}
-		});
-
-	});
-
-	//CALLING THE EVENT
-	IntegratedPayment.props.api.onValidateForm(({isFormValid}) => {
-
-		if(IntegratedPayment.oneClickSelected()){
-			IntegratedPayment.resetIntegratedForm();
-			IntegratedPayment.getPayment();
-
-		}else if (isFormValid) {
-			IntegratedPayment.getPayment();
-
-		} else {
-			jQuery('form.woocommerce-checkout').unblock();
-		}
-	});
+	IntegratedPayment.showValidationErrorMessages();
 });
 
 (function ($) {
 	$("body").attr("payplug-domain", payplug_integrated_payment_params.secureDomain);
+	IntegratedPayment.init();
 	//on submit event
-	$('form.woocommerce-checkout').on('submit', function(event){
-		console.log("-> pim");
-		IntegratedPayment.form.block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
-		console.log("-> pam");
+	$('form.woocommerce-checkout, form#order_review').on('submit', function(event){
+		IntegratedPayment.form().block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
 		IntegratedPayment.onSubmit(event);
 	});
 
-	//$(document).ajaxStart(jQuery.blockUI({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } })).ajaxStop($.unblockUI);
+	IntegratedPayment.showValidationErrorMessages();
 
 })(jQuery);
