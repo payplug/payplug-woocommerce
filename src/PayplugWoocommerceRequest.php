@@ -39,6 +39,7 @@ class PayplugWoocommerceRequest {
 		add_action( 'template_redirect', [ $this, 'set_session' ] );
 		add_action( 'wc_ajax_payplug_create_order', [ $this, 'ajax_create_order' ] );
 		add_action( 'wc_ajax_applepay_update_payment', [ $this, 'applepay_update_payment' ] );
+		add_action( 'wc_ajax_applepay_get_order_totals', [ $this, 'applepay_get_order_totals' ] );
 	}
 
 	/**
@@ -103,6 +104,16 @@ class PayplugWoocommerceRequest {
 			wp_send_json_success([ "result" => $update->is_paid ]);
 
 		}catch (\Exception $e){
+			wp_send_json_error($e->getMessage());
+		}
+	}
+
+	public function applepay_get_order_totals() {
+		try{
+			wp_send_json_success( WC()->cart->total );
+
+		}catch (\Exception $e){
+			PayplugGateway::log($e->getMessage());
 			wp_send_json_error($e->getMessage());
 		}
 	}
