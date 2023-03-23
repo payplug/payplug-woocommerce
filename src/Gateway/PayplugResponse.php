@@ -83,7 +83,7 @@ class PayplugResponse {
 				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed but failed.', $order_id, $resource->id));
 				wc_increase_stock_levels($order);
 				return;
-			} elseif (( $resource->failure == null ) && (isset($resource->payment_method)) && ( $resource->payment_method['is_pending'] == true )) {
+			} elseif (( $resource->failure == null ) && !empty($resource->payment_method['is_pending']) && ( $resource->payment_method['is_pending'] == true )) {
 				$this->handle_pending_oney( $order, $resource );
 			}
 
