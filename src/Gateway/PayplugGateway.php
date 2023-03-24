@@ -140,7 +140,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $this->debug          = 'yes' === $this->get_option('debug', 'no');
         $this->email          = $this->get_option('email');
         $this->payment_method = $this->get_option('payment_method');
-        $this->oneclick       = 'yes' === $this->get_option('oneclick', 'no');
+        $this->oneclick       = (('yes' === $this->get_option('oneclick', 'no')) && (is_user_logged_in()));
 		$this->oney_type      = $this->get_option('oney_type', 'with_fees');
 	    $oney_range = PayplugWoocommerceHelper::get_min_max_oney();
 
@@ -691,12 +691,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		}
 
 		if(($this->payment_method === 'integrated') && ($this->id == 'payplug')){
-			if (!is_user_logged_in()) {
 				echo IntegratedPayment::template_form($this->oneclick);
-			} else {
-				echo IntegratedPayment::template_form(false);
-			}
-
 		}
 
         if ($this->oneclick_available()) {
