@@ -691,7 +691,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		}
 
 		if(($this->payment_method === 'integrated') && ($this->id == 'payplug')){
-			echo IntegratedPayment::template_form($this->oneclick);
+			if (!is_user_logged_in()) {
+				echo IntegratedPayment::template_form($this->oneclick);
+			} else {
+				echo IntegratedPayment::template_form(false);
+			}
+
 		}
 
         if ($this->oneclick_available()) {
