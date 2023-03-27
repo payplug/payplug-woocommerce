@@ -13,9 +13,16 @@ class PaymentMethods {
 
 		$option = (get_option( 'woocommerce_payplug_settings', [] )['payment_method'] != "") ? get_option( 'woocommerce_payplug_settings', [] )['payment_method'] : false;
 
-		$redirect = false;
-		if($option === "redirect"){
-			$redirect = true;
+		$method = [
+			"redirect" => false,
+			"popup"	  => false,
+			"integrated" => false,
+		];
+
+		switch($option){
+			case "popup" : $method["popup"] = true;break;
+			case "integrated" : $method["integrated"] = true;break;
+			default: $method["redirect"] = true;break;
 		}
 
 		return [
@@ -39,7 +46,7 @@ class PaymentMethods {
 			"options"      => [
 				$this->title_field(),
 				$this->description_field(),
-				$this->embeded_option($redirect),
+				$this->embeded_option($method),
 				$this->one_click_option(),
 			]
 		];
@@ -128,7 +135,7 @@ class PaymentMethods {
 	/**
 	 * @return array
 	 */
-	public function embeded_option($redirect) {
+	public function embeded_option($method) {
 
 		return [
 			"type"         => "payment_option",
@@ -158,13 +165,13 @@ class PaymentMethods {
 					"name"  => "payplug_embedded",
 					"label" => __( 'payplug_section_standard_payment_option_popup_label', 'payplug' ),
 					"value" => "popup",
-					"checked" => $redirect ? false : true
+					"checked" => $method['popup']
 				],
 				[
 					"name"    => "payplug_embedded",
 					"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
 					"value"   => "redirect",
-					"checked" => $redirect ? true : false
+					"checked" => $method['redirect']
 				]
 			]
 		];
