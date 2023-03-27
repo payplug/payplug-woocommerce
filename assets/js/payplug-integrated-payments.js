@@ -182,11 +182,22 @@ var IntegratedPayment = {
 					return;
 				}
 
+				if(response.is_paid || IntegratedPayment.oneClickSelected()) {
+					document.location.href = response.redirect;
+					return;
+				}
+
 				IntegratedPayment.props.paymentId = response.payment_id;
 				IntegratedPayment.props.return_url = response.redirect;
 			},
 			complete: function(){
-				IntegratedPayment.SubmitPayment();
+				if(IntegratedPayment.oneClickSelected()){
+					return;
+
+				}else{
+					IntegratedPayment.SubmitPayment();
+
+				}
 			}
 		});
 	},

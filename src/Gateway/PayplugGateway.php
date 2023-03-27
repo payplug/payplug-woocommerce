@@ -1052,12 +1052,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 ],
             ];
 
-			if($this->payment_method === 'integrated'){
-				$payment_data['initiator'] = 'PAYER';
-				$payment_data['integration'] = 'INTEGRATED_PAYMENT';
-				unset($payment_data['hosted_payment']['cancel_url']);
-			}
-
             /** This filter is documented in src/Gateway/PayplugGateway */
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
             $payment      = $this->api->payment_create($payment_data);
