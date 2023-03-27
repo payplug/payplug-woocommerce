@@ -125,6 +125,7 @@ var IntegratedPayment = {
 							var error_messages = response.data.message || '';
 							IntegratedPayment.submit_error(error_messages);
 							jQuery(".payplug.IntegratedPayment_error.-payment").show();
+							IntegratedPayment.resetIntegratedForm();
 							return;
 						} else {
 							jQuery(".payplug.IntegratedPayment_error.-payment").hide();
@@ -234,6 +235,11 @@ var IntegratedPayment = {
 		IntegratedPayment.props.form.pan.clear();
 		IntegratedPayment.props.form.cvv.clear();
 		IntegratedPayment.props.form.exp.clear();
+
+		if(IntegratedPayment.props.save_card){
+			jQuery('.payplug.IntegratedPayment .-saveCard').find('input').click();
+		}
+
 	},
 	showValidationErrorMessages: function(){
 		jQuery.each(IntegratedPayment.props.form, function (key, field) {
