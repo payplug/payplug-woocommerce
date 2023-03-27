@@ -89,7 +89,7 @@ class Vue {
 					],
 					"link_access_portal" => [
 						"text"   => __( 'payplug_section_logged_link_access_portal', 'payplug' ),
-						"url"    => "https://www.payplug.com/portal",
+						"url"    => "https://portal.payplug.com/",
 						"target" => "_blank"
 					],
 				],
@@ -105,7 +105,7 @@ class Vue {
 					],
 					"link_access_portal" => [
 						"text"   => __( 'payplug_section_logged_link_access_portal', 'payplug' ),
-						"url"    => "https://www.payplug.com/portal",
+						"url"    => "https://portal.payplug.com/",
 						"target" => "_blank"
 					],
 				]
