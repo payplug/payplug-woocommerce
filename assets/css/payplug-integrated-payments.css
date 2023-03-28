@@ -173,8 +173,10 @@
 .IntegratedPayment_container .payplug-logo{
 	width: 80px;
 	height: auto;
-	float: right;
-	margin-left: 10px;
+	display: inline-block;
+	float: inherit !important;
+	margin-left: 6px;
+	vertical-align: text-top;
 }
 .IntegratedPayment_container.-privacy-policy{
 	display: inline-block;
