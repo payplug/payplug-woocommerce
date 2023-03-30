@@ -142,9 +142,15 @@ class PayplugWoocommerceRequest {
 
 		$payment_id = $_POST['payment_id'];
 
+		if (PayplugWoocommerceHelper::check_mode()) {
+			$key = PayplugWoocommerceHelper::get_live_key();
+		} else {
+			$key = PayplugWoocommerceHelper::get_test_key();
+		}
+
 		try {
 			\Payplug\Payplug::init(array(
-				'secretKey' => PayplugWoocommerceHelper::get_live_key(),
+				'secretKey' => $key,
 				'apiVersion' => "2019-08-06",
 			));
 
