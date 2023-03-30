@@ -523,8 +523,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function init_payplug()
     {
-        $this->api = new PayplugApi($this);
-        $this->api->init();
 
         $this->permissions = new PayplugPermissions($this);
         $this->response    = new PayplugResponse($this);
@@ -833,6 +831,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 
         PayplugGateway::log(sprintf('Processing payment for order #%s', $order_id));
+
+		$this->api = new PayplugApi($this);
+		$this->api->init();
 
         $order       = wc_get_order($order_id);
         $customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
