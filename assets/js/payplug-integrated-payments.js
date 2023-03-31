@@ -275,6 +275,11 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 
 (function ($) {
 	$("body").attr("payplug-domain", payplug_integrated_payment_params.secureDomain);
+
+	if(!jQuery('.cardHolder-input-container').length){
+		return;
+	}
+
 	IntegratedPayment.init();
 	//on submit event
 	$('form.woocommerce-checkout, form#order_review').on('submit', function(event){
