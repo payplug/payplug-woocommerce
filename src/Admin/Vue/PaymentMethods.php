@@ -11,11 +11,19 @@ class PaymentMethods {
 	 */
 	public function payment_method_standard( ) {
 
-		$option = (get_option( 'woocommerce_payplug_settings', [] )['payment_method'] != "") ? get_option( 'woocommerce_payplug_settings', [] )['payment_method'] : false;
+		$option = (get_option( 'woocommerce_payplug_settings', [] )['payment_method'] != "") ? get_option( 'woocommerce_payplug_settings', [] )['payment_method'] : "";
 
-		$redirect = false;
-		if($option === "redirect"){
-			$redirect = true;
+
+		$method = [
+			"redirect" => false,
+			"popup"	  => false,
+			"integrated" => false,
+		];
+
+		switch($option){
+			case "popup" : $method["popup"] = true;break;
+			case "integrated" : $method["integrated"] = true;break;
+			default: $method["redirect"] = true;break;
 		}
 
 		return [
@@ -39,7 +47,7 @@ class PaymentMethods {
 			"options"      => [
 				$this->title_field(),
 				$this->description_field(),
-				$this->embeded_option($redirect),
+				$this->embeded_option($method),
 				$this->one_click_option(),
 			]
 		];
@@ -128,7 +136,29 @@ class PaymentMethods {
 	/**
 	 * @return array
 	 */
-	public function embeded_option($redirect) {
+	public function embeded_option($method) {
+
+		$options = [];
+
+		if ( (isset( get_option( 'woocommerce_payplug_settings', [] )['can_use_integrated_payments'] ) ) && (get_option( 'woocommerce_payplug_settings', [] )['can_use_integrated_payments'] === true)) {
+			array_push($options, $this->integrated_payment($method));
+		}
+
+		$embeded = [
+			"name"  => "payplug_embedded",
+			"label" => __( 'payplug_section_standard_payment_option_popup_label', 'payplug' ),
+			"value" => "popup",
+			"checked" => $method['popup']
+		];
+
+		$redirect = [
+			"name"    => "payplug_embedded",
+			"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
+			"value"   => "redirect",
+			"checked" => $method['redirect']
+		];
+
+		array_push($options, $embeded, $redirect);
 
 		return [
 			"type"         => "payment_option",
@@ -139,6 +169,7 @@ class PaymentMethods {
 				"live"    => [
 					"description_redirect"    => __( 'payplug_section_standard_payment_redirected_description', 'payplug' ),
 					"description_popup"    => __( 'payplug_section_standard_payment_popup_description', 'payplug' ),
+					"description_integrated"    => __( 'payplug_section_standard_payment_integrated_description', 'payplug' ),
 					"link_know_more" => Component::link(
 						__( 'payplug_know_more_label', 'payplug' ),
 						__( 'payplug_embeded_option_url', 'payplug' ),
@@ -147,26 +178,14 @@ class PaymentMethods {
 				"sandbox" => [
 					"description_redirect"    => __( 'payplug_section_standard_payment_redirected_description', 'payplug' ),
 					"description_popup"    => __( 'payplug_section_standard_payment_popup_description', 'payplug' ),
+					"description_integrated"    => __( 'payplug_section_standard_payment_integrated_description', 'payplug' ),
 					"link_know_more" => Component::link(
 						__( 'payplug_know_more_label', 'payplug' ),
 						__( 'payplug_embeded_option_url', 'payplug' ),
 						"_blank" ),
 				]
 			],
-			"options"      => [
-				[
-					"name"  => "payplug_embedded",
-					"label" => __( 'payplug_section_standard_payment_option_popup_label', 'payplug' ),
-					"value" => "popup",
-					"checked" => $redirect ? false : true
-				],
-				[
-					"name"    => "payplug_embedded",
-					"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
-					"value"   => "redirect",
-					"checked" => $redirect ? true : false
-				]
-			]
+			"options" => $options
 		];
 	}
 
@@ -246,6 +265,15 @@ class PaymentMethods {
 				]
 			],
 		];
+	}
+
+	public static function integrated_payment($method) {
+			return [
+				"name"    => "payplug_integrated",
+				"label"   => __( 'payplug_section_standard_payment_option_integrated_label', 'payplug' ),
+				"value"   => "integrated",
+				"checked" => $method['integrated']
+			];
 	}
 
 }

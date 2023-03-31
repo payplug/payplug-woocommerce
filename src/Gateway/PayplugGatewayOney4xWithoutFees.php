@@ -24,6 +24,7 @@ class PayplugGatewayOney4xWithoutFees extends PayplugGatewayOney3x
         $this->method_title       = _x('PayPlug Oney 4x', 'Gateway method title', 'payplug');
         $this->method_description = __('Enable PayPlug Oney 4x for your customers.', 'payplug');
 	    $this->title              = __('Pay by credit card in 4x installments without fees with Oney', 'payplug');
+		$this->has_fields = false;
     }
 
     /**

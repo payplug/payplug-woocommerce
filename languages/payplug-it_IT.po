@@ -1025,3 +1025,54 @@ msgstr "Aggiorna le impostazioni"
 
 msgid "payplug_thresholds_error_msg"
 msgstr "L'importo deve essere compreso tra 100€ e 3000€."
+
+msgid "payplug_section_standard_payment_option_integrated_label"
+msgstr "Integrata"
+
+msgid "payplug_section_standard_payment_integrated_description"
+msgstr "I tuoi clienti vedranno comparire il modulo di pagamento direttamente nella pagina di check-out del tuo negozio."
+
+msgid "payplug_integrated_payment_cardholder"
+msgstr "Titolare della carta"
+
+msgid "payplug_integrated_payment_your_card"
+msgstr "LA TUA CARTA"
+
+msgid "payplug_integrated_payment_card_number"
+msgstr "Numero di carta"
+
+msgid "payplug_integrated_payment_expiration_date"
+msgstr "MM/AA"
+
+msgid "payplug_integrated_payment_cvv"
+msgstr "123"
+
+msgid "payplug_integrated_payment_oneClick"
+msgstr "Salva i dati della mia carta di credito"
+
+msgid "payplug_integrated_payment_transaction_secure"
+msgstr "Transazione protetta da"
+
+msgid "payplug_integrated_payment_privacy_policy"
+msgstr "Politica di confidenzialità"
+
+msgid "payplug_integrated_payment_privacy_policy_url"
+msgstr "https://www.payplug.com/it/politica-di-confidenzialita"
+
+msgid "payplug_integrated_payment_empty"
+msgstr "Campo obbligatorio."
+
+msgid "payplug_integrated_payment_cardHolder_error"
+msgstr "Nome e/o Cognome non valido(i)."
+
+msgid "payplug_integrated_payment_pan_error"
+msgstr "Numero di carta non valido."
+
+msgid "payplug_integrated_payment_cvv_error"
+msgstr "CVV non valido."
+
+msgid "payplug_integrated_payment_exp_error"
+msgstr "Data di scadenza non valida."
+
+msgid "payplug_integrated_payment_error"
+msgstr "La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta."
