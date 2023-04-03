@@ -63,14 +63,11 @@ HTML;
             } else {
                 $this->description = $this->oney_response;
             }
-        }
-        $available_img = 'x4_with_fees.svg';
-
-		$disable='';
-		if($this->check_oney_is_available() != true){
+        }else {
 			$disable='disable-checkout-icons';
 		}
 
+        $available_img = 'x4_with_fees.svg';
         $icons = apply_filters('payplug_payment_icons', [
             'payplug' => sprintf('<img src="%s" alt="Oney 4x" class="payplug-payment-icon ' . $disable . '" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $available_img)),
         ]);
