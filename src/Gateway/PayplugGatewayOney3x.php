@@ -177,15 +177,6 @@ HTML;
 			return self::ONEY_DISALBE_CHECKOUT_OPTIONS;
 		}
 
-
-        if ( !$this->validate_shipping_billing_country($country_code_shipping, $country_code_billing) ||
-			!$this->allowed_country($country_code_billing, $this->allowed_country_codes) ||
-			!$this->allowed_country($country_code_shipping, $this->allowed_country_codes)
-		) {
-            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.__('Unavailable for the specified country.', 'payplug').'</div>';
-            return self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED;
-        }
-
         return true;
     }
 
