@@ -13,6 +13,7 @@ use Payplug\Exception\HttpException;
 use Payplug\Exception\ForbiddenException;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Admin\Ajax;
+use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
@@ -111,6 +112,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$GLOBALS['hide_save_button'] = true;
 		}
 
+		//TODO: this should be properties of the class and implemented an interface on all classes (set values)
         $this->id                 = 'payplug';
         $this->icon               = '';
         $this->has_fields         = false;
@@ -138,9 +140,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $this->debug          = 'yes' === $this->get_option('debug', 'no');
         $this->email          = $this->get_option('email');
         $this->payment_method = $this->get_option('payment_method');
-        $this->oneclick       = 'yes' === $this->get_option('oneclick', 'no');
+        $this->oneclick       = (('yes' === $this->get_option('oneclick', 'no')) && (is_user_logged_in()));
 		$this->oney_type      = $this->get_option('oney_type', 'with_fees');
 	    $oney_range = PayplugWoocommerceHelper::get_min_max_oney();
+
+		//TODO:: remove this properties from here and add them on Oney classes
 	    $this->min_oney_price = (isset($oney_range['min'])) ? intval($oney_range['min']) : 100;
 	    $this->max_oney_price = (isset($oney_range['max'])) ? intval($oney_range['max']) : 3000;
 	    $this->oney_thresholds_min = $this->get_option('oney_thresholds_min', $this->min_oney_price );
@@ -165,12 +169,17 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             $this->description = trim($this->description);
         }
 
+		//add fields of IP to the description
+		if($this->payment_method === 'integrated'){
+			$this->has_fields = true;
+		}
+
         add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
         add_action('wp_enqueue_scripts', [$this, 'scripts']);
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
 		add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
-    }
+	}
 
     /**
      * Customize gateway title in emails.
@@ -313,6 +322,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function init_form_fields()
     {
+
         $anchor = esc_html_x( __("More informations", 'payplug'), 'modal', 'payplug' );
 		$domain = __( 'support.payplug.com/hc/fr/articles/4408142346002', 'payplug' );
 		$link   = sprintf(  ' <a href="https://%s" target="_blank">%s</a>', $domain, $anchor );
@@ -534,6 +544,32 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
     }
 
+	public function integrated_payments_scripts(){
+
+		$translations = array(
+			"cardholder" =>  __('payplug_integrated_payment_cardholder', 'payplug'),
+			"your_card" =>  __('payplug_integrated_payment_your_card', 'payplug'),
+			"card_number" =>  __('payplug_integrated_payment_card_number', 'payplug'),
+			"expiration_date" =>  __('payplug_integrated_payment_expiration_date', 'payplug'),
+			"cvv" =>  __('payplug_integrated_payment_cvv', 'payplug'),
+			"one_click" =>  __('payplug_integrated_payment_oneClick', 'payplug'),
+			'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_order'),
+			'check_payment_url' => \WC_AJAX::get_endpoint('payplug_check_payment'),
+			'nonce'    =>  wp_create_nonce('woocommerce-process_checkout'),
+			'mode' => PayplugWoocommerceHelper::check_mode() // true for TEST, false for LIVE
+		);
+
+		//TODO:: if integrated payment is active please active form and comment the one above
+		/**x
+		 * Integrated payments scripts
+		 */
+		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('payplug-integrated-payments-api', 'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js', [], 'v1.1', true);
+
+		wp_enqueue_script('payplug-integrated-payments', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-integrated-payments.js', ['jquery', 'payplug-integrated-payments-api'], 'v1.1', true);
+		wp_localize_script( 'payplug-integrated-payments', 'payplug_integrated_payment_params', $translations);
+	}
+
     /**
      * Embedded payment form scripts.
      *
@@ -558,23 +594,35 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return;
         }
 
-        // Register checkout styles.
-        wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
-        wp_enqueue_style('payplug-checkout');
+		//load Integrated Payment features
+		if($this->payment_method === 'integrated'){
+			$this->integrated_payments_scripts();
 
-        wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
-        wp_register_script('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [
-            'jquery',
-            'payplug'
-        ], PAYPLUG_GATEWAY_VERSION, true);
-        wp_localize_script('payplug-checkout', 'payplug_checkout_params', [
-            'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_order'),
-            'nonce'    => [
-                'checkout' => wp_create_nonce('woocommerce-process_checkout'),
-            ],
-            'is_embedded' => 'redirect' !== $this->payment_method
-        ]);
-        wp_enqueue_script('payplug-checkout');
+		}else{
+
+		//load popup features
+			// Register checkout styles.
+			wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
+			wp_enqueue_style('payplug-checkout');
+
+			//TODO:: if integrated payment is not active please active this and comment the one bellow
+			wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
+			wp_register_script('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [
+				'jquery',
+				'payplug'
+			], PAYPLUG_GATEWAY_VERSION, true);
+			wp_localize_script('payplug-checkout', 'payplug_checkout_params', [
+				'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_order'),
+				'nonce'    => [
+					'checkout' => wp_create_nonce('woocommerce-process_checkout'),
+				],
+				'is_embedded' => 'redirect' !== $this->payment_method
+			]);
+
+			wp_enqueue_script('payplug-checkout');
+		}
+
+
     }
 
     /**
@@ -638,9 +686,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function payment_fields()
     {
         $description = $this->get_description();
-        if (!empty($description)) {
-            echo wpautop(wptexturize($description));
-        }
+
+		if (!empty($description)) {
+			echo wpautop(wptexturize($description));
+		}
+
+		if(($this->payment_method === 'integrated') && ($this->id == 'payplug')){
+				echo IntegratedPayment::template_form($this->oneclick);
+		}
 
         if ($this->oneclick_available()) {
             $this->tokenization_script();
@@ -661,7 +714,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		wp_localize_script('app.js', 'payplug_admin_config',
 			array(
 				"img_path"		=> esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/'),
-				'ajax_url'      => get_home_url()
+				'ajax_url'      => get_home_url() . DIRECTORY_SEPARATOR . 'index.php'
 			));
 
 		?>
@@ -879,7 +932,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				$return_url = get_site_url().$return_url;
 			}
 
-            $payment_data = [
+			$payment_data = [
                 'amount'           => $amount,
                 'currency'         => get_woocommerce_currency(),
                 'allow_save_card'  => $this->oneclick_available() && (int) $customer_id > 0,
@@ -896,6 +949,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                     'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
                 ],
             ];
+
+			if($this->payment_method === 'integrated'){
+				$payment_data['initiator'] = 'PAYER';
+				$payment_data['integration'] = 'INTEGRATED_PAYMENT';
+				unset($payment_data['hosted_payment']['cancel_url']);
+			}
 
             /**
              * Filter the payment data before it's used
@@ -931,10 +990,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             PayplugGateway::log(sprintf('Payment creation complete for order #%s', $order_id));
 
             return [
-                'result'   => 'success',
-                'redirect' => $payment->hosted_payment->payment_url,
-                'cancel'   => $payment->hosted_payment->cancel_url,
-            ];
+				'payment_id' => $payment->id,
+				'result'   => 'success',
+				'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
+				'cancel'   => $payment->hosted_payment->cancel_url,
+			];
+
         } catch (HttpException $e) {
             PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
             throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
@@ -1003,10 +1064,19 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
             PayplugGateway::log(sprintf('Payment process complete for order #%s', $order_id));
 
+			if(($payment->__get('is_paid'))){
+				$redirect =  $order->get_checkout_order_received_url();
+			}else if(isset($payment->__get('hosted_payment')->payment_url)){
+				$redirect = $payment->__get('hosted_payment')->payment_url;
+			}else{
+				$redirect = $return_url;
+			}
+
             return [
+				'payment_id' => $payment->id,
                 'result'   => 'success',
                 'is_paid'  => $payment->__get('is_paid'), // Use for path redirect before DSP2
-                'redirect' => ($payment->__get('is_paid')) ? $order->get_checkout_order_received_url() : $payment->__get('hosted_payment')->payment_url
+                'redirect' => $redirect
             ];
         } catch (HttpException $e) {
             PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');

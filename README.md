@@ -1,10 +1,10 @@
-# PayPlug for WooCommerce (Official)
+# Payplug for WooCommerce (Official)
 ## Description
 PlayPlug is a French payment solution allowing small and medium e-commerce companies to accept online payments from Visa, MasterCard and CB cards.
 
-### What PayPlug does for merchants
+### What Payplug does for merchants
 
-PayPlug primary goal is to give you the tools you need to sell to your clients, wherever they are.
+Payplug primary goal is to give you the tools you need to sell to your clients, wherever they are.
 
 * Simple set up and management
 
@@ -19,7 +19,7 @@ PayPlug primary goal is to give you the tools you need to sell to your clients, 
 ### Accept payments
 * Fastest set up on the market, with no technical skills required
 
-* Plugin developed by PayPlug, configurable with just a few clicks
+* Plugin developed by Payplug, configurable with just a few clicks
 
 * Reception of online credit card payments from CB, Visa, Mastercard, without needing an extra merchant account
 
@@ -39,8 +39,8 @@ Discover our [features](https://www.payplug.com/online-payment)
 
 ## Installation
 
-1. Sign up for free on [PayPlug](https://portal.payplug.com/signup)
+1. Sign up for free on [Payplug](https://portal.payplug.com/signup)
 2. Install the plugin on WordPress
 3. Activate the plugin in Plugins >  Installed Plugins
-4. In Plugins > Installed Plugins > PayPlug for WooCommerce (Official) settings, log in with your PayPlug credentials
-5. In Settings, check that  PayPlug is enabled, chose your payment settings and save changes
+4. In Plugins > Installed Plugins > Payplug for WooCommerce (Official) settings, log in with your Payplug credentials
+5. In Settings, check that  Payplug is enabled, chose your payment settings and save changes

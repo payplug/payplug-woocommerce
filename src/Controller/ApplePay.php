@@ -25,6 +25,7 @@ class ApplePay extends PayplugGateway
 		/** @var \WC_Payment_Gateway overwrite for apple pay settings */
 		$this->method_title = __('payplug_apple_pay_title', 'payplug');
 		$this->method_description = "";
+		$this->has_fields = false;
 
 		$this->title = __('payplug_apple_pay_title', 'payplug');
 		$this->description = '<div id="apple-pay-button-wrapper"><apple-pay-button buttonstyle="black" type="pay" locale="'. get_locale() .'"></apple-pay-button></div>';
@@ -107,7 +108,7 @@ class ApplePay extends PayplugGateway
 	 * @return bool
 	 */
 	private function checkDeviceComptability(){
-		$user_agent = $_SERVER['HTTP_USER_AGENT'];
+		$user_agent = isset($_SERVER["HTTP_USER_AGENT"]) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
 		// Check if the Browser is Safari
 		if (stripos( $user_agent, 'Chrome') !== false) {
@@ -164,9 +165,10 @@ class ApplePay extends PayplugGateway
 			array(
 				'ajax_url_payplug_create_order' => \WC_AJAX::get_endpoint('payplug_create_order'),
 				'ajax_url_applepay_update_payment' => \WC_AJAX::get_endpoint('applepay_update_payment'),
+				'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
 				'countryCode' => WC()->customer->get_billing_country(),
 				'currencyCode' => get_woocommerce_currency(),
-				'total' => WC()->cart->total,
+				'total'  => WC()->cart->total,
 				'apple_pay_domain' => $this->domain_name
 			)
 		);

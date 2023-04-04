@@ -4,6 +4,7 @@
 	var $apple_pay_button = $('apple-pay-button')
 	var session = null;
 	var apple_pay = {
+		load_order_total: false,
 		init: function () {
 			$apple_pay_button = $('apple-pay-button')
 			$apple_pay_button.on(
@@ -121,6 +122,30 @@
 					},
 				})
 			}
+		},
+
+		getOrderTotals(){
+			// Avoid updating shipping costs when loading page
+			if(!apple_pay.load_order_total){
+				apple_pay.load_order_total = true;
+				return false;
+			}
+			 $('apple-pay-button').addClass("isDisabled")
+			jQuery.post(
+				apple_pay_params.ajax_url_applepay_get_order_totals
+			).done(function(results){
+				if(results.success){
+					apple_pay_params.total = results.data;
+				} else {
+					window.location.reload();
+					return false;
+				}
+
+				$('apple-pay-button').removeClass("isDisabled")
+			},).error( function() {
+				window.location.reload();
+				return false;
+			})
 		}
 	}
 
@@ -142,6 +167,13 @@
 	});
 
 	jQuery("[name=payment_method]").prop("checked", false);
+
+	//GET ORDER TOTALS ON SHIPPING METHOD SELECTION
+	jQuery( 'body' ).on( 'updated_checkout', function() {
+		apple_pay.getOrderTotals();
+	})
 })(jQuery)
+
+
 
 
