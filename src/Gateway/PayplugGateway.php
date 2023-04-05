@@ -1805,6 +1805,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 unset($gateways[$this->id]);
             }
         }
+
+		//FIXME:: refactoring to remove this - we should see this on the oney classes and not here
 		if($this->oney_type == 'with_fees'){
 			unset($gateways['oney_x3_without_fees']);
 			unset($gateways['oney_x4_without_fees']);
@@ -1812,6 +1814,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			unset($gateways['oney_x3_with_fees']);
 			unset($gateways['oney_x4_with_fees']);
 		}
+
         return $gateways;
     }
 

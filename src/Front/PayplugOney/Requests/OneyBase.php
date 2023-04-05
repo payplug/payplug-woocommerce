@@ -100,6 +100,11 @@ HTML;
 			$this->oney->setTotalPrice($total_price);
 			$this->oney->handleTotalProducts();
 
+			//don't show animation
+			if ( !PayplugWoocommerceHelper::check_order_max_amount($this->oney->getTotalPrice()) ) {
+				return false;
+			}
+
 			if ($this->oney->getTotalPrice() < $this->oney->get_min_amount() || $this->oney->getTotalPrice() > $this->oney->get_max_amount() || $this->oney->getTotalProducts() >= PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM) {
 				$this->oney->setDisable(true);
 			}
@@ -119,9 +124,14 @@ HTML;
 		if ( (is_product()) && PayplugWoocommerceHelper::is_oney_available()) {
 			global $product;
 
-			$total_price = $product->get_price();
+			$total_price = (is_numeric( floatval(WC()->cart->total))) ? floatval(WC()->cart->total) : (float)($product->get_price());
 			$this->oney->setTotalPrice($total_price);
 			$this->oney->handleTotalProducts();
+
+			//don't show animation
+			if ( !PayplugWoocommerceHelper::check_order_max_amount($this->oney->getTotalPrice()) ) {
+				return false;
+			}
 
 			if ($product->get_price() < $this->oney->get_min_amount() || $product->get_price() > $this->oney->get_max_amount() || $this->oney->getTotalProducts() >= PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM) {
 				$this->oney->setDisable(true);
