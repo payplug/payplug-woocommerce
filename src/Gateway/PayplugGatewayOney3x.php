@@ -38,10 +38,6 @@ class PayplugGatewayOney3x extends PayplugGateway
 
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'oney_refund_text']);
 
-        if (is_checkout()) {
-            PayplugWoocommerceHelper::set_account_data_from_options();
-        }
-
         self::set_oney_configuration();
 
     }
