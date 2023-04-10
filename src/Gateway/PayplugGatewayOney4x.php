@@ -36,6 +36,7 @@ class PayplugGatewayOney4x extends PayplugGatewayOney3x
 	        $total_price = floatval(WC()->cart->total);
 	        $this->oney_response = $this->api->simulate_oney_payment($total_price, 'with_fees');
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
+			$disable='';
             $f = function ($fn) {
                 return $fn;
             };
