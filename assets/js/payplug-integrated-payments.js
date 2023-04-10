@@ -1,4 +1,5 @@
 /* global window, payplug_integrated_payment_params */
+const PAYPLUG_DOMAIN = "https://secure-qa.payplug.com";
 
 var IntegratedPayment = {
 	props: {
@@ -44,6 +45,7 @@ var IntegratedPayment = {
 		scheme: null,
 		query: null,
 		submit: null,
+		order_review: false,
 		return_url: null
 	},
 	form: function(){
@@ -52,6 +54,7 @@ var IntegratedPayment = {
 		}
 
 		if(jQuery('form#order_review').length){
+			IntegratedPayment.props.order_review = true;
 			return jQuery('form#order_review');
 		}
 
@@ -162,9 +165,15 @@ var IntegratedPayment = {
 
 	},
 	getPayment: function(){
+
+		request_url = payplug_integrated_payment_params.ajax_url;
+		if(IntegratedPayment.props.order_review) {
+			request_url = payplug_integrated_payment_params.order_review_url;
+		}
+
 		jQuery.ajax({
 			type: 'POST',
-			url: payplug_integrated_payment_params.ajax_url, //NEED TO HAVE AN ENDPOINT FOR THIS,
+			url: request_url, //NEED TO HAVE AN ENDPOINT FOR THIS,
 			dataType: 'json',
 			data: IntegratedPayment.form().serialize(),
 			error: function (jqXHR, textStatus, errorThrown) {
