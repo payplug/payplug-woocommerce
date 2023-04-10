@@ -44,6 +44,8 @@ class PayplugWoocommerceRequest {
 		add_action( 'wc_ajax_applepay_update_payment', [ $this, 'applepay_update_payment' ] );
 		add_action( 'wc_ajax_applepay_get_order_totals', [ $this, 'applepay_get_order_totals' ] );
 		add_action( 'wc_ajax_payplug_check_payment', [$this, 'check_payment']);
+		add_action( 'wc_ajax_payplug_order_review_url', [ $this, 'ajax_create_payment' ] );
+
 	}
 
 	/**
@@ -82,6 +84,85 @@ class PayplugWoocommerceRequest {
 
 		die( 0 );
 	}
+
+	/**
+	 * Create the woocommerce order in the BO
+	 *
+	 */
+	public function ajax_create_payment() {
+
+		if ( WC()->cart->is_empty() ) {
+			wp_send_json_error( __( 'Empty cart', 'payplug' ) );
+		}
+
+		if ( ! defined( 'WOOCOMMERCE_CHECKOUT' ) ) {
+			define( 'WOOCOMMERCE_CHECKOUT', true );
+		}
+
+		$payment_method = $_POST['payment_method'];
+
+		//TODO:: check if integrated or embedded is activated, if not go to ajax_create_order as well
+		if($payment_method === 'payplug'){
+			$settings = get_option('woocommerce_payplug_settings', []);
+			$method = $settings['payment_method'];
+
+			if($method !== "integrated" && $method !== "popup" ){
+				$this->ajax_create_order();
+			}
+
+		}else{
+			$this->ajax_create_order();
+		}
+
+		$https_referer = $_POST['_wp_http_referer'];
+		$path = parse_url($https_referer);
+		wp_parse_str($path['query'], $output);
+		$order_id = $output['order-pay'];
+
+		$this->process_order_payment($order_id, $payment_method);
+
+	}
+
+	/**
+	 * wordpress class-wc-checkout.php
+	 * We don't need all the other verifications, at this point customer already had the checkout and it's all valid, the order already exists
+	 * We can+t use WP method because it's protected
+	 * Process an order that does require payment.
+	 *
+	 * @since 3.0.0
+	 * @param int    $order_id       Order ID.
+	 * @param string $payment_method Payment method.
+	 */
+	protected function process_order_payment( $order_id, $payment_method ) {
+		$available_gateways = WC()->payment_gateways->get_available_payment_gateways();
+
+		if ( ! isset( $available_gateways[ $payment_method ] ) ) {
+			return;
+		}
+
+		// Store Order ID in session so it can be re-used after payment failure.
+		WC()->session->set( 'order_awaiting_payment', $order_id );
+
+		// Process Payment.
+		$result = $available_gateways[ $payment_method ]->process_payment( $order_id );
+
+		// Redirect to success/confirmation/payment page.
+		if ( isset( $result['result'] ) && 'success' === $result['result'] ) {
+			$result['order_id'] = $order_id;
+
+			$result = apply_filters( 'woocommerce_payment_successful_result', $result, $order_id );
+
+			if ( ! wp_doing_ajax() ) {
+				// phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+				wp_redirect( $result['redirect'] );
+				exit;
+			}
+
+			wp_send_json( $result );
+		}
+	}
+
+
 
 	/**
 	 * Update Payplug API Payment for Apple Pay
