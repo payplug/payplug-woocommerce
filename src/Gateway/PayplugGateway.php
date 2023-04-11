@@ -554,7 +554,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			"cvv" =>  __('payplug_integrated_payment_cvv', 'payplug'),
 			"one_click" =>  __('payplug_integrated_payment_oneClick', 'payplug'),
 			'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_order'),
-			'check_payment_url' => \WC_AJAX::get_endpoint('payplug_check_payment'),
 			'order_review_url' => \WC_AJAX::get_endpoint('payplug_order_review_url'),
 			'nonce'    =>  wp_create_nonce('woocommerce-process_checkout'),
 			'mode' => PayplugWoocommerceHelper::check_mode() // true for TEST, false for LIVE
