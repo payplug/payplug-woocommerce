@@ -42,10 +42,11 @@ class PayplugGatewayOney3x extends PayplugGateway
 
         self::set_oney_configuration();
 
-		if ($this->check_oney_is_available() === self::ONEY_DISALBE_CHECKOUT_OPTIONS) {
-			$this->enabled = 'no';
+		if (is_checkout()) {
+			if ($this->check_oney_is_available() === self::ONEY_DISALBE_CHECKOUT_OPTIONS) {
+				$this->enabled = 'no';
+			}
 		}
-
 
 	}
 

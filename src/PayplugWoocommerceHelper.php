@@ -590,7 +590,7 @@ class PayplugWoocommerceHelper {
 	/**
 	 * @return bool
 	 */
-	public function check_order_max_amount($order_total){
+	public static function check_order_max_amount($order_total){
 		if ($order_total < PayplugGatewayOney3x::MIN_AMOUNT || $order_total > PayplugGatewayOney3x::MAX_AMOUNT) {
 			return false;
 		}
