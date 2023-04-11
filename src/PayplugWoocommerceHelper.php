@@ -455,7 +455,7 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function get_transient_key($options)
 	{
-		$transient_key = PayplugGatewayOney3x::OPTION_NAME . (array_key_exists('mode', $options) && $options['mode'] === 'yes' ? "_live" : "_test");
+		$transient_key = PayplugGateway::OPTION_NAME . (array_key_exists('mode', $options) && $options['mode'] === 'yes' ? "_live" : "_test");
 		return $transient_key;
 	}
 
