@@ -43,7 +43,6 @@ class PayplugWoocommerceRequest {
 		add_action( 'wc_ajax_payplug_create_order', [ $this, 'ajax_create_order' ] );
 		add_action( 'wc_ajax_applepay_update_payment', [ $this, 'applepay_update_payment' ] );
 		add_action( 'wc_ajax_applepay_get_order_totals', [ $this, 'applepay_get_order_totals' ] );
-		add_action( 'wc_ajax_payplug_check_payment', [$this, 'check_payment']);
 		add_action( 'wc_ajax_payplug_order_review_url', [ $this, 'ajax_create_payment' ] );
 
 	}
@@ -214,64 +213,6 @@ class PayplugWoocommerceRequest {
 	public function limit_length($value, $maxlength = 100)
 	{
 		return (strlen($value) > $maxlength) ? substr($value, 0, $maxlength) : $value;
-	}
-
-
-	public function check_payment() {
-
-		global $wpdb;
-
-		$payment_id = $_POST['payment_id'];
-
-		if (PayplugWoocommerceHelper::check_mode()) {
-			$key = PayplugWoocommerceHelper::get_live_key();
-		} else {
-			$key = PayplugWoocommerceHelper::get_test_key();
-		}
-
-		try {
-			\Payplug\Payplug::init(array(
-				'secretKey' => $key,
-				'apiVersion' => "2019-08-06",
-			));
-
-			$payment =\Payplug\Payment::retrieve($payment_id);
-
-		} catch ( \Exception $e ) {
-
-			$order_id = $wpdb->get_var(
-				$wpdb->prepare(
-					"
-				SELECT post_id
-				FROM $wpdb->postmeta
-				WHERE meta_key = '_transaction_id'
-				AND meta_value = %s
-				",
-					$payment_id
-				)
-			);
-
-			PayplugGateway::log(
-				sprintf(
-					'Order #%s : An error occurred while retrieving the payment data with the message : %s',
-					$order_id,
-					$e->getMessage()
-				)
-			);
-
-			return wp_send_json_error( $e->getMessage());
-		}
-
-		if ((isset($payment->failure)) && (!empty($payment->failure))) {
-			return wp_send_json_error(
-				[
-					'code' => $payment->failure->code,
-					'message' => $payment->failure->message
-				]
-			);
-		}
-		return wp_send_json_success($payment);
-
 	}
 
 }
