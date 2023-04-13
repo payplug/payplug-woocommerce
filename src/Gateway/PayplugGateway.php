@@ -1861,7 +1861,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
 			$transient = get_transient($transient_key);
 
-			if($transient["permissions"]['can_use_integrated_payments']){
+			if( !empty($transient["permissions"]['can_use_integrated_payments']) && $transient["permissions"]['can_use_integrated_payments']) {
 				$options['payment_method'] = "integrated";
 				$options['update_gateway'] = true;
 				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
