@@ -677,8 +677,8 @@ class Ajax {
 			//TODO:: add validation for mode
 			$test_mode = $options['mode'] === 'yes' ? false : true;
 
-			$options['title'] = wp_strip_all_tags($data['standard_payment_title']);
-			$options['description'] = wp_strip_all_tags($data['standard_payment_description']);
+			$options['title'] = trim(wp_strip_all_tags($data['standard_payment_title']));
+			$options['description'] = trim(wp_strip_all_tags($data['standard_payment_description']));
 			$options['payment_method'] = (Validator::payment_method($data['payplug_embeded'])) ? $data['payplug_embeded'] : $options['payplug_embeded'];
 			$options['oneclick'] = Validator::oneclick($data['enable_one_click']);
 
