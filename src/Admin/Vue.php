@@ -389,7 +389,9 @@ class Vue {
 					"default" => get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_max']
 				],
 				"error" => [
-					"text" => __( 'payplug_thresholds_error_msg', 'payplug' )
+					"text" => __( 'payplug_thresholds_error_msg', 'payplug' ),
+					"maxtext" => __('payplug_thresholds_error_maxtext_msg', 'payplug'),
+					"mintext" => __('payplug_thresholds_error_mintext_msg', 'payplug'),
 				]
 			],
 			"switch" => false

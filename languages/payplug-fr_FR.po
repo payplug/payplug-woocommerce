@@ -1076,3 +1076,9 @@ msgstr "Date d’expiration invalide."
 
 msgid "payplug_integrated_payment_error"
 msgstr "La transaction n'a pas pu aboutir, et votre carte n'a pas été débitée."
+
+msgid "payplug_thresholds_error_maxtext_msg"
+msgstr "Attention, le montant maximal renseigné est inférieur au montant minimal renseigné."
+
+msgid "payplug_thresholds_error_mintext_msg"
+msgstr "Attention, le montant minimal renseigné est supérieur au montant maximal renseigné."
