@@ -19,7 +19,6 @@ if (!defined('ABSPATH')) {
  */
 class PayplugGatewayOney3x extends PayplugGateway
 {
-    const OPTION_NAME = "payplug_oney_config";
     const ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED = 2;
     const ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH = 3;
 	const ONEY_DISALBE_CHECKOUT_OPTIONS = 4;
