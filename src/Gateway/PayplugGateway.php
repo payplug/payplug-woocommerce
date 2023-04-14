@@ -27,8 +27,9 @@ use WC_Payment_Tokens;
  */
 class PayplugGateway extends WC_Payment_Gateway_CC
 {
+	const OPTION_NAME = "payplug_config";
 
-    /**
+	/**
      * @var PayplugGatewayRequirements
      */
     private $requirements;
@@ -133,6 +134,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			delete_option('woocommerce_payplug_settings');
 			set_transient( PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', [])), null );
 		}
+
+		if(is_checkout() && !$this->get_option('update_gateway')){
+			$this->activate_integrated_payments();
+		}
+
 
         $this->title          = $this->get_option('title');
         $this->description    = $this->get_option('description');
@@ -1848,5 +1854,27 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 	public function setPayplugMerchantCountry($country){
 		$this->payplug_merchant_country = $country;
+	}
+
+	public function handle_ip_auto_activation(){
+
+	}
+
+	protected function activate_integrated_payments(){
+		//get options
+		$options = get_option('woocommerce_payplug_settings', []);
+
+		//was this option updated?
+		if(empty($options['update_gateway'])){
+			//get transient
+			$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
+			$transient = get_transient($transient_key);
+
+			if( !empty($transient["permissions"]['can_use_integrated_payments']) && $transient["permissions"]['can_use_integrated_payments']) {
+				$options['payment_method'] = "integrated";
+				$options['update_gateway'] = true;
+				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+			}
+		}
 	}
 }
