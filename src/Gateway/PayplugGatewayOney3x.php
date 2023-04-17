@@ -49,7 +49,16 @@ class PayplugGatewayOney3x extends PayplugGateway
 
 	}
 
-    /**
+	/**
+	 * this payment gateway cannot be updated on the wooco payment settings
+	 * @return bool
+	 */
+	public function needs_setup()
+	{
+		return true;
+	}
+
+	/**
      * Set oney settings
      *
      * @return void

@@ -42,6 +42,15 @@ class ApplePay extends PayplugGateway
 	}
 
 	/**
+	 * this payment gateway cannot be updated on the wooco payment settings
+	 * @return bool
+	 */
+	public function needs_setup()
+	{
+		return true;
+	}
+
+	/**
 	 * @return bool|void
 	 */
 	public function process_admin_options() {
