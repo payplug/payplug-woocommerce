@@ -212,6 +212,15 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	}
 
 	/**
+	 * this payment gateway cannot be updated on the wooco payment settings
+	 * @return bool
+	 */
+	public function needs_setup()
+	{
+		return true;
+	}
+
+	/**
      * Customize gateway title in emails.
      *
      * @param array $total_rows

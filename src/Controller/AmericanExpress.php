@@ -32,15 +32,6 @@ class AmericanExpress extends PayplugGateway
 	}
 
 	/**
-	 * this payment gateway cannot be updated on the wooco payment settings
-	 * @return bool
-	 */
-	public function needs_setup()
-	{
-		return true;
-	}
-
-	/**
 	 *
 	 * Check American Express Authorization
 	 *
