@@ -799,7 +799,7 @@ msgid "payplug_section_bancontact_payment_title"
 msgstr "Pagamento Bancontact"
 
 msgid "payplug_know_more_label"
-msgstr "Per saperne di più."
+msgstr " Per saperne di più."
 
 msgid "payplug_error_wrong_credentials"
 msgstr "L'indirizzo mail e/o la password sono errati."
