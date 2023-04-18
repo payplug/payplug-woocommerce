@@ -218,7 +218,7 @@ msgid "payplug_section_bancontact_payment_title"
 msgstr "Bancontact payment"
 
 msgid "payplug_know_more_label"
-msgstr "Find out more."
+msgstr " Find out more."
 
 msgid "payplug_error_wrong_credentials"
 msgstr "The email and/or password is incorrect."
@@ -281,7 +281,7 @@ msgid "payplug_ok"
 msgstr "OK"
 
 msgid "payplug_learn_more"
-msgstr "Find out more"
+msgstr " Find out more"
 
 msgid "payplug_mode_learn_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/360021142492"
