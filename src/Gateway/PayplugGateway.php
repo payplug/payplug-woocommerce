@@ -202,7 +202,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 * @param $value
 	 * @return bool|void
 	 */
-	public function update_option($option, $value){
+	public function update_option($option, $value = ''){
 		if ( $this->needs_setup() ) {
 			wp_send_json_error( 'needs_setup' );
 			wp_die();
