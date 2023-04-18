@@ -135,8 +135,18 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			set_transient( PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', [])), null );
 		}
 
-		if(is_checkout() && !$this->get_option('update_gateway')){
-			$this->activate_integrated_payments();
+
+		if(is_checkout()){
+			$options = get_option('woocommerce_payplug_settings', []);
+			if( !$this->get_option('update_gateway') ){
+				$this->activate_integrated_payments();
+			}
+
+			//refered to https://payplug-prod.atlassian.net/browse/WOOC-772
+			if( !$this->get_option('can_use_integrated_payments') && $this->get_option('payment_method') === "integrated"){
+				$options["payment_method"] = "popup";
+				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+			}
 		}
 
 
