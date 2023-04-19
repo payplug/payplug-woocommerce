@@ -595,7 +595,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_order'),
 			'order_review_url' => \WC_AJAX::get_endpoint('payplug_order_review_url'),
 			'nonce'    =>  wp_create_nonce('woocommerce-process_checkout'),
-			'mode' => PayplugWoocommerceHelper::check_mode() // true for TEST, false for LIVE
+			'mode' => PayplugWoocommerceHelper::check_mode(), // true for TEST, false for LIVE
+			'check_payment_url' => \WC_AJAX::get_endpoint('payplug_check_payment')
 		);
 
 		//TODO:: if integrated payment is active please active form and comment the one above
