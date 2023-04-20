@@ -144,7 +144,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 			//refered to https://payplug-prod.atlassian.net/browse/WOOC-772
 			if( !$this->get_option('can_use_integrated_payments') && $this->get_option('payment_method') === "integrated"){
-				$options["payment_method"] = "popup";
+				$options["payment_method"] = "redirect";
 				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
 			}
 		}
