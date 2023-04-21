@@ -39,7 +39,8 @@ var IntegratedPayment = {
 			},
 			invalid: {
 				color: '#E91932'
-			}
+			},
+			maxlength: "22 !important"
 		},
 		save_card: false,
 		scheme: null,
@@ -144,14 +145,15 @@ var IntegratedPayment = {
 		return jQuery("iframe#cardholder").length ? true : false;
 	},
 	manageSaveCard: function(Integrated){
-		$saveCard = jQuery('.payplug.IntegratedPayment .-saveCard');
-		$saveCard.find('input').on('change', function () {
+		saveCard = jQuery('.payplug.IntegratedPayment_container.-saveCard');
+
+		saveCard.find('input').on('change', function () {
 			if (jQuery(this).prop('checked')) {
 				Integrated.save_card = true;
-				$saveCard.addClass('-checked');
+				saveCard.addClass('-checked');
 			} else {
 				Integrated.save_card = false;
-				$saveCard.removeClass('-checked');
+				saveCard.removeClass('-checked');
 			}
 		});
 	},
