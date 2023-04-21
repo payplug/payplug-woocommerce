@@ -39,8 +39,7 @@ var IntegratedPayment = {
 			},
 			invalid: {
 				color: '#E91932'
-			},
-			maxlength: "22 !important"
+			}
 		},
 		save_card: false,
 		scheme: null,
