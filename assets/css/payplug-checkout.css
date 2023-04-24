@@ -15,6 +15,7 @@
 {
 	width: auto;
 	max-height: 40px;
+	max-width: max-content;
 }
 
 .disable-checkout-icons{

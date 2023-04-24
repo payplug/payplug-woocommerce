@@ -62,7 +62,6 @@
 	mask-image: url(../images/integrated/card.svg);
 }
 .IntegratedPayment_container.-exp, .IntegratedPayment_container.-cvv {
-	width: 50%;
 	max-width: calc(50% - 2px);
 	display: inline-block;
 }
