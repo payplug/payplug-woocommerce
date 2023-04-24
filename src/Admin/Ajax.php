@@ -112,7 +112,7 @@ class Ajax {
 			register_rest_route( 'payplug_api', '/integrated_permissions/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'api_check_integrated_payment' ],
-				'permission_callback' => '__return_true'
+				'permission_callback' => function () use ($permission) { return $permission ; }
 			) );
 
 		});
@@ -751,7 +751,8 @@ class Ajax {
 		$data = $request->get_params();
 
 		if($data['env']) {
-			$this->optionUnnavailableInTestMode();
+			wp_send_json_success(true);
+			return;
 		}
 
 		$this->accountIsNotValid();
@@ -760,7 +761,7 @@ class Ajax {
 			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
 
 		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
+			PayplugGateway::log('Error while getting account data : ' . $e->getMessage(), 'error');
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
 				"msg" => $e->getMessage(),
@@ -769,15 +770,7 @@ class Ajax {
 			return false;
 		}
 
-		PayplugWoocommerceHelper::set_transient_data($account);
-
-		if(isset($account['httpResponse']['permissions']['can_use_integrated_payments']) && $account['httpResponse']['payment_methods']['american_express']['enabled']){
-			wp_send_json_success(true);
-		}
-
-		$ip = isset($account['httpResponse']['permissions']['can_use_integrated_payments']) ? $account['httpResponse']['payment_methods']['american_express']['enabled']: false;
-
-		if(!$ip){
+		if( ! isset($account['httpResponse']['permissions']['can_use_integrated_payments'])){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
 				"msg" => __( 'payplug_amex_access_error', 'payplug' ),
@@ -785,6 +778,8 @@ class Ajax {
 			));
 		}
 
-		wp_send_json_success($ip);
+		wp_send_json_success(true);
+		return true;
+
 	}
 }
