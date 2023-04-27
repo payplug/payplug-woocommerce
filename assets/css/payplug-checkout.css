@@ -17,6 +17,10 @@
 	max-height: 40px;
 }
 
+#payment .payment_methods li.payment_method_american_express img.payplug-payment-icon {
+	max-width: max-content;
+}
+
 .disable-checkout-icons{
 	filter: grayscale(100%);
 }

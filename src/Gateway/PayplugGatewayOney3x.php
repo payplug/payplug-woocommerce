@@ -19,9 +19,10 @@ if (!defined('ABSPATH')) {
  */
 class PayplugGatewayOney3x extends PayplugGateway
 {
-    const OPTION_NAME = "payplug_oney_config";
     const ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED = 2;
     const ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH = 3;
+	const ONEY_DISALBE_CHECKOUT_OPTIONS = 4;
+
     const ONEY_PRODUCT_QUANTITY_MAXIMUM = 1000;
 
     protected $oney_response;
@@ -38,15 +39,17 @@ class PayplugGatewayOney3x extends PayplugGateway
 
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'oney_refund_text']);
 
-        if (is_checkout()) {
-            PayplugWoocommerceHelper::set_account_data_from_options();
-        }
-
         self::set_oney_configuration();
 
-    }
+		if (is_checkout()) {
+			if ($this->check_oney_is_available() === self::ONEY_DISALBE_CHECKOUT_OPTIONS) {
+				$this->enabled = 'no';
+			}
+		}
 
-    /**
+	}
+
+	/**
      * Set oney settings
      *
      * @return void
@@ -105,10 +108,6 @@ HTML;
 
 		$available_img = 'x3_with_fees.svg';
 
-		$icons = apply_filters('payplug_payment_icons', [
-			'payplug' => sprintf('<img src="%s" alt="Oney 3x" class="payplug-payment-icon ' . $disable . '" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $available_img)),
-		]);
-
         $icons = apply_filters('payplug_payment_icons', [
             'payplug' => sprintf('<img src="%s" alt="Oney 3x" class="payplug-payment-icon ' . $disable . '" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $available_img)),
         ]);
@@ -160,13 +159,19 @@ HTML;
 			$country_code_billing = WC()->customer->get_billing_country();
 		}
 
-        if ( !$this->validate_shipping_billing_country($country_code_shipping, $country_code_billing) ||
-			!$this->allowed_country($country_code_billing, $this->allowed_country_codes) ||
-			!$this->allowed_country($country_code_shipping, $this->allowed_country_codes)
-		) {
-            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.__('Unavailable for the specified country.', 'payplug').'</div>';
-            return self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED;
-        }
+
+		//WOOC-663 exception for the description to be visible
+		//billing allowed?
+		if ( $this->allowed_country($country_code_billing, $this->allowed_country_codes) ) {
+
+			//if shipping is different from billing and billing is accepted
+			if(!$this->validate_shipping_billing_country($country_code_shipping, $country_code_billing)){
+				$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.__('Unavailable for the specified country.', 'payplug').'</div>';
+				return self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED;
+			}
+		}else{
+			return self::ONEY_DISALBE_CHECKOUT_OPTIONS;
+		}
 
         return true;
     }
@@ -334,29 +339,7 @@ HTML;
             if (!PayplugWoocommerceHelper::is_oney_available()) {
                 unset($gateways[$this->id]);
             } else {
-                foreach ($gateways as $id => $gateway) {
-                    switch ($id) {
-                        case 'payplug':
-                            $ordered_gateways[$id] = $gateway;
-	                        if($this->oney_type == 'with_fees'){
-		                        $ordered_gateways['oney_x3_with_fees'] = $gateways['oney_x3_with_fees'];
-		                        $ordered_gateways['oney_x4_with_fees'] = $gateways['oney_x4_with_fees'];
-	                        } else{
-		                        $ordered_gateways['oney_x3_without_fees'] = $gateways['oney_x3_without_fees'];
-		                        $ordered_gateways['oney_x4_without_fees'] = $gateways['oney_x4_without_fees'];
-	                        }
-                            break;
-	                    case 'oney_x3_with_fees':
-	                    case 'oney_x4_with_fees':
-	                    case 'oney_x3_without_fees':
-	                    case 'oney_x4_without_fees':
-                            break;
-                        default:
-                            $ordered_gateways[$id] = $gateway;
-                            break;
-                    }
-                }
-                $gateways = $ordered_gateways;
+				$gateways = parent::check_gateway($gateways);
             }
         }
         return $gateways;

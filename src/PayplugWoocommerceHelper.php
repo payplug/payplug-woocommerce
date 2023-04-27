@@ -455,7 +455,7 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function get_transient_key($options)
 	{
-		$transient_key = PayplugGatewayOney3x::OPTION_NAME . (array_key_exists('mode', $options) && $options['mode'] === 'yes' ? "_live" : "_test");
+		$transient_key = PayplugGateway::OPTION_NAME . (array_key_exists('mode', $options) && $options['mode'] === 'yes' ? "_live" : "_test");
 		return $transient_key;
 	}
 
@@ -584,8 +584,17 @@ class PayplugWoocommerceHelper {
 		if(  $account && $account['permissions'][PayplugPermissions::USE_ONEY] == true && $account["country"] == self::getISOCountryCode() ){
 			return true;
 		}
-
 		return false;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public static function check_order_max_amount($order_total){
+		if ($order_total < PayplugGatewayOney3x::MIN_AMOUNT || $order_total > PayplugGatewayOney3x::MAX_AMOUNT) {
+			return false;
+		}
+		return true;
 	}
 
   	/**

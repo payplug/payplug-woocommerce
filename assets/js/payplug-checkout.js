@@ -1,6 +1,7 @@
 /* global window, payplug_checkout_params */
 (function ($) {
     var payplug_checkout = {
+		order_review: false,
         init: function () {
             if ($('form.woocommerce-checkout').length) {
                 this.$form = $('form.woocommerce-checkout');
@@ -10,6 +11,7 @@
                 )
             }
             if ($('form#order_review').length) {
+				this.order_review = true;
                 this.$form = $('form#order_review');
                 this.$form.on(
                     'submit',
@@ -18,6 +20,11 @@
             }
         },
         onSubmit: function (e) {
+			request_url = payplug_checkout_params.ajax_url;
+			if(payplug_checkout.order_review) {
+				request_url = payplug_checkout_params.order_review_url;
+			}
+
             if (!payplug_checkout.isPayplugChosen()) {
                 return;
             }
@@ -29,7 +36,7 @@
                 e.preventDefault();
                 e.stopImmediatePropagation();
                 $.post(
-                    payplug_checkout_params.ajax_url,
+                    request_url,
                     payplug_checkout.$form.serialize()
                 ).done(function (response) {
                     if (response.result === "failure") {
@@ -55,7 +62,7 @@
             e.stopImmediatePropagation();
             payplug_checkout.$form.block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
             $.post(
-                payplug_checkout_params.ajax_url,
+                request_url,
                 payplug_checkout.$form.serialize()
             ).done(payplug_checkout.openModal);
         },

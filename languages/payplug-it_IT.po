@@ -799,7 +799,7 @@ msgid "payplug_section_bancontact_payment_title"
 msgstr "Pagamento Bancontact"
 
 msgid "payplug_know_more_label"
-msgstr "Per saperne di più."
+msgstr " Per saperne di più."
 
 msgid "payplug_error_wrong_credentials"
 msgstr "L'indirizzo mail e/o la password sono errati."
@@ -1076,3 +1076,9 @@ msgstr "Data di scadenza non valida."
 
 msgid "payplug_integrated_payment_error"
 msgstr "La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta."
+
+msgid "payplug_thresholds_error_maxtext_msg"
+msgstr "Attenzione, l'importo massimo inserito è inferiore all'importo minimo inserito."
+
+msgid "payplug_thresholds_error_mintext_msg"
+msgstr "Attenzione, l'importo minimo inserito è superiore all'importo massimo inserito."

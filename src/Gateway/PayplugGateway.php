@@ -27,8 +27,9 @@ use WC_Payment_Tokens;
  */
 class PayplugGateway extends WC_Payment_Gateway_CC
 {
+	const OPTION_NAME = "payplug_config";
 
-    /**
+	/**
      * @var PayplugGatewayRequirements
      */
     private $requirements;
@@ -134,6 +135,21 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			set_transient( PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', [])), null );
 		}
 
+
+		if(is_checkout()){
+			$options = get_option('woocommerce_payplug_settings', []);
+			if( !$this->get_option('update_gateway') ){
+				$this->activate_integrated_payments();
+			}
+
+			//refered to https://payplug-prod.atlassian.net/browse/WOOC-772
+			if( !$this->get_option('can_use_integrated_payments') && $this->get_option('payment_method') === "integrated"){
+				$options["payment_method"] = "redirect";
+				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+			}
+		}
+
+
         $this->title          = $this->get_option('title');
         $this->description    = $this->get_option('description');
         $this->mode           = 'yes' === $this->get_option('mode', 'no') ? 'live' : 'test';
@@ -157,14 +173,15 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
         self::$log_enabled = $this->debug;
 
+
         // Ensure the description is not empty to correctly display users's save cards
-        if (empty($this->description) && 0 !== count($this->get_tokens())) {
+        if (empty($this->description) && 0 !== count($this->get_tokens()) && $this->oneclick_available()) {
             $this->description = ' ';
         }
 
+
         if ('test' === $this->mode) {
             $this->description .= " \n";
-
             $this->description .= __('You are in TEST MODE. In test mode you can use the card 4242424242424242 with any valid expiration date and CVC.', 'payplug');
             $this->description = trim($this->description);
         }
@@ -181,7 +198,30 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
 	}
 
-    /**
+	/**
+	 * @param $option
+	 * @param $value
+	 * @return bool|void
+	 */
+	public function update_option($option, $value = ''){
+		if ( $this->needs_setup() ) {
+			wp_send_json_error( 'needs_setup' );
+			wp_die();
+		}
+
+		parent::update_option($option, $value);
+	}
+
+	/**
+	 * this payment gateway cannot be updated on the wooco payment settings
+	 * @return bool
+	 */
+	public function needs_setup()
+	{
+		return true;
+	}
+
+	/**
      * Customize gateway title in emails.
      *
      * @param array $total_rows
@@ -554,9 +594,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			"cvv" =>  __('payplug_integrated_payment_cvv', 'payplug'),
 			"one_click" =>  __('payplug_integrated_payment_oneClick', 'payplug'),
 			'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_order'),
-			'check_payment_url' => \WC_AJAX::get_endpoint('payplug_check_payment'),
+			'order_review_url' => \WC_AJAX::get_endpoint('payplug_order_review_url'),
 			'nonce'    =>  wp_create_nonce('woocommerce-process_checkout'),
-			'mode' => PayplugWoocommerceHelper::check_mode() // true for TEST, false for LIVE
+			'mode' => PayplugWoocommerceHelper::check_mode(), // true for TEST, false for LIVE
+			'check_payment_url' => \WC_AJAX::get_endpoint('payplug_check_payment')
 		);
 
 		//TODO:: if integrated payment is active please active form and comment the one above
@@ -564,7 +605,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		 * Integrated payments scripts
 		 */
 		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
-		wp_enqueue_script('payplug-integrated-payments-api', 'https://cdn.payplug.com/js/integrated-payment/v1@1/index.js', [], 'v1.1', true);
+		wp_enqueue_script('payplug-integrated-payments-api', 'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js', [], 'v1.1', true);
 
 		wp_enqueue_script('payplug-integrated-payments', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-integrated-payments.js', ['jquery', 'payplug-integrated-payments-api'], 'v1.1', true);
 		wp_localize_script( 'payplug-integrated-payments', 'payplug_integrated_payment_params', $translations);
@@ -594,17 +635,17 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return;
         }
 
+		// Register checkout styles.
+		wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_style('payplug-checkout');
+
 		//load Integrated Payment features
 		if($this->payment_method === 'integrated'){
 			$this->integrated_payments_scripts();
 
 		}else{
 
-		//load popup features
-			// Register checkout styles.
-			wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
-			wp_enqueue_style('payplug-checkout');
-
+			//load popup features
 			//TODO:: if integrated payment is not active please active this and comment the one bellow
 			wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
 			wp_register_script('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [
@@ -613,6 +654,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			], PAYPLUG_GATEWAY_VERSION, true);
 			wp_localize_script('payplug-checkout', 'payplug_checkout_params', [
 				'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_order'),
+				'order_review_url' => \WC_AJAX::get_endpoint('payplug_order_review_url'),
 				'nonce'    => [
 					'checkout' => wp_create_nonce('woocommerce-process_checkout'),
 				],
@@ -708,8 +750,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 		/************ VUE Code *************/
 
-		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-1.2.1.js', [], PAYPLUG_GATEWAY_VERSION);
-		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.2.1.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-1.3.0.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.3.0.js', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('app.css', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/css/app.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_localize_script('app.js', 'payplug_admin_config',
 			array(
@@ -1805,6 +1847,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 unset($gateways[$this->id]);
             }
         }
+
+		//FIXME:: refactoring to remove this - we should see this on the oney classes and not here
 		if($this->oney_type == 'with_fees'){
 			unset($gateways['oney_x3_without_fees']);
 			unset($gateways['oney_x4_without_fees']);
@@ -1812,6 +1856,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			unset($gateways['oney_x3_with_fees']);
 			unset($gateways['oney_x4_with_fees']);
 		}
+
         return $gateways;
     }
 
@@ -1834,5 +1879,27 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 	public function setPayplugMerchantCountry($country){
 		$this->payplug_merchant_country = $country;
+	}
+
+	public function handle_ip_auto_activation(){
+
+	}
+
+	protected function activate_integrated_payments(){
+		//get options
+		$options = get_option('woocommerce_payplug_settings', []);
+
+		//was this option updated?
+		if(empty($options['update_gateway'])){
+			//get transient
+			$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
+			$transient = get_transient($transient_key);
+
+			if( !empty($transient["permissions"]['can_use_integrated_payments']) && $transient["permissions"]['can_use_integrated_payments']) {
+				$options['payment_method'] = "integrated";
+				$options['update_gateway'] = true;
+				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+			}
+		}
 	}
 }

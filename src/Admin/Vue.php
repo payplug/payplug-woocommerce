@@ -371,7 +371,7 @@ class Vue {
 
 		$thresholds = [
 			"name" => "thresholds",
-			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.png' ),
+			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.svg' ),
 			"title" => __( 'payplug_thresholds_oney_title', 'payplug' ),
 			"descriptions" => [
 				"description" => __( 'payplug_thresholds_oney_description', 'payplug' ),
@@ -389,7 +389,9 @@ class Vue {
 					"default" => get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_max']
 				],
 				"error" => [
-					"text" => __( 'payplug_thresholds_error_msg', 'payplug' )
+					"text" => __( 'payplug_thresholds_error_msg', 'payplug' ),
+					"maxtext" => __('payplug_thresholds_error_maxtext_msg', 'payplug'),
+					"mintext" => __('payplug_thresholds_error_mintext_msg', 'payplug'),
 				]
 			],
 			"switch" => false
@@ -406,7 +408,7 @@ class Vue {
 	public function show_oney_popup_product($active = false) {
 		return [
 			"name" => "oney_product_animation",
-			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.png' ),
+			"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/product.svg' ),
 			"title" => __( 'display_the_oney_installments_pop_up_on_the_product_page', 'payplug' ),
 			"descriptions" => [[
 				"description" => __( 'payplug_oney_product_page_description', 'payplug' ),

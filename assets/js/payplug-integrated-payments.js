@@ -1,4 +1,5 @@
 /* global window, payplug_integrated_payment_params */
+const PAYPLUG_DOMAIN = "https://secure-qa.payplug.com";
 
 var IntegratedPayment = {
 	props: {
@@ -44,6 +45,7 @@ var IntegratedPayment = {
 		scheme: null,
 		query: null,
 		submit: null,
+		order_review: false,
 		return_url: null
 	},
 	form: function(){
@@ -52,6 +54,7 @@ var IntegratedPayment = {
 		}
 
 		if(jQuery('form#order_review').length){
+			IntegratedPayment.props.order_review = true;
 			return jQuery('form#order_review');
 		}
 
@@ -132,6 +135,7 @@ var IntegratedPayment = {
 
 					}
 				});
+
 			});
 
 		}
@@ -140,14 +144,15 @@ var IntegratedPayment = {
 		return jQuery("iframe#cardholder").length ? true : false;
 	},
 	manageSaveCard: function(Integrated){
-		$saveCard = jQuery('.payplug.IntegratedPayment .-saveCard');
-		$saveCard.find('input').on('change', function () {
+		saveCard = jQuery('.payplug.IntegratedPayment_container.-saveCard');
+
+		saveCard.find('input').on('change', function () {
 			if (jQuery(this).prop('checked')) {
 				Integrated.save_card = true;
-				$saveCard.addClass('-checked');
+				saveCard.addClass('-checked');
 			} else {
 				Integrated.save_card = false;
-				$saveCard.removeClass('-checked');
+				saveCard.removeClass('-checked');
 			}
 		});
 	},
@@ -162,9 +167,15 @@ var IntegratedPayment = {
 
 	},
 	getPayment: function(){
+
+		request_url = payplug_integrated_payment_params.ajax_url;
+		if(IntegratedPayment.props.order_review) {
+			request_url = payplug_integrated_payment_params.order_review_url;
+		}
+
 		jQuery.ajax({
 			type: 'POST',
-			url: payplug_integrated_payment_params.ajax_url, //NEED TO HAVE AN ENDPOINT FOR THIS,
+			url: request_url, //NEED TO HAVE AN ENDPOINT FOR THIS,
 			dataType: 'json',
 			data: IntegratedPayment.form().serialize(),
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -225,7 +236,8 @@ var IntegratedPayment = {
 		try {
 			IntegratedPayment.props.api.pay(IntegratedPayment.props.paymentId, Payplug.Scheme.AUTO, {save_card: IntegratedPayment.props.save_card});
 		} catch(error) {
-			console.log(error);
+			IntegratedPayment.submit_error(error.message);
+			jQuery(".payplug.IntegratedPayment_error.-payment").show();
 		}
 	},
 	resetIntegratedForm: function(){

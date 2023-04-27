@@ -797,7 +797,7 @@ msgid "payplug_section_bancontact_payment_title"
 msgstr "Paiement Bancontact"
 
 msgid "payplug_know_more_label"
-msgstr "En savoir plus."
+msgstr " En savoir plus."
 
 msgid "payplug_error_wrong_credentials"
 msgstr "L'e-mail ou le mot de passe saisi est incorrect."
@@ -1076,3 +1076,9 @@ msgstr "Date d’expiration invalide."
 
 msgid "payplug_integrated_payment_error"
 msgstr "La transaction n'a pas pu aboutir, et votre carte n'a pas été débitée."
+
+msgid "payplug_thresholds_error_maxtext_msg"
+msgstr "Attention, le montant maximal renseigné est inférieur au montant minimal renseigné."
+
+msgid "payplug_thresholds_error_mintext_msg"
+msgstr "Attention, le montant minimal renseigné est supérieur au montant maximal renseigné."

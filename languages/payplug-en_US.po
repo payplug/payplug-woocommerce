@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2023-03-31 10:56+0100\n"
+"PO-Revision-Date: 2023-04-13 17:49+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -218,7 +218,7 @@ msgid "payplug_section_bancontact_payment_title"
 msgstr "Bancontact payment"
 
 msgid "payplug_know_more_label"
-msgstr "Find out more."
+msgstr " Find out more."
 
 msgid "payplug_error_wrong_credentials"
 msgstr "The email and/or password is incorrect."
@@ -281,7 +281,7 @@ msgid "payplug_ok"
 msgstr "OK"
 
 msgid "payplug_learn_more"
-msgstr "Find out more"
+msgstr " Find out more"
 
 msgid "payplug_mode_learn_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/360021142492"
@@ -465,3 +465,9 @@ msgstr "Invalid expiration date."
 
 msgid "payplug_integrated_payment_error"
 msgstr "The transaction was not completed, and your card was not charged."
+
+msgid "payplug_thresholds_error_maxtext_msg"
+msgstr "Please note that the maximum amount entered is less than the minimum amount entered."
+
+msgid "payplug_thresholds_error_mintext_msg"
+msgstr "Please note that the minimum amount entered is greater than the maximum amount entered."
