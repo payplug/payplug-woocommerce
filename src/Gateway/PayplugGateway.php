@@ -282,7 +282,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $transaction_id = PayplugWoocommerceHelper::is_pre_30() ? get_post_meta($order_id, '_transaction_id', true) : $order->get_transaction_id();
         if (empty($transaction_id)) {
             PayplugGateway::log(sprintf('Order #%s : Missing transaction id.', $order_id), 'error');
-
             return;
         }
 
@@ -299,12 +298,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 					)
 				);
 
-				return;
-			}
-
-			//FIXME:: this is being runned 1 time for each gateway,
-			// this comparisson is only needed to only run the process_method one time
-			if($payment_method != $this->id){
 				return;
 			}
 
