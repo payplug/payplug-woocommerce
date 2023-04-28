@@ -18,6 +18,7 @@ function upme( $upgrader_object, $options ) {
             }
         }
     }
+
     error_log("\n upme end = ". print_r(1,true),3,"./file,log");
 
 }
