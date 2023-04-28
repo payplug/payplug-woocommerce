@@ -51,6 +51,11 @@ function init() {
 	$GLOBALS["mo"]->import_from_file($path);
 }
 
+function create_lock_table(){
+	\Payplug\PayplugWoocommerce\Model\Lock::create_lock_table();
+}
+
+add_action( 'activated_plugin', __NAMESPACE__ . '\\create_lock_table');
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
 register_deactivation_hook( __FILE__,  __NAMESPACE__ .'\\PayplugWoocommerceHelper::plugin_deactivation' );
 
