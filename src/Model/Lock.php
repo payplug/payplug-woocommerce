@@ -60,7 +60,11 @@ class Lock
 	}
 
 	static function delete_lock_table(){
-		//TODO:: DROP TABLE $table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
+		$sql = "DROP TABLE IF EXISTS $table_name;";
+		$wpdb->query($sql);
 
 	}
 
