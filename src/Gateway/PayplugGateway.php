@@ -135,21 +135,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			set_transient( PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', [])), null );
 		}
 
-
-		if(is_checkout()){
-			$options = get_option('woocommerce_payplug_settings', []);
-			if( !$this->get_option('update_gateway') ){
-				$this->activate_integrated_payments();
-			}
-
-			//refered to https://payplug-prod.atlassian.net/browse/WOOC-772
-			if( !$this->get_option('can_use_integrated_payments') && $this->get_option('payment_method') === "integrated"){
-				$options["payment_method"] = "redirect";
-				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
-			}
-		}
-
-
         $this->title          = $this->get_option('title');
         $this->description    = $this->get_option('description');
         $this->mode           = 'yes' === $this->get_option('mode', 'no') ? 'live' : 'test';
@@ -1885,21 +1870,34 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 	}
 
-	protected function activate_integrated_payments(){
+	public function activate_integrated_payments(){
 		//get options
 		$options = get_option('woocommerce_payplug_settings', []);
+		$ip = new IntegratedPayment($options);
+		$ip_permissions = $ip->ip_permissions();
 
-		//was this option updated?
-		if(empty($options['update_gateway'])){
-			//get transient
-			$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
-			$transient = get_transient($transient_key);
+		if($options['payment_method'] === "integrated"){
+			$this->integrated_payments_scripts();
 
-			if( !empty($transient["permissions"]['can_use_integrated_payments']) && $transient["permissions"]['can_use_integrated_payments']) {
-				$options['payment_method'] = "integrated";
-				$options['update_gateway'] = true;
-				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+			if(!$ip_permissions){
+				$ip->disable_ip();
+
+			}else{
+				return;
+
 			}
 		}
+
+		if(!$ip_permissions){
+			return;
+		}
+
+		if($ip->already_updated()){
+			return;
+		}
+
+		$ip->enable_ip();
+
 	}
+
 }

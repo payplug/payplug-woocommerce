@@ -15,6 +15,7 @@ use Payplug\PayplugWoocommerce\Controller\Bancontact;
 use Payplug\PayplugWoocommerce\Controller\ApplePay;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithFees;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithoutFees;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 
 class PayplugWoocommerce {
 
@@ -121,6 +122,12 @@ class PayplugWoocommerce {
 
 	public function update_data() {
 		PayplugWoocommerceHelper::set_account_data_from_options();
+
+		if(is_checkout()){
+			$payplug = new PayplugGateway();
+			$payplug->activate_integrated_payments();
+		}
+
 	}
 
 	/**
