@@ -1877,7 +1877,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$ip_permissions = $ip->ip_permissions();
 
 		if($options['payment_method'] === "integrated"){
-			$this->integrated_payments_scripts();
 
 			if(!$ip_permissions){
 				$ip->disable_ip();
@@ -1897,6 +1896,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		}
 
 		$ip->enable_ip();
+		$this->integrated_payments_scripts();
 
 	}
 
