@@ -125,7 +125,10 @@ class PayplugWoocommerce {
 
 		if(is_checkout()){
 			$payplug = new PayplugGateway();
-			$payplug->activate_integrated_payments();
+			if($payplug->enabled === 'yes'){
+				$payplug->activate_integrated_payments();
+			}
+
 		}
 
 	}
