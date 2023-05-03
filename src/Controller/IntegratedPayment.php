@@ -2,6 +2,8 @@
 
 namespace Payplug\PayplugWoocommerce\Controller;
 
+use Payplug\Payplug;
+use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 class IntegratedPayment
@@ -95,6 +97,16 @@ HTML;
 	}
 
 	public function ip_permissions(){
+
+		if( $this->options['mode'] !== 'yes'){
+
+			//check if in live mode you've auth for ip
+			$permissions = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+			if( empty($permissions["httpResponse"]["permissions"]['can_use_integrated_payments']) || !$permissions["httpResponse"]["permissions"]['can_use_integrated_payments'] ){
+				return false;
+			}
+		}
+
 		//get transient
 		$transient_key = PayplugWoocommerceHelper::get_transient_key($this->options);
 		$transient = get_transient($transient_key);
