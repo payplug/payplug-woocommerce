@@ -2,8 +2,18 @@
 
 namespace Payplug\PayplugWoocommerce\Controller;
 
+use Payplug\Payplug;
+use Payplug\Authentication;
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+
 class IntegratedPayment
 {
+	protected $options;
+
+	public function __construct($options)
+	{
+		$this->options = $options;
+	}
 
 	static public function template_form($oneClick){
 
@@ -70,6 +80,51 @@ HTML;
 				</div>
 			</form>
 HTML;
+	}
+
+	public function enable_ip(){
+		$this->options['payment_method'] = "integrated";
+		$this->options['update_gateway'] = true;
+		update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $this->options) );
+	}
+
+	//refered to https://payplug-prod.atlassian.net/browse/WOOC-772
+	public function disable_ip(){
+		$this->options["payment_method"] = "redirect";
+		$this->options['update_gateway'] = false;
+		update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $this->options) );
+		return false;
+	}
+
+	public function ip_permissions(){
+
+		if( $this->options['mode'] !== 'yes'){
+
+			//check if in live mode you've auth for ip
+			$permissions = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+			if( empty($permissions["httpResponse"]["permissions"]['can_use_integrated_payments']) || !$permissions["httpResponse"]["permissions"]['can_use_integrated_payments'] ){
+				return false;
+			}
+		}
+
+		//get transient
+		$transient_key = PayplugWoocommerceHelper::get_transient_key($this->options);
+		$transient = get_transient($transient_key);
+
+		if( !empty($transient["permissions"]['can_use_integrated_payments']) && $transient["permissions"]['can_use_integrated_payments'] ){
+			return true;
+		}
+
+		return false;
+	}
+
+	public function already_updated(){
+
+		if(empty($this->options['update_gateway'])){
+			return false;
+		}
+
+		return true;
 	}
 
 }

@@ -503,6 +503,9 @@ class Ajax {
 		$password = base64_decode(wp_unslash($data['payplug_password']));
 		$wp_nonce = $data['_wpnonce'];
 
+		delete_option( 'woocommerce_payplug_settings' );
+		delete_site_option( 'woocommerce_payplug_settings' );
+
 		try {
 			$response = Authentication::getKeysByLogin($email, $password);
 			if (empty($response) || !isset($response)) {
@@ -547,12 +550,6 @@ class Ajax {
 				}
 
 				$data[$key] = $val;
-			}
-
-			if ( !empty($api_keys['live']) && $this->check_integrated_payment(!empty($api_keys['live']) ? esc_attr($api_keys['live']) : null) == true) {
-				$data['can_use_integrated_payments'] = true;
-			} else {
-				$data['can_use_integrated_payments'] = false;
 			}
 
 			$payplug->set_post_data($data);
