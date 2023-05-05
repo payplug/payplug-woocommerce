@@ -1,9 +1,4 @@
 <?php
-
-namespace Payplug\PayplugWoocommerce;
-
-//error_log("\n just payplug.php = ". print_r(0,true),3,"./file.log");
-
 /**
  * Plugin Name:     PayPlug pour WooCommerce (Officiel)
  * Plugin URI:      https://www.payplug.com/modules/woocommerce
@@ -19,6 +14,7 @@ namespace Payplug\PayplugWoocommerce;
  */
 
 
+namespace Payplug\PayplugWoocommerce;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -26,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-define( 'PAYPLUG_GATEWAY_VERSION', '2.4.4' );
+define( 'PAYPLUG_GATEWAY_VERSION', '2.4.0' );
 define( 'PAYPLUG_GATEWAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
