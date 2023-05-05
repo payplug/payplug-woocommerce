@@ -1880,6 +1880,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 			if(!$ip_permissions){
 				$ip->disable_ip();
+				wp_dequeue_style("payplugIP");
+				wp_dequeue_script('payplug-integrated-payments-api');
+				wp_dequeue_script('payplug-integrated-payments');
 
 			}else{
 				return;
