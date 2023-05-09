@@ -590,9 +590,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		 * Integrated payments scripts
 		 */
 		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
-		wp_enqueue_script('payplug-integrated-payments-api', 'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js', [], 'v1.1', true);
+		wp_register_script('payplug-integrated-payments-api', 'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js', [], 'v1.1', true);
+		wp_enqueue_script('payplug-integrated-payments-api');
 
-		wp_enqueue_script('payplug-integrated-payments', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-integrated-payments.js', ['jquery', 'payplug-integrated-payments-api'], 'v1.1', true);
+		wp_register_script('payplug-integrated-payments', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-integrated-payments.js',
+			['jquery', 'payplug-integrated-payments-api'], 'v1.1', true);
+
+		wp_enqueue_script('payplug-integrated-payments');
 		wp_localize_script( 'payplug-integrated-payments', 'payplug_integrated_payment_params', $translations);
 	}
 
@@ -624,8 +628,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('payplug-checkout');
 
-		//load Integrated Payment features
-		if($this->payment_method === 'integrated'){
+		$this->activate_integrated_payments();
+		$ip = get_transient( PayplugGateway::OPTION_NAME . '_ip');
+		if($ip['permission'] === true){
 			$this->integrated_payments_scripts();
 
 		}else{
@@ -1883,23 +1888,30 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				wp_dequeue_style("payplugIP");
 				wp_dequeue_script('payplug-integrated-payments-api');
 				wp_dequeue_script('payplug-integrated-payments');
+				return false;
 
 			}else{
-				return;
+				return false;
 
 			}
 		}
 
 		if(!$ip_permissions){
-			return;
+			$ip->disable_ip();
+			wp_dequeue_style("payplugIP");
+			wp_dequeue_script('payplug-integrated-payments-api');
+			wp_dequeue_script('payplug-integrated-payments');
+			return false;
 		}
 
 		if($ip->already_updated()){
-			return;
+			return false;
 		}
 
 		$ip->enable_ip();
 		$this->integrated_payments_scripts();
+		return true;
+
 
 	}
 

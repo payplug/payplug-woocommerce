@@ -68,19 +68,11 @@ var IntegratedPayment = {
 			IntegratedPayment.props.api.setDisplayMode3ds(Payplug.DisplayMode3ds.LIGHTBOX)
 
 			// Add each payments fields
-			IntegratedPayment.props.form.cardHolder = IntegratedPayment.props.api.cardHolder(
-				document.querySelector('.cardHolder-input-container'),
-				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.cardholder } );
-			IntegratedPayment.props.form.pan = IntegratedPayment.props.api.cardNumber(
-				document.querySelector('.pan-input-container'),
-				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.card_number } );
-			IntegratedPayment.props.form.cvv = IntegratedPayment.props.api.cvv(
-				document.querySelector('.cvv-input-container'),
-				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.cvv } );
+			IntegratedPayment.props.form.cardHolder = IntegratedPayment.props.api.cardHolder(document.querySelector('.cardHolder-input-container'), {default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.cardholder } );
+			IntegratedPayment.props.form.pan = IntegratedPayment.props.api.cardNumber(document.querySelector('.pan-input-container'), {default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.card_number } );
+			IntegratedPayment.props.form.cvv = IntegratedPayment.props.api.cvv(document.querySelector('.cvv-input-container'), {default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.cvv } );
 			// With one field for expiration date
-			IntegratedPayment.props.form.exp = IntegratedPayment.props.api.expiration(
-				document.querySelector('.exp-input-container'),
-				{default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.expiration_date } );
+			IntegratedPayment.props.form.exp = IntegratedPayment.props.api.expiration(document.querySelector('.exp-input-container'), {default: IntegratedPayment.props.inputStyle.default, placeholder:payplug_integrated_payment_params.expiration_date } );
 
 			IntegratedPayment.props.scheme = IntegratedPayment.props.api.getSupportedSchemes();
 
@@ -96,9 +88,12 @@ var IntegratedPayment = {
 
 				} else {
 					IntegratedPayment.form().unblock();
+					return false
 				}
 
 			});
+
+
 
 			//event to hide show form if token is already done
 			jQuery("[name=wc-payplug-payment-token]").on('change', function(event){
@@ -108,7 +103,6 @@ var IntegratedPayment = {
 					jQuery(".payplug.IntegratedPayment").hide()
 				}
 			});
-
 
 			IntegratedPayment.props.api.onCompleted(function (event) {
 				jQuery.post({
@@ -161,8 +155,10 @@ var IntegratedPayment = {
 			e.stopImmediatePropagation();
 			e.preventDefault();
 			//validate the form before create payment/submit payment
-			IntegratedPayment.props.api.validateForm();
-			return;
+			if(!IntegratedPayment.props.api.validateForm()){
+				return false;
+			}
+
 		}
 
 	},
@@ -275,12 +271,22 @@ var IntegratedPayment = {
 				}
 			});
 		});
+	},
+	//on submit event
+	submitEvent: function(){
+
+		jQuery('form.woocommerce-checkout, form#order_review').on('submit', function(event){
+			IntegratedPayment.form().block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
+			IntegratedPayment.onSubmit(event);
+		});
+
 	}
 };
 
 jQuery( 'body' ).on( 'updated_checkout', function() {
 	IntegratedPayment.init();
 	IntegratedPayment.showValidationErrorMessages();
+	IntegratedPayment.submitEvent();
 });
 
 (function ($) {
@@ -292,10 +298,7 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 
 	IntegratedPayment.init();
 	//on submit event
-	$('form.woocommerce-checkout, form#order_review').on('submit', function(event){
-		IntegratedPayment.form().block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
-		IntegratedPayment.onSubmit(event);
-	});
+	IntegratedPayment.submitEvent();
 
 	IntegratedPayment.showValidationErrorMessages();
 
