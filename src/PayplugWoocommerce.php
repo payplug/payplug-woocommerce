@@ -123,14 +123,6 @@ class PayplugWoocommerce {
 	public function update_data() {
 		PayplugWoocommerceHelper::set_account_data_from_options();
 
-		if(is_checkout()){
-			$payplug = new PayplugGateway();
-			if($payplug->enabled === 'yes'){
-				$payplug->activate_integrated_payments();
-			}
-
-		}
-
 	}
 
 	/**

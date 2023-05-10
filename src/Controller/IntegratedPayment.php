@@ -86,9 +86,6 @@ HTML;
 	public function enable_ip(){
 
 		//save into transaction the IP permissions
-		$ip_transient_key = PayplugGateway::OPTION_NAME . '_ip';
-		set_transient( $ip_transient_key, ['permission' => true] );
-
 		$this->options['payment_method'] = "integrated";
 		$this->options['update_gateway'] = true;
 		update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $this->options) );
@@ -100,8 +97,6 @@ HTML;
 		$this->options['update_gateway'] = false;
 
 		//save into transaction the IP permissions
-		set_transient( PayplugGateway::OPTION_NAME . '_ip', ['permission' => false] );
-
 		update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $this->options) );
 		return false;
 	}

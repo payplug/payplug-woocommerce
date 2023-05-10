@@ -284,9 +284,12 @@ var IntegratedPayment = {
 };
 
 jQuery( 'body' ).on( 'updated_checkout', function() {
+	if(!jQuery('.cardHolder-input-container').length){
+		return;
+	}
+
 	IntegratedPayment.init();
 	IntegratedPayment.showValidationErrorMessages();
-	IntegratedPayment.submitEvent();
 });
 
 (function ($) {
@@ -299,7 +302,6 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 	IntegratedPayment.init();
 	//on submit event
 	IntegratedPayment.submitEvent();
-
 	IntegratedPayment.showValidationErrorMessages();
 
 })(jQuery);
