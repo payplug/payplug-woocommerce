@@ -1002,6 +1002,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
              * @param PayplugAddressData $address_data
              */
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
+			$this->activate_integrated_payments();
             $payment      = $this->api->payment_create($payment_data);
 
             // Save transaction id for the order
@@ -1012,8 +1013,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             if (is_callable([$order, 'save'])) {
                 $order->save();
             }
-
-			$this->activate_integrated_payments();
 
             /**
              * Fires once a payment has been created.
@@ -1094,12 +1093,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
             /** This filter is documented in src/Gateway/PayplugGateway */
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
+			$this->activate_integrated_payments();
             $payment      = $this->api->payment_create($payment_data);
 
             /** This action is documented in src/Gateway/PayplugGateway */
             \do_action('payplug_gateway_payment_created', $order_id, $payment);
-
-			$this->activate_integrated_payments();
 
             $this->response->process_payment($payment, true);
 
