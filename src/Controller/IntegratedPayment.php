@@ -113,7 +113,7 @@ HTML;
 		}
 
 		//get transient
-		$transient_key = PayplugWoocommerceHelper::get_transient_key($this->options);
+		$transient_key = PayplugWoocommerceHelper::get_live_transient_key();
 		$transient = get_transient($transient_key);
 
 		if( !empty($transient["permissions"]['can_use_integrated_payments']) && $transient["permissions"]['can_use_integrated_payments'] ){

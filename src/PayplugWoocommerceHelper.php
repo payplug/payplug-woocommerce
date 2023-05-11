@@ -459,6 +459,17 @@ class PayplugWoocommerceHelper {
 		return $transient_key;
 	}
 
+
+	/**
+	 * Get transient live key from payplug option
+	 *
+	 * @return string
+	 */
+	public static function get_live_transient_key()
+	{
+		return PayplugGateway::OPTION_NAME .  "_live";
+	}
+
 	/**
 	 * Set transient data for payplug account
 	 *
@@ -622,16 +633,16 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return void
 	 */
-    public static function oney_simulation_values ($keys_array, &$array) {
-        foreach($keys_array as $key) {
-            if (array_key_exists($key, $array)) {
-                $array[$key]['down_payment_amount'] = floatval($array[$key]['down_payment_amount']) / 100;
-                foreach ($array[$key]['installments'] as $k => $value) {
-                    $array[$key]['installments'][$k]['amount'] = floatval($value['amount']) / 100;
-                }
-            }
-        }
-    }
+	public static function oney_simulation_values ($keys_array, &$array) {
+		foreach($keys_array as $key) {
+			if (array_key_exists($key, $array)) {
+				$array[$key]['down_payment_amount'] = floatval($array[$key]['down_payment_amount']) / 100;
+				foreach ($array[$key]['installments'] as $k => $value) {
+					$array[$key]['installments'][$k]['amount'] = floatval($value['amount']) / 100;
+				}
+			}
+		}
+	}
 
 	public static function getISOCountryCode()
 	{
