@@ -4,6 +4,7 @@ namespace Payplug\PayplugWoocommerce\Controller;
 
 use Payplug\Payplug;
 use Payplug\Authentication;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 class IntegratedPayment
@@ -83,6 +84,8 @@ HTML;
 	}
 
 	public function enable_ip(){
+
+		//save into transaction the IP permissions
 		$this->options['payment_method'] = "integrated";
 		$this->options['update_gateway'] = true;
 		update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $this->options) );
@@ -92,6 +95,8 @@ HTML;
 	public function disable_ip(){
 		$this->options["payment_method"] = "redirect";
 		$this->options['update_gateway'] = false;
+
+		//save into transaction the IP permissions
 		update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $this->options) );
 		return false;
 	}
