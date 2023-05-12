@@ -275,7 +275,7 @@ var IntegratedPayment = {
 	//on submit event
 	submitEvent: function(){
 
-		jQuery('form.woocommerce-checkout, form#order_review').on('submit', function(event){
+		jQuery('form.woocommerce-checkout, form#order_review').bindFirst('submit', function(event){
 			IntegratedPayment.form().block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
 			IntegratedPayment.onSubmit(event);
 		});
@@ -289,6 +289,8 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 	}
 
 	IntegratedPayment.init();
+	//on submit event
+	IntegratedPayment.submitEvent();
 	IntegratedPayment.showValidationErrorMessages();
 });
 
