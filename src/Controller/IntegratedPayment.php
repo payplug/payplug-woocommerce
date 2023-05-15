@@ -6,6 +6,7 @@ use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\Exception\ForbiddenException;
 
 class IntegratedPayment
 {
@@ -105,14 +106,16 @@ HTML;
 
 	public function ip_permissions(){
 
-		if( $this->options['mode'] == 'yes'){
-			//check if in live mode you've auth for ip
-			$permissions = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-		} elseif ($this->options['mode'] == 'no') {
-			$permissions = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_test_key()));
-		}
+		$options          = get_option('woocommerce_payplug_settings', []);
 
-		PayplugWoocommerceHelper::set_account_data_from_options();
+		try {
+			$permissions = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+			PayplugWoocommerceHelper::set_transient_data($permissions, $options);
+		} catch (\Payplug\Exception\UnauthorizedException $e) {
+		} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
+		} catch( \Payplug\Exception\ForbiddenException $e){
+		} catch (\Payplug\Exception\ForbiddenException $e){return array();}
+
 
 		if( empty($permissions["httpResponse"]["permissions"]['can_use_integrated_payments']) || !$permissions["httpResponse"]["permissions"]['can_use_integrated_payments'] ){
 			return false;
