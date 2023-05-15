@@ -88,6 +88,7 @@ HTML;
 		//save into transaction the IP permissions
 		$this->options['payment_method'] = "integrated";
 		$this->options['update_gateway'] = true;
+		$this->options['can_use_integrated_payments'] = true;
 		update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $this->options) );
 	}
 
@@ -95,6 +96,7 @@ HTML;
 	public function disable_ip(){
 		$this->options["payment_method"] = "redirect";
 		$this->options['update_gateway'] = false;
+		$this->options['can_use_integrated_payments'] = false;
 
 		//save into transaction the IP permissions
 		update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $this->options) );
@@ -103,20 +105,20 @@ HTML;
 
 	public function ip_permissions(){
 
-		if( $this->options['mode'] !== 'yes'){
-
+		if( $this->options['mode'] == 'yes'){
 			//check if in live mode you've auth for ip
 			$permissions = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-			if( empty($permissions["httpResponse"]["permissions"]['can_use_integrated_payments']) || !$permissions["httpResponse"]["permissions"]['can_use_integrated_payments'] ){
-				return false;
-			}
+		} elseif ($this->options['mode'] == 'no') {
+			$permissions = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_test_key()));
 		}
 
-		//get transient
-		$transient_key = PayplugWoocommerceHelper::get_live_transient_key();
-		$transient = get_transient($transient_key);
+		PayplugWoocommerceHelper::set_account_data_from_options();
 
-		if( !empty($transient["permissions"]['can_use_integrated_payments']) && $transient["permissions"]['can_use_integrated_payments'] ){
+		if( empty($permissions["httpResponse"]["permissions"]['can_use_integrated_payments']) || !$permissions["httpResponse"]["permissions"]['can_use_integrated_payments'] ){
+			return false;
+		}
+
+		if( !empty($permissions["httpResponse"]["permissions"]['can_use_integrated_payments']) && $permissions["httpResponse"]["permissions"]['can_use_integrated_payments'] ){
 			return true;
 		}
 

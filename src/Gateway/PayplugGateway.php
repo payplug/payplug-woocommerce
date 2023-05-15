@@ -1893,6 +1893,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			return false;
 		}
 
+
 		if($options['payment_method'] === "integrated"){
 			return true;
 		}
@@ -1903,6 +1904,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		$ip->enable_ip();
 		$this->integrated_payments_scripts();
+
 		return true;
 
 
