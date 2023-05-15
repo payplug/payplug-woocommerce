@@ -6,6 +6,7 @@ use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\Exception\ForbiddenException;
 
 class IntegratedPayment
 {
