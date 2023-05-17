@@ -81,3 +81,37 @@ function wpdocs_translate_text($msgstr, $msgid, $domain)
 	return $msgstr;
 }
 add_filter('gettext_payplug', __NAMESPACE__ . '\\wpdocs_translate_text', 10, 3);
+
+
+$payplug_id = ["type" => 'plugin', "action" => 'install']; // to be improved with id of our plugin well setted
+
+function payplug_pre_install($return='', $plugin='' ) {
+
+	global $payplug_id;
+
+	// do not add action on other plugins instalation
+	if ( $plugin == $payplug_id )
+		add_action( 'upgrader_process_complete',  __NAMESPACE__.'\\create_lock_table_action',10,2);
+
+	return $return;
+}
+
+// needs to be improved to only run on our plugin upgrade
+function create_lock_table_action($upgrader, $options) {
+
+	global $payplug_id;
+
+	// only run on our plugin update
+	if($options!=$payplug_id) return;
+
+	create_lock_table();
+
+	//just run the filter once on pre install
+	remove_filter( 'upgrader_pre_install', __NAMESPACE__.'\\payplug_pre_install', 10, 2 );
+
+}
+
+//just add filter and action once
+if ( ! has_action('upgrader_process_complete',  __NAMESPACE__.'\\create_lock_table_action'))
+	add_filter( 'upgrader_pre_install', __NAMESPACE__.'\\payplug_pre_install', 10, 2 );
+
