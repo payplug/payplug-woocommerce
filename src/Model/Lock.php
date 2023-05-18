@@ -4,21 +4,26 @@ namespace Payplug\PayplugWoocommerce\Model;
 
 class Lock
 {
-
+	static  $table="woocommerce_payplug_lock";
 	/**
 	 * create Lock table
 	 */
+
 	static function create_lock_table(){
 		global $wpdb;
 
-		$sql = "CREATE TABLE  IF NOT EXISTS `{$wpdb->base_prefix}woocommerce_payplug_lock` (";
-		$sql .= " `payment_id` VARCHAR(50) NOT NULL,";
-		$sql .= " `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,";
-		$sql .= " PRIMARY KEY (`payment_id`));";
+		$table_name = self::getTableName();
 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		dbDelta( $sql );
+		if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") !== $table_name)
+		{
+			$sql = "CREATE TABLE  IF NOT EXISTS `$table_name` (";
+			$sql .= " `payment_id` VARCHAR(50) NOT NULL,";
+			$sql .= " `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,";
+			$sql .= " PRIMARY KEY (`payment_id`));";
 
+			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			dbDelta($sql);
+		}
 	}
 
 	/**
@@ -27,7 +32,7 @@ class Lock
 	 */
 	static function insert_lock($payment_id){
 		global $wpdb;
-		return $wpdb->insert($wpdb->prefix . 'woocommerce_payplug_lock', array("payment_id" => $payment_id));
+		return $wpdb->insert(self::getTableName(), array("payment_id" => $payment_id));
 	}
 
 	/**
@@ -36,7 +41,7 @@ class Lock
 	 */
 	static function delete_lock($payment_id){
 		global $wpdb;
-		return $wpdb->delete($wpdb->prefix . 'woocommerce_payplug_lock', array("payment_id" => $payment_id));
+		return $wpdb->delete(self::getTableName(), array("payment_id" => $payment_id));
 	}
 
 	/**
@@ -46,10 +51,8 @@ class Lock
 	static function get_lock($payment_id){
 		global $wpdb;
 
-		$table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
-
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$result = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE payment_id = %s", array( $payment_id ) ) );
+		$result = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {self::getTableName()} WHERE payment_id = %s", array( $payment_id ) ) );
 
 		if ( !$result ) {
 			return false;
@@ -62,11 +65,15 @@ class Lock
 	static function delete_lock_table(){
 		global $wpdb;
 
-		$table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
-		$sql = "DROP TABLE IF EXISTS $table_name;";
+		$sql = "DROP TABLE IF EXISTS {self::getTableName()};";
 		$wpdb->query($sql);
 
 	}
 
+	static function getTableName()
+	{
+		global $wpdb;
+		return $wpdb->base_prefix . self::$table;
+	}
 
 }

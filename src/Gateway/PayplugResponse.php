@@ -41,6 +41,7 @@ class PayplugResponse {
 	{
 		$order_id = wc_clean($resource->metadata['order_id']);
 
+		Payplug\PayplugWoocommerce\Model\Lock::create_lock_table();
 		$lock = new Lock();
 		$lock->handleLock($resource->id);
 
