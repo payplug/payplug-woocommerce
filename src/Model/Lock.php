@@ -52,7 +52,7 @@ class Lock
 		global $wpdb;
 
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$result = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {self::getTableName()} WHERE payment_id = %s", array( $payment_id ) ) );
+		$result = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `".self::getTableName()."` WHERE payment_id = %s", array( $payment_id ) ) );
 
 		if ( !$result ) {
 			return false;
@@ -65,7 +65,7 @@ class Lock
 	static function delete_lock_table(){
 		global $wpdb;
 
-		$sql = "DROP TABLE IF EXISTS {self::getTableName()};";
+		$sql = "DROP TABLE IF EXISTS `" .self::getTableName()."`;";
 		$wpdb->query($sql);
 
 	}
