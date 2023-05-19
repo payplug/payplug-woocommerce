@@ -41,6 +41,7 @@ class Lock
 	 */
 	static function delete_lock($payment_id){
 		global $wpdb;
+		$wpdb->hide_errors();
 		return $wpdb->delete(self::getTableName(), array("payment_id" => $payment_id));
 	}
 
