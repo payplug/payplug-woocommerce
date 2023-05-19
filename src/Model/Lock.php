@@ -27,6 +27,7 @@ class Lock
 	 */
 	static function insert_lock($payment_id){
 		global $wpdb;
+		$wpdb->hide_errors();
 		return $wpdb->insert($wpdb->prefix . 'woocommerce_payplug_lock', array("payment_id" => $payment_id));
 	}
 
