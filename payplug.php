@@ -52,7 +52,6 @@ function init() {
 }
 
 function create_lock_table(){
-	error_log("\n\n \$create_lock_table = ".print_r('create_lock_table',true),3,"./file.log");
 
 	init();
 	\Payplug\PayplugWoocommerce\Model\Lock::create_lock_table();
@@ -92,7 +91,6 @@ function create_lock_table_action($upgrader, $options)
 
 	// only run on our plugin update
 	if ($options == $payplug_id) {
-		error_log("\n\n create_lock_table = " . print_r($options, true), 3, "./file.log");
 		create_lock_table();
 	}
 }
