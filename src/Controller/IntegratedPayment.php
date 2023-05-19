@@ -2,8 +2,20 @@
 
 namespace Payplug\PayplugWoocommerce\Controller;
 
+use Payplug\Payplug;
+use Payplug\Authentication;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\Exception\ForbiddenException;
+
 class IntegratedPayment
 {
+	protected $options;
+
+	public function __construct($options)
+	{
+		$this->options = $options;
+	}
 
 	static public function template_form($oneClick){
 
@@ -70,6 +82,59 @@ HTML;
 				</div>
 			</form>
 HTML;
+	}
+
+	public function enable_ip(){
+
+		//save into transaction the IP permissions
+		$this->options['payment_method'] = "integrated";
+		$this->options['update_gateway'] = true;
+		$this->options['can_use_integrated_payments'] = true;
+		update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $this->options) );
+	}
+
+	//refered to https://payplug-prod.atlassian.net/browse/WOOC-772
+	public function disable_ip(){
+		$this->options["payment_method"] = "redirect";
+		$this->options['update_gateway'] = false;
+		$this->options['can_use_integrated_payments'] = false;
+
+		//save into transaction the IP permissions
+		update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $this->options) );
+		return false;
+	}
+
+	public function ip_permissions(){
+
+		$options          = get_option('woocommerce_payplug_settings', []);
+
+		try {
+			$permissions = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+			PayplugWoocommerceHelper::set_transient_data($permissions, $options);
+		} catch (\Payplug\Exception\UnauthorizedException $e) {
+		} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
+		} catch( \Payplug\Exception\ForbiddenException $e){
+		} catch (\Payplug\Exception\ForbiddenException $e){return array();}
+
+
+		if( empty($permissions["httpResponse"]["permissions"]['can_use_integrated_payments']) || !$permissions["httpResponse"]["permissions"]['can_use_integrated_payments'] ){
+			return false;
+		}
+
+		if( !empty($permissions["httpResponse"]["permissions"]['can_use_integrated_payments']) && $permissions["httpResponse"]["permissions"]['can_use_integrated_payments'] ){
+			return true;
+		}
+
+		return false;
+	}
+
+	public function already_updated(){
+
+		if(empty($this->options['update_gateway'])){
+			return false;
+		}
+
+		return true;
 	}
 
 }

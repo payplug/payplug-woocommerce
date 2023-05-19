@@ -7,8 +7,8 @@
  * Author URI:      https://www.payplug.com/
  * Text Domain:     payplug
  * Domain Path:     /languages
- * Version:         2.4.0
- * WC tested up to: 7.5.1
+ * Version:         2.4.1
+ * WC tested up to: 7.7.0
  * License:         GPLv3 or later
  * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-define( 'PAYPLUG_GATEWAY_VERSION', '2.4.0' );
+define( 'PAYPLUG_GATEWAY_VERSION', '2.4.1' );
 define( 'PAYPLUG_GATEWAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );

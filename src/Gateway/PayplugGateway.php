@@ -135,21 +135,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			set_transient( PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', [])), null );
 		}
 
-
-		if(is_checkout()){
-			$options = get_option('woocommerce_payplug_settings', []);
-			if( !$this->get_option('update_gateway') ){
-				$this->activate_integrated_payments();
-			}
-
-			//refered to https://payplug-prod.atlassian.net/browse/WOOC-772
-			if( !$this->get_option('can_use_integrated_payments') && $this->get_option('payment_method') === "integrated"){
-				$options["payment_method"] = "redirect";
-				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
-			}
-		}
-
-
         $this->title          = $this->get_option('title');
         $this->description    = $this->get_option('description');
         $this->mode           = 'yes' === $this->get_option('mode', 'no') ? 'live' : 'test';
@@ -598,42 +583,51 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		 * Integrated payments scripts
 		 */
 		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
-		wp_enqueue_script('payplug-integrated-payments-api', 'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js', [], 'v1.1', true);
 
-		wp_enqueue_script('payplug-integrated-payments', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-integrated-payments.js', ['jquery', 'payplug-integrated-payments-api'], 'v1.1', true);
+		wp_register_script('payplug-integrated-payments-api', 'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js', [], 'v1.1', true);
+		wp_enqueue_script('payplug-integrated-payments-api');
+
+		wp_register_script( 'jquery-bind-first', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/jquery.bind-first-0.2.3.min.js', array( 'jquery' ), '1.0.0', true );
+		wp_enqueue_script('jquery-bind-first');
+
+		wp_register_script('payplug-integrated-payments', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-integrated-payments.js', ['jquery', 'jquery-bind-first', 'payplug-integrated-payments-api'], 'v1.1', true);
+		wp_enqueue_script('payplug-integrated-payments');
+
 		wp_localize_script( 'payplug-integrated-payments', 'payplug_integrated_payment_params', $translations);
 	}
 
-    /**
-     * Embedded payment form scripts.
-     *
-     * Register scripts and additionnal data needed for the
-     * embedded payment form.
-     */
-    public function scripts()
-    {
-        if (!is_cart() && !is_checkout() && !isset($_GET['pay_for_order']) && !is_add_payment_method_page() && !isset($_GET['change_payment_method'])) {
-            return;
-        }
+	/**
+	 * Embedded payment form scripts.
+	 *
+	 * Register scripts and additionnal data needed for the
+	 * embedded payment form.
+	 */
+	public function scripts()
+	{
+		if (!is_cart() && !is_checkout() && !isset($_GET['pay_for_order']) && !is_add_payment_method_page() && !isset($_GET['change_payment_method'])) {
+			return;
+		}
 
-        // If PayPlug is not enabled bail.
-        if ('no' === $this->enabled) {
-            return;
-        }
+		// If PayPlug is not enabled bail.
+		if ('no' === $this->enabled) {
+			return;
+		}
 
-        // If keys are not set bail.
-        if (empty($this->get_api_key($this->mode))) {
-            PayplugGateway::log('Keys are not set correctly.');
+		// If keys are not set bail.
+		if (empty($this->get_api_key($this->mode))) {
+			PayplugGateway::log('Keys are not set correctly.');
 
-            return;
-        }
+			return;
+		}
 
 		// Register checkout styles.
 		wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('payplug-checkout');
 
-		//load Integrated Payment features
-		if($this->payment_method === 'integrated'){
+		$this->activate_integrated_payments();
+		$transient_key = PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', []));
+		$ip = get_transient($transient_key);
+		if(isset($ip['permissions']['can_use_integrated_payments']) && ($ip['permissions']['can_use_integrated_payments'] === true)){
 			$this->integrated_payments_scripts();
 
 		}else{
@@ -656,7 +650,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 			wp_enqueue_script('payplug-checkout');
 		}
-
 
     }
 
@@ -1874,25 +1867,40 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$this->payplug_merchant_country = $country;
 	}
 
-	public function handle_ip_auto_activation(){
-
-	}
-
-	protected function activate_integrated_payments(){
+	public function activate_integrated_payments(){
 		//get options
 		$options = get_option('woocommerce_payplug_settings', []);
 
-		//was this option updated?
-		if(empty($options['update_gateway'])){
-			//get transient
-			$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
-			$transient = get_transient($transient_key);
-
-			if( !empty($transient["permissions"]['can_use_integrated_payments']) && $transient["permissions"]['can_use_integrated_payments']) {
-				$options['payment_method'] = "integrated";
-				$options['update_gateway'] = true;
-				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
-			}
+		if($options["enabled"] != "yes"){
+			return false;
 		}
+
+		$ip = new IntegratedPayment($options);
+		$ip_permissions = $ip->ip_permissions();
+
+		if(!$ip_permissions){
+			$ip->disable_ip();
+			wp_dequeue_style("payplugIP");
+			wp_dequeue_script('payplug-integrated-payments-api');
+			wp_dequeue_script('payplug-integrated-payments');
+			return false;
+		}
+
+
+		if($options['payment_method'] === "integrated"){
+			return true;
+		}
+
+		if($ip->already_updated()){
+			return false;
+		}
+
+		$ip->enable_ip();
+		$this->integrated_payments_scripts();
+
+		return true;
+
+
 	}
+
 }
