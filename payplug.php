@@ -51,7 +51,12 @@ function init() {
 	$GLOBALS["mo"]->import_from_file($path);
 }
 
-add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
+function create_lock_table(){
+	init();
+	\Payplug\PayplugWoocommerce\Model\Lock::create_lock_table();
+}
+
+add_action( 'plugins_loaded', __NAMESPACE__ . '\\create_lock_table' );
 register_deactivation_hook( __FILE__,  __NAMESPACE__ .'\\PayplugWoocommerceHelper::plugin_deactivation' );
 
 /**
@@ -75,3 +80,6 @@ function wpdocs_translate_text($msgstr, $msgid, $domain)
 	return $msgstr;
 }
 add_filter('gettext_payplug', __NAMESPACE__ . '\\wpdocs_translate_text', 10, 3);
+
+
+
