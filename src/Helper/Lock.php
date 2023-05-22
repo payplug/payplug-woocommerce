@@ -8,7 +8,7 @@ class Lock
 {
 
 	public static function handleLock($payment_id){
-		\Payplug\PayplugWoocommerce\Model\Lock::insert_lock($payment_id)
+		\Payplug\PayplugWoocommerce\Model\Lock::insert_lock($payment_id);
 		do{
 			$lock = \Payplug\PayplugWoocommerce\Model\Lock::get_lock($payment_id);
 			if( !empty($lock) ){
