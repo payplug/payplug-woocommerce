@@ -630,8 +630,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		if(isset($ip['permissions']['can_use_integrated_payments']) && ($ip['permissions']['can_use_integrated_payments'] === true)){
 			$this->integrated_payments_scripts();
 
-		}else{
+		}
+		if ($this->payment_method == "popup") {
 
+			wp_dequeue_style("payplugIP");
+			wp_dequeue_script('payplug-integrated-payments-api');
+			wp_dequeue_script('payplug-integrated-payments');
 			//load popup features
 			//TODO:: if integrated payment is not active please active this and comment the one bellow
 			wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
@@ -1896,6 +1900,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		}
 
 		$ip->enable_ip();
+		$this->payment_method = "integrated";
 		$this->integrated_payments_scripts();
 
 		return true;
