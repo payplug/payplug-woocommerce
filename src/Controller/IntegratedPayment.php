@@ -109,8 +109,13 @@ HTML;
 		$options          = get_option('woocommerce_payplug_settings', []);
 
 		try {
-			$permissions = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-			PayplugWoocommerceHelper::set_transient_data($permissions, $options);
+			if (!empty(PayplugWoocommerceHelper::get_live_key())) {
+				$permissions = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+				PayplugWoocommerceHelper::set_transient_data($permissions, $options);
+			} else {
+				return false;
+			}
+
 		} catch (\Payplug\Exception\UnauthorizedException $e) {
 		} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
 		} catch( \Payplug\Exception\ForbiddenException $e){
