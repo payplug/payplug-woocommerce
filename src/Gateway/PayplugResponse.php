@@ -78,12 +78,14 @@ class PayplugResponse {
 
 			// Handle failed payments
 			if (!empty($resource->failure)) {
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
 				$order->update_status(
 					'failed',
 					sprintf(__('PayPlug IPN OK | Transaction %s failed : %s', 'payplug'), $resource->id, wc_clean($resource->failure->message))
 				);
 				/** This action is documented in src/Gateway/PayplugResponse */
 				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
 				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed but failed.', $order_id, $resource->id));
 				wc_increase_stock_levels($order);
 
@@ -123,6 +125,7 @@ class PayplugResponse {
 
 			// Handle successful payments
 			if ($resource->is_paid) {
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
 				if (!$is_payment_with_token) {
 					$this->maybe_save_card($resource);
 				}
@@ -139,6 +142,7 @@ class PayplugResponse {
 				 * @param PaymentResource $resource Payment resource
 				 */
 				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
+				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
 				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed successfully.', $order_id, $resource->id));
 			}
 
