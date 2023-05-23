@@ -7,7 +7,7 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 class Lock
 {
 
-	public static function handleLock($payment_id){
+	public function handleLock($payment_id){
 		\Payplug\PayplugWoocommerce\Model\Lock::insert_lock($payment_id);
 		do{
 			$lock = \Payplug\PayplugWoocommerce\Model\Lock::get_lock($payment_id);
@@ -25,7 +25,7 @@ class Lock
 
 	}
 
-	public static function deleteLock($payment_id){
+	public function deleteLock($payment_id){
 		return \Payplug\PayplugWoocommerce\Model\Lock::delete_lock($payment_id);
 	}
 

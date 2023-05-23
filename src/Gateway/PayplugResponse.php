@@ -41,7 +41,8 @@ class PayplugResponse {
 	{
 		$order_id = wc_clean($resource->metadata['order_id']);
 
-		\Payplug\PayplugWoocommerce\Helper\Lock::handleLock($resource->id);
+		$lock = new Lock();
+		$lock->handleLock($resource->id);
 
 		$order = wc_get_order($order_id);
 		$gateway_id = $order->get_payment_method();
