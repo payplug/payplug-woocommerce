@@ -630,7 +630,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		if((isset($ip['permissions']['can_use_integrated_payments']) && ($ip['permissions']['can_use_integrated_payments'] === true)) || ($this->payment_method == "integrated")){
 			$this->integrated_payments_scripts();
 
-		} elseif ($this->payment_method == "popup") {
+		}
+
+		if ($this->payment_method == "popup") {
 
 			wp_dequeue_style("payplugIP");
 			wp_dequeue_script('payplug-integrated-payments-api');
