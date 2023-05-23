@@ -44,8 +44,8 @@
                         var error_messages = response.messages || '';
                         payplug_checkout.submit_error(error_messages);
                         return;
-                    } 
-                    
+                    }
+
                     if(response.is_paid) {
                         document.location.href = response.redirect;
                         return;
@@ -78,7 +78,7 @@
             Payplug.showPayment(response.redirect);
         },
         isPayplugChosen: function () {
-            return $('#payment_method_payplug').is(':checked');
+            return ($('#payment_method_payplug').is(':checked') || $('#payment_method_american_express').is(':checked'));
         },
         isPaymentTokenSelected: function () {
             var token = $('input[name=wc-payplug-payment-token]:checked');
