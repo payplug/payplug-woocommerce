@@ -7,7 +7,7 @@
  * Author URI:      https://www.payplug.com/
  * Text Domain:     payplug
  * Domain Path:     /languages
- * Version:         2.4.1
+ * Version:         2.5.0
  * WC tested up to: 7.7.0
  * License:         GPLv3 or later
  * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-define( 'PAYPLUG_GATEWAY_VERSION', '2.4.1' );
+define( 'PAYPLUG_GATEWAY_VERSION', '2.5.0' );
 define( 'PAYPLUG_GATEWAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -51,7 +51,12 @@ function init() {
 	$GLOBALS["mo"]->import_from_file($path);
 }
 
-add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
+function create_lock_table(){
+	init();
+	\Payplug\PayplugWoocommerce\Model\Lock::create_lock_table();
+}
+
+add_action( 'plugins_loaded', __NAMESPACE__ . '\\create_lock_table' );
 register_deactivation_hook( __FILE__,  __NAMESPACE__ .'\\PayplugWoocommerceHelper::plugin_deactivation' );
 
 /**
@@ -75,3 +80,6 @@ function wpdocs_translate_text($msgstr, $msgid, $domain)
 	return $msgstr;
 }
 add_filter('gettext_payplug', __NAMESPACE__ . '\\wpdocs_translate_text', 10, 3);
+
+
+

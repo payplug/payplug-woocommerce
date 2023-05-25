@@ -267,7 +267,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $transaction_id = PayplugWoocommerceHelper::is_pre_30() ? get_post_meta($order_id, '_transaction_id', true) : $order->get_transaction_id();
         if (empty($transaction_id)) {
             PayplugGateway::log(sprintf('Order #%s : Missing transaction id.', $order_id), 'error');
-
             return;
         }
 
@@ -284,12 +283,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 					)
 				);
 
-				return;
-			}
-
-			//FIXME:: this is being runned 1 time for each gateway,
-			// this comparisson is only needed to only run the process_method one time
-			if($payment_method != $this->id){
 				return;
 			}
 
@@ -634,11 +627,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$this->activate_integrated_payments();
 		$transient_key = PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', []));
 		$ip = get_transient($transient_key);
-		if(isset($ip['permissions']['can_use_integrated_payments']) && ($ip['permissions']['can_use_integrated_payments'] === true)){
+		if((isset($ip['permissions']['can_use_integrated_payments']) && ($ip['permissions']['can_use_integrated_payments'] === true)) || ($this->payment_method == "integrated")){
 			$this->integrated_payments_scripts();
 
-		}else{
+		}
 
+		if ($this->payment_method == "popup") {
+
+			wp_dequeue_style("payplugIP");
+			wp_dequeue_script('payplug-integrated-payments-api');
+			wp_dequeue_script('payplug-integrated-payments');
 			//load popup features
 			//TODO:: if integrated payment is not active please active this and comment the one bellow
 			wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
@@ -1903,6 +1901,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		}
 
 		$ip->enable_ip();
+		$this->payment_method = "integrated";
 		$this->integrated_payments_scripts();
 
 		return true;

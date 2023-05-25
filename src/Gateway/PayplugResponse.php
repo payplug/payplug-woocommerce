@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Payplug\PayplugWoocommerce\Helper\Lock;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\IVerifiableAPIResource;
 use Payplug\Resource\Payment as PaymentResource;
@@ -39,10 +40,15 @@ class PayplugResponse {
 	public function process_payment($resource, $is_payment_with_token = false, $source = null)
 	{
 		$order_id = wc_clean($resource->metadata['order_id']);
+
+		if ((!empty($source) && ($source === "ipn"))) {
+			$lock = new Lock();
+			$lock->handleLock($resource->id);
+		}
+
 		$order = wc_get_order($order_id);
 		$gateway_id = $order->get_payment_method();
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($resource);
-
 
 		// Ignore undefined orders
 		if (!$order) {
@@ -61,12 +67,14 @@ class PayplugResponse {
 			// Ignore cancelled orders
 			if ($order->has_status('refunded')) {
 				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order has been refunded. Ignoring IPN', $order_id));
+				//$lock->deleteLock($resource->id);
 				return;
 			}
 
 			// Ignore paid orders
 			if ($order->is_paid()) {
 				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order is already complete. Ignoring IPN.', $order_id));
+				//$lock->deleteLock($resource->id);
 				return;
 			}
 
@@ -82,8 +90,13 @@ class PayplugResponse {
 				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
 				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed but failed.', $order_id, $resource->id));
 				wc_increase_stock_levels($order);
+
+				//$lock->deleteLock($resource->id);
 				return;
-			} elseif (( $resource->failure == null ) && !empty($resource->payment_method['is_pending']) && ( $resource->payment_method['is_pending'] == true )) {
+			}
+
+			elseif (( $resource->failure == null ) && !empty($resource->payment_method['is_pending'])
+				&& ( $resource->payment_method['is_pending'] == true )) {
 				$this->handle_pending_oney( $order, $resource );
 			}
 
@@ -134,6 +147,8 @@ class PayplugResponse {
 				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
 				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed successfully.', $order_id, $resource->id));
 			}
+
+			//$lock->deleteLock($resource->id);
 		}
 	}
 
@@ -200,13 +215,6 @@ class PayplugResponse {
 	public function oney_ipn( $resource ) {
 		$gateway_id = $resource->payment_method['type'];
 		$order_id = wc_clean( $resource->metadata['order_id'] );
-		$order    = wc_get_order( $order_id );
-		$order_metadata = $order->get_meta( '_payplug_metadata', true );
-
-		if ( is_array( $order_metadata ) && array_key_exists( 'transaction_in_progress', $order_metadata ) ) {
-			PayplugGateway::log( sprintf( 'Order #%s : Order '. $this->gateway_name($gateway_id) .' IPN already in progress. Ignoring IPN', $order_id ) );
-			return;
-		}
 
 		if ( ( $resource->is_paid == true ) && ( $resource->failure == null ) ) {
 			PayplugGateway::log( sprintf( 'Order #%s : '. $this->gateway_name($gateway_id) .' payment SUCCESS', $order_id ) );
