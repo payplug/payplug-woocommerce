@@ -41,10 +41,12 @@ class PayplugResponse {
 	{
 		$order_id = wc_clean($resource->metadata['order_id']);
 
+		/*
 		if ((!empty($source) && ($source === "ipn"))) {
 			$lock = new Lock();
 			$lock->handleLock($resource->id);
 		}
+		*/
 
 		$order = wc_get_order($order_id);
 		$gateway_id = $order->get_payment_method();
