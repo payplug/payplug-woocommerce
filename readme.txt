@@ -82,6 +82,11 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 
 == Changelog ==
 
+= 2.5.1 =
+* Minor bug fix
+* Tested up to Woocommerce 7.7.0
+* Tested up to Wordpress 6.2
+
 = 2.5 =
 * New feature: Amex with Pop up mode
 * Bug fixes: double IPN
