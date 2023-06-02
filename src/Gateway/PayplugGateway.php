@@ -14,6 +14,7 @@ use Payplug\Exception\ForbiddenException;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Admin\Ajax;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
+use Payplug\PayplugWoocommerce\Helper\Lock;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
@@ -242,13 +243,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      *
      * @throws \WC_Data_Exception
      */
-    public function validate_payment()
+    public function validate_payment($id = null, $save_request = true)
     {
-        if (!is_wc_endpoint_url('order-received') || empty($_GET['key'])) {
+        if (!is_wc_endpoint_url('order-received') || (empty($_GET['key']) && empty($id)) ) {
             return;
         }
 
-        $order_id = wc_get_order_id_by_order_key(wc_clean($_GET['key']));
+        $order_id = wc_get_order_id_by_order_key(wc_clean( (!empty($_GET['key']) ? $_GET['key'] : $id) ) );
         if (empty($order_id)) {
             return;
         }
@@ -272,6 +273,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		if($payment_method === $this->id) {
 
+			$lock_id = Lock::handle_insert($save_request, $transaction_id);
+			if(!$lock_id){
+				return;
+			}
+
 			try {
 				$payment = $this->api->payment_retrieve($transaction_id);
 			} catch (\Exception $e) {
@@ -287,6 +293,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			}
 
 			$this->response->process_payment($payment);
+
+			\Payplug\PayplugWoocommerce\Model\Lock::delete_lock($lock_id);
+			$waiting_requests = \Payplug\PayplugWoocommerce\Model\Lock::get_lock_by_payment_id($transaction_id);
+
+			if($waiting_requests){
+				Lock::delete_lock($waiting_requests->id);
+				$this->validate_payment($order_id, false);
+			};
 		}
     }
 
