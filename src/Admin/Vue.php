@@ -36,6 +36,11 @@ class Vue {
 			} else {
 				$payplug_wooc_settings['can_use_integrated_payments'] = false;
 			}
+
+			if ($payplug->get_current_mode() == "test") {
+				$payplug_wooc_settings['can_use_integrated_payments'] = true;
+			}
+
 			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $payplug_wooc_settings) );
 
 			if ((empty($payplug_wooc_settings['oney_thresholds_default_min'])) && (empty($payplug_wooc_settings['oney_thresholds_default_max']))) {
