@@ -584,7 +584,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		 */
 		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
 
-		wp_register_script('payplug-integrated-payments-api', 'https://cdn.payplug.com/js/integrated-payment/v1@1/index.js', [], 'v1.1', true);
+		wp_register_script('payplug-integrated-payments-api', 'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js', [], 'v1.1', true);
 		wp_enqueue_script('payplug-integrated-payments-api');
 
 		wp_register_script( 'jquery-bind-first', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/jquery.bind-first-0.2.3.min.js', array( 'jquery' ), '1.0.0', true );
@@ -1881,6 +1881,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		}
 
 		$ip = new IntegratedPayment($options);
+
+		if($ip->already_updated()){
+			return false;
+		}
+
 		$ip_permissions = $ip->ip_permissions();
 
 		if(!$ip_permissions){
@@ -1896,9 +1901,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			return true;
 		}
 
-		if($ip->already_updated()){
-			return false;
-		}
 
 		$ip->enable_ip();
 		$this->payment_method = "integrated";
