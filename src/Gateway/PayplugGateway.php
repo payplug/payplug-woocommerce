@@ -1881,6 +1881,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		}
 
 		$ip = new IntegratedPayment($options);
+
+		if($ip->already_updated()){
+			return false;
+		}
+
 		$ip_permissions = $ip->ip_permissions();
 
 		if(!$ip_permissions){
@@ -1896,9 +1901,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			return true;
 		}
 
-		if($ip->already_updated()){
-			return false;
-		}
 
 		$ip->enable_ip();
 		$this->payment_method = "integrated";
