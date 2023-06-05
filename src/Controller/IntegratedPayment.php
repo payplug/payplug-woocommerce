@@ -95,7 +95,9 @@ HTML;
 
 	//refered to https://payplug-prod.atlassian.net/browse/WOOC-772
 	public function disable_ip(){
-		$this->options["payment_method"] = "redirect";
+		if ($this->options['payment_method'] == "integrated") {
+			$this->options["payment_method"] = "redirect";
+		}
 		$this->options['update_gateway'] = false;
 		$this->options['can_use_integrated_payments'] = false;
 
