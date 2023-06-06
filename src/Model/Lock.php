@@ -12,13 +12,22 @@ class Lock
 		global $wpdb;
 
 		$sql = "CREATE TABLE  IF NOT EXISTS `{$wpdb->base_prefix}woocommerce_payplug_lock` (";
-		$sql .= " `id` int NOT NULL AUTO_INCREMENT,";
 		$sql .= " `payment_id` VARCHAR(50) NOT NULL,";
 		$sql .= " `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,";
-		$sql .= " PRIMARY KEY (`id`));";
+		$sql .= " PRIMARY KEY (`payment_id`));";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 		dbDelta( $sql );
+
+		$result = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT count(column_name) as column_exists FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{$wpdb->base_prefix}woocommerce_payplug_lock' AND column_name = 'id' "
+			)
+		);
+
+		if( !empty($result) && !$result->column_exists){
+			static::update_lock_table();
+		}
 
 	}
 
@@ -29,12 +38,10 @@ class Lock
 		global $wpdb;
 
 		$sql = "ALTER TABLE `{$wpdb->base_prefix}woocommerce_payplug_lock` ";
-		$sql .= "ADD COLUMN `id` INT NOT NULL FIRST,";
-		$sql .= "DROP PRIMARY KEY,";
-		$sql .= "ADD PRIMARY KEY (`id`);";
-
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		dbDelta( $sql );
+		$sql .= " ADD COLUMN `id` INT NOT NULL AUTO_INCREMENT FIRST,";
+		$sql .= " DROP PRIMARY KEY,";
+		$sql .= " ADD PRIMARY KEY (`id`);";
+		$wpdb->query($sql);
 
 	}
 
