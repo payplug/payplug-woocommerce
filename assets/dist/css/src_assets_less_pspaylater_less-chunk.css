@@ -1,103 +1,6 @@
-/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/@vue/cli-service/node_modules/css-loader/dist/cjs.js??clonedRuleSet-12.use[1]!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/@vue/cli-service/node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-12.use[2]!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./src/components/organisms/NavBar.vue?vue&type=style&index=0&id=315665e4&scoped=true&lang=css ***!
-  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-@import url(https://getbootstrap.com/docs/5.0/dist/css/bootstrap.min.css);
-/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/@vue/cli-service/node_modules/css-loader/dist/cjs.js??clonedRuleSet-12.use[1]!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/@vue/cli-service/node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-12.use[2]!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./src/components/organisms/NavBar.vue?vue&type=style&index=0&id=315665e4&scoped=true&lang=css (1) ***!
-  \************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-
-.nav-item.active .nav-link[data-v-315665e4] {
-  color: #fff;
-}
-.bg-primary[data-v-315665e4] {
-  background-color: #00474a !important;
-}
-
-/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/@vue/cli-service/node_modules/css-loader/dist/cjs.js??clonedRuleSet-32.use[1]!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/@vue/cli-service/node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-32.use[2]!./node_modules/less-loader/dist/cjs.js??clonedRuleSet-32.use[3]!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./src/App.vue?vue&type=style&index=0&id=7ba5bd90&lang=less ***!
-  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-.payplugConfiguration .payplug {
-  margin-bottom: 200px;
-}
-.payplugConfiguration .saveChangesButton {
-  width: 100%;
-  max-width: 1000px;
-}
-.payplugConfiguration .store {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-}
-.payplugConfiguration .global-wrapper {
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 999;
-  overflow: hidden;
-  margin: 0;
-}
-.payplugConfiguration .blurred {
-  filter: blur(8px);
-  -webkit-filter: blur(8px);
-}
-.payplugConfiguration .component-wrapper {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 999;
-  overflow: hidden;
-  margin: 0;
-}
-.payplugConfiguration .payplugUIModal {
-  text-align: center;
-}
-.payplugConfiguration .payplugUIModal._show ._modal,
-.payplugConfiguration .payplugUIModal._show ._overlay {
-  display: block;
-}
-.payplugConfiguration .payplugUIModal .payplugUIButton {
-  display: block;
-  margin: 0px auto;
-  width: 100px;
-  font-size: 14px;
-}
-.payplugConfiguration .color {
-  color: #00AB7A !important;
-}
-.payplugConfiguration ._forgotPassword_wrapper {
-  display: inline-block !important;
-  min-width: 171px;
-  text-align: center;
-}
-.payplugConfiguration ._paylaterAdvancedOption.-product {
-  position: relative;
-}
-.payplugConfiguration ._paylaterAdvancedOption.-product ._switch {
-  position: absolute;
-  top: 45%;
-  right: 0px;
-}
-.payplugConfiguration .text-left {
-  text-align: left;
-}
-.payplugConfiguration #inactiveModalClick {
-  text-decoration: underline;
-  cursor: pointer;
-}
-.payplugConfiguration .standardPaymentAdvanced .payplugUIAccordion_contentWrapper {
-  width: 100% !important;
-}
-.payplugConfiguration .inputError {
-  border-color: red !important;
-}
-
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/@vue/cli-service/node_modules/css-loader/dist/cjs.js??clonedRuleSet-34.use[1]!./node_modules/@vue/cli-service/node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-34.use[2]!./node_modules/less-loader/dist/cjs.js??clonedRuleSet-34.use[3]!./src/assets/less/admin.less ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************/
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/@vue/cli-service/node_modules/css-loader/dist/cjs.js??clonedRuleSet-34.use[1]!./node_modules/@vue/cli-service/node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-34.use[2]!./node_modules/less-loader/dist/cjs.js??clonedRuleSet-34.use[3]!./src/assets/less/pspaylater.less ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************/
 /**
  * 2013 - 2022 PayPlug SAS
  *
@@ -173,6 +76,9 @@
   src: url(https://fonts.gstatic.com/s/gantari/v1/jVyK7nvyB2HL8iZyJEIupw4GV8w.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+/*
+* override some of the map settings for the paylater
+*/
 .payplugUIComponentsList {
   background: #fff;
   margin: -16px -16px -16px -16px;
@@ -248,7 +154,7 @@
   width: 100%;
   padding: 30px 72px 30px 24px;
   margin: 0;
-  color: #0555EB;
+  color: #442CC7;
   font-weight: 700;
   cursor: pointer;
 }
@@ -297,8 +203,8 @@
 }
 .bootstrap .payplugUIAction.-hover,
 .bootstrap .payplugUIAction:hover {
-  color: #0555EB;
-  background: rgba(5, 85, 235, 0.1);
+  color: #442CC7;
+  background: rgba(68, 44, 199, 0.1);
   text-decoration: none;
 }
 .bootstrap .payplugUIAction.-disabled,
@@ -472,7 +378,7 @@
   display: block;
   width: 40px;
   height: 5px;
-  background: #FFD908;
+  background: #363a41;
 }
 .bootstrap .payplugUiBlock > ._description {
   margin: 0 0 24px;
@@ -509,7 +415,7 @@
   align-items: center;
   height: calc(40em / 14);
   padding: 0 calc(20em / 14);
-  background: #0555EB;
+  background: #442CC7;
   border-radius: 4px;
   border: none;
   font-family: 'Gantari', sans-serif;
@@ -527,32 +433,32 @@
 }
 .bootstrap .payplugUIButton:hover,
 .bootstrap .payplugUIButton.-hover {
-  background: #0443b9;
+  background: #36239d;
   color: #fff;
 }
 .bootstrap .payplugUIButton.-disabled,
 .bootstrap .payplugUIButton[disabled="disabled"] {
   opacity: 0.3;
   cursor: not-allowed;
-  background: #0555EB;
+  background: #442CC7;
 }
 .bootstrap .payplugUIButton.-secondary {
-  border: 1px solid #0555EB;
+  border: 1px solid #442CC7;
   background: #fff;
 }
 .bootstrap .payplugUIButton.-secondary,
 .bootstrap .payplugUIButton.-secondary:focus,
 .bootstrap .payplugUIButton.-secondary:active {
-  color: #0555EB;
+  color: #442CC7;
 }
 .bootstrap .payplugUIButton.-secondary:hover,
 .bootstrap .payplugUIButton.-secondary.-hover {
-  background: #0555EB;
+  background: #442CC7;
   color: #fff;
 }
 .bootstrap .payplugUIButton.-secondary.-disabled {
   background: #fff;
-  color: #0555EB;
+  color: #442CC7;
 }
 .bootstrap .payplugUIButton.-tertiary {
   border: 1px solid #C8D7E4;
@@ -581,7 +487,7 @@
   align-items: center;
   height: calc(40em / 14);
   padding: 0 calc(20em / 14);
-  background: #0555EB;
+  background: #442CC7;
   border-radius: 4px;
   border: none;
   font-family: 'Gantari', sans-serif;
@@ -599,32 +505,32 @@
 }
 .bootstrap .payplugUIButtonLink:hover,
 .bootstrap .payplugUIButtonLink.-hover {
-  background: #0443b9;
+  background: #36239d;
   color: #fff;
 }
 .bootstrap .payplugUIButtonLink.-disabled,
 .bootstrap .payplugUIButtonLink[disabled="disabled"] {
   opacity: 0.3;
   cursor: not-allowed;
-  background: #0555EB;
+  background: #442CC7;
 }
 .bootstrap .payplugUIButtonLink.-secondary {
-  border: 1px solid #0555EB;
+  border: 1px solid #442CC7;
   background: #fff;
 }
 .bootstrap .payplugUIButtonLink.-secondary,
 .bootstrap .payplugUIButtonLink.-secondary:focus,
 .bootstrap .payplugUIButtonLink.-secondary:active {
-  color: #0555EB;
+  color: #442CC7;
 }
 .bootstrap .payplugUIButtonLink.-secondary:hover,
 .bootstrap .payplugUIButtonLink.-secondary.-hover {
-  background: #0555EB;
+  background: #442CC7;
   color: #fff;
 }
 .bootstrap .payplugUIButtonLink.-secondary.-disabled {
   background: #fff;
-  color: #0555EB;
+  color: #442CC7;
 }
 .bootstrap .payplugUIButtonLink.-tertiary {
   border: 1px solid #C8D7E4;
@@ -662,7 +568,7 @@
   fill: #fff;
 }
 .bootstrap .payplugUIButtonLink.-secondary.-icon svg {
-  fill: #0555EB;
+  fill: #442CC7;
 }
 .bootstrap .payplugUIButtonLink.-secondary.-icon.-hover svg,
 .bootstrap .payplugUIButtonLink.-secondary.-icon:hover svg {
@@ -743,8 +649,8 @@
 .bootstrap .payplugUIInput input[type=email]:hover,
 .bootstrap .payplugUIInput input[type=password]:hover,
 .bootstrap .payplugUIInput input[type=number]:hover {
-  box-shadow: 0 0 0 1px #0555EB;
-  border-color: #0555EB;
+  box-shadow: 0 0 0 1px #442CC7;
+  border-color: #442CC7;
 }
 .bootstrap .payplugUIInput input[type=text]:focus-visible,
 .bootstrap .payplugUIInput input[type=email]:focus-visible,
@@ -826,7 +732,7 @@
 .bootstrap .payplugUIInput.-hover input[type=password],
 .bootstrap .payplugUIInput.-focus input[type=number],
 .bootstrap .payplugUIInput.-hover input[type=number] {
-  border-color: #0555EB;
+  border-color: #442CC7;
 }
 .bootstrap .payplugUIInput.-error input[type=text],
 .bootstrap .payplugUIInput.-error input[type=password],
@@ -835,18 +741,18 @@
 }
 .bootstrap .payplugUILink {
   text-decoration: none;
-  color: #0555EB;
+  color: #442CC7;
 }
 .bootstrap .payplugUILink:hover,
 .bootstrap .payplugUILink.-hover {
-  color: #0443b9;
+  color: #36239d;
   text-decoration: none;
 }
 .bootstrap .payplugUILink.-disabled,
 .bootstrap .payplugUILink[disabled="disabled"] {
   opacity: 0.3;
   cursor: default;
-  color: #0555EB;
+  color: #442CC7;
 }
 .bootstrap .payplugUILoader svg {
   position: absolute;
@@ -857,7 +763,7 @@
 }
 .bootstrap .payplugUILoader svg circle {
   fill: transparent;
-  stroke: #0555EB;
+  stroke: #442CC7;
   stroke-width: 4;
   stroke-linecap: round;
   stroke-dasharray: 125.6;
@@ -932,7 +838,7 @@
   fill: #212225;
 }
 .bootstrap .payplugUIModal ._modal ._close:hover svg {
-  fill: #0555EB;
+  fill: #442CC7;
 }
 .bootstrap .payplugUIModal ._modal ._header {
   border-bottom: 1px solid #EDEEF0;
@@ -946,7 +852,7 @@
   margin: 0;
 }
 .bootstrap .payplugUIModal ._modal ._body a {
-  color: #0555EB;
+  color: #442CC7;
   text-decoration: none;
 }
 .bootstrap .payplugUIModal ._modal ._footer {
@@ -996,9 +902,9 @@
   display: none;
 }
 .bootstrap .payplugUIIOptions label input[type="radio"]:checked ~ span {
-  border: 1px solid #0555EB;
-  background: rgba(5, 85, 235, 0.1);
-  color: #0555EB;
+  border: 1px solid #442CC7;
+  background: rgba(68, 44, 199, 0.1);
+  color: #442CC7;
   position: relative;
 }
 .bootstrap .payplugUIIOptions label input[type="radio"]:checked ~ span:before {
@@ -1013,10 +919,10 @@
   mask-image: url(../img/check.9e76f38d.svg);
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
-  background-color: #0555EB;
+  background-color: #442CC7;
 }
 .bootstrap .payplugUIIOptions label input[type="radio"]:checked ~ span > span {
-  color: #0555EB;
+  color: #5D5FEF;
 }
 .bootstrap .payplugUIIOptions label + label {
   margin: 0 0 0 8px;
@@ -1132,7 +1038,7 @@
 }
 .bootstrap .payplugUISelect ._listWrapper.-scrollbar ._list::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background: #0555EB;
+  background: #442CC7;
   position: relative;
   right: 4px;
 }
@@ -1161,8 +1067,8 @@
   white-space: nowrap;
 }
 .bootstrap .payplugUISelect ._option:hover {
-  color: #0555EB;
-  background: rgba(5, 85, 235, 0.1);
+  color: #442CC7;
+  background: rgba(68, 44, 199, 0.1);
 }
 .bootstrap .payplugUISelect.-disabled {
   cursor: default;
@@ -1230,7 +1136,7 @@
   cursor: not-allowed;
 }
 .bootstrap .payplugUISwitch input:checked + ._slider {
-  background-color: #0555EB;
+  background-color: #442CC7;
 }
 .bootstrap .payplugUISwitch input:checked + ._slider:before {
   transform: translateX(16px);
@@ -1247,7 +1153,7 @@
   color: #D7D8D9;
 }
 .bootstrap .payplugUITitle.primary {
-  color: #0555EB;
+  color: #442CC7;
 }
 .bootstrap .payplugUITooltip {
   position: relative;
@@ -1293,7 +1199,7 @@
   fill: #212225;
 }
 .bootstrap .payplugUITooltip ._icon:hover svg {
-  fill: #0555EB;
+  fill: #442CC7;
 }
 .bootstrap .payplugUICheckbox .checkbox-label {
   display: block;
@@ -1333,7 +1239,7 @@
 }
 .bootstrap .payplugUICheckbox .checkbox-label input[type="checkbox"]:checked {
   border: none;
-  background-color: #0555EB;
+  background-color: #442CC7;
 }
 .bootstrap .payplugUICheckbox .checkbox-label input[type="checkbox"]:checked::after {
   content: url("data:image/svg+xml, <svg viewBox=%270 0 16 15%27 xmlns=%27http://www.w3.org/2000/svg%27><path fill=%27white%27 d=%27M15.25.847a1.51 1.51 0 0 1 .405 2.096L8.106 14.11a1.944 1.944 0 0 1-2.94.329L.6 10.156a1.51 1.51 0 1 1 2.067-2.202l3.645 3.42 6.841-10.122a1.51 1.51 0 0 1 2.098-.405Z%27/></svg>");
@@ -1398,7 +1304,7 @@
   }
 }
 .payplugConfiguration .descriptionBlock {
-  background: #FFD908;
+  background: #011638;
   box-sizing: border-box;
 }
 .payplugConfiguration .descriptionBlock ._header {
@@ -1542,7 +1448,7 @@
   font-family: 'Gantari', sans-serif;
   font-size: 12px;
   font-weight: 700;
-  color: #0555EB;
+  color: #442CC7;
   letter-spacing: calc(1em / 12);
   height: calc(36em / 12);
   padding: 0 12px;
@@ -1555,14 +1461,14 @@
 .generalBlock.-logged ._userPortal.-icon .buttonIcon {
   height: calc(18em / 12);
   width: calc(18em / 12);
-  fill: #0555EB;
+  fill: #442CC7;
 }
 .generalBlock.-logged ._userLogout {
   border: none;
 }
 .generalBlock.-logged ._userLogout:hover {
-  color: #0555EB;
-  background: rgba(5, 85, 235, 0.1);
+  color: #442CC7;
+  background: rgba(68, 44, 199, 0.1);
 }
 .generalBlock.-logged ._sandbox {
   display: flex;
@@ -1837,7 +1743,7 @@
   max-width: calc(80% - 60px);
 }
 .payplugConfiguration .paymentOption > ._text ._title {
-  color: #FFD908;
+  color: #363a41;
   margin: 0;
 }
 .payplugConfiguration .paymentOption > ._text p {
@@ -2116,7 +2022,7 @@
   fill: #D5343C;
 }
 .payplugConfiguration .stateBlock .payplugUIAccordion.-stateBlock ._stateContent .indicators .indicator .checkClass > svg {
-  fill: #0555EB;
+  fill: #442CC7;
 }
 .payplugConfiguration .stateBlock .payplugUIAccordion.-stateBlock ._stateContent .indicators .indicator p {
   padding: 3px 0 0 28px;
@@ -2144,39 +2050,7 @@ input[type=submit] {
   -webkit-appearance: button;
   cursor: pointer;
 }
-
-/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/@vue/cli-service/node_modules/css-loader/dist/cjs.js??clonedRuleSet-12.use[1]!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/@vue/cli-service/node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-12.use[2]!./node_modules/@vue/cli-service/node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./src/pages/AtomsList.vue?vue&type=style&index=0&id=784c130c&scoped=true&lang=css ***!
-  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-
-.container[data-v-784c130c] {
-  margin: -40px auto 200px;
-  width: 90%;
-}
-.container > h5[data-v-784c130c] {
-  color: #00474a;
-  font-weight: bold;
-  margin-top: 30px;
-}
-.buttonLinkContainer[data-v-784c130c], .selectContainer[data-v-784c130c] {
-  width: 400px;
-}
-.imageContainer[data-v-784c130c] {
-  text-align: center;
-}
-.library-title[data-v-784c130c] {
-  width: 100%;
-  text-align: center;
-  border-bottom: 1px solid #00AB7A;
-  line-height: 0.1em;
-  margin: 10px 0 30px;
-}
-.library-title span[data-v-784c130c] {
-  background: #fff;
-  color: #00AB7A;
-  padding: 0px 10px;
-}
-.bootstrap .payplugUILoader[data-v-784c130c] {
-  top: 53%;
+.pspaylater .descriptionBlock .payplugUIParagraph {
+  color: #FFFFFF !important;
 }
 
