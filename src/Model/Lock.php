@@ -21,7 +21,7 @@ class Lock
 
 		$result = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT count(column_name) as column_exists FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{$wpdb->base_prefix}woocommerce_payplug_lock' AND column_name = 'id' "
+				"SELECT count(column_name) as column_exists FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{$wpdb->base_prefix}woocommerce_payplug_lock' AND column_name = %s ", ['id']
 			)
 		);
 
