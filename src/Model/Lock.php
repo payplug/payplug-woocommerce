@@ -77,7 +77,7 @@ class Lock
 		$table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
 
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$result = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$table_name} WHERE `payment_id` = %s AND `id` <> %s ", array( $payment_id ) ) );
+		$result = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$table_name} WHERE `payment_id` = %s AND `id` <> %s ", array( $payment_id, $id ) ) );
 
 		if ( !$result ) {
 			return false;
