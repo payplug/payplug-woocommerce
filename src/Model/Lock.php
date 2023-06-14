@@ -57,10 +57,21 @@ class Lock
 	}
 
 	/**
-	 * @param $payment_id
-	 * @return bool|int
+	 * @param $id
+	 * @return bool
 	 */
-	static function delete_lock($payment_id){
+	static function delete_lock($id){
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
+		$wpdb->query( $wpdb->prepare("DELETE FROM {$table_name} WHERE id = %s OR created < NOW() - INTERVAL 1 DAY;", [$id] ));
+		return true;
+	}
+
+	/**
+	 * @param $payment_id
+	 * @return bool
+	 */
+	static function delete_lock_by_payment_id($payment_id){
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
 		$wpdb->query( $wpdb->prepare("DELETE FROM {$table_name} WHERE payment_id = %s OR created < NOW() - INTERVAL 1 DAY;", [$payment_id] ));
