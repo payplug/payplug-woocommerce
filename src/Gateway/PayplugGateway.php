@@ -298,7 +298,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$waiting_requests = \Payplug\PayplugWoocommerce\Model\Lock::get_lock_by_payment_id($transaction_id);
 
 			if($waiting_requests){
-				Lock::delete_lock($waiting_requests->id);
+				\Payplug\PayplugWoocommerce\Model\Lock::delete_lock($waiting_requests->id);
 				$this->validate_payment($order_id, false);
 			};
 		}
