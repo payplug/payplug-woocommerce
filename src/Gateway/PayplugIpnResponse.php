@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Payplug\Exception\UnknownAPIResourceException;
 use Payplug\Notification;
+use Payplug\PayplugWoocommerce\Model\Lock;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\IVerifiableAPIResource;
 use WC_Payment_Token_CC;
@@ -71,7 +72,22 @@ class PayplugIpnResponse {
 	 * @throws \WC_Data_Exception
 	 */
 	public function process_payment_resource( $resource ) {
+
+		$lock_id = \Payplug\PayplugWoocommerce\Helper\Lock::handle_insert(true, $resource->id);
+		if(!$lock_id){
+			return;
+		}
+
 		$this->gateway->response->process_payment( $resource, false, "ipn" );
+
+		Lock::delete_lock($lock_id);
+		$waiting_requests = Lock::get_lock_by_payment_id($resource->id);
+
+		if($waiting_requests){
+			$this->gateway->validate_payment($resource->metadata['order_id'], false);
+			Lock::delete_lock_by_payment_id($resource->id);
+
+		};
 	}
 
 	/**
