@@ -109,6 +109,11 @@ class Ajax {
 				'permission_callback' => function () use ($permission)  {return $permission ;},
 				'show_in_index' => false
 			) );
+			register_rest_route( 'payplug_api', '/integrated_permissions/', array(
+				'methods' => 'POST',
+				'callback' => [ $this, 'api_check_integrated_payment' ],
+				'permission_callback' => function () use ($permission) { return $permission ; }
+			) );
 
 		});
 
@@ -738,4 +743,40 @@ class Ajax {
 		return false;
 	}
 
+	public function api_check_integrated_payment(WP_REST_Request $request)
+	{
+		$data = $request->get_params();
+
+		if($data['env']) {
+			wp_send_json_success(true);
+			return;
+		}
+
+		$this->accountIsNotValid();
+
+		try{
+			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+
+		}  catch (PayplugException $e){
+			PayplugGateway::log('Error while getting account data : ' . $e->getMessage(), 'error');
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => $e->getMessage(),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+			return false;
+		}
+
+		if( ! isset($account['httpResponse']['permissions']['can_use_integrated_payments'])){
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => __( 'payplug_amex_access_error', 'payplug' ),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+		}
+
+		wp_send_json_success(true);
+		return true;
+
+	}
 }
