@@ -83,7 +83,6 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 == Changelog ==
 
 = 2.5.3 =
-
 * Minor bug fixes to avoid double IPNs
 * Tested up to WooCommerce 7.7.0
 * Tested up to Wordpress 6.2.2
