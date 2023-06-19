@@ -1112,3 +1112,48 @@ msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ pe
 
 msgid "ideal_threshold"
 msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite iDEAL."
+
+msgid "payplug_satispay_activate"
+msgstr "Pagamenti Satispay"
+
+msgid "payplug_satispay_description"
+msgstr "Permetti ai tuoi clienti di pagare con lo loro conto Satispay."
+
+msgid "payplug_satispay_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/8089121532700-Satispay-chez-Payplug"
+
+msgid "payplug_mybank_activate"
+msgstr "Pagamenti MyBank"
+
+msgid "payplug_mybank_description"
+msgstr "Permetti ai tuoi clienti di pagare con lo loro conto MyBank."
+
+msgid "payplug_mybank_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/8089123857564-MyBank-chez-Payplug"
+
+msgid "payplug_sofort_activate"
+msgstr "Pagamenti Sofort"
+
+msgid "payplug_sofort_description"
+msgstr "Permetti ai tuoi clienti di pagare con lo loro conto Sofort."
+
+msgid "payplug_sofort_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/8089091941660-Sofort-chez-Payplug"
+
+msgid "payplug_giropay_activate"
+msgstr "Pagamenti Giropay"
+
+msgid "payplug_giropay_description"
+msgstr "Permetti ai tuoi clienti di pagare con lo loro conto Giropay."
+
+msgid "payplug_giropay_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/8089089179420"
+
+msgid "payplug_ideal_activate"
+msgstr "Pagamenti iDEAL"
+
+msgid "payplug_ideal_description"
+msgstr "Permetti ai tuoi clienti di pagare con lo loro conto iDeal."
+
+msgid "payplug_ideal_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/8089119071132"

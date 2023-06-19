@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2023-06-19 14:32+0100\n"
+"PO-Revision-Date: 2023-06-19 20:27+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -501,3 +501,48 @@ msgstr "The total amount of your order should be between %s€ and %s€ to pay 
 
 msgid "ideal_threshold"
 msgstr "The total amount of your order should be between %s€ and %s€ to pay with iDEAL."
+
+msgid "payplug_satispay_activate"
+msgstr "Satispay payments"
+
+msgid "payplug_satispay_description"
+msgstr "Allow your customers to pay with their Satispay account."
+
+msgid "payplug_satispay_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089121532700-Satispay-chez-Payplug"
+
+msgid "payplug_mybank_activate"
+msgstr "MyBank payments"
+
+msgid "payplug_mybank_description"
+msgstr "Allow your customers to pay with their MyBank account."
+
+msgid "payplug_mybank_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089123857564-MyBank-chez-Payplug"
+
+msgid "payplug_sofort_activate"
+msgstr "Sofort payments"
+
+msgid "payplug_sofort_description"
+msgstr "Allow your customers to pay with their Sofort account."
+
+msgid "payplug_sofort_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089091941660-Sofort-chez-Payplug"
+
+msgid "payplug_giropay_activate"
+msgstr "Giropay payments"
+
+msgid "payplug_giropay_description"
+msgstr "Allow your customers to pay with their Giropay account."
+
+msgid "payplug_giropay_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089089179420"
+
+msgid "payplug_ideal_activate"
+msgstr "iDEAL payments"
+
+msgid "payplug_ideal_description"
+msgstr "Allow your customers to pay with their iDeal account."
+
+msgid "payplug_ideal_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089119071132"
