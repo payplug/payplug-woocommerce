@@ -1157,3 +1157,33 @@ msgstr "Permettez à vos clients de payer avec leurs compte iDeal."
 
 msgid "payplug_ideal_more_url"
 msgstr "https://support.payplug.com/hc/fr/articles/8089119071132"
+
+msgid "payplug_satispay_unavailable_testmode_description"
+msgstr "Satispay n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
+
+msgid "payplug_mybank_unavailable_testmode_description"
+msgstr "Mybank n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
+
+msgid "payplug_sofort_unavailable_testmode_description"
+msgstr "Sofort n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
+
+msgid "payplug_giropay_unavailable_testmode_description"
+msgstr "Giropay n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
+
+msgid "payplug_ideal_unavailable_testmode_description"
+msgstr "iDeal n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
+
+msgid "payplug_section_satispay_payment_description"
+msgstr "Permettez à vos clients de payer avec leurs cartes Satispay."
+
+msgid "payplug_section_mybank_payment_description"
+msgstr "Permettez à vos clients de payer avec leurs cartes Mybank."
+
+msgid "payplug_section_sofort_payment_description"
+msgstr "Permettez à vos clients de payer avec leurs cartes Sofort."
+
+msgid "payplug_section_giropay_payment_description"
+msgstr "Permettez à vos clients de payer avec leurs cartes Giropay."
+
+msgid "payplug_section_ideal_payment_description"
+msgstr "Permettez à vos clients de payer avec leurs cartes iDeal."

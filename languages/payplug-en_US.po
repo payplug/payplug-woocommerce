@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2023-06-19 20:27+0100\n"
+"PO-Revision-Date: 2023-06-19 20:30+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -546,3 +546,33 @@ msgstr "Allow your customers to pay with their iDeal account."
 
 msgid "payplug_ideal_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/8089119071132"
+
+msgid "payplug_satispay_unavailable_testmode_description"
+msgstr "Satispay is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_mybank_unavailable_testmode_description"
+msgstr "Mybank is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_sofort_unavailable_testmode_description"
+msgstr "Sofort is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_giropay_unavailable_testmode_description"
+msgstr "Giropay is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_ideal_unavailable_testmode_description"
+msgstr "iDeal is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_section_satispay_payment_description"
+msgstr "Display the Satispay payment button on your store."
+
+msgid "payplug_section_mybank_payment_description"
+msgstr "Display the Mybank payment button on your store."
+
+msgid "payplug_section_sofort_payment_description"
+msgstr "Display the Sofort payment button on your store."
+
+msgid "payplug_section_giropay_payment_description"
+msgstr "Display the Giropay payment button on your store."
+
+msgid "payplug_section_ideal_payment_description"
+msgstr "Display the iDeal payment button on your store."
