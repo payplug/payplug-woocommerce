@@ -520,6 +520,20 @@ class PayplugWoocommerceHelper {
 	}
 
 	/**
+	 * Get current option from payplug settings
+	 *this should replace get_account_data_from_options
+	 *
+	 * @return array
+	 */
+	public static function generic_get_account_data_from_options(){
+		$options = get_option('woocommerce_payplug_settings', []);
+		$transient_key = self::get_transient_key($options);
+		$account = get_transient($transient_key);
+		return $account;
+
+	}
+
+	/**
 	 *
 	 * Retrieve the local oney threshold configration
 	 *

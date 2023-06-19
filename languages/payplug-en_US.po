@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2023-04-13 17:49+0100\n"
+"PO-Revision-Date: 2023-06-19 14:32+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -471,3 +471,33 @@ msgstr "Please note that the maximum amount entered is less than the minimum amo
 
 msgid "payplug_thresholds_error_mintext_msg"
 msgstr "Please note that the minimum amount entered is greater than the maximum amount entered."
+
+msgid "pay_with_satispay"
+msgstr "Pay with Satispay"
+
+msgid "pay_with_mybank"
+msgstr "Pay with MyBank"
+
+msgid "pay_with_giropay"
+msgstr "Pay with Giropay"
+
+msgid "pay_with_sofort"
+msgstr "Pay with Sofort"
+
+msgid "pay_with_ideal"
+msgstr "Pay with iDEAL"
+
+msgid "satispay_threshold"
+msgstr "The total amount of your order should be between %s€ and %s€ to pay with Satispay."
+
+msgid "mybank_threshold"
+msgstr "The total amount of your order should be between %s€ and %s€ to pay with MyBank."
+
+msgid "giropay_threshold"
+msgstr "The total amount of your order should be between %s€ and %s€ to pay with Giropay."
+
+msgid "sofort_threshold"
+msgstr "The total amount of your order should be between %s€ and %s€ to pay with Sofort."
+
+msgid "ideal_threshold"
+msgstr "The total amount of your order should be between %s€ and %s€ to pay with iDEAL."
