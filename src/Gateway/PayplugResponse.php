@@ -7,7 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Payplug\PayplugWoocommerce\Helper\Lock;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\IVerifiableAPIResource;
 use Payplug\Resource\Payment as PaymentResource;
@@ -40,13 +39,6 @@ class PayplugResponse {
 	public function process_payment($resource, $is_payment_with_token = false, $source = null)
 	{
 		$order_id = wc_clean($resource->metadata['order_id']);
-
-		/*
-		if ((!empty($source) && ($source === "ipn"))) {
-			$lock = new Lock();
-			$lock->handleLock($resource->id);
-		}
-		*/
 
 		$order = wc_get_order($order_id);
 		$gateway_id = $order->get_payment_method();
@@ -150,7 +142,6 @@ class PayplugResponse {
 				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed successfully.', $order_id, $resource->id));
 			}
 
-			//$lock->deleteLock($resource->id);
 		}
 	}
 
