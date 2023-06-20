@@ -293,12 +293,12 @@ class Vue {
 				(new PaymentMethods())->payment_method_standard(),
 				PaymentMethods::payment_method_amex(!empty($options) && $options['american_express'] === 'yes'),
 				PaymentMethods::payment_method_applepay(!empty($options) && $options['apple_pay'] === 'yes'),
-				PaymentMethods::payment_method_bancontact(!empty($options) &&$options['bancontact'] === 'yes'),
-				PaymentMethods::payment_method_satispay(!empty($options) &&$options['satispay'] === 'yes'),
-				PaymentMethods::payment_method_mybank(!empty($options) &&$options['mybank'] === 'yes'),
-				PaymentMethods::payment_method_sofort(!empty($options) &&$options['sofort'] === 'yes'),
-				PaymentMethods::payment_method_giropay(!empty($options) &&$options['giropay'] === 'yes'),
-				PaymentMethods::payment_method_ideal(!empty($options) &&$options['ideak'] === 'yes'),
+				PaymentMethods::payment_method_bancontact(!empty($options) && $options['bancontact'] === 'yes'),
+				PaymentMethods::payment_method_satispay(!empty($options) && $options['satispay'] === 'yes'),
+				PaymentMethods::payment_method_mybank(!empty($options) && $options['mybank'] === 'yes'),
+				PaymentMethods::payment_method_sofort(!empty($options) && $options['sofort'] === 'yes'),
+				PaymentMethods::payment_method_giropay(!empty($options) && $options['giropay'] === 'yes'),
+				PaymentMethods::payment_method_ideal(!empty($options) && $options['ideak'] === 'yes'),
 
 			]
 		];

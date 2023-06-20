@@ -836,9 +836,6 @@ msgstr "Pay with Satispay"
 msgid "payplug_satispay_activate"
 msgstr "Satispay payments"
 
-msgid "payplug_satispay_description"
-msgstr "Allow your customers to pay with their Satispay account."
-
 msgid "payplug_satispay_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/8089121532700-Satispay-chez-Payplug"
 
@@ -847,9 +844,6 @@ msgstr "Pay with MyBank"
 
 msgid "payplug_mybank_activate"
 msgstr "MyBank payments"
-
-msgid "payplug_mybank_description"
-msgstr "Allow your customers to pay with their MyBank account."
 
 msgid "payplug_mybank_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/8089123857564-MyBank-chez-Payplug"
@@ -860,9 +854,6 @@ msgstr "Pay with Sofort"
 msgid "payplug_sofort_activate"
 msgstr "Sofort payments"
 
-msgid "payplug_sofort_description"
-msgstr "Allow your customers to pay with their Sofort account."
-
 msgid "payplug_sofort_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/8089091941660-Sofort-chez-Payplug"
 
@@ -872,9 +863,6 @@ msgstr "Pay with Giropay"
 msgid "payplug_giropay_activate"
 msgstr "Giropay payments"
 
-msgid "payplug_giropay_description"
-msgstr "Allow your customers to pay with their Giropay account."
-
 msgid "payplug_giropay_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/8089089179420"
 
@@ -883,9 +871,6 @@ msgstr "Pay with iDEAL"
 
 msgid "payplug_ideal_activate"
 msgstr "iDEAL payments"
-
-msgid "payplug_ideal_description"
-msgstr "Allow your customers to pay with their iDeal account."
 
 msgid "payplug_ideal_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/8089119071132"

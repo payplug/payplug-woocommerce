@@ -281,7 +281,7 @@ class PaymentMethods {
 			"type" => "payment_method",
 			"name" => "satispay",
 			"title" => __( 'payplug_satispay_activate', 'payplug' ),
-			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/satispay.svg' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/satispay.svg' ),
 			"checked" =>  $active,
 			"available_test_mode" => false,
 			"descriptions" => [
@@ -301,7 +301,7 @@ class PaymentMethods {
 			"type" => "payment_method",
 			"name" => "mybank",
 			"title" => __( 'payplug_mybank_activate', 'payplug' ),
-			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/mybank.svg' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/mybank.svg' ),
 			"checked" =>  $active,
 			"available_test_mode" => false,
 			"descriptions" => [
@@ -321,7 +321,7 @@ class PaymentMethods {
 			"type" => "payment_method",
 			"name" => "sofort",
 			"title" => __( 'payplug_sofort_activate', 'payplug' ),
-			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/sofort.svg' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/sofort.svg' ),
 			"checked" =>  $active,
 			"available_test_mode" => false,
 			"descriptions" => [
@@ -341,7 +341,7 @@ class PaymentMethods {
 			"type" => "payment_method",
 			"name" => "giropay",
 			"title" => __( 'payplug_giropay_activate', 'payplug' ),
-			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/giropay.svg' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/giropay.svg' ),
 			"checked" =>  $active,
 			"available_test_mode" => false,
 			"descriptions" => [
@@ -361,7 +361,7 @@ class PaymentMethods {
 			"type" => "payment_method",
 			"name" => "ideal",
 			"title" => __( 'payplug_ideal_activate', 'payplug' ),
-			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/ideal.svg' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/ideal.svg' ),
 			"checked" =>  $active,
 			"available_test_mode" => false,
 			"descriptions" => [

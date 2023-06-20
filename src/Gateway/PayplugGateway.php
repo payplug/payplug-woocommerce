@@ -541,46 +541,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'desc_tip'    => false,
 				'type' => 'oney_product_animation'
 			],
-			'satispay'        => [
-				'title'       => __('payplug_satispay_title', 'payplug'),
-				'type'        => 'checkbox',
-				'label'       => __('payplug_satispay_activate', 'payplug'),
-				'description' => '<p class="description" id="satispay_test_mode_description"> '. __('payplug_satispay_description', 'payplug') .' </p>' .
-					'<p class="description" id="satispay_live_mode_description"> '. __('payplug_satispay_description', 'payplug') .' </p>' ,
-				'default'     => 'no',
-			],
-			'mybank'        => [
-				'title'       => __('payplug_mybank_title', 'payplug'),
-				'type'        => 'checkbox',
-				'label'       => __('payplug_mybank_activate', 'payplug'),
-				'description' => '<p class="description" id="mybank_test_mode_description"> '. __('payplug_mybank_description', 'payplug') .' </p>' .
-					'<p class="description" id="mybank_live_mode_description"> '. __('payplug_mybank_description', 'payplug') .' </p>' ,
-				'default'     => 'no',
-			],
-			'sofort'        => [
-				'title'       => __('payplug_sofort_title', 'payplug'),
-				'type'        => 'checkbox',
-				'label'       => __('payplug_sofort_activate', 'payplug'),
-				'description' => '<p class="description" id="sofort_test_mode_description"> '. __('payplug_sofort_description', 'payplug') .' </p>' .
-					'<p class="description" id="sofort_live_mode_description"> '. __('payplug_sofort_description', 'payplug') .' </p>' ,
-				'default'     => 'no',
-			],
-			'giropay'        => [
-				'title'       => __('payplug_giropay_title', 'payplug'),
-				'type'        => 'checkbox',
-				'label'       => __('payplug_giropay_activate', 'payplug'),
-				'description' => '<p class="description" id="giropay_test_mode_description"> '. __('payplug_giropay_description', 'payplug') .' </p>' .
-					'<p class="description" id="giropay_live_mode_description"> '. __('payplug_giropay_description', 'payplug') .' </p>' ,
-				'default'     => 'no',
-			],
-			'ideal'        => [
-				'title'       => __('payplug_ideal_title', 'payplug'),
-				'type'        => 'checkbox',
-				'label'       => __('payplug_ideal_activate', 'payplug'),
-				'description' => '<p class="description" id="ideal_test_mode_description"> '. __('payplug_ideal_description', 'payplug') .' </p>' .
-					'<p class="description" id="ideal_live_mode_description"> '. __('payplug_ideal_description', 'payplug') .' </p>' ,
-				'default'     => 'no',
-			],
         ];
 
         if ($this->user_logged_in()) {

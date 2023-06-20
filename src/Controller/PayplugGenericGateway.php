@@ -78,7 +78,19 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
 		$order_amount = $this->get_order_total();
 
-		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options();
+		//TODO:: MISSING saved configurations
+		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options($this->id);
+
+		//account doesnt have permissions
+		if( empty($account["payment_methods"][$this->id]['enabled']) && !$account["payment_methods"][$this->id]['enabled']){
+			return false;
+		}
+
+		//check if it's activated on the BO
+		if(!$account['permissions'][$this->id]){
+			return false;
+		}
+
 		$this->allowed_country_codes = $account["payment_methods"][$this->id]['allowed_countries'];
 		$this->get_thresholds_values($account);
 

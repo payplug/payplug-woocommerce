@@ -25,34 +25,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Ajax {
 
-	/**
-	 * @var PayplugPermissions
-	 */
-	private $permissions;
-
-	const CHECK_LIVE_PERMISSIONS = 'check_live_permissions';
-	const CHECK_BANCONTACT_PERMISSIONS = 'check_bancontact_permissions';
-	const CHECK_APPLEPAY_PERMISSIONS = 'check_applepay_permissions';
-	const CHECK_AMERICAN_EXPRESS_PERMISSIONS = 'check_american_express_permissions';
-	const CHECK_SATISPAY_PERMISSIONS = 'check_satispay_permissions';
-	const CHECK_MYBANK_PERMISSIONS  = 'check_mybank_permissions';
-	const CHECK_SOFORT_PERMISSIONS  = 'check_sofort_permissions';
-	const CHECK_GIROPAY_PERMISSIONS = 'check_giropay_permissions';
-	const CHECK_IDEAL_PERMISSIONS   = 'check_ideal_permissions';
-
-
-
 	public function __construct() {
 		$permission = ( current_user_can('editor') || current_user_can('administrator') );
-		add_action( 'wp_ajax_' . self::CHECK_LIVE_PERMISSIONS, [ $this, 'check_live_permissions' ] );
-		add_action( 'wp_ajax_' . self::CHECK_BANCONTACT_PERMISSIONS, [ $this, 'check_bancontact_permissions' ] );
-		add_action( 'wp_ajax_' . self::CHECK_APPLEPAY_PERMISSIONS, [ $this, 'check_applepay_permissions' ] );
-		add_action( 'wp_ajax_' . self::CHECK_AMERICAN_EXPRESS_PERMISSIONS, [ $this, 'check_american_express_permissions' ] );
-		add_action( 'wp_ajax_' . self::CHECK_SATISPAY_PERMISSIONS, [ $this, 'check_satispay_permissions' ] );
-		add_action( 'wp_ajax_' . self::CHECK_MYBANK_PERMISSIONS,   [ $this, 'check_mybank_permissions' ] );
-		add_action( 'wp_ajax_' . self::CHECK_SOFORT_PERMISSIONS,   [ $this, 'check_sofort_permissions' ] );
-		add_action( 'wp_ajax_' . self::CHECK_GIROPAY_PERMISSIONS,  [ $this, 'check_giropay_permissions' ] );
-		add_action( 'wp_ajax_' . self::CHECK_IDEAL_PERMISSIONS,    [ $this, 'check_ideal_permissions' ] );
 
 		add_action( 'rest_api_init', function () use ($permission) {
 			//Path to REST route and the callback function
@@ -124,31 +98,31 @@ class Ajax {
 			) );
 			register_rest_route( 'payplug_api', '/satispay_permissions/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'api_check_satispay_permission' ],
+				'callback' => [ $this, 'api_check_satispay_permissions' ],
 				'permission_callback' => function () use ($permission)  {return $permission ;},
 				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/mybank_permissions/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'api_check_mybank_permission' ],
+				'callback' => [ $this, 'api_check_mybank_permissions' ],
 				'permission_callback' => function () use ($permission)  {return $permission ;},
 				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/sofort_permissions/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'api_check_sofort_permission' ],
+				'callback' => [ $this, 'api_check_sofort_permissions' ],
 				'permission_callback' => function () use ($permission)  {return $permission ;},
 				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/giropay_permissions/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'api_check_giropay_permission' ],
+				'callback' => [ $this, 'api_check_giropay_permissions' ],
 				'permission_callback' => function () use ($permission)  {return $permission ;},
 				'show_in_index' => false
 			) );
 			register_rest_route( 'payplug_api', '/ideal_permissions/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'api_check_ideal_permission' ],
+				'callback' => [ $this, 'api_check_ideal_permissions' ],
 				'permission_callback' => function () use ($permission)  {return $permission ;},
 				'show_in_index' => false
 			) );
@@ -223,19 +197,6 @@ class Ajax {
 				'message' => __( 'Your API keys has successfully been updated.', 'payplug' )
 			)
 		);
-	}
-
-	public function check_live_permissions() {
-		try{
-			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
-			return false;
-		}
-		PayplugWoocommerceHelper::set_transient_data($account);
-		$permissions = $account['httpResponse']['permissions'];
-		wp_send_json_success($permissions);
 	}
 
 	public function api_check_one_click_permission(WP_REST_Request $request){
@@ -430,16 +391,11 @@ class Ajax {
 
 		PayplugWoocommerceHelper::set_transient_data($account);
 
-		if(isset($account['httpResponse']['payment_methods']['satispay']['enabled']) && $account['httpResponse']['payment_methods']['satispay']['enabled']){
-			wp_send_json_success(true);
-		}
-
 		$enabled = isset($account['httpResponse']['payment_methods']['satispay']['enabled']) ? $account['httpResponse']['payment_methods']['satispay']['enabled']: false;
-
 		if(!$enabled){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_amex_access_error', 'payplug' ),
+				"msg" => __( 'payplug_satispay_access_error', 'payplug' ),
 				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
@@ -471,16 +427,11 @@ class Ajax {
 
 		PayplugWoocommerceHelper::set_transient_data($account);
 
-		if(isset($account['httpResponse']['payment_methods']['mybank']['enabled']) && $account['httpResponse']['payment_methods']['mybank']['enabled']){
-			wp_send_json_success(true);
-		}
-
 		$enabled = isset($account['httpResponse']['payment_methods']['mybank']['enabled']) ? $account['httpResponse']['payment_methods']['mybank']['enabled']: false;
-
 		if(!$enabled){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_amex_access_error', 'payplug' ),
+				"msg" => __( 'payplug_mybank_access_error', 'payplug' ),
 				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
@@ -512,16 +463,11 @@ class Ajax {
 
 		PayplugWoocommerceHelper::set_transient_data($account);
 
-		if(isset($account['httpResponse']['payment_methods']['sofort']['enabled']) && $account['httpResponse']['payment_methods']['sofort']['enabled']){
-			wp_send_json_success(true);
-		}
-
 		$enabled = isset($account['httpResponse']['payment_methods']['sofort']['enabled']) ? $account['httpResponse']['payment_methods']['sofort']['enabled']: false;
-
 		if(!$enabled){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_amex_access_error', 'payplug' ),
+				"msg" => __( 'payplug_sofort_access_error', 'payplug' ),
 				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
@@ -552,17 +498,11 @@ class Ajax {
 		}
 
 		PayplugWoocommerceHelper::set_transient_data($account);
-
-		if(isset($account['httpResponse']['payment_methods']['giropay']['enabled']) && $account['httpResponse']['payment_methods']['giropay']['enabled']){
-			wp_send_json_success(true);
-		}
-
 		$enabled = isset($account['httpResponse']['payment_methods']['giropay']['enabled']) ? $account['httpResponse']['payment_methods']['giropay']['enabled']: false;
-
 		if(!$enabled){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_amex_access_error', 'payplug' ),
+				"msg" => __( 'payplug_giropay_access_error', 'payplug' ),
 				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
@@ -594,16 +534,11 @@ class Ajax {
 
 		PayplugWoocommerceHelper::set_transient_data($account);
 
-		if(isset($account['httpResponse']['payment_methods']['ideal']['enabled']) && $account['httpResponse']['payment_methods']['ideal']['enabled']){
-			wp_send_json_success(true);
-		}
-
 		$enabled = isset($account['httpResponse']['payment_methods']['ideal']['enabled']) ? $account['httpResponse']['payment_methods']['ideal']['enabled']: false;
-
 		if(!$enabled){
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_amex_access_error', 'payplug' ),
+				"msg" => __( 'payplug_ideal_access_error', 'payplug' ),
 				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
@@ -905,79 +840,6 @@ class Ajax {
 		}
 
 		return false;
-	}
-
-	public function check_satispay_permissions() {
-		try{
-			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
-			return false;
-		}
-
-		PayplugWoocommerceHelper::set_transient_data($account);
-		$enabled = isset($account['httpResponse']['payment_methods']['satispay']['enabled']) ? $account['httpResponse']['payment_methods']['satispay']['enabled']: false;
-		wp_send_json_success($enabled);
-	}
-
-	public function check_mybank_permissions() {
-		try{
-			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
-			return false;
-		}
-
-		PayplugWoocommerceHelper::set_transient_data($account);
-		$enabled = isset($account['httpResponse']['payment_methods']['mybank']['enabled']) ? $account['httpResponse']['payment_methods']['mybank']['enabled']: false;
-		wp_send_json_success($enabled);
-	}
-
-	public function check_sofort_permissions() {
-		try{
-			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
-			return false;
-		}
-
-		PayplugWoocommerceHelper::set_transient_data($account);
-		$enabled = isset($account['httpResponse']['payment_methods']['sofort']['enabled']) ? $account['httpResponse']['payment_methods']['sofort']['enabled']: false;
-		wp_send_json_success($enabled);
-	}
-	public function check_giropay_permissions() {
-		try{
-			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
-			return false;
-		}
-
-		PayplugWoocommerceHelper::set_transient_data($account);
-		$enabled = isset($account['httpResponse']['payment_methods']['giropay']['enabled']) ? $account['httpResponse']['payment_methods']['giropay']['enabled']: false;
-		wp_send_json_success($enabled);
-	}
-	public function check_ideal_permissions() {
-		try{
-			$account = Authentication::getAccount(new Payplug($_POST['livekey']));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
-			return false;
-		}
-
-		PayplugWoocommerceHelper::set_transient_data($account);
-		$enabled = isset($account['httpResponse']['payment_methods']['ideal']['enabled']) ? $account['httpResponse']['payment_methods']['ideal']['enabled']: false;
-		wp_send_json_success($enabled);
 	}
 
 }
