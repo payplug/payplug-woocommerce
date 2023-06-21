@@ -21,6 +21,8 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	{
 		parent::__construct();
 
+		//this is only for PPRo payments
+		add_action('woocommerce_order_item_add_action_buttons', [$this, 'hide_wc_refund_button']);
 		//TODO:: add requirements here
 
 	}
@@ -213,11 +215,62 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
 	}
 
+	/**
+	 * Process refund for an order paid with PayPlug gateway.
+	 *
+	 * @param int $order_id
+	 * @param null $amount
+	 * @param string $reason
+	 *
+	 * @return bool|\WP_Error
+	 */
+	public function process_refund($order_id, $amount = null, $reason = ''){
+
+		PayplugGateway::log(sprintf('Processing refund for order #%s', $order_id));
+
+		if( !$this->user_logged_in()){
+			PayplugGateway::log(__('You must be logged in with your PayPlug account.', 'payplug'), 'error');
+			return new \WP_Error('process_refund_error', __('You must be logged in with your PayPlug account.', 'payplug'));
+		}
+
+		$order = wc_get_order($order_id);
+		if (!$order instanceof \WC_Order) {
+			PayplugGateway::log(sprintf('The order #%s does not exist.', $order_id), 'error');
+
+			return new \WP_Error('process_refund_error', sprintf(__('The order %s does not exist.', 'payplug'), $order_id));
+		}
+
+		if ($order->get_status() === "cancelled") {
+			PayplugGateway::log(sprintf('The order #%s cannot be refund.', $order_id), 'error');
+
+			return new \WP_Error('process_refund_error', sprintf(__('The order %s cannot be refund.', 'payplug'), $order_id));
+		}
+
+		$transaction_id = PayplugWoocommerceHelper::is_pre_30() ? get_post_meta($order_id, '_transaction_id', true) : $order->get_transaction_id();
+		if (empty($transaction_id)) {
+			PayplugGateway::log(sprintf('The order #%s does not have PayPlug transaction ID associated with it.', $order_id), 'error');
+
+			return new \WP_Error('process_refund_error', __('No PayPlug transaction was found for this order. The refund could not be processed.', 'payplug'));
+		}
+
+		add_action('admin_head', [$this, 'hide_wc_refund_button'] );
+
+		//TODO:: add the refund process, for now we don't have any scenario where we allow refund for the new gateways
+		PayplugGateway::log(__('payplug_refund_disabled_error', 'payplug'), 'error');
+		return new \WP_Error('process_refund_error', __('payplug_refund_disabled_error', 'payplug'));
+
+	}
 
 
-
-
-
+	public function hide_wc_refund_button(){
+		?>
+		<script>
+			jQuery(function () {
+				jQuery('.refund-items').attr("disabled", true);
+			});
+		</script>
+		<?php
+	}
 
 	/**
 	 *

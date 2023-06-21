@@ -1187,3 +1187,8 @@ msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Gir
 
 msgid "payplug_ideal_access_error"
 msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer iDEAL, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=8248663314844' target='_blank'>ce formulaire</a>"
+
+msgid "payplug_refund_disabled_error"
+msgstr ""
+"Le remboursement automatique n’est pas réalisable depuis votre Portail.\n"
+"Veuillez contacter support@payplug.com"

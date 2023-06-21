@@ -1187,3 +1187,8 @@ msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Giropay, c
 
 msgid "payplug_ideal_access_error"
 msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare iDEAL, compila <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=8248663314844' target='_blank'>questo modulo</a>"
+
+msgid "payplug_refund_disabled_error"
+msgstr ""
+"Il rimborso automatico non è possibile dal tuo Portale.\n"
+"Contatta supporto@payplug.com"

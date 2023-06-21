@@ -71,7 +71,7 @@ class Validator {
 		wp_send_json_error(['error' => 'oneclick is missing']);
 	}
 
-	public static function bancontact($value, $test_mode) {
+	public static function genericPaymentGateway($value, $payment, $test_mode) {
 
 		if($test_mode){
 			return "no";
@@ -86,43 +86,7 @@ class Validator {
 		}
 
 		http_response_code(400);
-		wp_send_json_error(['error' => 'bancontact is missing']);
-	}
-
-	public static function apple_pay($value, $test_mode) {
-
-		if($test_mode){
-			return "no";
-		}
-
-		if ($value == 1){
-			return "yes";
-		}
-
-		if ($value == 0){
-			return "no";
-		}
-
-		http_response_code(400);
-		wp_send_json_error(['error' => 'apple pay is missing']);
-	}
-
-	public static function american_express($value, $test_mode) {
-
-		if($test_mode){
-			return "no";
-		}
-
-		if ($value == 1){
-			return "yes";
-		}
-
-		if ($value == 0){
-			return "no";
-		}
-
-		http_response_code(400);
-		wp_send_json_error(['error' => 'American Express is missing']);
+		wp_send_json_error(['error' => $payment . ' is missing']);
 	}
 
 	public static function oney($value) {
