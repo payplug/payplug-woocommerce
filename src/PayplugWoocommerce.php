@@ -134,11 +134,6 @@ class PayplugWoocommerce {
 		$methods[] = __NAMESPACE__ . '\\Controller\\Bancontact';
 		$methods[] = __NAMESPACE__ . '\\Controller\\ApplePay';
 		$methods[] = __NAMESPACE__ . '\\Controller\\AmericanExpress';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Mybank';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Giropay';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Ideal';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Sofort';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Satispay';
 
 		return $methods;
 	}

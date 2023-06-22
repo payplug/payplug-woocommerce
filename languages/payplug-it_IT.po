@@ -1083,35 +1083,5 @@ msgstr "Attenzione, l'importo massimo inserito è inferiore all'importo minimo i
 msgid "payplug_thresholds_error_mintext_msg"
 msgstr "Attenzione, l'importo minimo inserito è superiore all'importo massimo inserito."
 
-msgid "pay_with_satispay"
-msgstr "Paga con Satispay"
-
-msgid "pay_with_mybank"
-msgstr "Paga con MyBank"
-
-msgid "pay_with_giropay"
-msgstr "Paga con Giropay"
-
-msgid "pay_with_sofort"
-msgstr "Paga con Sofort"
-
-msgid "pay_with_ideal"
-msgstr "Paga con iDEAL"
-
-msgid "satispay_threshold"
-msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite Satispay."
-
-msgid "mybank_threshold"
-msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite MyBank."
-
-msgid "giropay_threshold"
-msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite Giropay."
-
-msgid "sofort_threshold"
-msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite Sofort."
-
-msgid "ideal_threshold"
-msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite iDEAL."
-
 msgid "payplug_integrated_access_error"
 msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Integrated Payments, compila <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=5965121371548' target='_blank'>questo modulo</a>"
