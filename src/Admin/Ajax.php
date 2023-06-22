@@ -508,6 +508,9 @@ class Ajax {
 		$password = base64_decode(wp_unslash($data['payplug_password']));
 		$wp_nonce = $data['_wpnonce'];
 
+		delete_option( 'woocommerce_payplug_settings' );
+		delete_site_option( 'woocommerce_payplug_settings' );
+
 		try {
 			$response = Authentication::getKeysByLogin($email, $password);
 			if (empty($response) || !isset($response)) {
@@ -552,12 +555,6 @@ class Ajax {
 				}
 
 				$data[$key] = $val;
-			}
-
-			if ( !empty($api_keys['live']) && $this->check_integrated_payment(!empty($api_keys['live']) ? esc_attr($api_keys['live']) : null) == true) {
-				$data['can_use_integrated_payments'] = true;
-			} else {
-				$data['can_use_integrated_payments'] = false;
 			}
 
 			$payplug->set_post_data($data);
@@ -746,6 +743,43 @@ class Ajax {
 		return false;
 	}
 
+	public function api_check_integrated_payment(WP_REST_Request $request)
+	{
+		$data = $request->get_params();
+
+		if($data['env']) {
+			wp_send_json_success(true);
+			return;
+		}
+
+		$this->accountIsNotValid();
+
+		try{
+			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
+
+		}  catch (PayplugException $e){
+			PayplugGateway::log('Error while getting account data : ' . $e->getMessage(), 'error');
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => $e->getMessage(),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+			return false;
+		}
+
+		if( ! isset($account['httpResponse']['permissions']['can_use_integrated_payments'])
+		    || ! $account['httpResponse']['permissions']['can_use_integrated_payments'] ) {
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => __( 'payplug_integrated_access_error', 'payplug' ),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+		}
+
+		wp_send_json_success(true);
+		return true;
+
+	}
 	public function api_check_integrated_payment(WP_REST_Request $request)
 	{
 		$data = $request->get_params();
