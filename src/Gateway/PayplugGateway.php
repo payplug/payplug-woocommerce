@@ -638,7 +638,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('payplug-checkout');
 
-		$this->activate_integrated_payments();
+		if ($this->get_current_mode() == "live") {
+			$this->activate_integrated_payments();
+		}
+
 		$transient_key = PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', []));
 		$ip = get_transient($transient_key);
 		if((isset($ip['permissions']['can_use_integrated_payments']) && ($ip['permissions']['can_use_integrated_payments'] === true)) || ($this->payment_method == "integrated")){
