@@ -1082,3 +1082,6 @@ msgstr "Attention, le montant maximal renseigné est inférieur au montant minim
 
 msgid "payplug_thresholds_error_mintext_msg"
 msgstr "Attention, le montant minimal renseigné est supérieur au montant maximal renseigné."
+
+msgid "payplug_integrated_access_error"
+msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Integrated Payments, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=5965121371548' target='_blank'>ce formulaire</a>"
