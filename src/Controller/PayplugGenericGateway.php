@@ -89,7 +89,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		}
 
 		//check if it's activated on the BO
-		if(!$account['permissions'][$this->id]){
+		if( !isset($account['permissions'][$this->id]) || (isset($account['permissions'][$this->id]) && !$account['permissions'][$this->id]) ){
 			return false;
 		}
 
