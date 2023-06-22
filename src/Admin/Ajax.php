@@ -767,10 +767,11 @@ class Ajax {
 			return false;
 		}
 
-		if( ! isset($account['httpResponse']['permissions']['can_use_integrated_payments'])){
+		if( ! isset($account['httpResponse']['permissions']['can_use_integrated_payments'])
+		    || ! $account['httpResponse']['permissions']['can_use_integrated_payments'] ) {
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_amex_access_error', 'payplug' ),
+				"msg" => __( 'payplug_integrated_access_error', 'payplug' ),
 				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
