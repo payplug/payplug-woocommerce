@@ -269,9 +269,8 @@ class PaymentMethods {
 			return [
 				"name"    => "payplug_integrated",
 				"label"   => __( 'payplug_section_standard_payment_option_integrated_label', 'payplug' ),
-				"value"   => 'integrated',
-				"checked" => $method['integrated']
-
+				"value"   => "integrated",
+				"checked" => $method['redirect']
 			];
 	}
 
