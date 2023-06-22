@@ -1192,3 +1192,6 @@ msgid "payplug_refund_disabled_error"
 msgstr ""
 "Il rimborso automatico non è possibile dal tuo Portale.\n"
 "Contatta supporto@payplug.com"
+
+msgid "payplug_integrated_access_error"
+msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Integrated Payments, compila <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=5965121371548' target='_blank'>questo modulo</a>"

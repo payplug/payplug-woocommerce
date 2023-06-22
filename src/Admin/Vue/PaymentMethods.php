@@ -15,7 +15,7 @@ class PaymentMethods {
 
 
 		$method = [
-			"redirect" => false,
+			"redirect" => true,
 			"popup"	  => false,
 			"integrated" => false,
 		];
@@ -272,7 +272,7 @@ class PaymentMethods {
 				"name"    => "payplug_integrated",
 				"label"   => __( 'payplug_section_standard_payment_option_integrated_label', 'payplug' ),
 				"value"   => "integrated",
-				"checked" => $method['integrated']
+				"checked" => $method['redirect']
 			];
 	}
 
