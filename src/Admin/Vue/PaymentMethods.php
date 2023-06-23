@@ -15,7 +15,7 @@ class PaymentMethods {
 
 
 		$method = [
-			"redirect" => true,
+			"redirect" => false,
 			"popup"	  => false,
 			"integrated" => false,
 		];
