@@ -310,7 +310,7 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_mybank_more_url', 'payplug' ), "_blank"),
 				],
 				"sandbox" => [
-					"description"      => __( 'payplug_bancontact_unavailable_testmode_description', 'payplug' ),
+					"description"      => __( 'payplug_mybank_unavailable_testmode_description', 'payplug' ),
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_mybank_more_url', 'payplug' ), "_blank"),
 				]
 			],
