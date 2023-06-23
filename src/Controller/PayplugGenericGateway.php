@@ -84,7 +84,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options($this->id);
 
 		//account doesnt have permissions
-		if( empty($account["payment_methods"][$this->id]['enabled']) && !$account["payment_methods"][$this->id]['enabled']){
+		if( empty($account["payment_methods"][$this->id]) && !$account["payment_methods"][$this->id]['enabled']){
 			return false;
 		}
 
