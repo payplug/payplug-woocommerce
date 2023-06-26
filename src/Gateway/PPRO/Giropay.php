@@ -22,7 +22,7 @@ class Giropay extends PayplugGenericGateway
 		$this->title = __("pay_with_giropay", "payplug");
 		$this->method_description = "";
 		$this->description = "";
-		$this->image = 'Giropay.svg';
+		$this->image = 'giropay.svg';
 
 		//WOOCO FIELDS
 		$this->has_fields = false;

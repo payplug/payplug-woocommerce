@@ -23,7 +23,7 @@ class Mybank extends PayplugGenericGateway
 		$this->title = __("pay_with_mybank", "payplug");
 		$this->method_description = "";
 		$this->description = "";
-		$this->image = 'Mybank.svg';
+		$this->image = 'mybank.svg';
 
 		//WOOCO FIELDS
 		$this->has_fields = false;

@@ -32,6 +32,7 @@ class Metabox {
 	public function register_payplug_metabox() {
 		global $post;
 		$screen = get_current_screen();
+		$payment_methods = ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express', 'giropay', 'satispay', 'sofort', 'ideal', 'mybank'];
 		if ( is_null( $screen ) || 'shop_order' !== $screen->post_type ) {
 			return;
 		}
@@ -43,7 +44,7 @@ class Metabox {
 
 		$payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
 
-		if(!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express'])) {
+		if(!in_array($payment_method, $payment_methods)) {
 			return;
 		}
 
