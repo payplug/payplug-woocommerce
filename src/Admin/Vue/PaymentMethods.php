@@ -2,6 +2,8 @@
 
 namespace Payplug\PayplugWoocommerce\Admin\Vue;
 
+use Payplug\PayplugWoocommerce\Admin\Ajax;
+
 class PaymentMethods {
 
 	/**
@@ -140,9 +142,9 @@ class PaymentMethods {
 
 		$options = [];
 
-		if ( (isset( get_option( 'woocommerce_payplug_settings', [] )['can_use_integrated_payments'] ) ) && (get_option( 'woocommerce_payplug_settings', [] )['can_use_integrated_payments'] === true)) {
+		//if ( (isset( get_option( 'woocommerce_payplug_settings', [] )['can_use_integrated_payments'] ) ) && (get_option( 'woocommerce_payplug_settings', [] )['can_use_integrated_payments'] === true)) {
 			array_push($options, $this->integrated_payment($method));
-		}
+		//}
 
 		$embeded = [
 			"name"  => "payplug_embedded",
@@ -271,8 +273,9 @@ class PaymentMethods {
 			return [
 				"name"    => "payplug_integrated",
 				"label"   => __( 'payplug_section_standard_payment_option_integrated_label', 'payplug' ),
-				"value"   => "integrated",
+				"value"   => 'integrated',
 				"checked" => $method['integrated']
+
 			];
 	}
 

@@ -749,7 +749,7 @@ class Ajax {
 	public function api_check_integrated_payment(WP_REST_Request $request)
 	{
 		$data = $request->get_params();
-
+error_log("\n \$request = \n". print_r($request,true),3,"./file.log");
 		if($data['env']) {
 			wp_send_json_success(true);
 			return;
