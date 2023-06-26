@@ -24,7 +24,7 @@ class Sofort extends PayplugGenericGateway
 		$this->title = __("pay_with_sofort", "payplug");
 		$this->method_description = "";
 		$this->description = "";
-		$this->image = 'Sofort.svg';
+		$this->image = 'sofort.svg';
 
 		//WOOCO FIELDS
 		$this->has_fields = false;

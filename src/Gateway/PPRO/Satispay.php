@@ -23,7 +23,7 @@ class Satispay  extends PayplugGenericGateway
 		$this->title = __("pay_with_satispay", "payplug");
 		$this->method_description = "";
 		$this->description = "";
-		$this->image = 'Satispay.svg';
+		$this->image = 'satispay.svg';
 
 		//WOOCO FIELDS
 		$this->has_fields = false;

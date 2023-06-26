@@ -36,7 +36,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
 		//get object $image
 		$icons = apply_filters('payplug_payment_icons', [
-			'payplug' => sprintf('<img src="%s" alt="Oney 4x" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $this->image)),
+			'payplug' => sprintf('<img src="%s" alt="%s" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $this->image), $this->id . " Icon"),
 		]);
 
 		$icons_str = '';
