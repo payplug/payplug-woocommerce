@@ -16,8 +16,9 @@ class Lock
 		$sql .= " `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,";
 		$sql .= " PRIMARY KEY (`payment_id`));";
 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		dbDelta( $sql );
+		$table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		maybe_create_table( $table_name, $sql);
 
 		$result = $wpdb->get_row(
 			$wpdb->prepare(
