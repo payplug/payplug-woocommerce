@@ -22,7 +22,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		parent::__construct();
 
 		//this is only for PPRo payments
-		add_action('woocommerce_order_item_add_action_buttons', [$this, 'hide_wc_refund_button']);
+		add_action('woocommerce_after_order_itemmeta', [$this, 'hide_wc_refund_button']);
 		//TODO:: add requirements here
 
 	}
@@ -36,7 +36,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
 		//get object $image
 		$icons = apply_filters('payplug_payment_icons', [
-			'payplug' => sprintf('<img src="%s" alt="Oney 4x" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $this->image)),
+			'payplug' => sprintf('<img src="%s" alt="%s" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $this->image), $this->id . " Icon"),
 		]);
 
 		$icons_str = '';
@@ -263,13 +263,18 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
 
 	public function hide_wc_refund_button(){
+		global $post;
+		$payment_methods = ['giropay', 'satispay', 'sofort', 'ideal', 'mybank'];
+		$order = new \WC_Order($post->ID);
+		if (in_array($order->get_payment_method(), $payment_methods)) {
 		?>
-		<script>
+			<script>
 			jQuery(function () {
 				jQuery('.refund-items').attr("disabled", true);
 			});
 		</script>
 		<?php
+		}
 	}
 
 	/**

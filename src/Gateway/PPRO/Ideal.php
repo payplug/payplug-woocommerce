@@ -22,7 +22,7 @@ class Ideal extends PayplugGenericGateway
 		$this->title = __("pay_with_ideal", "payplug");
 		$this->method_description = "";
 		$this->description = "";
-		$this->image = 'Ideal.svg';
+		$this->image = 'ideal.svg';
 
 		//WOOCO FIELDS
 		$this->has_fields = false;
