@@ -144,12 +144,4 @@ HTML;
 		return true;
 	}
 
-	public static function display_notice() {
-		?>
-		<div class="notice notice-error is-dismissible">
-			<p><?php echo __( 'payplug_integrated_unauthorized_message', 'payplug' ); ?></p>
-		</div>
-		<?php
-	}
-
 }
