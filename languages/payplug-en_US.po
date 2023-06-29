@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2023-06-21 12:31+0100\n"
+"PO-Revision-Date: 2023-06-29 10:38+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -548,19 +548,19 @@ msgid "payplug_ideal_unavailable_testmode_description"
 msgstr "iDeal is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
 
 msgid "payplug_section_satispay_payment_description"
-msgstr "Display the Satispay payment button on your store."
+msgstr "Allow your customers to pay via Satispay."
 
 msgid "payplug_section_mybank_payment_description"
-msgstr "Display the Mybank payment button on your store."
+msgstr "Allow your customers to pay via Mybank."
 
 msgid "payplug_section_sofort_payment_description"
-msgstr "Display the Sofort payment button on your store."
+msgstr "Allow your customers to pay via Sofort."
 
 msgid "payplug_section_giropay_payment_description"
-msgstr "Display the Giropay payment button on your store."
+msgstr "Allow your customers to pay via Giropay."
 
 msgid "payplug_section_ideal_payment_description"
-msgstr "Display the iDeal payment button on your store."
+msgstr "Allow your customers to pay via iDeal."
 
 msgid "payplug_satispay_access_error"
 msgstr "You don't have access to this feature yet. To activate Satispay, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248599064860' target='_blank'>the following form</a>"
