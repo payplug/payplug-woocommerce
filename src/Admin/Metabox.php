@@ -90,18 +90,29 @@ class Metabox {
 				<li><span><?php _e( 'Paid at', 'payplug' ); ?>
 						:</span> <?php echo ! empty( $metadata['paid_at'] ) ? esc_html( date_i18n( sprintf( '%s %s', $date_format, $time_format ), $metadata['paid_at'] ) ) : ''; ?>
 				</li>
-				<li><span><?php _e( 'Credit card', 'payplug' ); ?>
-						:</span> <?php echo ! empty( $metadata['card_brand'] ) ? esc_html( sprintf( '%s (%s)', $metadata['card_brand'], $metadata['card_country'] ) ) : ''; ?>
-				</li>
-				<li><span><?php _e( 'Card mask', 'payplug' ); ?>
-						:</span> <?php echo ! empty( $metadata['card_last4'] ) ? esc_html( sprintf( '**** **** **** %s', $metadata['card_last4'] ) ) : ''; ?>
-				</li>
+
+				<?php if(!empty( $metadata['card_brand'])){ ?>
+					<li><span><?php _e( 'Credit card', 'payplug' ); ?>
+							:</span> <?php echo ! empty( $metadata['card_brand'] ) ? esc_html( sprintf( '%s (%s)', $metadata['card_brand'], $metadata['card_country'] ) ) : ''; ?>
+					</li>
+				<?php } ?>
+
+				<?php if(!empty( $metadata['card_last4'])){ ?>
+					<li><span><?php _e( 'Card mask', 'payplug' ); ?>
+							:</span> <?php echo ! empty( $metadata['card_last4'] ) ? esc_html( sprintf( '**** **** **** %s', $metadata['card_last4'] ) ) : ''; ?>
+					</li>
+				<?php } ?>
+
 				<li><span><?php _e( '3 D Secure', 'payplug' ); ?>
 						:</span> <?php echo isset( $metadata['3ds'] ) ? true === $metadata['3ds'] ? __( 'Yes', 'payplug' ) : __( 'No', 'payplug' ) : ''; ?>
 				</li>
-				<li><span><?php _e( 'Expiration date', 'payplug' ); ?>
-						:</span> <?php echo ( ! empty( $metadata['card_exp_month'] ) && ! empty( $metadata['card_exp_year'] ) ) ? esc_html( sprintf( '%s/%s', zeroise( $metadata['card_exp_month'], 2 ), zeroise( $metadata['card_exp_year'], 2 ) ) ) : ''; ?>
-				</li>
+
+				<?php if( ! empty( $metadata['card_exp_month'] ) && ! empty( $metadata['card_exp_year'] ) ){ ?>
+					<li><span><?php _e( 'Expiration date', 'payplug' ); ?>
+							:</span> <?php echo ( ! empty( $metadata['card_exp_month'] ) && ! empty( $metadata['card_exp_year'] ) ) ? esc_html( sprintf( '%s/%s', zeroise( $metadata['card_exp_month'], 2 ), zeroise( $metadata['card_exp_year'], 2 ) ) ) : ''; ?>
+					</li>
+				<?php } ?>
+
 				<li><span><?php _e( 'Mode', 'payplug' ); ?>
 						:</span> <?php echo true === $metadata['live'] ? _e( 'Live', 'payplug' ) : _e( 'Test', 'payplug' ); ?>
 				</li>
