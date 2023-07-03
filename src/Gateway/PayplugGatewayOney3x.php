@@ -52,14 +52,18 @@ class PayplugGatewayOney3x extends PayplugGateway
 
 	public function validate_checkout(){
 
-		if ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED) {
-			throw new \Exception(__('Unavailable for the specified country.'));
+		$posted_data = $this->get_post_data();
 
-		} else if ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH) {
-			throw new \Exception(sprintf(__('The payment with Oney is unavailable because you have more than %s items in your cart.', 'payplug'), self::ONEY_PRODUCT_QUANTITY_MAXIMUM));
+		if( in_array($posted_data['payment_method'], ["oney_x3_with_fees","oney_x4_with_fees", "oney_x3_without_fees", "oney_x4_without_fees"] ) ){
+			if ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED) {
+				throw new \Exception(__('Unavailable for the specified country.'));
 
-		} else if(!$this->check_oney_is_available()){
-			throw new \Exception(sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->oney_thresholds_min , $this->oney_thresholds_max ));
+			} else if ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH) {
+				throw new \Exception(sprintf(__('The payment with Oney is unavailable because you have more than %s items in your cart.', 'payplug'), self::ONEY_PRODUCT_QUANTITY_MAXIMUM));
+
+			} else if(!$this->check_oney_is_available()){
+				throw new \Exception(sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->oney_thresholds_min , $this->oney_thresholds_max ));
+			}
 		}
 	}
 
