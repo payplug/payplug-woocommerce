@@ -138,25 +138,26 @@ class PaymentMethods {
 	 */
 	public function embeded_option($method) {
 
-		$options = [];
-
-		array_push($options, $this->integrated_payment($method));
-
-		$embeded = [
+		$options = Array(
+			array(
 			"name"  => "payplug_embedded",
 			"label" => __( 'payplug_section_standard_payment_option_popup_label', 'payplug' ),
 			"value" => "popup",
 			"checked" => $method['popup']
-		];
-
-		$redirect = [
+			),
+			array(
 			"name"    => "payplug_embedded",
 			"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
 			"value"   => "redirect",
 			"checked" => $method['redirect']
-		];
-
-		array_push($options, $embeded, $redirect);
+			),
+			array(
+				"name"    => "payplug_embedded",
+				"label"   => __( 'payplug_section_standard_payment_option_integrated_label', 'payplug' ),
+				"value"   => "integrated",
+				"checked" => $method['integrated']
+			)
+		);
 
 		return [
 			"type"         => "payment_option",
@@ -263,15 +264,6 @@ class PaymentMethods {
 				]
 			],
 		];
-	}
-
-	public static function integrated_payment($method) {
-			return [
-				"name"    => "payplug_integrated",
-				"label"   => __( 'payplug_section_standard_payment_option_integrated_label', 'payplug' ),
-				"value"   => "integrated",
-				"checked" => $method['integrated']
-			];
 	}
 
 	public static function payment_method_satispay( $active = false ) {
