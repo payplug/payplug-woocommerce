@@ -32,6 +32,8 @@ class Giropay extends PayplugGenericGateway
 			$this->enabled = "no";
 		}
 
+		add_action('woocommerce_order_item_add_action_buttons', [$this, 'refund_not_available']);
+
 	}
 
 }

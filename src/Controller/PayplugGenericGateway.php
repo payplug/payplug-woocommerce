@@ -278,6 +278,18 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	}
 
 	/**
+	 * refund not possible for PPRO payments
+	 *
+	 * @return void
+	 */
+	public function refund_not_available($order)
+	{
+		if ($this->id === $order->get_payment_method() ) {
+			echo "<p style='color: red;'>" . __('payplug_refund_disabled_error', 'payplug') . "</p>";
+		}
+	}
+
+	/**
 	 *
 	 * Billing and shipping addresses should have the same country and allowed by Oney
 	 * https://payplug-prod.atlassian.net/browse/WOOC-227
