@@ -1114,31 +1114,31 @@ msgid "ideal_threshold"
 msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite iDEAL."
 
 msgid "payplug_satispay_activate"
-msgstr "Pagamenti Satispay"
+msgstr "Pagamento Satispay"
 
 msgid "payplug_satispay_more_url"
 msgstr "https://support.payplug.com/hc/it/articles/8089121532700-Satispay-chez-Payplug"
 
 msgid "payplug_mybank_activate"
-msgstr "Pagamenti MyBank"
+msgstr "Pagamento MyBank"
 
 msgid "payplug_mybank_more_url"
 msgstr "https://support.payplug.com/hc/it/articles/8089123857564-MyBank-chez-Payplug"
 
 msgid "payplug_sofort_activate"
-msgstr "Pagamenti Sofort"
+msgstr "Pagamento Sofort"
 
 msgid "payplug_sofort_more_url"
 msgstr "https://support.payplug.com/hc/it/articles/8089091941660-Sofort-chez-Payplug"
 
 msgid "payplug_giropay_activate"
-msgstr "Pagamenti Giropay"
+msgstr "Pagamento Giropay"
 
 msgid "payplug_giropay_more_url"
 msgstr "https://support.payplug.com/hc/it/articles/8089089179420"
 
 msgid "payplug_ideal_activate"
-msgstr "Pagamenti iDEAL"
+msgstr "Pagamento iDEAL"
 
 msgid "payplug_ideal_more_url"
 msgstr "https://support.payplug.com/hc/it/articles/8089119071132"
