@@ -140,6 +140,12 @@ class PaymentMethods {
 
 		$options = Array(
 			array(
+				"name"    => "payplug_embedded",
+				"label"   => __( 'payplug_section_standard_payment_option_integrated_label', 'payplug' ),
+				"value"   => "integrated",
+				"checked" => $method['integrated']
+			),
+			array(
 			"name"  => "payplug_embedded",
 			"label" => __( 'payplug_section_standard_payment_option_popup_label', 'payplug' ),
 			"value" => "popup",
@@ -150,12 +156,6 @@ class PaymentMethods {
 			"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
 			"value"   => "redirect",
 			"checked" => $method['redirect']
-			),
-			array(
-				"name"    => "payplug_embedded",
-				"label"   => __( 'payplug_section_standard_payment_option_integrated_label', 'payplug' ),
-				"value"   => "integrated",
-				"checked" => $method['integrated']
 			)
 		);
 
