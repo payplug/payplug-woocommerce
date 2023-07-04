@@ -21,9 +21,9 @@ class PaymentMethods {
 		];
 
 		switch($option){
-			case "popup" : $method["popup"] = true;break;
+			case "redirect" : $method["redirect"] = true;break;
 			case "integrated" : $method["integrated"] = true;break;
-			default: $method["redirect"] = true;break;
+			default: $method["popup"] = true;break;
 		}
 
 		return [
@@ -76,21 +76,21 @@ class PaymentMethods {
 	private function title_field(){
 		$title = get_option( 'woocommerce_payplug_settings', [] )['title'];
 		return array(
-				"type"         => "payment_option",
-				"sub_type"     => "input",
-				"name"     	   => "standard_payment_title",
-				"title"		   => __("payplug_standard_payment_title_title", "payplug"),
-				"value"		   => !empty($title) ? $title : __("payplug_standard_payment_title_placeholder", "payplug"),
-				"descriptions" => [
-					"live"    => [
-						"description"      => __("payplug_standard_payment_title_description", "payplug"),
-						"placeholder"      => __("payplug_standard_payment_title_placeholder", "payplug"),
-					],
-					"sandbox" => [
-						"description"      => __("payplug_standard_payment_title_description", "payplug"),
-						"placeholder"      => __("payplug_standard_payment_title_placeholder", "payplug"),
-					]
+			"type"         => "payment_option",
+			"sub_type"     => "input",
+			"name"     	   => "standard_payment_title",
+			"title"		   => __("payplug_standard_payment_title_title", "payplug"),
+			"value"		   => !empty($title) ? $title : __("payplug_standard_payment_title_placeholder", "payplug"),
+			"descriptions" => [
+				"live"    => [
+					"description"      => __("payplug_standard_payment_title_description", "payplug"),
+					"placeholder"      => __("payplug_standard_payment_title_placeholder", "payplug"),
 				],
+				"sandbox" => [
+					"description"      => __("payplug_standard_payment_title_description", "payplug"),
+					"placeholder"      => __("payplug_standard_payment_title_placeholder", "payplug"),
+				]
+			],
 		);
 	}
 
@@ -146,16 +146,16 @@ class PaymentMethods {
 				"checked" => $method['integrated']
 			),
 			array(
-			"name"  => "payplug_embedded",
-			"label" => __( 'payplug_section_standard_payment_option_popup_label', 'payplug' ),
-			"value" => "popup",
-			"checked" => $method['popup']
+				"name"  => "payplug_embedded",
+				"label" => __( 'payplug_section_standard_payment_option_popup_label', 'payplug' ),
+				"value" => "popup",
+				"checked" => $method['popup']
 			),
 			array(
-			"name"    => "payplug_embedded",
-			"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
-			"value"   => "redirect",
-			"checked" => $method['redirect']
+				"name"    => "payplug_embedded",
+				"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
+				"value"   => "redirect",
+				"checked" => $method['redirect']
 			)
 		);
 
