@@ -261,11 +261,11 @@ class PayplugWoocommerceRequest {
 			return wp_send_json_error( $e->getMessage());
 		}
 
-		if ((isset($payment->failure)) && (!empty($payment->failure))) {
+		if ((isset($payment->failure)) && (!empty($payment->failure)) || ($payment->is_paid === false && is_null($payment->paid_at))) {
 			return wp_send_json_error(
 				[
 					'code' => $payment->failure->code,
-					'message' => $payment->failure->message
+					'message' => !empty($payment->failure->message) ? $payment->failure->message :__("payplug_integrated_payment_error", "payplug")
 				]
 			);
 		}
