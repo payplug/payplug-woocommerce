@@ -2,8 +2,6 @@
 
 namespace Payplug\PayplugWoocommerce\Admin\Vue;
 
-use Payplug\PayplugWoocommerce\Admin\Ajax;
-
 class PaymentMethods {
 
 	/**
@@ -23,9 +21,9 @@ class PaymentMethods {
 		];
 
 		switch($option){
-			case "popup" : $method["popup"] = true;break;
+			case "redirect" : $method["redirect"] = true;break;
 			case "integrated" : $method["integrated"] = true;break;
-			default: $method["redirect"] = true;break;
+			default: $method["popup"] = true;break;
 		}
 
 		return [
@@ -78,21 +76,21 @@ class PaymentMethods {
 	private function title_field(){
 		$title = get_option( 'woocommerce_payplug_settings', [] )['title'];
 		return array(
-				"type"         => "payment_option",
-				"sub_type"     => "input",
-				"name"     	   => "standard_payment_title",
-				"title"		   => __("payplug_standard_payment_title_title", "payplug"),
-				"value"		   => !empty($title) ? $title : __("payplug_standard_payment_title_placeholder", "payplug"),
-				"descriptions" => [
-					"live"    => [
-						"description"      => __("payplug_standard_payment_title_description", "payplug"),
-						"placeholder"      => __("payplug_standard_payment_title_placeholder", "payplug"),
-					],
-					"sandbox" => [
-						"description"      => __("payplug_standard_payment_title_description", "payplug"),
-						"placeholder"      => __("payplug_standard_payment_title_placeholder", "payplug"),
-					]
+			"type"         => "payment_option",
+			"sub_type"     => "input",
+			"name"     	   => "standard_payment_title",
+			"title"		   => __("payplug_standard_payment_title_title", "payplug"),
+			"value"		   => !empty($title) ? $title : __("payplug_standard_payment_title_placeholder", "payplug"),
+			"descriptions" => [
+				"live"    => [
+					"description"      => __("payplug_standard_payment_title_description", "payplug"),
+					"placeholder"      => __("payplug_standard_payment_title_placeholder", "payplug"),
 				],
+				"sandbox" => [
+					"description"      => __("payplug_standard_payment_title_description", "payplug"),
+					"placeholder"      => __("payplug_standard_payment_title_placeholder", "payplug"),
+				]
+			],
 		);
 	}
 
@@ -140,27 +138,26 @@ class PaymentMethods {
 	 */
 	public function embeded_option($method) {
 
-		$options = [];
-
-		//if ( (isset( get_option( 'woocommerce_payplug_settings', [] )['can_use_integrated_payments'] ) ) && (get_option( 'woocommerce_payplug_settings', [] )['can_use_integrated_payments'] === true)) {
-			array_push($options, $this->integrated_payment($method));
-		//}
-
-		$embeded = [
-			"name"  => "payplug_embedded",
-			"label" => __( 'payplug_section_standard_payment_option_popup_label', 'payplug' ),
-			"value" => "popup",
-			"checked" => $method['popup']
-		];
-
-		$redirect = [
-			"name"    => "payplug_embedded",
-			"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
-			"value"   => "redirect",
-			"checked" => $method['redirect']
-		];
-
-		array_push($options, $embeded, $redirect);
+		$options = Array(
+			array(
+				"name"    => "payplug_embedded",
+				"label"   => __( 'payplug_section_standard_payment_option_integrated_label', 'payplug' ),
+				"value"   => "integrated",
+				"checked" => $method['integrated']
+			),
+			array(
+				"name"  => "payplug_embedded",
+				"label" => __( 'payplug_section_standard_payment_option_popup_label', 'payplug' ),
+				"value" => "popup",
+				"checked" => $method['popup']
+			),
+			array(
+				"name"    => "payplug_embedded",
+				"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
+				"value"   => "redirect",
+				"checked" => $method['redirect']
+			)
+		);
 
 		return [
 			"type"         => "payment_option",
@@ -267,16 +264,6 @@ class PaymentMethods {
 				]
 			],
 		];
-	}
-
-	public static function integrated_payment($method) {
-			return [
-				"name"    => "payplug_integrated",
-				"label"   => __( 'payplug_section_standard_payment_option_integrated_label', 'payplug' ),
-				"value"   => 'integrated',
-				"checked" => $method['integrated']
-
-			];
 	}
 
 	public static function payment_method_satispay( $active = false ) {
