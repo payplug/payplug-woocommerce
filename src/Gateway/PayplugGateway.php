@@ -642,7 +642,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$this->activate_integrated_payments();
 		$transient_key = PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', []));
 		$ip = get_transient($transient_key);
-		if((isset($ip['permissions']['can_use_integrated_payments']) && ($ip['permissions']['can_use_integrated_payments'] === true)) || ($this->payment_method == "integrated")){
+		if((isset($ip['permissions']['can_use_integrated_payments']) && ($ip['permissions']['can_use_integrated_payments'] === true)) && ($this->payment_method == "integrated")){
 			$this->integrated_payments_scripts();
 			$ip_was_activated = true;
 
