@@ -63,68 +63,79 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	public function checkGateway()
 	{
 
-		if(empty( WC()->cart )){
-			return false;
-		}
-
-		//for backend orders
-		if( !empty(get_query_var('order-pay')) ){
-			$order = wc_get_order(get_query_var('order-pay'));
-			$items = $order->get_items();
-
-			$country_code_shipping = $order->get_shipping_country();
-			$country_code_billing = $order->get_billing_country();
-
-			$this->order_items_to_cart(WC()->cart, $items);
-		}
-
-		$order_amount = $this->get_order_total();
-
 		//TODO:: MISSING saved configurations
-		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options($this->id);
+		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options( $this->id );
 
 		//account doesnt have permissions
-		if( (isset($account["payment_methods"])) && (empty($account["payment_methods"][$this->id])) && (!$account["payment_methods"][$this->id]['enabled'])){
+		if ( ( isset( $account["payment_methods"] ) ) && ( empty( $account["payment_methods"][ $this->id ] ) ) && ( ! $account["payment_methods"][ $this->id ]['enabled'] ) ) {
 			return false;
 		}
 
 		//check if it's activated on the BO
-		if( !isset($account['permissions'][$this->id]) || (isset($account['permissions'][$this->id]) && !$account['permissions'][$this->id]) ){
+		if ( ! isset( $account['permissions'][ $this->id ] ) || ( isset( $account['permissions'][ $this->id ] ) && ! $account['permissions'][ $this->id ] ) ) {
 			return false;
 		}
 
-		$this->allowed_country_codes = $account["payment_methods"][$this->id]['allowed_countries'];
-		$this->get_thresholds_values($account);
-
-
-		//threshold validations
-		if ( (!empty($this->min_thresholds) && $order_amount < $this->min_thresholds)  || ( !empty($this->max_thresholds) && $order_amount > $this->max_thresholds ) ) {
-			$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.__($this->id . '_threshold.', 'payplug').'</div>';
-			return false;
-		}
-
-		if( empty($country_code_shipping) || empty($country_code_shipping) ) {
-			$country_code_shipping = WC()->customer->get_shipping_country();
-			$country_code_billing = WC()->customer->get_billing_country();
-		}
-
-		if( $this->allowed_country_codes === "ALL" || empty($this->allowed_country_codes) ) {
-			return true;
-		}
-
-		//check if country is allowed
-		if( in_array($country_code_billing, $this->allowed_country_codes) ) {
-
-			//billing and shipping should be the same country
-			if(!$this->validate_shipping_billing_country($country_code_shipping, $country_code_billing)){
-				$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.__('Unavailable for the specified country.', 'payplug').'</div>';
+		if (is_checkout()) {
+			if ( empty( WC()->cart ) ) {
 				return false;
 			}
 
-			return true;
+			//for backend orders
+			if ( ! empty( get_query_var( 'order-pay' ) ) ) {
+				$order = wc_get_order( get_query_var( 'order-pay' ) );
+				$items = $order->get_items();
 
-		}else{
-			return false;
+				$country_code_shipping = $order->get_shipping_country();
+				$country_code_billing  = $order->get_billing_country();
+
+				$this->order_items_to_cart( WC()->cart, $items );
+			}
+
+			$order_amount = $this->get_order_total();
+
+			$this->allowed_country_codes = $account["payment_methods"][ $this->id ]['allowed_countries'];
+			$this->get_thresholds_values( $account );
+
+
+			//threshold validations
+			if ( ( ! empty( $this->min_thresholds ) && $order_amount < $this->min_thresholds ) || ( ! empty( $this->max_thresholds ) && $order_amount > $this->max_thresholds ) ) {
+				$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __( $this->id . '_threshold.', 'payplug' ) . '</div>';
+
+				return false;
+			}
+
+			if ( empty( $country_code_shipping ) || empty( $country_code_shipping ) ) {
+				$country_code_shipping = WC()->customer->get_shipping_country();
+				$country_code_billing  = WC()->customer->get_billing_country();
+			}
+
+			if ( $this->allowed_country_codes === "ALL" || empty( $this->allowed_country_codes ) ) {
+				return true;
+			}
+
+			//check if country is allowed
+			if ( in_array( $country_code_billing, $this->allowed_country_codes ) ) {
+
+				//billing and shipping should be the same country
+				if ( ! $this->validate_shipping_billing_country( $country_code_shipping, $country_code_billing ) ) {
+					$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __( 'Unavailable for the specified country.', 'payplug' ) . '</div>';
+
+					return false;
+				}
+
+				return true;
+
+			} else {
+				return false;
+			}
+		} else {
+			//check if it's activated on the BO
+			if ( ! isset( $account['permissions'][ $this->id ] ) || ( isset( $account['permissions'][ $this->id ] ) && ! $account['permissions'][ $this->id ] ) ) {
+				return false;
+			} else {
+				return true;
+			}
 		}
 	}
 
