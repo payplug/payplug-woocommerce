@@ -137,7 +137,7 @@ HTML;
 
 	public function already_updated(){
 
-		if(empty($this->options['update_gateway'])){
+		if( empty($this->options['update_gateway']) || (!empty($this->options['update_gateway']) && !$this->options['update_gateway'] ) ){
 			return false;
 		}
 
