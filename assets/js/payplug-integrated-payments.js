@@ -196,13 +196,15 @@ var IntegratedPayment = {
 				IntegratedPayment.props.paymentId = response.payment_id;
 				IntegratedPayment.props.return_url = response.redirect;
 			},
-			complete: function(){
-				if(IntegratedPayment.oneClickSelected()){
-					return;
+			complete: function(response) {
+				if (response.responseJSON.result != "failure") {
+					if (IntegratedPayment.oneClickSelected()) {
+						return;
 
-				}else{
-					IntegratedPayment.SubmitPayment();
+					} else {
+						IntegratedPayment.SubmitPayment();
 
+					}
 				}
 			}
 		});
@@ -211,7 +213,6 @@ var IntegratedPayment = {
 		var parsedHtml = jQuery.parseHTML(error_message, document, false);
 		jQuery('#woocommerce-NoticeGroup').remove();
 		jQuery('<div></div>')
-			.addClass('woocommerce-error')
 			.attr('id', 'woocommerce-NoticeGroup')
 			.html(parsedHtml)
 			.prependTo(IntegratedPayment.form());

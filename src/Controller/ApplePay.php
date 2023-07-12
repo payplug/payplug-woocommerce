@@ -29,7 +29,7 @@ class ApplePay extends PayplugGateway
 
 		$this->title = __('payplug_apple_pay_title', 'payplug');
 		$this->description = '<div id="apple-pay-button-wrapper"><apple-pay-button buttonstyle="black" type="pay" locale="'. get_locale() .'"></apple-pay-button></div>';
-		$this->domain_name = strtr(get_site_url(), array("http://" => "", "https://" => ""));
+		$this->domain_name = $_SERVER['HTTP_HOST'];
 
 		if (!($this->checkApplePay() && $this->checkDeviceComptability() && $this->isSSL())) {
 			$this->enabled = 'no';

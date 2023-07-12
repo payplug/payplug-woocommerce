@@ -111,16 +111,11 @@ HTML;
 		$options          = get_option('woocommerce_payplug_settings', []);
 
 		try {
-			if (!empty(PayplugWoocommerceHelper::get_live_key())) {
-				$permissions = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-				PayplugWoocommerceHelper::set_transient_data($permissions, $options);
-			} else {
-				return false;
-			}
-
-		} catch (\Payplug\Exception\UnauthorizedException $e) {
-		} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
-		} catch( \Payplug\Exception\ForbiddenException $e){
+			$permissions = Authentication::getAccount( new Payplug( $options['mode'] === 'yes' && PayplugWoocommerceHelper::get_live_key() ? PayplugWoocommerceHelper::get_live_key() : PayplugWoocommerceHelper::get_test_key() ) );;
+			PayplugWoocommerceHelper::set_transient_data( $permissions, $options );
+		} catch ( \Payplug\Exception\UnauthorizedException $e ) {
+		} catch ( \Payplug\Exception\ConfigurationNotSetException $e ) {
+		} catch ( \Payplug\Exception\ForbiddenException $e ) {
 		} catch (\Payplug\Exception\ForbiddenException $e){return array();}
 
 
@@ -137,7 +132,7 @@ HTML;
 
 	public function already_updated(){
 
-		if(empty($this->options['update_gateway'])){
+		if( empty($this->options['update_gateway']) || (!empty($this->options['update_gateway']) && !$this->options['update_gateway'] ) ){
 			return false;
 		}
 
