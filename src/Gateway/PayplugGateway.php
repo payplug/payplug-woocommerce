@@ -1916,16 +1916,17 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$ip = new IntegratedPayment($options);
 		$ip_permissions = $ip->ip_permissions();
 
+		//if test mode && IP is enabled (from bo)
+		if($options['mode'] === 'no' && $options["payment_method"] === "integrated" ){
+			return true;
+		}
+
 		if(!$ip_permissions){
 			$ip->disable_ip();
 			wp_dequeue_style("payplugIP");
 			wp_dequeue_script('payplug-integrated-payments-api');
 			wp_dequeue_script('payplug-integrated-payments');
 			return false;
-		}
-
-		if($options['payment_method'] === "integrated"){
-			return true;
 		}
 
 		if($ip->already_updated()){
@@ -1935,7 +1936,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		$ip->enable_ip();
 		$this->payment_method = "integrated";
-		//$this->integrated_payments_scripts();
 
 		return true;
 
