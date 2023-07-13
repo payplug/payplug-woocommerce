@@ -520,6 +520,25 @@ class PayplugWoocommerceHelper {
 	}
 
 	/**
+	 * Get current option from payplug settings
+	 *this should replace get_account_data_from_options
+	 *
+	 * @return array
+	 */
+	public static function generic_get_account_data_from_options($gateway_id){
+		$options = get_option('woocommerce_payplug_settings', []);
+		$transient_key = self::get_transient_key($options);
+		$account = get_transient($transient_key);
+
+		if( isset($options[$gateway_id]) && $options[$gateway_id] =="yes"){
+			$account['permissions'][$gateway_id] = true;
+		}
+
+		return $account;
+
+	}
+
+	/**
 	 *
 	 * Retrieve the local oney threshold configration
 	 *

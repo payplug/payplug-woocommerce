@@ -108,7 +108,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function __construct()
     {
-		$payplug_gateways = array('payplug', 'american_express', 'apple_pay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees');
+		$payplug_gateways = array('payplug', 'american_express', 'apple_pay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees','giropay', 'satispay', 'sofort', 'ideal', 'mybank');
 
 		if ((!empty($_GET['section'])) && (in_array($_GET['section'], $payplug_gateways))) {
 			$GLOBALS['hide_save_button'] = true;
@@ -260,7 +260,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         }
 
         $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express'])) {
+        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express', "satispay","sofort","giropay","mybank","ideal" ])) {
             return;
         }
 
@@ -637,16 +637,18 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		// Register checkout styles.
 		wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('payplug-checkout');
+		//$ip_was_activated = false;
 
-		$this->activate_integrated_payments();
+		$ip_was_activated = $this->activate_integrated_payments();
 		$transient_key = PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', []));
 		$ip = get_transient($transient_key);
-		if((isset($ip['permissions']['can_use_integrated_payments']) && ($ip['permissions']['can_use_integrated_payments'] === true)) || ($this->payment_method == "integrated")){
+		if( $ip_was_activated || ((isset($ip['permissions']['can_use_integrated_payments']) && ($ip['permissions']['can_use_integrated_payments'] === true)) && ($this->payment_method == "integrated")) ){
 			$this->integrated_payments_scripts();
+			$ip_was_activated = true;
 
 		}
 
-		if ($this->payment_method == "popup") {
+		if ($this->payment_method == "popup" && !$ip_was_activated && $this->id === "payplug") {
 
 			wp_dequeue_style("payplugIP");
 			wp_dequeue_script('payplug-integrated-payments-api');
@@ -1900,6 +1902,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	}
 
 	public function activate_integrated_payments(){
+
+		if($this->id !== "payplug"){
+			return false;
+		}
 		//get options
 		$options = get_option('woocommerce_payplug_settings', []);
 
@@ -1908,12 +1914,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		}
 
 		$ip = new IntegratedPayment($options);
-
-		if($ip->already_updated()){
-			return false;
-		}
-
 		$ip_permissions = $ip->ip_permissions();
+
+		//if test mode && IP is enabled (from bo)
+		if($options['mode'] === 'no' && $options["payment_method"] === "integrated" ){
+			return true;
+		}
 
 		if(!$ip_permissions){
 			$ip->disable_ip();
@@ -1923,15 +1929,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			return false;
 		}
 
-
-		if($options['payment_method'] === "integrated"){
-			return true;
+		if($ip->already_updated()){
+			return false;
 		}
 
 
 		$ip->enable_ip();
 		$this->payment_method = "integrated";
-		$this->integrated_payments_scripts();
 
 		return true;
 

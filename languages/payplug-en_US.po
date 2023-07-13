@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug pour WooCommerce (Officiel) 1.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2022-02-15 22:42+0000\n"
-"PO-Revision-Date: 2023-04-13 17:49+0100\n"
+"PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -471,3 +471,116 @@ msgstr "Please note that the maximum amount entered is less than the minimum amo
 
 msgid "payplug_thresholds_error_mintext_msg"
 msgstr "Please note that the minimum amount entered is greater than the maximum amount entered."
+
+msgid "pay_with_satispay"
+msgstr "Pay with Satispay"
+
+msgid "pay_with_mybank"
+msgstr "Pay with MyBank"
+
+msgid "pay_with_giropay"
+msgstr "Pay with Giropay"
+
+msgid "pay_with_sofort"
+msgstr "Pay with Sofort"
+
+msgid "pay_with_ideal"
+msgstr "Pay with iDEAL"
+
+msgid "satispay_threshold"
+msgstr "The total amount of your order should be between %s€ and %s€ to pay with Satispay."
+
+msgid "mybank_threshold"
+msgstr "The total amount of your order should be between %s€ and %s€ to pay with MyBank."
+
+msgid "giropay_threshold"
+msgstr "The total amount of your order should be between %s€ and %s€ to pay with Giropay."
+
+msgid "sofort_threshold"
+msgstr "The total amount of your order should be between %s€ and %s€ to pay with Sofort."
+
+msgid "ideal_threshold"
+msgstr "The total amount of your order should be between %s€ and %s€ to pay with iDEAL."
+
+msgid "payplug_satispay_activate"
+msgstr "Satispay payments"
+
+msgid "payplug_satispay_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089121532700-Satispay-chez-Payplug"
+
+msgid "payplug_mybank_activate"
+msgstr "MyBank payments"
+
+msgid "payplug_mybank_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089123857564-MyBank-chez-Payplug"
+
+msgid "payplug_sofort_activate"
+msgstr "Sofort payments"
+
+msgid "payplug_sofort_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089091941660-Sofort-chez-Payplug"
+
+msgid "payplug_giropay_activate"
+msgstr "Giropay payments"
+
+msgid "payplug_giropay_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089089179420"
+
+msgid "payplug_ideal_activate"
+msgstr "iDEAL payments"
+
+msgid "payplug_ideal_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089119071132"
+
+msgid "payplug_satispay_unavailable_testmode_description"
+msgstr "Satispay is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_mybank_unavailable_testmode_description"
+msgstr "Mybank is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_sofort_unavailable_testmode_description"
+msgstr "Sofort is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_giropay_unavailable_testmode_description"
+msgstr "Giropay is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_ideal_unavailable_testmode_description"
+msgstr "iDeal is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_section_satispay_payment_description"
+msgstr "Allow your customers to pay via Satispay."
+
+msgid "payplug_section_mybank_payment_description"
+msgstr "Allow your customers to pay via Mybank."
+
+msgid "payplug_section_sofort_payment_description"
+msgstr "Allow your customers to pay via Sofort."
+
+msgid "payplug_section_giropay_payment_description"
+msgstr "Allow your customers to pay via Giropay."
+
+msgid "payplug_section_ideal_payment_description"
+msgstr "Allow your customers to pay via iDeal."
+
+msgid "payplug_satispay_access_error"
+msgstr "You don't have access to this feature yet. To activate Satispay, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248599064860' target='_blank'>the following form</a>"
+
+msgid "payplug_mybank_access_error"
+msgstr "You don't have access to this feature yet. To activate MyBank, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248631711516' target='_blank'>the following form</a>"
+
+msgid "payplug_sofort_access_error"
+msgstr "You don't have access to this feature yet. To activate Sofort, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248655934108' target='_blank'>the following form</a>"
+
+msgid "payplug_giropay_access_error"
+msgstr "You don't have access to this feature yet. To activate Giropay, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248632664476' target='_blank'>the following form</a>"
+
+msgid "payplug_ideal_access_error"
+msgstr "You don't have access to this feature yet. To activate iDEAL, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248663314844' target='_blank'>the following form</a>"
+
+msgid "payplug_refund_disabled_error"
+msgstr ""
+"The automatic refund is not available from your Portal.\n"
+"Please contact support@payplug.com"
+
+msgid "payplug_integrated_access_error"
+msgstr "You don't have access to this feature yet. To activate Integrated Payments, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=6331992459420' target='_blank'>the following form</a>"

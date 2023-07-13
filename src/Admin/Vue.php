@@ -36,6 +36,7 @@ class Vue {
 			} else {
 				$payplug_wooc_settings['can_use_integrated_payments'] = false;
 			}
+
 			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $payplug_wooc_settings) );
 
 			if ((empty($payplug_wooc_settings['oney_thresholds_default_min'])) && (empty($payplug_wooc_settings['oney_thresholds_default_max']))) {
@@ -293,7 +294,13 @@ class Vue {
 				(new PaymentMethods())->payment_method_standard(),
 				PaymentMethods::payment_method_amex(!empty($options) && $options['american_express'] === 'yes'),
 				PaymentMethods::payment_method_applepay(!empty($options) && $options['apple_pay'] === 'yes'),
-				PaymentMethods::payment_method_bancontact(!empty($options) &&$options['bancontact'] === 'yes')
+				PaymentMethods::payment_method_bancontact(!empty($options) && $options['bancontact'] === 'yes'),
+				PaymentMethods::payment_method_satispay(!empty($options) && $options['satispay'] === 'yes'),
+				PaymentMethods::payment_method_mybank(!empty($options) && $options['mybank'] === 'yes'),
+				PaymentMethods::payment_method_sofort(!empty($options) && $options['sofort'] === 'yes'),
+				PaymentMethods::payment_method_giropay(!empty($options) && $options['giropay'] === 'yes'),
+				PaymentMethods::payment_method_ideal(!empty($options) && $options['ideal'] === 'yes'),
+
 			]
 		];
 

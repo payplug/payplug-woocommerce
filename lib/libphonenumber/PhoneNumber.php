@@ -565,7 +565,7 @@ class PhoneNumber implements \Serializable
      */
     public function serialize()
     {
-        return serialize(
+        return __serialize(
             array(
                 $this->countryCode,
                 $this->nationalNumber,
@@ -584,7 +584,7 @@ class PhoneNumber implements \Serializable
      */
     public function unserialize($serialized)
     {
-        $data = unserialize($serialized);
+        $data = __unserialize($serialized);
 
         list(
             $this->countryCode,
@@ -601,4 +601,14 @@ class PhoneNumber implements \Serializable
             $this->hasNumberOfLeadingZeros = true;
         }
     }
+
+	public function __serialize() {
+		return get_object_vars( $this );
+	}
+
+	public function __unserialize( $data ) {
+		foreach ( $data as $key => $value ) {
+			$this->$key = $value;
+		}
+	}
 }

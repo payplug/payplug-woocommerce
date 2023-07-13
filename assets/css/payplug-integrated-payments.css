@@ -199,7 +199,7 @@
 }
 .IntegratedPayment_error.-exp, .IntegratedPayment_error.-cvv {
 	width: 100%;
-	max-width: calc(45%);
+	max-width: calc(49%);
 }
 .IntegratedPayment_error.-cvv {
 	justify-self: flex-end;

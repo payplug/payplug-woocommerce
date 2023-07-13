@@ -1082,3 +1082,116 @@ msgstr "Attenzione, l'importo massimo inserito è inferiore all'importo minimo i
 
 msgid "payplug_thresholds_error_mintext_msg"
 msgstr "Attenzione, l'importo minimo inserito è superiore all'importo massimo inserito."
+
+msgid "pay_with_satispay"
+msgstr "Paga con Satispay"
+
+msgid "pay_with_mybank"
+msgstr "Paga con MyBank"
+
+msgid "pay_with_giropay"
+msgstr "Paga con Giropay"
+
+msgid "pay_with_sofort"
+msgstr "Paga con Sofort"
+
+msgid "pay_with_ideal"
+msgstr "Paga con iDEAL"
+
+msgid "satispay_threshold"
+msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite Satispay."
+
+msgid "mybank_threshold"
+msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite MyBank."
+
+msgid "giropay_threshold"
+msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite Giropay."
+
+msgid "sofort_threshold"
+msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite Sofort."
+
+msgid "ideal_threshold"
+msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite iDEAL."
+
+msgid "payplug_satispay_activate"
+msgstr "Pagamento Satispay"
+
+msgid "payplug_satispay_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/8089121532700-Satispay-chez-Payplug"
+
+msgid "payplug_mybank_activate"
+msgstr "Pagamento MyBank"
+
+msgid "payplug_mybank_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/8089123857564-MyBank-chez-Payplug"
+
+msgid "payplug_sofort_activate"
+msgstr "Pagamento Sofort"
+
+msgid "payplug_sofort_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/8089091941660-Sofort-chez-Payplug"
+
+msgid "payplug_giropay_activate"
+msgstr "Pagamento Giropay"
+
+msgid "payplug_giropay_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/8089089179420"
+
+msgid "payplug_ideal_activate"
+msgstr "Pagamento iDEAL"
+
+msgid "payplug_ideal_more_url"
+msgstr "https://support.payplug.com/hc/it/articles/8089119071132"
+
+msgid "payplug_satispay_unavailable_testmode_description"
+msgstr "Satispay non è disponibile in modalità TEST. Per attivarlo, è necessario mettere il modulo Payplug in modalità LIVE."
+
+msgid "payplug_mybank_unavailable_testmode_description"
+msgstr "Mybank non è disponibile in modalità TEST. Per attivarlo, è necessario mettere il modulo Payplug in modalità LIVE."
+
+msgid "payplug_sofort_unavailable_testmode_description"
+msgstr "Sofort non è disponibile in modalità TEST. Per attivarlo, è necessario mettere il modulo Payplug in modalità LIVE."
+
+msgid "payplug_giropay_unavailable_testmode_description"
+msgstr "Giropay non è disponibile in modalità TEST. Per attivarlo, è necessario mettere il modulo Payplug in modalità LIVE."
+
+msgid "payplug_ideal_unavailable_testmode_description"
+msgstr "iDeal non è disponibile in modalità TEST. Per attivarlo, è necessario mettere il modulo Payplug in modalità LIVE."
+
+msgid "payplug_section_satispay_payment_description"
+msgstr "Permetti ai tuoi clienti di pagare con Satispay."
+
+msgid "payplug_section_mybank_payment_description"
+msgstr "Permetti ai tuoi clienti di pagare con Mybank."
+
+msgid "payplug_section_sofort_payment_description"
+msgstr "Permetti ai tuoi clienti di pagare con Sofort."
+
+msgid "payplug_section_giropay_payment_description"
+msgstr "Permetti ai tuoi clienti di pagare con Giropay."
+
+msgid "payplug_section_ideal_payment_description"
+msgstr "Permetti ai tuoi clienti di pagare con iDeal."
+
+msgid "payplug_satispay_access_error"
+msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Satispay, compila <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=8248599064860' target='_blank'>questo modulo</a>"
+
+msgid "payplug_mybank_access_error"
+msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare MyBank, compila <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=8248631711516' target='_blank'>questo modulo</a>"
+
+msgid "payplug_sofort_access_error"
+msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Sofort, compila <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=8248655934108' target='_blank'>questo modulo</a>"
+
+msgid "payplug_giropay_access_error"
+msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Giropay, compila <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=8248632664476' target='_blank'>questo modulo</a>"
+
+msgid "payplug_ideal_access_error"
+msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare iDEAL, compila <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=8248663314844' target='_blank'>questo modulo</a>"
+
+msgid "payplug_refund_disabled_error"
+msgstr ""
+"Il rimborso automatico non è possibile dal tuo Portale.\n"
+"Contatta supporto@payplug.com"
+
+msgid "payplug_integrated_access_error"
+msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Integrated Payments, compila <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=5965121371548' target='_blank'>questo modulo</a>"

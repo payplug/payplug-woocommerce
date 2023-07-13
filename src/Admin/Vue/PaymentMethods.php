@@ -21,9 +21,9 @@ class PaymentMethods {
 		];
 
 		switch($option){
-			case "popup" : $method["popup"] = true;break;
+			case "redirect" : $method["redirect"] = true;break;
 			case "integrated" : $method["integrated"] = true;break;
-			default: $method["redirect"] = true;break;
+			default: $method["popup"] = true;break;
 		}
 
 		return [
@@ -138,27 +138,26 @@ class PaymentMethods {
 	 */
 	public function embeded_option($method) {
 
-		$options = [];
-
-		if ( (isset( get_option( 'woocommerce_payplug_settings', [] )['can_use_integrated_payments'] ) ) && (get_option( 'woocommerce_payplug_settings', [] )['can_use_integrated_payments'] === true)) {
-			array_push($options, $this->integrated_payment($method));
-		}
-
-		$embeded = [
+		$options = Array(
+			array(
+				"name"    => "payplug_embedded",
+				"label"   => __( 'payplug_section_standard_payment_option_integrated_label', 'payplug' ),
+				"value"   => "integrated",
+				"checked" => $method['integrated']
+			),
+			array(
 			"name"  => "payplug_embedded",
 			"label" => __( 'payplug_section_standard_payment_option_popup_label', 'payplug' ),
 			"value" => "popup",
 			"checked" => $method['popup']
-		];
-
-		$redirect = [
+			),
+			array(
 			"name"    => "payplug_embedded",
 			"label"   => __( 'payplug_section_standard_payment_option_redirected_label', 'payplug' ),
 			"value"   => "redirect",
 			"checked" => $method['redirect']
-		];
-
-		array_push($options, $embeded, $redirect);
+			)
+		);
 
 		return [
 			"type"         => "payment_option",
@@ -267,13 +266,106 @@ class PaymentMethods {
 		];
 	}
 
-	public static function integrated_payment($method) {
-			return [
-				"name"    => "payplug_integrated",
-				"label"   => __( 'payplug_section_standard_payment_option_integrated_label', 'payplug' ),
-				"value"   => "integrated",
-				"checked" => $method['integrated']
-			];
+	public static function payment_method_satispay( $active = false ) {
+		return [
+			"type" => "payment_method",
+			"name" => "satispay",
+			"title" => __( 'payplug_satispay_activate', 'payplug' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/satispay.svg' ),
+			"checked" =>  $active,
+			"available_test_mode" => false,
+			"descriptions" => [
+				"live"    => [
+					"description"      => __( 'payplug_section_satispay_payment_description', 'payplug' ),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_satispay_more_url', 'payplug' ), "_blank"),
+				],
+				"sandbox" => [
+					"description"      => __( 'payplug_satispay_unavailable_testmode_description', 'payplug' ),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_satispay_more_url', 'payplug' ), "_blank"),
+				]
+			],
+		];
 	}
+	public static function payment_method_mybank( $active = false ) {
+		return [
+			"type" => "payment_method",
+			"name" => "mybank",
+			"title" => __( 'payplug_mybank_activate', 'payplug' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/mybank.svg' ),
+			"checked" =>  $active,
+			"available_test_mode" => false,
+			"descriptions" => [
+				"live"    => [
+					"description"      => __( 'payplug_section_mybank_payment_description', 'payplug' ),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_mybank_more_url', 'payplug' ), "_blank"),
+				],
+				"sandbox" => [
+					"description"      => __( 'payplug_mybank_unavailable_testmode_description', 'payplug' ),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_mybank_more_url', 'payplug' ), "_blank"),
+				]
+			],
+		];
+	}
+	public static function payment_method_sofort( $active = false ) {
+		return [
+			"type" => "payment_method",
+			"name" => "sofort",
+			"title" => __( 'payplug_sofort_activate', 'payplug' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/sofort.svg' ),
+			"checked" =>  $active,
+			"available_test_mode" => false,
+			"descriptions" => [
+				"live"    => [
+					"description"      => __( 'payplug_section_sofort_payment_description', 'payplug' ),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_sofort_more_url', 'payplug' ), "_blank"),
+				],
+				"sandbox" => [
+					"description"      => __( 'payplug_sofort_unavailable_testmode_description', 'payplug' ),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_sofort_more_url', 'payplug' ), "_blank"),
+				]
+			],
+		];
+	}
+	public static function payment_method_giropay( $active = false ) {
+		return [
+			"type" => "payment_method",
+			"name" => "giropay",
+			"title" => __( 'payplug_giropay_activate', 'payplug' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/giropay.svg' ),
+			"checked" =>  $active,
+			"available_test_mode" => false,
+			"descriptions" => [
+				"live"    => [
+					"description"      => __( 'payplug_section_giropay_payment_description', 'payplug' ),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_giropay_more_url', 'payplug' ), "_blank"),
+				],
+				"sandbox" => [
+					"description"      => __( 'payplug_giropay_unavailable_testmode_description', 'payplug' ),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_giropay_more_url', 'payplug' ), "_blank"),
+				]
+			],
+		];
+	}
+	public static function payment_method_ideal( $active = false ) {
+		return [
+			"type" => "payment_method",
+			"name" => "ideal",
+			"title" => __( 'payplug_ideal_activate', 'payplug' ),
+			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/ideal.svg' ),
+			"checked" =>  $active,
+			"available_test_mode" => false,
+			"descriptions" => [
+				"live"    => [
+					"description"      => __( 'payplug_section_ideal_payment_description', 'payplug' ),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_ideal_more_url', 'payplug' ), "_blank"),
+				],
+				"sandbox" => [
+					"description"      => __( 'payplug_ideal_unavailable_testmode_description', 'payplug' ),
+					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_ideal_more_url', 'payplug' ), "_blank"),
+				]
+			],
+		];
+	}
+
 
 }
