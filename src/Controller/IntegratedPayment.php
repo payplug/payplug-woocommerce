@@ -84,6 +84,10 @@ HTML;
 HTML;
 	}
 
+	/**
+	 * return bool if it was enabled auto or not
+	 * @return bool
+	 */
 	public function enable_ip(){
 
 		//save into transaction the IP permissions
@@ -91,6 +95,7 @@ HTML;
 		$this->options['update_gateway'] = true;
 		$this->options['can_use_integrated_payments'] = true;
 		update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $this->options) );
+		return true;
 	}
 
 	//refered to https://payplug-prod.atlassian.net/browse/WOOC-772
@@ -109,18 +114,19 @@ HTML;
 	public function ip_permissions(){
 
 		$options          = get_option('woocommerce_payplug_settings', []);
+		$live_key = PayplugWoocommerceHelper::get_live_key();
+
+		if( empty($live_key)){
+			return false;
+		}
 
 		try {
-			if (!empty(PayplugWoocommerceHelper::get_live_key())) {
-				$permissions = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-				PayplugWoocommerceHelper::set_transient_data($permissions, $options);
-			} else {
-				return false;
-			}
+			$permissions = Authentication::getAccount( new Payplug( $live_key ) );;
+			PayplugWoocommerceHelper::set_transient_data( $permissions, $options );
 
-		} catch (\Payplug\Exception\UnauthorizedException $e) {
-		} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
-		} catch( \Payplug\Exception\ForbiddenException $e){
+		} catch ( \Payplug\Exception\UnauthorizedException $e ) {
+		} catch ( \Payplug\Exception\ConfigurationNotSetException $e ) {
+		} catch ( \Payplug\Exception\ForbiddenException $e ) {
 		} catch (\Payplug\Exception\ForbiddenException $e){return array();}
 
 
@@ -137,7 +143,7 @@ HTML;
 
 	public function already_updated(){
 
-		if(empty($this->options['update_gateway'])){
+		if( empty($this->options['update_gateway']) || (!empty($this->options['update_gateway']) && !$this->options['update_gateway'] ) ){
 			return false;
 		}
 
