@@ -642,7 +642,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$this->integrated_payments_scripts();
 		}
 
-		if ($this->payment_method == "popup" ) {
+		if (($this->payment_method == "popup" ) && ($this->id === "payplug")) {
 
 			//load popup features
 			//TODO:: if integrated payment is not active please active this and comment the one bellow
