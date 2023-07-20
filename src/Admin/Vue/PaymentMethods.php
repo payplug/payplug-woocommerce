@@ -51,6 +51,7 @@ class PaymentMethods {
 				$this->one_click_option(),
 			],
 			"integrated_warning" =>  __( 'payplug_section_standard_ip_warning', 'payplug' ),
+			"show_ip_warning" => $method['integrated']
 		];
 	}
 
