@@ -637,22 +637,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		// Register checkout styles.
 		wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('payplug-checkout');
-		//$ip_was_activated = false;
 
-		$ip_was_activated = $this->activate_integrated_payments();
-		$transient_key = PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', []));
-		$ip = get_transient($transient_key);
-		if( $ip_was_activated || ((isset($ip['permissions']['can_use_integrated_payments']) && ($ip['permissions']['can_use_integrated_payments'] === true)) && ($this->payment_method == "integrated")) ){
+		if ($this->payment_method == "integrated" ) {
 			$this->integrated_payments_scripts();
-			$ip_was_activated = true;
-
 		}
 
-		if ($this->payment_method == "popup" && !$ip_was_activated && $this->id === "payplug") {
+		if (($this->payment_method == "popup" ) && ($this->id === "payplug")) {
 
-			wp_dequeue_style("payplugIP");
-			wp_dequeue_script('payplug-integrated-payments-api');
-			wp_dequeue_script('payplug-integrated-payments');
 			//load popup features
 			//TODO:: if integrated payment is not active please active this and comment the one bellow
 			wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
@@ -1899,47 +1890,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 	public function setPayplugMerchantCountry($country){
 		$this->payplug_merchant_country = $country;
-	}
-
-	public function activate_integrated_payments(){
-
-		if($this->id !== "payplug"){
-			return false;
-		}
-		//get options
-		$options = get_option('woocommerce_payplug_settings', []);
-
-		if($options["enabled"] != "yes"){
-			return false;
-		}
-
-		$ip = new IntegratedPayment($options);
-		$ip_permissions = $ip->ip_permissions();
-
-		//if test mode && IP is enabled (from bo)
-		if($options['mode'] === 'no' && $options["payment_method"] === "integrated" ){
-			return true;
-		}
-
-		if(!$ip_permissions){
-			$ip->disable_ip();
-			wp_dequeue_style("payplugIP");
-			wp_dequeue_script('payplug-integrated-payments-api');
-			wp_dequeue_script('payplug-integrated-payments');
-			return false;
-		}
-
-		if($ip->already_updated()){
-			return false;
-		}
-
-
-		$ip->enable_ip();
-		$this->payment_method = "integrated";
-
-		return true;
-
-
 	}
 
 }
