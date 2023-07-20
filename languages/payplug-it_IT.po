@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1195,3 +1195,6 @@ msgstr ""
 
 msgid "payplug_integrated_access_error"
 msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Integrated Payments, compila <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=5965121371548' target='_blank'>questo modulo</a>"
+
+msgid "payplug_section_standard_ip_warning"
+msgstr "La visualizzazione del pagamento integrato è compatibile solo con una pagina di pagamento standard che soddisfi le linee guida di WooCommerce. Alcune personalizzazioni del checkout non consentiranno il funzionamento della funzione (modifica del pulsante \"Effettua ordine\", ecc.)."

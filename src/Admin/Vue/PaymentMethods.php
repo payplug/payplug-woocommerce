@@ -49,7 +49,8 @@ class PaymentMethods {
 				$this->description_field(),
 				$this->embeded_option($method),
 				$this->one_click_option(),
-			]
+			],
+			"integrated_warning" =>  __( 'payplug_section_standard_ip_warning', 'payplug' ),
 		];
 	}
 
