@@ -13,7 +13,6 @@ class PaymentMethods {
 
 		$option = (get_option( 'woocommerce_payplug_settings', [] )['payment_method'] != "") ? get_option( 'woocommerce_payplug_settings', [] )['payment_method'] : "";
 
-
 		$method = [
 			"redirect" => false,
 			"popup"	  => false,
@@ -48,10 +47,9 @@ class PaymentMethods {
 				$this->title_field(),
 				$this->description_field(),
 				$this->embeded_option($method),
-				$this->one_click_option(),
+				$this->standard_warning_message(),
+				$this->one_click_option()
 			],
-			"integrated_warning" =>  __( 'payplug_section_standard_ip_warning', 'payplug' ),
-			"show_ip_warning" => $method['integrated']
 		];
 	}
 
@@ -94,6 +92,22 @@ class PaymentMethods {
 					]
 				],
 		);
+	}
+
+	/**
+	 * @param $active
+	 *
+	 * @return array|bool[]|false[]
+	 */
+	public function standard_warning_message( $active = null ) {
+		$arr = [
+			"type"         => "warning_message",
+			"sub_type"     => "warning",
+			"name"         => "warning_message",
+			"description"  => __( 'payplug_section_standard_ip_warning', 'payplug' )
+		];
+
+		return $arr;
 	}
 
 	/**
