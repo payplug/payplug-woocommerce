@@ -1176,6 +1176,10 @@
 .bootstrap .payplugUISelect.-disabled ._listWrapper {
   display: none !important;
 }
+.bootstrap span.fade-in {
+  opacity: 0.5;
+  transition: opacity 0.2s ease-in-out;
+}
 .bootstrap .payplugUISwitch ._switch {
   position: relative;
   vertical-align: middle;
