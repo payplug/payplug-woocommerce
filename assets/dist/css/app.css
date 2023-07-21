@@ -204,7 +204,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: start;
   margin: 0 0 12px;
 }
 .payplugUIComponentsList section:not(.payplugUiBlock) > div > div {
@@ -441,7 +441,7 @@
   border-radius: 4px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: start;
   width: 100%;
   max-width: 1000px;
   position: relative;
@@ -1547,7 +1547,7 @@
   height: calc(36em / 12);
   padding: 0 12px;
   background: #FAFAFB;
-  justify-content: flex-start;
+  justify-content: start;
 }
 .generalBlock.-logged ._userPortal.-icon .payplugUIIcon {
   margin-right: 10px;
@@ -1567,7 +1567,7 @@
 .generalBlock.-logged ._sandbox {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: start;
   flex-wrap: wrap;
   margin: 0 0 36px;
 }
