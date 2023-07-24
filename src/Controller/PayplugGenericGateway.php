@@ -116,17 +116,10 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
 			//check if country is allowed
 			if ( in_array( $country_code_billing, $this->allowed_country_codes ) ) {
-
-				//billing and shipping should be the same country
-				if ( ! $this->validate_shipping_billing_country( $country_code_shipping, $country_code_billing ) ) {
-					$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __( 'Unavailable for the specified country.', 'payplug' ) . '</div>';
-
-					return false;
-				}
-
 				return true;
 
 			} else {
+				$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __( 'Unavailable for the specified country.', 'payplug' ) . '</div>';
 				return false;
 			}
 		} else {
@@ -298,23 +291,6 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		if ($this->id === $order->get_payment_method() ) {
 			echo "<p style='color: red;'>" . __('payplug_refund_disabled_error', 'payplug') . "</p>";
 		}
-	}
-
-	/**
-	 *
-	 * Billing and shipping addresses should have the same country and allowed by Oney
-	 * https://payplug-prod.atlassian.net/browse/WOOC-227
-	 *
-	 * @param $order
-	 * @return bool
-	 *
-	 */
-	private function validate_shipping_billing_country($shipping_country, $billing_country)
-	{
-		if($billing_country === $shipping_country)
-			return true;
-
-		return false;
 	}
 
 	/**
