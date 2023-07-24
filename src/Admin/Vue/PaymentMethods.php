@@ -101,10 +101,11 @@ class PaymentMethods {
 	 */
 	public function standard_warning_message( $active = null ) {
 		$arr = [
-			"type"         => "warning_message",
-			"sub_type"     => "warning",
-			"name"         => "warning_message",
-			"description"  => __( 'payplug_section_standard_ip_warning', 'payplug' )
+			"type"         		=> "warning_message",
+			"sub_type"     		=> "warning",
+			"name"        		=> "warning_message",
+			"payment_method"	=> "integrated",
+			"description"  		=> __( 'payplug_section_standard_ip_warning', 'payplug' )
 		];
 
 		return $arr;
