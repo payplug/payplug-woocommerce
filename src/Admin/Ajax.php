@@ -231,8 +231,6 @@ class Ajax {
 			return false;
 		}
 
-		PayplugWoocommerceHelper::set_transient_data($account);
-
 		if(isset($account['httpResponse']['payment_methods']['bancontact']['enabled']) && $account['httpResponse']['payment_methods']['bancontact']['enabled']){
 			wp_send_json_success(true);
 		}
@@ -267,7 +265,6 @@ class Ajax {
 			return false;
 		}
 
-		PayplugWoocommerceHelper::set_transient_data($account);
 		$applepay = false;
 
 		if ($account['httpResponse']['payment_methods']['apple_pay']['enabled']) {
@@ -310,23 +307,16 @@ class Ajax {
 			return false;
 		}
 
-		PayplugWoocommerceHelper::set_transient_data($account);
-
 		if(isset($account['httpResponse']['payment_methods']['american_express']['enabled']) && $account['httpResponse']['payment_methods']['american_express']['enabled']){
 			wp_send_json_success(true);
 		}
 
-		$enabled = isset($account['httpResponse']['payment_methods']['american_express']['enabled']) ? $account['httpResponse']['payment_methods']['american_express']['enabled']: false;
+		wp_send_json_error(array(
+			"title" => __( 'payplug_enable_feature', 'payplug' ),
+			"msg" => __( 'payplug_amex_access_error', 'payplug' ),
+			"close" => __( 'payplug_ok', 'payplug' )
+		));
 
-		if(!$enabled){
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_amex_access_error', 'payplug' ),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
-		}
-
-		wp_send_json_success($enabled);
 	}
 
 	public function api_check_oney_permissions(WP_REST_Request $request) {
@@ -349,8 +339,6 @@ class Ajax {
 			wp_send_json_error(["error" => $e->getMessage()]);
 			return false;
 		}
-
-		PayplugWoocommerceHelper::set_transient_data($account);
 
 		if(isset($account['httpResponse']['permissions']['can_use_oney']) && $account['httpResponse']['permissions']['can_use_oney']){
 			wp_send_json_success(true);
@@ -395,8 +383,6 @@ class Ajax {
 			return false;
 		}
 
-		PayplugWoocommerceHelper::set_transient_data($account);
-
 		$enabled = isset($account['httpResponse']['payment_methods']['satispay']['enabled']) ? $account['httpResponse']['payment_methods']['satispay']['enabled']: false;
 		if(!$enabled){
 			wp_send_json_error(array(
@@ -430,8 +416,6 @@ class Ajax {
 			));
 			return false;
 		}
-
-		PayplugWoocommerceHelper::set_transient_data($account);
 
 		$enabled = isset($account['httpResponse']['payment_methods']['mybank']['enabled']) ? $account['httpResponse']['payment_methods']['mybank']['enabled']: false;
 		if(!$enabled){
@@ -467,8 +451,6 @@ class Ajax {
 			return false;
 		}
 
-		PayplugWoocommerceHelper::set_transient_data($account);
-
 		$enabled = isset($account['httpResponse']['payment_methods']['sofort']['enabled']) ? $account['httpResponse']['payment_methods']['sofort']['enabled']: false;
 		if(!$enabled){
 			wp_send_json_error(array(
@@ -503,7 +485,6 @@ class Ajax {
 			return false;
 		}
 
-		PayplugWoocommerceHelper::set_transient_data($account);
 		$enabled = isset($account['httpResponse']['payment_methods']['giropay']['enabled']) ? $account['httpResponse']['payment_methods']['giropay']['enabled']: false;
 		if(!$enabled){
 			wp_send_json_error(array(
@@ -538,8 +519,6 @@ class Ajax {
 			return false;
 		}
 
-		PayplugWoocommerceHelper::set_transient_data($account);
-
 		$enabled = isset($account['httpResponse']['payment_methods']['ideal']['enabled']) ? $account['httpResponse']['payment_methods']['ideal']['enabled']: false;
 		if(!$enabled){
 			wp_send_json_error(array(
@@ -552,11 +531,12 @@ class Ajax {
 		wp_send_json_success($enabled);
 	}
 
-	private function getAccount(){
+	//TODO:: WTF, why repetition?
+	private function getAccount($test_mode){
 		// Checking in Live Mode
 		try{
 			// In case the account is inactive use the test key instead of live key
-			$key = PayplugWoocommerceHelper::get_live_key() ? PayplugWoocommerceHelper::get_live_key() : PayplugWoocommerceHelper::get_test_key();
+			$key = $test_mode ? PayplugWoocommerceHelper::get_test_key() : PayplugWoocommerceHelper::get_live_key();
 			$account = Authentication::getAccount(new Payplug($key));
 
 		}  catch (PayplugException $e){
@@ -775,8 +755,6 @@ class Ajax {
 
 			$data = $request->get_params();
 			$options = get_option('woocommerce_payplug_settings', []);
-			$account = $this->getAccount();
-			PayplugWoocommerceHelper::set_transient_data($account);
 
 			$options['enabled'] = Validator::enabled($data['payplug_enable']);
 			$options['mode'] = Validator::mode($data['payplug_sandbox']);
@@ -810,6 +788,10 @@ class Ajax {
 
 			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
 			http_response_code(200);
+
+			//TODO:: do we need this?
+			$account = $this->getAccount($test_mode);
+			PayplugWoocommerceHelper::set_transient_data($account);
 
 			wp_send_json_success( array(
 				"title" => null,

@@ -4,8 +4,8 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 4.4
 Tested up to: 6.2.2
 Requires PHP: 5.6
-Stable tag: 2.6.0
-VueJs Payplug UI lib tag: 1.3.0
+Stable tag: 2.6.1
+VueJs Payplug UI lib tag: 1.5.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -81,12 +81,16 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 2.6.1 =
+* Minor fixes and improvements
+* Tested up to Woocommerce 7.9.0
+* Tested up to Wordpress 6.2.2
 
 = 2.6.0 =
 * New local payment methods: Giropay, Satispay, MyBank, iDEAL, SOFORT
 * Minor fixes & improvements
 * Tested up to Woocommerce 7.8
-* Tested up to Wordpress 6.2
+* Tested up to Wordpress 6.2.2
 
 = 2.5.3 =
 * Minor bug fixes to avoid double IPNs

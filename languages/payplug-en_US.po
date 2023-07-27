@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 msgid "payplug_advanced_settings"
 msgstr "Advanced Settings"
@@ -482,7 +482,7 @@ msgid "pay_with_giropay"
 msgstr "Pay with Giropay"
 
 msgid "pay_with_sofort"
-msgstr "Pay with Sofort"
+msgstr "Pay with SOFORT"
 
 msgid "pay_with_ideal"
 msgstr "Pay with iDEAL"
@@ -497,7 +497,7 @@ msgid "giropay_threshold"
 msgstr "The total amount of your order should be between %s€ and %s€ to pay with Giropay."
 
 msgid "sofort_threshold"
-msgstr "The total amount of your order should be between %s€ and %s€ to pay with Sofort."
+msgstr "The total amount of your order should be between %s€ and %s€ to pay with SOFORT."
 
 msgid "ideal_threshold"
 msgstr "The total amount of your order should be between %s€ and %s€ to pay with iDEAL."
@@ -515,7 +515,7 @@ msgid "payplug_mybank_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/8089123857564-MyBank-chez-Payplug"
 
 msgid "payplug_sofort_activate"
-msgstr "Sofort payments"
+msgstr "SOFORT payments"
 
 msgid "payplug_sofort_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/8089091941660-Sofort-chez-Payplug"
@@ -539,7 +539,7 @@ msgid "payplug_mybank_unavailable_testmode_description"
 msgstr "Mybank is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
 
 msgid "payplug_sofort_unavailable_testmode_description"
-msgstr "Sofort is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+msgstr "SOFORT is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
 
 msgid "payplug_giropay_unavailable_testmode_description"
 msgstr "Giropay is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
@@ -554,7 +554,7 @@ msgid "payplug_section_mybank_payment_description"
 msgstr "Allow your customers to pay via Mybank."
 
 msgid "payplug_section_sofort_payment_description"
-msgstr "Allow your customers to pay via Sofort."
+msgstr "Allow your customers to pay via SOFORT."
 
 msgid "payplug_section_giropay_payment_description"
 msgstr "Allow your customers to pay via Giropay."
@@ -569,7 +569,7 @@ msgid "payplug_mybank_access_error"
 msgstr "You don't have access to this feature yet. To activate MyBank, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248631711516' target='_blank'>the following form</a>"
 
 msgid "payplug_sofort_access_error"
-msgstr "You don't have access to this feature yet. To activate Sofort, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248655934108' target='_blank'>the following form</a>"
+msgstr "You don't have access to this feature yet. To activate SOFORT, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248655934108' target='_blank'>the following form</a>"
 
 msgid "payplug_giropay_access_error"
 msgstr "You don't have access to this feature yet. To activate Giropay, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248632664476' target='_blank'>the following form</a>"
@@ -579,8 +579,11 @@ msgstr "You don't have access to this feature yet. To activate iDEAL, please fil
 
 msgid "payplug_refund_disabled_error"
 msgstr ""
-"The automatic refund is not available from your Portal.\n"
+"The automatic refund is not available.\n"
 "Please contact support@payplug.com"
 
 msgid "payplug_integrated_access_error"
 msgstr "You don't have access to this feature yet. To activate Integrated Payments, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=6331992459420' target='_blank'>the following form</a>"
+
+msgid "payplug_section_standard_ip_warning"
+msgstr "The Embedded Payment display is only compatible with a standardized checkout page that meets the WooCommerce guidelines. Some checkout customizations will not allow the feature to work (changing the “Place order” button, etc.)."

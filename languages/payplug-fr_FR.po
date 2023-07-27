@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1093,7 +1093,7 @@ msgid "pay_with_giropay"
 msgstr "Payer avec Giropay"
 
 msgid "pay_with_sofort"
-msgstr "Payer avec Sofort"
+msgstr "Payer avec SOFORT"
 
 msgid "pay_with_ideal"
 msgstr "Payer avec iDEAL"
@@ -1108,7 +1108,7 @@ msgid "giropay_threshold"
 msgstr "Le montant total de votre panier doit être compris entre %s€ and %s€ pour payer avec Giropay."
 
 msgid "sofort_threshold"
-msgstr "Le montant total de votre panier doit être compris entre %s€ and %s€ pour payer avec Sofort."
+msgstr "Le montant total de votre panier doit être compris entre %s€ and %s€ pour payer avec SOFORT."
 
 msgid "ideal_threshold"
 msgstr "Le montant total de votre panier doit être compris entre %s€ and %s€ pour payer avec iDEAL."
@@ -1126,7 +1126,7 @@ msgid "payplug_mybank_more_url"
 msgstr "https://support.payplug.com/hc/fr/articles/8089123857564-MyBank-chez-Payplug"
 
 msgid "payplug_sofort_activate"
-msgstr "Paiement Sofort"
+msgstr "Paiement SOFORT"
 
 msgid "payplug_sofort_more_url"
 msgstr "https://support.payplug.com/hc/fr/articles/8089091941660-Sofort-chez-Payplug"
@@ -1150,7 +1150,7 @@ msgid "payplug_mybank_unavailable_testmode_description"
 msgstr "Mybank n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
 
 msgid "payplug_sofort_unavailable_testmode_description"
-msgstr "Sofort n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
+msgstr "SOFORT n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
 
 msgid "payplug_giropay_unavailable_testmode_description"
 msgstr "Giropay n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
@@ -1165,7 +1165,7 @@ msgid "payplug_section_mybank_payment_description"
 msgstr "Permettez à vos clients de payer via Mybank."
 
 msgid "payplug_section_sofort_payment_description"
-msgstr "Permettez à vos clients de payer via Sofort."
+msgstr "Permettez à vos clients de payer via SOFORT."
 
 msgid "payplug_section_giropay_payment_description"
 msgstr "Permettez à vos clients de payer via Giropay."
@@ -1180,7 +1180,7 @@ msgid "payplug_mybank_access_error"
 msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer MyBank, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=8248631711516' target='_blank'>ce formulaire</a>"
 
 msgid "payplug_sofort_access_error"
-msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Sofort, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=8248655934108' target='_blank'>ce formulaire</a>"
+msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer SOFORT, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=8248655934108' target='_blank'>ce formulaire</a>"
 
 msgid "payplug_giropay_access_error"
 msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Giropay, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=8248632664476' target='_blank'>ce formulaire</a>"
@@ -1190,8 +1190,11 @@ msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer iDE
 
 msgid "payplug_refund_disabled_error"
 msgstr ""
-"Le remboursement automatique n’est pas réalisable depuis votre Portail.\n"
+"Le remboursement automatique n’est pas réalisable.\n"
 "Veuillez contacter support@payplug.com"
 
 msgid "payplug_integrated_access_error"
 msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Integrated Payments, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=5965121371548' target='_blank'>ce formulaire</a>"
+
+msgid "payplug_section_standard_ip_warning"
+msgstr "L’affichage du paiement intégré est seulement compatible avec une page de paiement standard respectant les directives WooCommerce. Certains cas de personnalisation du checkout ne permettront pas le fonctionnement du paiement intégré (modification du bouton “Commander”, etc.)."
