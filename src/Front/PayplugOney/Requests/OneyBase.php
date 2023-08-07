@@ -123,13 +123,12 @@ HTML;
 	{
 		if ( (is_product()) && PayplugWoocommerceHelper::is_oney_available()) {
 			global $product;
-
-			$total_price = (is_numeric( floatval(WC()->cart->total))) ? floatval(WC()->cart->total) : (float)($product->get_price());
-			$this->oney->setTotalPrice($total_price);
+			$price = $product->get_price();
+			$this->oney->setTotalPrice($price);
 			$this->oney->handleTotalProducts();
 
 			//don't show animation
-			if ( !PayplugWoocommerceHelper::check_order_max_amount($this->oney->getTotalPrice()) ) {
+			if ( !PayplugWoocommerceHelper::check_order_max_amount($product->get_price()) ) {
 				return false;
 			}
 
