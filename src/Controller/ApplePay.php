@@ -11,7 +11,6 @@ use Payplug\Resource\Payment as PaymentResource;
 class ApplePay extends PayplugGateway
 {
 
-	protected $enable = false;
 	protected $domain_name = "";
 
 	public function __construct()
@@ -31,8 +30,11 @@ class ApplePay extends PayplugGateway
 		$this->description = '<div id="apple-pay-button-wrapper"><apple-pay-button buttonstyle="black" type="pay" locale="'. get_locale() .'"></apple-pay-button></div>';
 		$this->domain_name = $_SERVER['HTTP_HOST'];
 
-		if (!($this->checkApplePay() && $this->checkDeviceComptability() && $this->isSSL())) {
-			$this->enabled = 'no';
+		if(($this->checkApplePay() && is_admin())){
+			$this->enabled = true;
+
+		}else if (!($this->checkApplePay() && $this->checkDeviceComptability() && $this->isSSL())) {
+			$this->enabled = false;
 
 		} else {
 			add_action('wp_enqueue_scripts', [$this, 'add_apple_pay_css']);
