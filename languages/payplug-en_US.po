@@ -590,3 +590,6 @@ msgstr "The Embedded Payment display is only compatible with a standardized chec
 
 msgid "payment_method"
 msgstr "Payment method"
+
+msgid "payplug_payment_gateways_country_permissions"
+msgstr "%s is only available for payers with billing addresses in the following countries: "

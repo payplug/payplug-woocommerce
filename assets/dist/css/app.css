@@ -315,7 +315,6 @@
   justify-content: center;
   position: relative;
   padding: 16px 24px 16px 72px;
-  margin: 0 auto 24px;
   width: 100%;
   min-height: 103px;
   max-width: 1000px;
@@ -1245,7 +1244,7 @@
 .bootstrap .payplugUITitle {
   font-weight: 700;
   color: #212225;
-  margin: 0 0 8px;
+  margin: 8px 0 8px;
 }
 .bootstrap .payplugUITitle.-disabled {
   color: #D7D8D9;
@@ -1815,6 +1814,7 @@
   align-items: center;
   margin: 16px 0 0;
   position: relative;
+  flex-wrap: wrap;
 }
 .payplugConfiguration .paymentOption ._logo {
   border: 1px solid #C8D7E4;

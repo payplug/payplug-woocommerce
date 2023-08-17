@@ -2,6 +2,8 @@
 
 namespace Payplug\PayplugWoocommerce\Admin\Vue;
 
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+
 class PaymentMethods {
 
 	/**
@@ -283,6 +285,10 @@ class PaymentMethods {
 		];
 	}
 
+	/**
+	 * @param $active
+	 * @return array
+	 */
 	public static function payment_method_satispay( $active = false ) {
 		return [
 			"type" => "payment_method",
@@ -301,8 +307,16 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_satispay_more_url', 'payplug' ), "_blank"),
 				]
 			],
+			"options"      => [
+				self::get_allowed_countries("satispay")
+			],
 		];
 	}
+
+	/**
+	 * @param $active
+	 * @return array
+	 */
 	public static function payment_method_mybank( $active = false ) {
 		return [
 			"type" => "payment_method",
@@ -321,8 +335,16 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_mybank_more_url', 'payplug' ), "_blank"),
 				]
 			],
+			"options"      => [
+				self::get_allowed_countries("mybank")
+			],
 		];
 	}
+
+	/**
+	 * @param $active
+	 * @return array
+	 */
 	public static function payment_method_sofort( $active = false ) {
 		return [
 			"type" => "payment_method",
@@ -341,8 +363,16 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_sofort_more_url', 'payplug' ), "_blank"),
 				]
 			],
+			"options"      => [
+				self::get_allowed_countries("sofort")
+			],
 		];
 	}
+
+	/**
+	 * @param $active
+	 * @return array
+	 */
 	public static function payment_method_giropay( $active = false ) {
 		return [
 			"type" => "payment_method",
@@ -361,8 +391,16 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_giropay_more_url', 'payplug' ), "_blank"),
 				]
 			],
+			"options"      => [
+				self::get_allowed_countries("giropay")
+			],
 		];
 	}
+
+	/**
+	 * @param $active
+	 * @return array
+	 */
 	public static function payment_method_ideal( $active = false ) {
 		return [
 			"type" => "payment_method",
@@ -381,7 +419,33 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_ideal_more_url', 'payplug' ), "_blank"),
 				]
 			],
+			"options"      => [
+				self::get_allowed_countries("ideal")
+			],
 		];
+	}
+
+	/**
+	 * @param $id
+	 * @return false|string
+	 */
+	private static function get_allowed_countries($id){
+		$account = PayplugWoocommerceHelper::get_account_data_from_options();
+
+		if(empty($account['payment_methods'][$id])){
+			return false;
+		}
+
+		$arr = [
+			"type"         		=> "warning_message",
+			"sub_type"     		=> "warning",
+			"name"        		=> "warning_message",
+			"payment_method"	=> $id,
+			"description"  		=> sprintf(__("payplug_payment_gateways_country_permissions", "payplug"), str_replace("_", " ",ucfirst($id) )) . implode(", ", $account['payment_methods'][$id]['allowed_countries']) . "."
+		];
+
+		 return $arr;
+
 	}
 
 
