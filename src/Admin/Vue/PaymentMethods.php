@@ -20,9 +20,9 @@ class PaymentMethods {
 		];
 
 		switch($option){
-			case "redirect" : $method["redirect"] = true;break;
+			case "popup" : $method["popup"] = true;break;
 			case "integrated" : $method["integrated"] = true;break;
-			default: $method["popup"] = true;break;
+			default: $method["redirect"] = true;break;
 		}
 
 		return [
