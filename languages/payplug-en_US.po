@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "payplug_advanced_settings"
 msgstr "Advanced Settings"
@@ -587,3 +587,6 @@ msgstr "You don't have access to this feature yet. To activate Integrated Paymen
 
 msgid "payplug_section_standard_ip_warning"
 msgstr "The Embedded Payment display is only compatible with a standardized checkout page that meets the WooCommerce guidelines. Some checkout customizations will not allow the feature to work (changing the “Place order” button, etc.)."
+
+msgid "payment_method"
+msgstr "Payment method"
