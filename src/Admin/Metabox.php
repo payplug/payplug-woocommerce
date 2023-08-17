@@ -87,7 +87,7 @@ class Metabox {
 				</li>
 				<!-- PPRO methods don't have card brand info-->
 				<?php if(empty( $metadata['card_brand'])){ ?>
-					<li><span><?php _e( 'payment_method', 'payplug' ); ?>:</span> <?php echo ucfirst($order->get_payment_method()); ?></li>
+					<li><span><?php _e( 'payment_method', 'payplug' ); ?>:</span> <?php echo str_replace("_", " ",ucfirst($order->get_payment_method())); ?></li>
 				<?php } ?>
 				<li><span><?php _e( 'Amount', 'payplug' ); ?>
 						:</span> <?php echo wc_price( (int) $metadata['amount'] / 100 ); ?></li>
