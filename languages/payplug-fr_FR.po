@@ -1201,3 +1201,6 @@ msgstr "L’affichage du paiement intégré est seulement compatible avec une pa
 
 msgid "payment_method"
 msgstr "Moyen de paiement"
+
+msgid "payplug_payment_gateways_country_permissions"
+msgstr "%s est disponible  pour vos clients dont l’adresse de facturation se situe dans l’un des pays suivants: "
