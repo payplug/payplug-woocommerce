@@ -67,12 +67,20 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options( $this->id );
 
 		//account doesnt have permissions
-		if ( ( isset( $account["payment_methods"] ) ) && ( empty( $account["payment_methods"][ $this->id ] ) ) && ( ! $account["payment_methods"][ $this->id ]['enabled'] ) ) {
+		if (
+			( isset( $account["payment_methods"] ) ) &&
+			( empty( $account["payment_methods"][ $this->id ] ) ) &&
+			( ! $account["payment_methods"][ $this->id ]['enabled'] )
+		) {
 			return false;
 		}
 
 		//check if it's activated on the BO
-		if ( ! isset( $account['permissions'][ $this->id ] ) || ( isset( $account['permissions'][ $this->id ] ) && ! $account['permissions'][ $this->id ] ) ) {
+		if (
+			! isset( $account['permissions'][ $this->id ] ) ||
+			( isset( $account['permissions'][ $this->id ] ) &&
+				!$account['permissions'][ $this->id ] )
+		) {
 			return false;
 		}
 
@@ -105,12 +113,12 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 				return false;
 			}
 
-			if ( empty( $country_code_shipping ) || empty( $country_code_shipping ) ) {
+			if ( empty( $country_code_billing ) || empty( $country_code_shipping ) ) {
 				$country_code_shipping = WC()->customer->get_shipping_country();
 				$country_code_billing  = WC()->customer->get_billing_country();
 			}
 
-			if ( $this->allowed_country_codes === "ALL" || empty( $this->allowed_country_codes ) ) {
+			if ( in_array( "ALL", $this->allowed_country_codes) || empty( $this->allowed_country_codes ) ) {
 				return true;
 			}
 
@@ -122,14 +130,9 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 				$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __( 'Unavailable for the specified country.', 'payplug' ) . '</div>';
 				return false;
 			}
-		} else {
-			//check if it's activated on the BO
-			if ( ! isset( $account['permissions'][ $this->id ] ) || ( isset( $account['permissions'][ $this->id ] ) && ! $account['permissions'][ $this->id ] ) ) {
-				return false;
-			} else {
-				return true;
-			}
 		}
+
+		return true;
 	}
 
 	public function process_standard_payment($order, $amount, $customer_id)
