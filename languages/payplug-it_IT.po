@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1190,7 +1190,7 @@ msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare iDEAL, com
 
 msgid "payplug_refund_disabled_error"
 msgstr ""
-"Il rimborso automatico non è possibile.\n"
+"Il rimborso automatico non è possibile dal tuo back-office.\n"
 "Contatta supporto@payplug.com"
 
 msgid "payplug_integrated_access_error"
