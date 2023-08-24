@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 msgid "payplug_advanced_settings"
 msgstr "Advanced Settings"
@@ -579,7 +579,7 @@ msgstr "You don't have access to this feature yet. To activate iDEAL, please fil
 
 msgid "payplug_refund_disabled_error"
 msgstr ""
-"The automatic refund is not available.\n"
+"The automatic refund is not available from your back-office.\n"
 "Please contact support@payplug.com"
 
 msgid "payplug_integrated_access_error"
