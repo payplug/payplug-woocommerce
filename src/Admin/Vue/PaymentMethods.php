@@ -437,11 +437,11 @@ class PaymentMethods {
 		}
 
 		$arr = [
-			"type"         		=> "warning_message",
-			"sub_type"     		=> "warning",
-			"name"        		=> "warning_message",
+			"type"         		=> "info_message",
+			"sub_type"     		=> "text",
+			"name"        		=> "allowed_countries",
 			"payment_method"	=> $id,
-			"description"  		=> sprintf(__("payplug_payment_gateways_country_permissions", "payplug"), str_replace("_", " ",ucfirst($id) )) . implode(", ", $account['payment_methods'][$id]['allowed_countries']) . "."
+			"description"  		=> trim(sprintf(__("payplug_payment_gateways_country_permissions", "payplug"), ucfirst($id))) . implode(", ", $account['payment_methods'][$id]['allowed_countries']) . "."
 		];
 
 		 return $arr;
