@@ -15,7 +15,7 @@ class PayplugPayWithOney
 	 */
 	public function check_oney_frontend() {
 
-		if ( ( is_cart() || is_checkout()) && PayplugWoocommerceHelper::is_oney_available()) {
+		if ( ( is_cart() || is_checkout() || is_product()) && PayplugWoocommerceHelper::is_oney_available()) {
 
 			add_action('woocommerce_cart_totals_after_order_total', [$this, 'oney_simulate_payment_detail']);
 		//	add_action('woocommerce_review_order_before_payment', [$this, 'oney_simulate_payment_detail']);

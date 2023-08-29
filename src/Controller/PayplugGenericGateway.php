@@ -13,6 +13,7 @@ use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\HttpException;
 use Payplug\Exception\ForbiddenException;
 use Payplug\Payplug;
+use Payplug\Resource\Refund as RefundResource;
 
 class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuilder
 {
@@ -67,12 +68,20 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options( $this->id );
 
 		//account doesnt have permissions
-		if ( ( isset( $account["payment_methods"] ) ) && ( empty( $account["payment_methods"][ $this->id ] ) ) && ( ! $account["payment_methods"][ $this->id ]['enabled'] ) ) {
+		if (
+			( isset( $account["payment_methods"] ) ) &&
+			( empty( $account["payment_methods"][ $this->id ] ) ) &&
+			( ! $account["payment_methods"][ $this->id ]['enabled'] )
+		) {
 			return false;
 		}
 
 		//check if it's activated on the BO
-		if ( ! isset( $account['permissions'][ $this->id ] ) || ( isset( $account['permissions'][ $this->id ] ) && ! $account['permissions'][ $this->id ] ) ) {
+		if (
+			! isset( $account['permissions'][ $this->id ] ) ||
+			( isset( $account['permissions'][ $this->id ] ) &&
+				!$account['permissions'][ $this->id ] )
+		) {
 			return false;
 		}
 
@@ -105,12 +114,12 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 				return false;
 			}
 
-			if ( empty( $country_code_shipping ) || empty( $country_code_shipping ) ) {
+			if ( empty( $country_code_billing ) || empty( $country_code_shipping ) ) {
 				$country_code_shipping = WC()->customer->get_shipping_country();
 				$country_code_billing  = WC()->customer->get_billing_country();
 			}
 
-			if ( $this->allowed_country_codes === "ALL" || empty( $this->allowed_country_codes ) ) {
+			if ( in_array( "ALL", $this->allowed_country_codes) || empty( $this->allowed_country_codes ) ) {
 				return true;
 			}
 
@@ -122,14 +131,9 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 				$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __( 'Unavailable for the specified country.', 'payplug' ) . '</div>';
 				return false;
 			}
-		} else {
-			//check if it's activated on the BO
-			if ( ! isset( $account['permissions'][ $this->id ] ) || ( isset( $account['permissions'][ $this->id ] ) && ! $account['permissions'][ $this->id ] ) ) {
-				return false;
-			} else {
-				return true;
-			}
 		}
+
+		return true;
 	}
 
 	public function process_standard_payment($order, $amount, $customer_id)
@@ -240,28 +244,102 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		$order = wc_get_order($order_id);
 		if (!$order instanceof \WC_Order) {
 			PayplugGateway::log(sprintf('The order #%s does not exist.', $order_id), 'error');
-
 			return new \WP_Error('process_refund_error', sprintf(__('The order %s does not exist.', 'payplug'), $order_id));
 		}
 
 		if ($order->get_status() === "cancelled") {
 			PayplugGateway::log(sprintf('The order #%s cannot be refund.', $order_id), 'error');
-
 			return new \WP_Error('process_refund_error', sprintf(__('The order %s cannot be refund.', 'payplug'), $order_id));
 		}
 
 		$transaction_id = PayplugWoocommerceHelper::is_pre_30() ? get_post_meta($order_id, '_transaction_id', true) : $order->get_transaction_id();
 		if (empty($transaction_id)) {
 			PayplugGateway::log(sprintf('The order #%s does not have PayPlug transaction ID associated with it.', $order_id), 'error');
-
 			return new \WP_Error('process_refund_error', __('No PayPlug transaction was found for this order. The refund could not be processed.', 'payplug'));
 		}
 
-		add_action('admin_head', [$this, 'hide_wc_refund_button'] );
+		/**
+		* PPRO gateways feature!
+		 */
+		if( isset($this->enable_refund) && $this->enable_refund === false){
+			add_action('admin_head', [$this, 'hide_wc_refund_button'] );
+			PayplugGateway::log(__('payplug_refund_disabled_error', 'payplug'), 'error');
+			return new \WP_Error('process_refund_error', __('payplug_refund_disabled_error', 'payplug'));
+		}
 
-		//TODO:: add the refund process, for now we don't have any scenario where we allow refund for the new gateways
-		PayplugGateway::log(__('payplug_refund_disabled_error', 'payplug'), 'error');
-		return new \WP_Error('process_refund_error', __('payplug_refund_disabled_error', 'payplug'));
+		$customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
+		$data = [
+			'metadata' => [
+				'order_id'    => $order_id,
+				'customer_id' => ((int) $customer_id > 0) ? $customer_id : 'guest',
+				'refund_from' => 'woocommerce',
+			]
+		];
+
+		if (!is_null($amount)) {
+			$data['amount'] = PayplugWoocommerceHelper::get_payplug_amount($amount);
+		}
+
+		if (!empty($reason)) {
+			$data['metadata']['reason'] = $reason;
+		}
+
+		/**
+		 * Filter the refund data before it's used.
+		 *
+		 * @param array $data
+		 * @param int $order_id
+		 * @param string $transaction_id
+		 */
+		$data = apply_filters('payplug_gateway_refund_data', $data, $order_id, $transaction_id);
+
+		try {
+			$refund = $this->api->refund_create($transaction_id, $data);
+
+			/**
+			 * Fires once a refund has been created.
+			 *
+			 * @param int $order_id Order ID
+			 * @param RefundResource $refund Refund resource
+			 * @param string $transaction_id Transaction id
+			 */
+			\do_action('payplug_gateway_refund_created', $order_id, $refund, $transaction_id);
+
+			$refund_meta_key = sprintf('_pr_%s', wc_clean($refund->id));
+			if (PayplugWoocommerceHelper::is_pre_30()) {
+				update_post_meta($order_id, $refund_meta_key, $refund->id);
+			} else {
+				$order->add_meta_data($refund_meta_key, $refund->id, true);
+				$order->save();
+			}
+
+			$note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($refund->id), wc_price(((int) $refund->amount) / 100));
+			if (!empty($refund->metadata['reason'])) {
+				$note .= sprintf(' (%s)', esc_html($refund->metadata['reason']));
+			}
+			$order->add_order_note($note);
+
+			try {
+				$payment  = $this->api->payment_retrieve($transaction_id);
+				$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
+				PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
+			} catch (\Exception $e) {
+			}
+
+			PayplugGateway::log('Refund process complete for the order.');
+
+			return true;
+		} catch (HttpException $e) {
+			PayplugGateway::log(sprintf('Refund request error for the order %s from PayPlug API : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
+
+			return new \WP_Error('process_refund_error', __('The transaction could not be refunded. Please try again.', 'payplug'));
+		} catch (\Exception $e) {
+			PayplugGateway::log(sprintf('Refund request error for the order %s : %s', $order_id, wc_clean($e->getMessage())), 'error');
+
+			return new \WP_Error('process_refund_error', __('The transaction could not be refunded. Please try again.', 'payplug'));
+		}
+
+
 
 	}
 
