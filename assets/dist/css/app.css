@@ -1179,6 +1179,16 @@
   opacity: 0.5;
   transition: opacity 0.2s ease-in-out;
 }
+.bootstrap .payplugUIInfoSpan {
+  color: #909192;
+}
+.bootstrap .payplugUIInfoSpan.fade-in {
+  opacity: 0.5;
+  transition: opacity 0.2s ease-in-out;
+}
+.bootstrap .payplugUIInfoSpan .payplugUIIcon {
+  display: inline-block;
+}
 .bootstrap .payplugUISwitch ._switch {
   position: relative;
   vertical-align: middle;
