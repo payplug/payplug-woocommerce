@@ -86,7 +86,7 @@ class Metabox {
 					<?php endif; ?>
 				</li>
 				<!-- PPRO methods don't have card brand info-->
-				<?php if(empty( $metadata['card_brand'])){ ?>
+				<?php if( empty( $metadata['card_brand'] ) && $order->get_payment_method() != 'payplug' ){ ?>
 					<li><span><?php _e( 'payment_method', 'payplug' ); ?>:</span> <?php echo str_replace("_", " ",ucfirst($order->get_payment_method())); ?></li>
 				<?php } ?>
 				<li><span><?php _e( 'Amount', 'payplug' ); ?>
