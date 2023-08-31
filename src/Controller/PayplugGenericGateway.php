@@ -64,6 +64,11 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	public function checkGateway()
 	{
 
+		//check if module is enabled
+		if(!empty($this->settings['enabled']) && 'no' === $this->settings['enabled']){
+			return false;
+		}
+
 		//TODO:: MISSING saved configurations
 		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options( $this->id );
 
