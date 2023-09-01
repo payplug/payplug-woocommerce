@@ -432,10 +432,6 @@ class PaymentMethods {
 	private static function get_allowed_countries($id){
 		$account = PayplugWoocommerceHelper::get_account_data_from_options();
 
-		if(empty($account['payment_methods'][$id])){
-			return false;
-		}
-
 		$arr = [
 			"type"         		=> "info_message",
 			"sub_type"     		=> "text",
