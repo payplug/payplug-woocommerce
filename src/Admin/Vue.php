@@ -177,7 +177,7 @@ class Vue {
 					"password_placeholder" => __( 'payplug_section_login_password_label', 'payplug' ),
 					"link_forgot_password" => [
 						"text"   => __( 'payplug_section_login_forgot_password', 'payplug' ),
-						"url"    => "https://www.payplug.com/portal/forgot_password",
+						"url"    => "https://portal.payplug.com/forgot_password",
 						"target" => "_blank"
 					],
 				],
@@ -191,7 +191,7 @@ class Vue {
 					"password_placeholder" => __( 'payplug_section_login_password_label', 'payplug' ),
 					"link_forgot_password" => [
 						"text"   => __( 'payplug_section_login_forgot_password', 'payplug' ),
-						"url"    => "https://www.payplug.com/portal/forgot_password",
+						"url"    => "https://portal.payplug.com/forgot_password",
 						"target" => "_blank"
 					],
 				]

@@ -131,7 +131,7 @@ class PayplugWoocommerce {
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4x';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3xWithoutFees';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4xWithoutFees';
-		$methods[] = __NAMESPACE__ . '\\Controller\\Bancontact';
+		$methods[] = __NAMESPACE__ . '\\Gateway\\Bancontact';
 		$methods[] = __NAMESPACE__ . '\\Controller\\ApplePay';
 		$methods[] = __NAMESPACE__ . '\\Controller\\AmericanExpress';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Mybank';

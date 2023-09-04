@@ -1180,6 +1180,16 @@
   opacity: 0.5;
   transition: opacity 0.2s ease-in-out;
 }
+.bootstrap .payplugUIInfoSpan {
+  color: #909192;
+}
+.bootstrap .payplugUIInfoSpan.fade-in {
+  opacity: 0.5;
+  transition: opacity 0.2s ease-in-out;
+}
+.bootstrap .payplugUIInfoSpan .payplugUIIcon {
+  display: inline-block;
+}
 .bootstrap .payplugUISwitch ._switch {
   position: relative;
   vertical-align: middle;
@@ -1245,7 +1255,7 @@
 .bootstrap .payplugUITitle {
   font-weight: 700;
   color: #212225;
-  margin: 0 0 8px;
+  margin: 8px 0 8px;
 }
 .bootstrap .payplugUITitle.-disabled {
   color: #D7D8D9;
@@ -1815,6 +1825,7 @@
   align-items: center;
   margin: 16px 0 0;
   position: relative;
+  flex-wrap: wrap;
 }
 .payplugConfiguration .paymentOption ._logo {
   border: 1px solid #C8D7E4;

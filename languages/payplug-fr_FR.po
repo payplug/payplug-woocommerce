@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1190,7 +1190,7 @@ msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer iDE
 
 msgid "payplug_refund_disabled_error"
 msgstr ""
-"Le remboursement automatique n’est pas réalisable.\n"
+"Le remboursement automatique n’est pas réalisable depuis votre back-office.\n"
 "Veuillez contacter support@payplug.com"
 
 msgid "payplug_integrated_access_error"
@@ -1198,3 +1198,9 @@ msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Int
 
 msgid "payplug_section_standard_ip_warning"
 msgstr "L’affichage du paiement intégré est seulement compatible avec une page de paiement standard respectant les directives WooCommerce. Certains cas de personnalisation du checkout ne permettront pas le fonctionnement du paiement intégré (modification du bouton “Commander”, etc.)."
+
+msgid "payment_method"
+msgstr "Moyen de paiement"
+
+msgid "payplug_payment_gateways_country_permissions"
+msgstr "%s est disponible  pour vos clients dont l’adresse de facturation se situe dans l’un des pays suivants : "

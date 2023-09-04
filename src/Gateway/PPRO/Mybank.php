@@ -10,6 +10,7 @@ class Mybank extends PayplugGenericGateway
 	protected $min_thresholds;
 	protected $max_thresholds;
 	protected $allowed_country_codes = [];
+	protected $enable_refund = false;
 
 	public function __construct()
 	{

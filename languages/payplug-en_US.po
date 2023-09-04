@@ -579,7 +579,7 @@ msgstr "You don't have access to this feature yet. To activate iDEAL, please fil
 
 msgid "payplug_refund_disabled_error"
 msgstr ""
-"The automatic refund is not available.\n"
+"The automatic refund is not available from your back-office.\n"
 "Please contact support@payplug.com"
 
 msgid "payplug_integrated_access_error"
@@ -587,3 +587,9 @@ msgstr "You don't have access to this feature yet. To activate Integrated Paymen
 
 msgid "payplug_section_standard_ip_warning"
 msgstr "The Embedded Payment display is only compatible with a standardized checkout page that meets the WooCommerce guidelines. Some checkout customizations will not allow the feature to work (changing the “Place order” button, etc.)."
+
+msgid "payment_method"
+msgstr "Payment method"
+
+msgid "payplug_payment_gateways_country_permissions"
+msgstr "%s is only available for payers with billing addresses in the following countries: "
