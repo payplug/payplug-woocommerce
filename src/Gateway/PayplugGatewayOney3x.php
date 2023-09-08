@@ -96,6 +96,7 @@ class PayplugGatewayOney3x extends PayplugGateway
             $total_price = floatval(WC()->cart->total);
             $this->oney_response = $this->api->simulate_oney_payment($total_price, 'with_fees');
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
+			$total_price_oney = $total_price + $this->oney_response['x3_with_fees']['nominal_annual_percentage_rate'];
             $f = function ($fn) {
                 return $fn;
             };
@@ -107,12 +108,19 @@ class PayplugGatewayOney3x extends PayplugGateway
                         <div>{$this->oney_response['x3_with_fees']['down_payment_amount']} {$currency}</div>
                     </div>
                     <div class="payplug-oney-flex">
+					<small>( {$f(__('oney_financing_cost', 'payplug'))} <b>{$this->oney_response['x3_with_fees']['nominal_annual_percentage_rate']} {$currency}</b> TAEG : <b>{$this->oney_response['x3_with_fees']['effective_annual_percentage_rate']} %</b> )</small>
+				</div>
+                    <div class="payplug-oney-flex">
                         <div>{$f(__('1st monthly payment', 'payplug'))}:</div>
                         <div>{$this->oney_response['x3_with_fees']['installments'][0]['amount']} {$currency}</div>
                     </div>
                     <div class="payplug-oney-flex">
                         <div>{$f(__('2nd monthly payment', 'payplug'))}:</div>
                         <div>{$this->oney_response['x3_with_fees']['installments'][1]['amount']} {$currency}</div>
+                    </div>
+                    <div class="payplug-oney-flex">
+                        <div><b>{$f(__('oney_total', 'payplug'))}</b></div>
+                        <div><b>{$total_price_oney} {$currency}</b></div>
                     </div>
                 </p>
 HTML;

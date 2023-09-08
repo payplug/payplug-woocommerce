@@ -39,6 +39,8 @@ Abstract class OneyBase
 
 		if (isset($options['oney_product_animation']) && ($options['oney_product_animation'] == 'yes'))
 			add_action( 'woocommerce_before_add_to_cart_form', [ $this, 'showOneyAnimationProduct' ] );
+
+		add_action( 'wp_enqueue_scripts', [$this, 'addOneyJs' ]);
 	}
 
 	/**
@@ -180,6 +182,14 @@ HTML;
 	public function setOney($oney)
 	{
 		$this->oney = $oney;
+	}
+
+	public function addOneyJs() {
+		wp_enqueue_script('payplug-oney-mobile', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-detect-mobile.js', [], PAYPLUG_GATEWAY_VERSION, true);
+		wp_enqueue_script('payplug-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-oney.js', [
+			'jquery',
+			'jquery-ui-position'
+		], PAYPLUG_GATEWAY_VERSION, true);
 	}
 
 }
