@@ -142,7 +142,7 @@
 				}
 
 				$('apple-pay-button').removeClass("isDisabled")
-			},).error( function() {
+			}).fail( function() {
 				window.location.reload();
 				return false;
 			})
