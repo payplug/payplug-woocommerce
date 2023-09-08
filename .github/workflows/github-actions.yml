@@ -151,7 +151,7 @@ jobs:
           projectBaseDir: .
           args: >
             -Dsonar.organization=${{ secrets.SONAR_ORGA }}
-            -Dsonar.projectKey=github-payplug-payplug-php
+            -Dsonar.projectKey=github-payplug-payplug-woocommerce
             -Dsonar.sources=lib/
             -Dsonar.test.exclusions=tests/**
             -Dsonar.tests=tests/
