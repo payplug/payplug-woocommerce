@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1204,3 +1204,9 @@ msgstr "Metodo di pagamento"
 
 msgid "payplug_payment_gateways_country_permissions"
 msgstr "%s è disponibile solo per i clienti con indirizzo di fatturazione in : "
+
+msgid "oney_financing_cost"
+msgstr "Di cui una commissione :"
+
+msgid "oney_total"
+msgstr "Totale da rimborsare :"
