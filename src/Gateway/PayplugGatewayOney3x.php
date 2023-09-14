@@ -159,6 +159,12 @@ HTML;
 		//for backend orders
 		if( !empty(get_query_var('order-pay')) ){
 			$order = wc_get_order(get_query_var('order-pay'));
+
+			//wc_get_order @return bool|WC_Order|WC_Order_Refund
+			if($order === false){
+				return false;
+			}
+
 			$items = $order->get_items();
 
 			$country_code_shipping = $order->get_shipping_country();
