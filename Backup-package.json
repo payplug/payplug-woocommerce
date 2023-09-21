@@ -1,0 +1,23 @@
+{
+  "name": "payplug",
+  "version": "0.1.0",
+  "description": "PayPLug CSS assets management",
+  "license": "GPL-3.0-or-later",
+  "author": "PayPlug",
+  "scripts": {
+    "preinstall": "npx npm-force-resolutions",
+    "build:css-app": "node-sass --include-path scss assets/scss/app.scss assets/css/app.css --source-map-embed true --output-style compressed",
+    "build:css-notice": "node-sass --include-path scss assets/scss/notice.scss assets/css/notice.css --source-map-embed true --output-style compressed",
+    "build:css": "npm run build:css-app && npm run build:css-notice"
+  },
+  "devDependencies": {
+    "cypress": "^9.5.1"
+  },
+  "dependencies": {
+    "node-sass": "^7.0.3",
+    "trim-newlines": "^3.0.1"
+  },
+  "resolutions": {
+    "trim-newlines": "^3.0.1"
+  }
+}
