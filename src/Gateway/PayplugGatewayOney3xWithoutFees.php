@@ -42,9 +42,18 @@ class PayplugGatewayOney3xWithoutFees extends PayplugGatewayOney3x
             $f = function ($fn) {
                 return $fn;
             };
+
+	        $total_price_oney = floatval($this->oney_response['x3_without_fees']['down_payment_amount']);
+	        foreach ($this->oney_response['x3_without_fees']['installments'] as $installment) {
+		        $total_price_oney = $total_price_oney + floatval($installment['amount']);
+	        }
+
             if(is_array($this->oney_response)) {
                 $this->description = <<<HTML
-                <p>
+               		<div class="payplug-oney-flex">
+                        <div><b>{$f(__('oney_total', 'payplug'))}</b></div>
+                        <div><b>{$total_price_oney} {$currency}</b></div>
+                    </div>
                     <div class="payplug-oney-flex">
                         <div>{$f(__('Bring', 'payplug'))}:</div>
                         <div>{$this->oney_response['x3_without_fees']['down_payment_amount']} {$currency}</div>
@@ -57,7 +66,9 @@ class PayplugGatewayOney3xWithoutFees extends PayplugGatewayOney3x
                         <div>{$f(__('2nd monthly payment', 'payplug'))}:</div>
                         <div>{$this->oney_response['x3_without_fees']['installments'][1]['amount']} {$currency}</div>
                     </div>
-                </p>
+                    <div>
+{$f(__('oney_financing_cost', 'payplug'))} {$this->oney_response['x3_without_fees']['nominal_annual_percentage_rate']} {$currency} TAEG : {$this->oney_response['x3_without_fees']['effective_annual_percentage_rate']} %
+                    </div>
 HTML;
             } else {
                 $this->description = $this->oney_response;
