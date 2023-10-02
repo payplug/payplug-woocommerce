@@ -104,11 +104,7 @@ class PayplugGatewayOney3x extends PayplugGateway
                 return $fn;
             };
 
-			$tax_cost = floatval($this->oney_response['x3_with_fees']['total_cost']) - (
-					floatval($this->oney_response['x3_with_fees']['installments'][0]['amount']) +
-					floatval($this->oney_response['x3_with_fees']['installments'][1]['amount'])
-				);
-			$tax_cost = floatval($this->oney_response['x3_with_fees']['down_payment_amount']) - $tax_cost;
+			$tax_cost = $total_price_oney - $total_price;
 
             if(is_array($this->oney_response)) {
                 $this->description = <<<HTML
