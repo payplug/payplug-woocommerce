@@ -21,12 +21,7 @@
                 if (!$.browser.mobile) {
                     _checkOneyError()
                     var top = oneyData.hasClass('disabled') ? 50 : 110
-                    popup.css('position', 'fixed')
-                    popup.position({
-                        my: popupLoaded ? "left top-" + top : "left top-75",
-                        at: popupLoaded ? "right+40 bottom" : "right bottom",
-                        of: showpopup,
-                    })
+
                 }
             })
         }
