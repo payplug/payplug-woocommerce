@@ -103,6 +103,9 @@ class PayplugGatewayOney3x extends PayplugGateway
             $f = function ($fn) {
                 return $fn;
             };
+
+			$tax_cost = $total_price_oney - $total_price;
+
             if(is_array($this->oney_response)) {
                 $this->description = <<<HTML
                 <p>
@@ -111,7 +114,7 @@ class PayplugGatewayOney3x extends PayplugGateway
                         <div>{$this->oney_response['x3_with_fees']['down_payment_amount']} {$currency}</div>
                     </div>
                     <div class="payplug-oney-flex">
-					<small>( {$f(__('oney_financing_cost', 'payplug'))} <b>{$this->oney_response['x3_with_fees']['nominal_annual_percentage_rate']} {$currency}</b> TAEG : <b>{$this->oney_response['x3_with_fees']['effective_annual_percentage_rate']} %</b> )</small>
+					<small>( {$f(__('oney_financing_cost', 'payplug'))} <b>{$tax_cost} {$currency}</b> TAEG : <b>{$this->oney_response['x3_with_fees']['effective_annual_percentage_rate']} %</b> )</small>
 				</div>
                     <div class="payplug-oney-flex">
                         <div>{$f(__('1st monthly payment', 'payplug'))}:</div>
