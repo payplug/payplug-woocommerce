@@ -40,6 +40,8 @@ class PayplugGatewayOney4x extends PayplugGatewayOney3x
 	        foreach ($this->oney_response['x4_with_fees']['installments'] as $installment) {
 		        $total_price_oney = $total_price_oney + floatval($installment['amount']);
 	        }
+
+			$tax_cost = floatval($this->oney_response['x3_with_fees']['total_cost']) / 100;
 			$disable='';
             $f = function ($fn) {
                 return $fn;
@@ -52,7 +54,7 @@ class PayplugGatewayOney4x extends PayplugGatewayOney3x
                         <div>{$this->oney_response['x4_with_fees']['down_payment_amount']} {$currency}</div>
                     </div>
                    <div class="payplug-oney-flex">
-					<small>( {$f(__('oney_financing_cost', 'payplug'))} <b>{$this->oney_response['x4_with_fees']['nominal_annual_percentage_rate']} {$currency}</b> TAEG : <b>{$this->oney_response['x3_with_fees']['effective_annual_percentage_rate']} %</b> )</small>
+					<small>( {$f(__('oney_financing_cost', 'payplug'))} <b>{$tax_cost} {$currency}</b> TAEG : <b>{$this->oney_response['x3_with_fees']['effective_annual_percentage_rate']} %</b> )</small>
 					</div>
                     <div class="payplug-oney-flex">
                         <div>{$f(__('1st monthly payment', 'payplug'))}:</div>

@@ -132,7 +132,7 @@ class PayplugApi {
 			    try {
 				    try {
 					    $response = $this->do_request('\Payplug\OneySimulation::getSimulations', [[
-						    "amount" => (int)$price * 100,
+						    "amount" => floatval($price) * 100,
 						    "country" => $country,
 						    "operations" => $oney_fees
 					    ]]);

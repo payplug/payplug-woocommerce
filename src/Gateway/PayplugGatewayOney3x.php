@@ -94,7 +94,7 @@ class PayplugGatewayOney3x extends PayplugGateway
 		$disable='';
         if ($this->check_oney_is_available() === true) {
             $total_price = floatval(WC()->cart->total);
-            $this->oney_response = $this->api->simulate_oney_payment($total_price, 'with_fees');
+            $a = $this->oney_response = $this->api->simulate_oney_payment($total_price, 'with_fees');
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
 	        $total_price_oney = floatval($this->oney_response['x3_with_fees']['down_payment_amount']);
 			foreach ($this->oney_response['x3_with_fees']['installments'] as $installment) {
@@ -104,7 +104,7 @@ class PayplugGatewayOney3x extends PayplugGateway
                 return $fn;
             };
 
-			$tax_cost = $total_price_oney - $total_price;
+			$tax_cost = floatval($this->oney_response['x3_with_fees']['total_cost']) / 100;
 
             if(is_array($this->oney_response)) {
                 $this->description = <<<HTML
