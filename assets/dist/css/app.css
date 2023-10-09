@@ -650,6 +650,9 @@
   text-decoration: none;
   color: #fff;
 }
+.bootstrap .payplugUIButtonLink.-icon {
+  overflow: auto;
+}
 .bootstrap .payplugUIButtonLink.-icon svg {
   transition: fill 0.4s;
   fill: #fff;
@@ -1210,11 +1213,6 @@
 .bootstrap .payplugUISwitch ._label::before {
   content: attr(data-disable-text);
 }
-@media (max-width: 767px) {
-  .bootstrap .payplugUISwitch ._label {
-    display: none;
-  }
-}
 .bootstrap .payplugUISwitch ._slider {
   -webkit-transition: 0.4s;
   background-color: #909192;
@@ -1551,6 +1549,7 @@
   margin: 0 0 8px;
   background-color: #f3f3f3;
   color: #20272e;
+  overflow: auto;
 }
 .generalBlock.-logged ._userPortal {
   font-family: 'Gantari', sans-serif;
@@ -1842,11 +1841,6 @@
   display: block;
   width: 48px;
 }
-@media (max-width: 1023px) {
-  .payplugConfiguration .paymentOption ._logo {
-    display: none;
-  }
-}
 .payplugConfiguration .paymentOption > ._text {
   margin: 0 0 0 24px;
   max-width: calc(80% - 60px);
@@ -1864,7 +1858,6 @@
 @media (max-width: 767px) {
   .payplugConfiguration .paymentOption > ._text {
     margin: 0 0 0 24px;
-    max-width: 80%;
   }
 }
 .payplugConfiguration .paymentOption.-oney ._informations {
@@ -1988,7 +1981,8 @@
 }
 @media (max-width: 1023px) {
   .payplugConfiguration .paymentOption.-standard ._informations .payplugUIIOptions {
-    flex-direction: column;
+    flex-direction: row;
+    margin: 10px;
   }
 }
 @media (max-width: 767px) {
@@ -2023,6 +2017,15 @@
   .payplugConfiguration .paymentOption + .paymentOption {
     margin: 16px 0 0;
   }
+}
+@media (max-width: 767px) {
+  .payplugConfiguration .paymentMethodOption:nth-child(3) {
+    flex-direction: column;
+    align-items: baseline;
+  }
+}
+.payplugConfiguration .paymentMethodOption ._text:nth-child(1) {
+  width: 362px;
 }
 .payplugConfiguration .paymentMethodOption {
   display: flex;
@@ -2081,12 +2084,22 @@
 }
 .payplugConfiguration .stateBlock .payplugUIAccordion.-stateBlock label:after {
   position: relative;
-  top: -60px;
+  top: -80px;
   left: calc(100% - 30px);
   height: 12px;
   width: 18px;
   -webkit-mask-size: 35px;
   mask-size: 35px;
+}
+@media (max-width: 751px) {
+  .payplugConfiguration .stateBlock .payplugUIAccordion.-stateBlock label:after {
+    top: -100px;
+  }
+}
+@media (max-width: 460px) {
+  .payplugConfiguration .stateBlock .payplugUIAccordion.-stateBlock label:after {
+    top: -120px;
+  }
 }
 .payplugConfiguration .stateBlock .payplugUIAccordion.-stateBlock ._stateAlert {
   display: none;
