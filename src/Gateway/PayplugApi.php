@@ -41,7 +41,7 @@ class PayplugApi {
 	 * Configure PayPlug client.
 	 */
 	public function init() {
-		$current_mode = $this->gateway->get_current_mode(); 
+		$current_mode = $this->gateway->get_current_mode();
 		$key          = $this->gateway->get_api_key( $current_mode );
 
         Payplug::init(array(
@@ -108,7 +108,7 @@ class PayplugApi {
 	 *
 	 * @param string $transaction_id
 	 * @param array $data
-	 * 
+	 *
 	 * @return null|\Payplug\Resource\Refund
 	 * @throws \Payplug\Exception\ConfigurationException
 	 * @author Clément Boirie
@@ -132,7 +132,7 @@ class PayplugApi {
 			    try {
 				    try {
 					    $response = $this->do_request('\Payplug\OneySimulation::getSimulations', [[
-						    "amount" => (int)$price * 100,
+						    "amount" => intval(floatval($price) * 100),
 						    "country" => $country,
 						    "operations" => $oney_fees
 					    ]]);

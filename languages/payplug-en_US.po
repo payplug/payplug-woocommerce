@@ -593,3 +593,9 @@ msgstr "Payment method"
 
 msgid "payplug_payment_gateways_country_permissions"
 msgstr "%s is only available for payers with billing addresses in the following countries: "
+
+msgid "oney_financing_cost"
+msgstr "Financing cost :"
+
+msgid "oney_total"
+msgstr "Total :"
