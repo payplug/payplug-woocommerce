@@ -52,6 +52,9 @@ function init() {
 }
 
 function create_lock_table(){
+	if ( file_exists( plugin_dir_path( __FILE__ ) . '/vendor/autoload.php' ) ) {
+		require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
+	}
 	\Payplug\PayplugWoocommerce\Model\Lock::create_lock_table();
 }
 
