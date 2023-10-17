@@ -16,7 +16,7 @@ class Lock
 		$sql .= " `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,";
 		$sql .= " PRIMARY KEY (`payment_id`));";
 
-		$table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
+		$table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		maybe_create_table( $table_name, $sql);
 
@@ -53,7 +53,7 @@ class Lock
 	static function insert_lock($payment_id){
 		global $wpdb;
 		$wpdb->hide_errors();
-		$wpdb->insert($wpdb->prefix . 'woocommerce_payplug_lock', array("payment_id" => $payment_id));
+		$wpdb->insert($wpdb->base_prefix . 'woocommerce_payplug_lock', array("payment_id" => $payment_id));
 		return $wpdb->insert_id;
 	}
 
@@ -63,7 +63,7 @@ class Lock
 	 */
 	static function delete_lock($id){
 		global $wpdb;
-		$table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
+		$table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
 		$wpdb->query( $wpdb->prepare("DELETE FROM {$table_name} WHERE id = %s OR created < NOW() - INTERVAL 1 DAY;", [$id] ));
 		return true;
 	}
@@ -74,7 +74,7 @@ class Lock
 	 */
 	static function delete_lock_by_payment_id($payment_id){
 		global $wpdb;
-		$table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
+		$table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
 		$wpdb->query( $wpdb->prepare("DELETE FROM {$table_name} WHERE payment_id = %s OR created < NOW() - INTERVAL 1 DAY;", [$payment_id] ));
 		return true;
 	}
@@ -88,7 +88,7 @@ class Lock
 	static function locked($payment_id, $id){
 		global $wpdb;
 
-		$table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
+		$table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
 
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$result = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$table_name} WHERE `payment_id` = %s AND `id` <> %s ", array( $payment_id, $id ) ) );
@@ -108,7 +108,7 @@ class Lock
 	static function get_lock_by_payment_id($payment_id){
 		global $wpdb;
 
-		$table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
+		$table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
 
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$result = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$table_name} WHERE payment_id = %s", array( $payment_id ) ) );
@@ -123,7 +123,7 @@ class Lock
 	static function delete_lock_table(){
 		global $wpdb;
 
-		$table_name = $wpdb->prefix . 'woocommerce_payplug_lock';
+		$table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
 		$sql = "DROP TABLE IF EXISTS $table_name;";
 		$wpdb->query($sql);
 
