@@ -56,7 +56,8 @@ function create_lock_table(){
 	\Payplug\PayplugWoocommerce\Model\Lock::create_lock_table();
 }
 
-add_action( 'plugins_loaded', __NAMESPACE__ . '\\create_lock_table' );
+add_action( 'upgrader_process_complete', __NAMESPACE__ . '\\create_lock_table', 10, 2 );
+add_action( 'activated_plugin', __NAMESPACE__ . '\\create_lock_table', 10, 2 );
 register_deactivation_hook( __FILE__,  __NAMESPACE__ .'\\PayplugWoocommerceHelper::plugin_deactivation' );
 
 /**
