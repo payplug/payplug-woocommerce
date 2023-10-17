@@ -52,7 +52,6 @@ function init() {
 }
 
 function create_lock_table(){
-	init();
 	\Payplug\PayplugWoocommerce\Model\Lock::create_lock_table();
 }
 
