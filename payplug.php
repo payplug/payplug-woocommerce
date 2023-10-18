@@ -7,8 +7,8 @@
  * Author URI:      https://www.payplug.com/
  * Text Domain:     payplug
  * Domain Path:     /languages
- * Version:         2.6.3
- * WC tested up to: 8.1.1
+ * Version:         2.6.4
+ * WC tested up to: 8.2.1
  * License:         GPLv3 or later
  * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-define( 'PAYPLUG_GATEWAY_VERSION', '2.6.3' );
+define( 'PAYPLUG_GATEWAY_VERSION', '2.6.4' );
 define( 'PAYPLUG_GATEWAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -56,7 +56,10 @@ function create_lock_table(){
 	\Payplug\PayplugWoocommerce\Model\Lock::create_lock_table();
 }
 
-add_action( 'plugins_loaded', __NAMESPACE__ . '\\create_lock_table' );
+add_action( 'upgrader_process_complete', __NAMESPACE__ . '\\create_lock_table', 10, 2 );
+add_action( 'activated_plugin', __NAMESPACE__ . '\\create_lock_table', 10, 2 );
+add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
+
 register_deactivation_hook( __FILE__,  __NAMESPACE__ .'\\PayplugWoocommerceHelper::plugin_deactivation' );
 
 /**

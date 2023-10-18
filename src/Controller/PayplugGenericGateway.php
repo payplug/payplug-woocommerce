@@ -123,19 +123,21 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 				$country_code_shipping = WC()->customer->get_shipping_country();
 				$country_code_billing  = WC()->customer->get_billing_country();
 			}
+			if (is_array($this->allowed_country_codes)) {
+				if ( in_array( "ALL", $this->allowed_country_codes) || empty( $this->allowed_country_codes ) ) {
+					return true;
+				}
 
-			if ( in_array( "ALL", $this->allowed_country_codes) || empty( $this->allowed_country_codes ) ) {
-				return true;
+				//check if country is allowed
+				if ( in_array( $country_code_billing, $this->allowed_country_codes ) ) {
+					return true;
+
+				} else {
+					$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __( 'Unavailable for the specified country.', 'payplug' ) . '</div>';
+					return false;
+				}
 			}
 
-			//check if country is allowed
-			if ( in_array( $country_code_billing, $this->allowed_country_codes ) ) {
-				return true;
-
-			} else {
-				$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __( 'Unavailable for the specified country.', 'payplug' ) . '</div>';
-				return false;
-			}
 		}
 
 		return true;
