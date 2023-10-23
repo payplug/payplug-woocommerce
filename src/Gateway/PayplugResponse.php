@@ -50,6 +50,9 @@ class PayplugResponse {
 			return;
 		}
 
+		// Third party hook
+		\do_action('payplug_gateway_payment_response_third', $order_id, $resource, $is_payment_with_token, $source);
+
 		/**
 		 *
 		 * Checking if it is coming from the order confirmation page or the IPN
