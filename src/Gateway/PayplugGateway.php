@@ -1042,6 +1042,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
             PayplugGateway::log(sprintf('Payment creation complete for order #%s', $order_id));
 
+			ob_clean();
             wp_send_json( [
 				'payment_id' => $payment->id,
 				'result'   => 'success',
