@@ -957,10 +957,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         if ($payment_token_id && $this->oneclick_available() && (int) $customer_id > 0) {
             PayplugGateway::log(sprintf('Payment token found.', $amount));
 
-            wp_send_json($this->process_payment_with_token($order, $amount, $customer_id, $payment_token_id));
+            return $this->process_payment_with_token($order, $amount, $customer_id, $payment_token_id);
         }
 
-		wp_send_json($this->process_standard_payment($order, $amount, $customer_id));
+		return $this->process_standard_payment($order, $amount, $customer_id);
     }
 
     /**
@@ -1042,12 +1042,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
             PayplugGateway::log(sprintf('Payment creation complete for order #%s', $order_id));
 
-            wp_send_json( [
+			ob_clean();
+			return array(
 				'payment_id' => $payment->id,
 				'result'   => 'success',
 				'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
-				'cancel'   => $payment->hosted_payment->cancel_url,
-			]);
+				'cancel'   => $payment->hosted_payment->cancel_url
+			);
 
         } catch (HttpException $e) {
             PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
