@@ -1042,7 +1042,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
             PayplugGateway::log(sprintf('Payment creation complete for order #%s', $order_id));
 
-			ob_clean();
+			if(ob_get_length() > 0){
+				ob_clean();
+			}
+
 			return array(
 				'payment_id' => $payment->id,
 				'result'   => 'success',
