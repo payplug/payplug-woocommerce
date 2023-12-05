@@ -747,27 +747,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function admin_options()
     {
 		/************ VUE Code *************/
-
-		$handle = curl_init(get_home_url() . DIRECTORY_SEPARATOR . 'index.php/?rest_route=/payplug_api/init');
-		curl_setopt($handle,  CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($handle,CURLOPT_HTTPHEADER,array ("Accept: application/rdf+xml"));
-		curl_setopt($handle, CURLOPT_NOBODY, true);
-		curl_exec($handle);
-		$check_ajax_url = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-
-		if ($check_ajax_url == 200) {
-			$ajax_url = get_home_url() . DIRECTORY_SEPARATOR . 'index.php';
-		} else {
-			$ajax_url = get_home_url();
-		}
-
 		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-1.6.1.js', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.6.1.js', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('app.css', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/css/app.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_localize_script('app.js', 'payplug_admin_config',
 			array(
 				"img_path"		=> esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/'),
-				'ajax_url'      => $ajax_url
+				'ajax_url'		=> get_rest_url() . 'payplug_api'
 			));
 
 		?>
