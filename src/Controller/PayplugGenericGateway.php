@@ -108,7 +108,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
 			$order_amount = $this->get_order_total();
 
-			$this->allowed_country_codes = $account["payment_methods"][ $this->id ]['allowed_countries'];
+			$this->allowed_country_codes = !empty($account["payment_methods"][ $this->id ]['allowed_countries']) ? $account["payment_methods"][ $this->id ]['allowed_countries'] : null;
 			$this->get_thresholds_values( $account );
 
 
@@ -388,7 +388,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	private function order_items_to_cart($cart, $items){
 		$cart->empty_cart();
 		foreach ($items as $item){
-			$cart->add_to_cart($item->get_product_id(), $item->get_quantity());
+			$cart->add_to_cart($item->get_product_id(), $item->get_quantity(), $item->get_variation_id());
 		}
 	}
 
