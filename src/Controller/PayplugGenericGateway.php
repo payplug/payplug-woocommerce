@@ -358,16 +358,16 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		$payment_methods = ['giropay', 'satispay', 'sofort', 'ideal', 'mybank'];
 
 		if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
-			$order_id = $_GET["id"];
+			$order_id = !empty($_GET["id"]) ? $_GET["id"] : null;
 
 		}else{
-			if(empty($post)){
-				return false;
-			}
 
 			$order_id = $post->ID;
 		}
 
+		if(empty($order_id)){
+			return false;
+		}
 
 		$order = new \WC_Order($order_id);
 		if (in_array($order->get_payment_method(), $payment_methods)) {

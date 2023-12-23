@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use WP_Post;
 
@@ -48,11 +49,15 @@ class Metabox {
 			return;
 		}
 
+		$screen = class_exists( '\Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController' ) && wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled()
+			? wc_get_page_screen_id( 'shop-order' )
+			: 'shop_order';
+
 		add_meta_box(
 			'payplug-transaction-details',
 			__( 'PayPlug payment details', 'payplug' ),
 			[ $this, 'render' ],
-			'shop_order',
+			$screen,
 			'side'
 		);
 	}

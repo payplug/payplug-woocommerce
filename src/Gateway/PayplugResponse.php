@@ -397,12 +397,6 @@ class PayplugResponse {
 				)
 			);
 
-/*
-			$sql = "SELECT o.id, om.meta_key, om.meta_value FROM $wpdb->wc_orders o
-				LEFT JOIN $wpdb->wc_orders_meta om ON o.id = om.order_id
-				WHERE o.id = %s AND meta_key LIKE '_pr_" . esc_sql( $refund_id ) . " AND om.meta_value = %s";
-			$results = $wpdb->get_col( $wpdb->prepare( $sql, (int) $order_id, $refund_id ) );
-*/
 		}else{
 			$sql = "
 			SELECT p.ID
