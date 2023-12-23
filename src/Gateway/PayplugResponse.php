@@ -13,6 +13,7 @@ use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
 use WC_Payment_Tokens;
 use WC_Payment_Token_CC;
+use Automattic\WooCommerce\Utilities\OrderUtil;
 
 /**
  * Process responses from PayPlug.
@@ -332,17 +333,30 @@ class PayplugResponse {
 	protected function get_order_from_transaction_id( $transaction_id ) {
 		global $wpdb;
 
-		$order_id = $wpdb->get_var(
-			$wpdb->prepare(
-				"
-				SELECT post_id
-				FROM $wpdb->postmeta
-				WHERE meta_key = '_transaction_id'
-				AND meta_value = %s
-				",
-				$transaction_id
-			)
-		);
+		if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
+
+			$orders = wc_get_orders(
+				array(
+					'field_query' => array(
+						array(
+							'key'        => 'transaction_id',
+							'comparison' => $transaction_id
+						),
+					),
+				)
+			);
+			$order = $orders[0];
+			$order_id = $order->get_id();
+			//$sql = "SELECT o.id FROM $wpdb->wc_orders o WHERE o.transaction_id = %s";
+
+		}else{
+			$order_id = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_transaction_id' AND meta_value = %s",
+					$transaction_id
+				)
+			);
+		}
 
 		return ! is_null( $order_id ) ? wc_get_order( $order_id ) : false;
 	}
@@ -357,27 +371,61 @@ class PayplugResponse {
 	protected function refund_exist_for_order( $order_id, $refund_id ) {
 		global $wpdb;
 
-		$sql = "
-			SELECT p.ID
-			FROM $wpdb->posts p
-			INNER JOIN $wpdb->postmeta pm
-				ON p.ID = pm.post_id
-			WHERE 1=1
-			AND p.post_type = %s
-			AND p.ID = %d
-			AND pm.meta_key LIKE '_pr_" . esc_sql( $refund_id ) . "'
-			AND pm.meta_value = %s
-			LIMIT 1
-		";
+		if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
 
-		$results = $wpdb->get_col(
-			$wpdb->prepare(
-				$sql,
-				'shop_order',
-				(int) $order_id,
-				$refund_id
-			)
-		);
+			$results = wc_get_orders(
+				array(
+					'meta_query' => array(
+						array(
+							'field_query' => array(
+								'relation' => 'AND',
+								array(
+									'field'   => 'meta_key',
+									'value'   => '_pr_' . esc_sql( $refund_id ),
+								),
+								array(
+									'field'   => 'meta_value',
+									'value'   => $refund_id
+								),
+								array(
+									'field'   => 'order_id',
+									'value'   => (int) $order_id
+								),
+							)
+						)
+					),
+				)
+			);
+
+/*
+			$sql = "SELECT o.id, om.meta_key, om.meta_value FROM $wpdb->wc_orders o
+				LEFT JOIN $wpdb->wc_orders_meta om ON o.id = om.order_id
+				WHERE o.id = %s AND meta_key LIKE '_pr_" . esc_sql( $refund_id ) . " AND om.meta_value = %s";
+			$results = $wpdb->get_col( $wpdb->prepare( $sql, (int) $order_id, $refund_id ) );
+*/
+		}else{
+			$sql = "
+			SELECT p.ID
+				FROM $wpdb->posts p
+				INNER JOIN $wpdb->postmeta pm
+					ON p.ID = pm.post_id
+				WHERE 1=1
+				AND p.post_type = %s
+				AND p.ID = %d
+				AND pm.meta_key LIKE '_pr_" . esc_sql( $refund_id ) . "'
+				AND pm.meta_value = %s
+			LIMIT 1
+			";
+
+			$results = $wpdb->get_col(
+				$wpdb->prepare(
+					$sql,
+					'shop_order',
+					(int) $order_id,
+					$refund_id
+				)
+			);
+		}
 
 		return ! empty( $results ) ? true : false;
 	}
