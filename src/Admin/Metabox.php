@@ -32,22 +32,6 @@ class Metabox {
 	 */
 	public function register_payplug_metabox() {
 		global $post;
-		$screen = get_current_screen();
-		$payment_methods = ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express', 'giropay', 'satispay', 'sofort', 'ideal', 'mybank'];
-		if ( is_null( $screen ) || 'shop_order' !== $screen->post_type ) {
-			return;
-		}
-
-		$order = wc_get_order( $post );
-		if ( false === $order ) {
-			return;
-		}
-
-		$payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-
-		if(!in_array($payment_method, $payment_methods)) {
-			return;
-		}
 
 		$screen = class_exists( '\Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController' ) && wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled()
 			? wc_get_page_screen_id( 'shop-order' )
@@ -68,8 +52,14 @@ class Metabox {
 	 * @param WP_Post $post
 	 */
 	public function render( $post ) {
-		$order = wc_get_order( $post );
+
+		$order = ( $post instanceof WP_Post ) ? wc_get_order( $post->ID ) : $post;
+
 		if ( false === $order ) {
+			return;
+		}
+
+		if( !in_array($order->get_payment_method(), ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express', 'giropay', 'satispay', 'sofort', 'ideal', 'mybank'])){
 			return;
 		}
 
