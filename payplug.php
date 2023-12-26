@@ -60,6 +60,12 @@ add_action( 'upgrader_process_complete', __NAMESPACE__ . '\\create_lock_table', 
 add_action( 'activated_plugin', __NAMESPACE__ . '\\create_lock_table', 10, 2 );
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
 
+add_action( 'before_woocommerce_init', function() {
+	if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+	}
+} );
+
 register_deactivation_hook( __FILE__,  __NAMESPACE__ .'\\PayplugWoocommerceHelper::plugin_deactivation' );
 
 /**
