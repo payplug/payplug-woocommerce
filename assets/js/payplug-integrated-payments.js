@@ -1,5 +1,4 @@
 /* global window, payplug_integrated_payment_params */
-
 var IntegratedPayment = {
 	props: {
 		cartId: null,

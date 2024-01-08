@@ -6,6 +6,7 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Interfaces\PayplugGatewayBuilder;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Automattic\WooCommerce\Utilities\OrderUtil;
 
 
 use Payplug\Authentication;
@@ -353,8 +354,22 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
 	public function hide_wc_refund_button(){
 		global $post;
+
 		$payment_methods = ['giropay', 'satispay', 'sofort', 'ideal', 'mybank'];
-		$order = new \WC_Order($post->ID);
+
+		if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
+			$order_id = !empty($_GET["id"]) ? $_GET["id"] : null;
+
+		}else{
+
+			$order_id = $post->ID;
+		}
+
+		if(empty($order_id)){
+			return false;
+		}
+
+		$order = new \WC_Order($order_id);
 		if (in_array($order->get_payment_method(), $payment_methods)) {
 		?>
 			<script>

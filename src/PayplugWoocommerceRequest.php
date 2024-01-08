@@ -7,6 +7,7 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use WC_Payment_Tokens;
 use WP_REST_Request;
+use Automattic\WooCommerce\Utilities\OrderUtil;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -238,17 +239,33 @@ class PayplugWoocommerceRequest {
 
 		} catch ( \Exception $e ) {
 
-			$order_id = $wpdb->get_var(
-				$wpdb->prepare(
-					"
-				SELECT post_id
-				FROM $wpdb->postmeta
-				WHERE meta_key = '_transaction_id'
-				AND meta_value = %s
-				",
-					$payment_id
-				)
-			);
+			if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
+				$orders = wc_get_orders(
+					array(
+						'field_query' => array(
+							array(
+								'key'        => 'transaction_id',
+								'comparison' => $payment_id
+							),
+						),
+					)
+				);
+				$order = $orders[0];
+				$order_id = $order->get_id();
+
+			}else{
+
+				$sql = "SELECT post_id
+							FROM $wpdb->postmeta
+								WHERE meta_key = '_transaction_id' AND meta_value = %s";
+
+				$order_id = $wpdb->get_var(
+					$wpdb->prepare(
+						$sql,
+						$payment_id
+					)
+				);
+			}
 
 			PayplugGateway::log(
 				sprintf(
