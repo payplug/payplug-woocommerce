@@ -60,11 +60,33 @@ add_action( 'upgrader_process_complete', __NAMESPACE__ . '\\create_lock_table', 
 add_action( 'activated_plugin', __NAMESPACE__ . '\\create_lock_table', 10, 2 );
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
 
+// Registers WooCommerce Blocks integration.
+add_action( 'woocommerce_blocks_loaded', __NAMESPACE__ . '\\woocommerce_gateway_payplug_woocommerce_block_support' );
+
+/**
+ * declare HPOS support
+ */
 add_action( 'before_woocommerce_init', function() {
 	if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
 		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
 	}
 } );
+
+/**
+ * Registers WooCommerce Blocks integration.
+ */
+function woocommerce_gateway_payplug_woocommerce_block_support() {
+	if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+		require_once 'src/Gateway/Blocks/PayplugGateway_Blocks_Support.php';
+
+		add_action(
+			'woocommerce_blocks_payment_method_type_registration',
+			function( \Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+				$payment_method_registry->register( new \Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugGateway_Blocks_Support() );
+			}
+		);
+	}
+}
 
 register_deactivation_hook( __FILE__,  __NAMESPACE__ .'\\PayplugWoocommerceHelper::plugin_deactivation' );
 
