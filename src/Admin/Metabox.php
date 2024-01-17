@@ -34,7 +34,7 @@ class Metabox {
 		global $post;
 
 		$screen = class_exists( '\Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController' ) && wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled()
-			? wc_get_page_screen_id( 'shop-order' )
+			? function_exists("wc_get_page_screen_id") ? wc_get_page_screen_id( 'shop-order' ) : "shop_order"
 			: 'shop_order';
 
 		add_meta_box(
