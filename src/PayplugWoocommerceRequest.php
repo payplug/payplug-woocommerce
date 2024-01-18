@@ -239,33 +239,8 @@ class PayplugWoocommerceRequest {
 
 		} catch ( \Exception $e ) {
 
-			if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
-				$orders = wc_get_orders(
-					array(
-						'field_query' => array(
-							array(
-								'key'        => 'transaction_id',
-								'comparison' => $payment_id
-							),
-						),
-					)
-				);
-				$order = $orders[0];
-				$order_id = $order->get_id();
-
-			}else{
-
-				$sql = "SELECT post_id
-							FROM $wpdb->postmeta
-								WHERE meta_key = '_transaction_id' AND meta_value = %s";
-
-				$order_id = $wpdb->get_var(
-					$wpdb->prepare(
-						$sql,
-						$payment_id
-					)
-				);
-			}
+			$order_id = $this->getOrderFromPaymentId($payment_id);
+			$order       = wc_get_order($order_id);
 
 			PayplugGateway::log(
 				sprintf(
@@ -278,16 +253,61 @@ class PayplugWoocommerceRequest {
 			return wp_send_json_error( $e->getMessage());
 		}
 
+		$order_id = $this->getOrderFromPaymentId($payment_id);
+		$order       = wc_get_order($order_id);
+
 		if ((isset($payment->failure)) && (!empty($payment->failure)) || ($payment->is_paid === false && is_null($payment->paid_at))) {
-			return wp_send_json_error(
+
+			$order->update_status( 'failed', __( 'Order cancelled by customer.', 'woocommerce' ) );
+			wp_send_json_error(
 				[
-					'code' => $payment->failure->code,
-					'message' => !empty($payment->failure->message) ? $payment->failure->message :__("payplug_integrated_payment_error", "payplug")
+					'code' => isset($payment->failure->code) ? $payment->failure->code : 500,
+					'message' => !empty($payment->failure->message) ? $payment->failure->message :__("payplug_integrated_payment_error", "payplug"),
+					'cancel_url' => esc_url_raw($order->get_cancel_order_url_raw())
 				]
 			);
 		}
+
+
 		return wp_send_json_success($payment);
 
+	}
+
+	/**
+	 * @param $payment_id
+	 * @return int|string|null
+	 */
+	private function getOrderFromPaymentId( $payment_id){
+		global $wpdb;
+
+		if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
+			$orders = wc_get_orders(
+				array(
+					'field_query' => array(
+						array(
+							'key'        => 'transaction_id',
+							'comparison' => $payment_id
+						),
+					),
+				)
+			);
+			$order = $orders[0];
+			$order_id = $order->get_id();
+
+		}else{
+
+			$sql = "SELECT post_id
+							FROM $wpdb->postmeta
+								WHERE meta_key = '_transaction_id' AND meta_value = %s";
+			$order_id = $wpdb->get_var(
+				$wpdb->prepare(
+					$sql,
+					$payment_id
+				)
+			);
+		}
+
+		return $order_id;
 	}
 
 }
