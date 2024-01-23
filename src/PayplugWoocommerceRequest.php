@@ -259,7 +259,8 @@ class PayplugWoocommerceRequest {
 		if ((isset($payment->failure)) && (!empty($payment->failure)) || ($payment->is_paid === false && is_null($payment->paid_at))) {
 
 			$order->update_status( 'failed', __( 'Order cancelled by customer.', 'woocommerce' ) );
-			wp_send_json_error(
+
+			return wp_send_json_error(
 				[
 					'code' => isset($payment->failure->code) ? $payment->failure->code : 500,
 					'message' => !empty($payment->failure->message) ? $payment->failure->message :__("payplug_integrated_payment_error", "payplug"),
