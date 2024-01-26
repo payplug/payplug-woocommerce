@@ -67,6 +67,11 @@ Abstract Class OneyBase implements InterfaceOney
 	 */
 	private $min_default_amount = 100;
 
+	/**
+	 * @var array
+	 */
+	private $variations = [];
+
 	public function __construct()
 	{
 		$this->payplugOptions = PayplugWoocommerceHelper::getOneySettings();
@@ -248,6 +253,20 @@ Abstract Class OneyBase implements InterfaceOney
 	public function setPayplugOptions($payplugOptions)
 	{
 		$this->payplugOptions = $payplugOptions;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getVariations(){
+		return $this->variations;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function setVariations($variations){
+		$this->variations[$variations['variation_id']] = (float) $variations["display_price"];
 	}
 
 
