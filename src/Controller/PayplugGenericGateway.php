@@ -6,6 +6,7 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Interfaces\PayplugGatewayBuilder;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Automattic\WooCommerce\Utilities\OrderUtil;
 
 
 use Payplug\Authentication;
@@ -108,7 +109,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
 			$order_amount = $this->get_order_total();
 
-			$this->allowed_country_codes = $account["payment_methods"][ $this->id ]['allowed_countries'];
+			$this->allowed_country_codes = !empty($account["payment_methods"][ $this->id ]['allowed_countries']) ? $account["payment_methods"][ $this->id ]['allowed_countries'] : null;
 			$this->get_thresholds_values( $account );
 
 
@@ -353,8 +354,31 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
 	public function hide_wc_refund_button(){
 		global $post;
+
 		$payment_methods = ['giropay', 'satispay', 'sofort', 'ideal', 'mybank'];
-		$order = new \WC_Order($post->ID);
+
+		if ( class_exists("OrderUtil") && OrderUtil::custom_orders_table_usage_is_enabled() ) {
+			$order_id = !empty($_GET["id"]) ? $_GET["id"] : null;
+
+		}else{
+
+			if(!empty($post->ID)){
+				$order_id = $post->ID;
+
+			}else if( !empty($_GET["id"]) ){
+				$order_id = $_GET["id"];
+
+			}else{
+				$order_id = null;
+
+			}
+		}
+
+		if(empty($order_id)){
+			return false;
+		}
+
+		$order = new \WC_Order($order_id);
 		if (in_array($order->get_payment_method(), $payment_methods)) {
 		?>
 			<script>
@@ -388,7 +412,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	private function order_items_to_cart($cart, $items){
 		$cart->empty_cart();
 		foreach ($items as $item){
-			$cart->add_to_cart($item->get_product_id(), $item->get_quantity());
+			$cart->add_to_cart($item->get_product_id(), $item->get_quantity(), $item->get_variation_id());
 		}
 	}
 
