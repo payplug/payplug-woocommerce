@@ -37,8 +37,10 @@ Abstract class OneyBase
 
 		$options = get_option('woocommerce_payplug_settings', []);
 
-		if (isset($options['oney_product_animation']) && ($options['oney_product_animation'] == 'yes'))
+		if (isset($options['oney_product_animation']) && ($options['oney_product_animation'] == 'yes')){
 			add_action( 'woocommerce_before_add_to_cart_form', [ $this, 'showOneyAnimationProduct' ] );
+
+		}
 	}
 
 	/**
@@ -124,6 +126,15 @@ HTML;
 		if ( (is_product()) && PayplugWoocommerceHelper::is_oney_available()) {
 			global $product;
 			$price = $product->get_price();
+
+			$available_variations = $product->get_available_variations();
+
+			if(!empty($available_variations)){
+				foreach ($available_variations as $k => $value){
+					$this->oney->setVariations($value);
+				}
+			}
+
 			$this->oney->setTotalPrice($price);
 			$this->oney->handleTotalProducts();
 

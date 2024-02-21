@@ -183,20 +183,28 @@ HTML;
 	 */
 	static function payWithOney($oney)
 	{
-		return '
+		$variations = $oney->getVariations();
+
+		$html = '
 			<div class="payplug-oney ' . $oney->isDisable(). '"
 				 data-is-cart="' . (is_cart() ? 1 : 0) . '"
 				 data-total-products="' . $oney->getTotalProducts() . '"
 				 data-price="' .  $oney->getTotalPrice() .'"
 				 data-max-oney-qty="' .  PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM .'"
 				 data-min-oney="' .  $oney->get_min_amount() . '"
-				 data-max-oney="' .  $oney->get_max_amount() . '">
-				' . __('OR PAY IN', 'payplug') . '
-				<div class="payplug-oney-popup">
+				 data-max-oney="' .  $oney->get_max_amount() . '" >';
+		$html .= __('OR PAY IN', 'payplug');
+		if(!empty($variations)){
+			foreach($variations as $id => $price){
+				$html .= '<input type="hidden" name="variation_' . $id. '" value = "' . $price. '" />';
+			}
+		}
+		$html .= '<div class="payplug-oney-popup">
 					<div class="oney-img ' . $oney->getIcon() . '"></div>
 					<div id="oney-show-popup" class="bold oney-color">?</div>
 				</div>
 			</div>';
+		return $html;
 	}
 
 }

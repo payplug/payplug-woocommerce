@@ -134,6 +134,13 @@
 				}
 			}
 		});
+
+		$(".variation_id").on('change', function(){
+			if( typeof $(".variation_id").val() != "undefined" && $(".variation_id").val() != 0){
+				$("#oney-show-popup").closest('.payplug-oney').data('price', parseFloat($("[name=variation_" + $(".variation_id").val() + "]").val()) );
+			}
+		})
+
     };
 
 	$(function() {
