@@ -127,7 +127,9 @@ HTML;
 			global $product;
 			$price = $product->get_price();
 
-			$available_variations = $product->get_available_variations();
+			if(method_exists($product,"get_available_variations")){
+				$available_variations = $product->get_available_variations();
+			}
 
 			if(!empty($available_variations)){
 				foreach ($available_variations as $k => $value){
