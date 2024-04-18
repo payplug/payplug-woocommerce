@@ -531,7 +531,7 @@ class Ajax {
 		wp_send_json_success($enabled);
 	}
 
-	//TODO:: WTF, why repetition?
+	//TODO:: why repetition?
 	private function getAccount($test_mode){
 		// Checking in Live Mode
 		try{
