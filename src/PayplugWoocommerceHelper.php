@@ -510,7 +510,13 @@ class PayplugWoocommerceHelper {
 
 			if ($account['payment_methods']['apple_pay']['enabled']) {
 				if ($apple_pay_enabled == "yes" && in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
-					$account['apple_pay'] = "yes";
+					if ((isset($options['apple_pay_checkout'])) || (isset($options['apple_pay_cart']))) {
+						$account['apple_pay']['apple_pay_checkout'] = $options['apple_pay_checkout'];
+						$account['apple_pay']['apple_pay_cart'] = $options['apple_pay_checkout'];
+					} else {
+						$account['apple_pay'] = "yes";
+					}
+
 				} else {
 					$account['apple_pay'] = "no";
 					$options['apple_pay'] = "no";

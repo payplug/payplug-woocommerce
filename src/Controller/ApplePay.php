@@ -75,15 +75,26 @@ class ApplePay extends PayplugGateway
 
 		if (isset($account['payment_methods']['apple_pay']['enabled']) ) {
 
-			if( !empty($account['apple_pay']) && $account['apple_pay'] === 'yes' ) {
+			if( (!empty($account['apple_pay'])) ) {
+				if (($account['apple_pay'] === 'yes') || (($account['apple_pay']['apple_pay_checkout'] === 'yes') || (($account['apple_pay']['apple_pay_cart'] === 'yes'))) ) {
+					$applepay = false;
+					if ($account['payment_methods']['apple_pay']['enabled']) {
+						if (in_array($this->domain_name, $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
+							$applepay = true;
+						}
+					}
+				}
+
+
+				return  $applepay;
+			} elseif (($account['apple_pay']['apple_pay_checkout'] === 'yes') || (($account['apple_pay']['apple_pay_cart'] === 'yes'))) {
 				$applepay = false;
 				if ($account['payment_methods']['apple_pay']['enabled']) {
 					if (in_array($this->domain_name, $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
 						$applepay = true;
 					}
 				}
-
-				return  $applepay;
+				return $applepay;
 			}
 		}
 
