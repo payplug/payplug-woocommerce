@@ -1210,3 +1210,27 @@ msgstr "Coût du financement :"
 
 msgid "oney_total"
 msgstr "Total :"
+
+msgid "applepay_display_choice_title"
+msgstr "Choisissez sur quelle(s) page(s) vous souhaitez proposer le paiement Apple Pay :"
+
+msgid "applepay_display_checkout"
+msgstr "Page Checkout"
+
+msgid "applepay_display_cart"
+msgstr "Page Panier"
+
+msgid "applepay_display_product"
+msgstr "Page Produit"
+
+msgid "applepay_active_carriers_title"
+msgstr "Méthodes de livraison actives sur votre boutique"
+
+msgid "applepay_active_carriers_alert"
+msgstr "Si aucune méthode de livraison n'est sélectionnée, le bouton Apple Pay ne sera pas affiché."
+
+msgid "applepay_active_carriers_description"
+msgstr "Avec Apple Pay, les livraisons sont possibles uniquement vers les adresses présentes dans le wallet de vos clients (adresse du domicile, du bureau etc..). Les livraisons en point de collecte ne sont pas possibles, elles ne seront donc pas proposées à vos clients (ex : livraison en boutique, en point de collecte ou pick-up station)."
+
+msgid "applepay_active_carriers_instructions"
+msgstr "Veuillez sélectionner les méthodes de livraison qui ne sont pas des points de collecte."
