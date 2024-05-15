@@ -810,4 +810,17 @@ class PayplugWoocommerceHelper {
 		\Payplug\PayplugWoocommerce\Model\Lock::delete_lock_table();
 	}
 
+	public static function available_shipping_methods($carriers = []) {
+		$shippings = WC()->shipping()->get_shipping_methods();
+		$shippings_methods = [];
+		foreach ($shippings as $shipping) {
+			array_push($shippings_methods,[
+				"id_carrier" => $shipping->id,
+				"name" => $shipping->method_title,
+				"checked" => in_array($shipping->id, $carriers)
+			]);
+		}
+		return $shippings_methods;
+	}
+
 }
