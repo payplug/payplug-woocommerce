@@ -1210,3 +1210,27 @@ msgstr "Di cui una commissione :"
 
 msgid "oney_total"
 msgstr "Totale da rimborsare :"
+
+msgid "applepay_display_choice_title"
+msgstr "Scegli su quale(i) pagina(e) proporre il pagamento Apple Pay :"
+
+msgid "applepay_display_checkout"
+msgstr "Checkout"
+
+msgid "applepay_display_cart"
+msgstr "Carrello"
+
+msgid "applepay_display_product"
+msgstr "Pagina prodotto"
+
+msgid "applepay_active_carriers_title"
+msgstr "Metodi di spedizione attivi sul tuo negozio"
+
+msgid "applepay_active_carriers_alert"
+msgstr "Se nessun metodo di spedizione è selezionato, il tasto Apple Pay non verrà visualizzato"
+
+msgid "applepay_active_carriers_description"
+msgstr "Con Apple Pay, le uniche spedizioni possibili sono quelle verso l'indirizzo indicato nel wallet dei clienti (indirizzo di casa, lavoro, ecc...). Le spedizioni nei punti di ritiro non sono disponibili e, pertanto, non verranno proposte ai tuoi clienti (ex: ritiro in negozio, ecc...)."
+
+msgid "applepay_active_carriers_instructions"
+msgstr "Seleziona i metodi di spedizione differenti dai punti di ritiro."

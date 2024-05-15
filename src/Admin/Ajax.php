@@ -756,6 +756,7 @@ class Ajax {
 			$data = $request->get_params();
 			$options = get_option('woocommerce_payplug_settings', []);
 
+
 			$options['enabled'] = Validator::enabled($data['payplug_enable']);
 			$options['mode'] = Validator::mode($data['payplug_sandbox']);
 
@@ -769,7 +770,11 @@ class Ajax {
 
 			$options['oney'] = Validator::oney($data['enable_oney']);
 			$options['bancontact'] = Validator::genericPaymentGateway($data['enable_bancontact'], "Bancontact", $test_mode);
+			// TODO : WOOC-1186 : change the saved data according to the incoming data with the new names and values
 			$options['apple_pay'] = Validator::genericPaymentGateway($data['enable_applepay'], "Apple Pay", $test_mode);
+			$options['applepay_carriers'] = (!empty($data['applepay_carriers'])) ? $data['applepay_carriers'] : [];
+			$options['applepay_checkout'] = Validator::genericPaymentGateway($data['payplug_applepay_display']['checkout'], "Apple Pay Checkout", $test_mode);
+			$options['applepay_cart'] = Validator::genericPaymentGateway($data['payplug_applepay_display']['cart'], "Apple Pay Cart", $test_mode);
 			$options['american_express'] = Validator::genericPaymentGateway($data['enable_american_express'],"American Express", $test_mode);
 			$options['satispay'] = Validator::genericPaymentGateway($data['enable_satispay'], "Satispay", $test_mode);
 			$options['sofort'] = Validator::genericPaymentGateway($data['enable_sofort'], "Sofort", $test_mode);

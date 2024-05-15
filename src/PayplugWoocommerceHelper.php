@@ -510,7 +510,13 @@ class PayplugWoocommerceHelper {
 
 			if ($account['payment_methods']['apple_pay']['enabled']) {
 				if ($apple_pay_enabled == "yes" && in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
-					$account['apple_pay'] = "yes";
+					if ((isset($options['apple_pay_checkout'])) || (isset($options['apple_pay_cart']))) {
+						$account['apple_pay']['apple_pay_checkout'] = $options['apple_pay_checkout'];
+						$account['apple_pay']['apple_pay_cart'] = $options['apple_pay_checkout'];
+					} else {
+						$account['apple_pay'] = "yes";
+					}
+
 				} else {
 					$account['apple_pay'] = "no";
 					$options['apple_pay'] = "no";
@@ -802,6 +808,19 @@ class PayplugWoocommerceHelper {
 		// for site options in Multisite
 		delete_site_option( $option_name );
 		\Payplug\PayplugWoocommerce\Model\Lock::delete_lock_table();
+	}
+
+	public static function available_shipping_methods($carriers = []) {
+		$shippings = WC()->shipping()->get_shipping_methods();
+		$shippings_methods = [];
+		foreach ($shippings as $shipping) {
+			array_push($shippings_methods,[
+				"id_carrier" => $shipping->id,
+				"name" => $shipping->method_title,
+				"checked" => in_array($shipping->id, $carriers)
+			]);
+		}
+		return $shippings_methods;
 	}
 
 }
