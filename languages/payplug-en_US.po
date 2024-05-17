@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.4.4\n"
 
 msgid "payplug_advanced_settings"
 msgstr "Advanced Settings"
@@ -619,7 +619,13 @@ msgid "applepay_active_carriers_alert"
 msgstr "If no delivery method is selected, the Apple Pay button will not be displayed."
 
 msgid "applepay_active_carriers_description"
-msgstr "With ApplePay, deliveries are only possible to addresses stored in your customers' wallet (home address, office, etc.). Deliveries to collection points are not possible, so they will not be offered to your customers (e.g., delivery to a store, collection point, or pick-up station)."
+msgstr "With ApplePay, deliveries are only possible to addresses stored in your customers' wallet (home address, office, etc.). "
+
+msgid "applepay_active_carriers_description_bold"
+msgstr "Deliveries to collection points are not possible, "
+
+msgid "applepay_active_carriers_description_warning"
+msgstr " so they will not be offered to your customers (e.g., delivery to a store, collection point, or pick-up station)"
 
 msgid "applepay_active_carriers_instructions"
 msgstr "Please select the delivery methods that are not collection points."
