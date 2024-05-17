@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.4.4\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1230,7 +1230,13 @@ msgid "applepay_active_carriers_alert"
 msgstr "Se nessun metodo di spedizione è selezionato, il tasto Apple Pay non verrà visualizzato"
 
 msgid "applepay_active_carriers_description"
-msgstr "Con Apple Pay, le uniche spedizioni possibili sono quelle verso l'indirizzo indicato nel wallet dei clienti (indirizzo di casa, lavoro, ecc...). Le spedizioni nei punti di ritiro non sono disponibili e, pertanto, non verranno proposte ai tuoi clienti (ex: ritiro in negozio, ecc...)."
+msgstr "Con Apple Pay, le uniche spedizioni possibili sono quelle verso l'indirizzo indicato nel wallet dei clienti (indirizzo di casa, lavoro, ecc...)."
+
+msgid "applepay_active_carriers_description_bold"
+msgstr "Le spedizioni nei punti di ritiro non sono disponibili e, "
+
+msgid "applepay_active_carriers_description_warning"
+msgstr "pertanto, non verranno proposte ai tuoi clienti (ex: ritiro in negozio, ecc...)."
 
 msgid "applepay_active_carriers_instructions"
 msgstr "Seleziona i metodi di spedizione differenti dai punti di ritiro."

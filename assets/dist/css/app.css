@@ -1056,6 +1056,9 @@
 .bootstrap .payplugUIParagraph.-disabled {
   color: #D7D8D9;
 }
+.bootstrap .payplugUIParagraph span.-warning {
+  color: #FFA000;
+}
 .bootstrap .payplugUISelect {
   border: 1px solid #C8D7E4;
   border-radius: 4px;
@@ -2028,6 +2031,9 @@
 }
 .payplugConfiguration .paymentOption.-applepay .paymentMethodOption ._action {
   margin: 24px 0 0;
+}
+.payplugConfiguration .paymentOption.-applepay .paymentMethodOption ._action .payplugUIIOptions {
+  justify-content: space-between;
 }
 .payplugConfiguration .paymentOption.-applepay .paymentMethodOption ._action .payplugUIIOptions label {
   width: 200px;
