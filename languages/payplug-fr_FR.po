@@ -1215,13 +1215,13 @@ msgid "applepay_display_choice_title"
 msgstr "Choisissez sur quelle(s) page(s) vous souhaitez proposer le paiement Apple Pay :"
 
 msgid "applepay_display_checkout"
-msgstr "Page Checkout"
+msgstr "Affichage du bouton sur la page checkout"
 
 msgid "applepay_display_cart"
-msgstr "Page Panier"
+msgstr "Affichage du bouton sur la page panier"
 
 msgid "applepay_display_product"
-msgstr "Page Produit"
+msgstr "Affichage du bouton sur la page produit"
 
 msgid "applepay_active_carriers_title"
 msgstr "Méthodes de livraison actives sur votre boutique"
