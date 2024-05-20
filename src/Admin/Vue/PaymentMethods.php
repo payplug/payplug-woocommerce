@@ -233,7 +233,7 @@ class PaymentMethods {
 			"name" => "applepay",
 			"title" => __( 'payplug_section_applepay_payment_title', 'payplug' ),
 			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/applepay.svg' ),
-			"checked" =>  true,
+			"checked" =>  $active,
 			"available_test_mode" => false,
 			"descriptions" => [
 				"live"    => [
