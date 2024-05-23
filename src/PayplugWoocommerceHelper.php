@@ -818,4 +818,21 @@ class PayplugWoocommerceHelper {
 		return $shippings_methods;
 	}
 
+	public static function get_payplug_options() {
+		return get_option('woocommerce_payplug_settings', []);
+	}
+
+	public static function get_applepay_options() {
+		$options = self::get_payplug_options();
+		$applepay = [
+			"enabled" => (!empty($options['apple_pay'])) ? $options['apple_pay'] : false,
+			"checkout" => (!empty($options['applepay_checkout'])) ? $options['applepay_checkout'] : false,
+			"cart" => (!empty($options['applepay_cart'])) ? $options['applepay_cart'] : false,
+			"carriers" => (!empty($options['applepay_carriers'])) ? $options['applepay_carriers'] : [],
+
+		];
+
+		return $applepay;
+	}
+
 }

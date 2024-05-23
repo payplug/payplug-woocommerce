@@ -16,3 +16,12 @@ apple-pay-button.isDisabled {
 	cursor: not-allowed;
 	opacity: 0.5;
 }
+
+.cart_totals apple-pay-button {
+	display: inline-block;
+	--apple-pay-button-width: 100%;
+	--apple-pay-button-height: 70px;
+	--apple-pay-button-border-radius: 0px;
+	--apple-pay-button-padding: 0px 15%;
+	--apple-pay-button-box-sizing: border-box;
+}
