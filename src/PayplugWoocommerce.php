@@ -114,6 +114,10 @@ class PayplugWoocommerce {
 			$this->animationHandlers();
 		}
 
+		if (!empty(PayplugWoocommerceHelper::get_applepay_options()['cart']) && PayplugWoocommerceHelper::get_applepay_options()['cart']) {
+			$this->show_applepay_cart();
+		}
+
 		add_action( 'woocommerce_payment_gateways', [ $this, 'register_payplug_gateway' ] );
 		add_filter( 'plugin_action_links_' . PAYPLUG_GATEWAY_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
 	}
@@ -183,5 +187,9 @@ class PayplugWoocommerce {
 			case "without_fees" : new OneyWithoutFees();break;
 			default: new OneyWithFees();break;
 		}
+	}
+
+	public function show_applepay_cart() {
+		new \Payplug\PayplugWoocommerce\Front\ApplePay();
 	}
 }
