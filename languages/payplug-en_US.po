@@ -604,13 +604,13 @@ msgid "applepay_display_choice_title"
 msgstr "Choose on which page(s) you would like to propose Apple Pay payment :"
 
 msgid "applepay_display_checkout"
-msgstr "Checkout Page"
+msgstr "Display the button on the checkout page"
 
 msgid "applepay_display_cart"
-msgstr "Cart Page"
+msgstr "Display the button on the cart page"
 
 msgid "applepay_display_product"
-msgstr "Product Page"
+msgstr "Display the button on the product page"
 
 msgid "applepay_active_carriers_title"
 msgstr "Methods of delivery active on your shop."

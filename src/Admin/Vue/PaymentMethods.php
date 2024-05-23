@@ -252,19 +252,24 @@ class PaymentMethods {
 						"sub_type" => "IOptions",
 						"name" => "applepay_display",
 						"title" => __( 'applepay_display_choice_title', 'payplug' ),
-						"multiple" => true,
 						"options" =>
 							[
 								[
-									"name" => "applepay_display",
+									"name" => "applepay_checkout",
+									"title" => __( 'applepay_display_checkout', 'payplug' ),
+									"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/cart/applepay_checkout.svg' ),
 									"label" => __( 'applepay_display_checkout', 'payplug' ),
 									"value" => "checkout",
+									"switch" => true,
 									"checked" => $checkout || ($active && !$cart)
 								],
 								[
-									"name" => "applepay_display",
+									"name" => "applepay_cart",
+									"title" => __( 'applepay_display_cart', 'payplug' ),
+									"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/cart/applepay_cart.svg' ),
 									"label" => __( 'applepay_display_cart', 'payplug' ),
 									"value" => "cart",
+									"switch" => true,
 									"checked" => $cart
 								]
 							],
