@@ -114,7 +114,7 @@ class PayplugWoocommerce {
 			$this->animationHandlers();
 		}
 
-		if (!empty(PayplugWoocommerceHelper::get_applepay_options()['cart']) && (PayplugWoocommerceHelper::get_applepay_options()['cart'] === 'yes')) {
+		if (!empty(PayplugWoocommerceHelper::get_applepay_options()['cart']) && PayplugWoocommerceHelper::get_applepay_options()['cart']) {
 			$this->show_applepay_cart();
 		}
 
