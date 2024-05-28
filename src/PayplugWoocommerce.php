@@ -114,7 +114,7 @@ class PayplugWoocommerce {
 			$this->animationHandlers();
 		}
 
-		if (!empty(PayplugWoocommerceHelper::get_applepay_options()['cart']) && PayplugWoocommerceHelper::get_applepay_options()['cart']) {
+		if (!empty(PayplugWoocommerceHelper::get_applepay_options()['cart']) && (PayplugWoocommerceHelper::get_applepay_options()['cart'] === 'yes')) {
 			$this->show_applepay_cart();
 		}
 
@@ -137,13 +137,17 @@ class PayplugWoocommerce {
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4xWithoutFees';
 
 		$methods[] = __NAMESPACE__ . '\\Gateway\\Bancontact';
-		$methods[] = __NAMESPACE__ . '\\Controller\\ApplePay';
+
 		$methods[] = __NAMESPACE__ . '\\Gateway\\AmericanExpress';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Mybank';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Giropay';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Ideal';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Sofort';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Satispay';
+
+		if (!empty(PayplugWoocommerceHelper::get_applepay_options()['checkout']) && (PayplugWoocommerceHelper::get_applepay_options()['checkout'] === 'yes')) {
+			$methods[] = __NAMESPACE__ . '\\Controller\\ApplePay';
+		}
 
 		return $methods;
 	}
