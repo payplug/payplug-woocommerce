@@ -105,10 +105,16 @@ class ApplePay extends PayplugGateway
 	public function checkDeviceComptability(){
 		$user_agent = isset($_SERVER["HTTP_USER_AGENT"]) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
-		// Check if the OS is Mac
-		if(!preg_match('/macintosh|mac os x/i', $user_agent)) {
+		// Check if the Browser is Safari
+		if (stripos( $user_agent, 'Chrome') !== false) {
 			return false;
+		} elseif (stripos( $user_agent, 'Safari') !== false) {
+			// Check if the OS is Mac
+			if(!preg_match('/macintosh|mac os x/i', $user_agent)) {
+				return false;
+			}
 		}
+
 
 		return true;
 	}
