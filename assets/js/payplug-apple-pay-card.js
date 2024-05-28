@@ -37,6 +37,21 @@
 		},
 
 		CreateSession: function () {
+			jQuery.post(
+				apple_pay_params.ajax_url_applepay_get_shippings
+			).done(function(results){
+				if(results.success){
+					apple_pay_params.total = results.data;
+					console.log(results.data);
+				} else {
+				//	window.location.reload();
+					return false;
+				}
+
+			}).fail( function() {
+
+				return false;
+			})
 			const request = {
 				"countryCode": apple_pay_params.countryCode,
 				"currencyCode": apple_pay_params.currencyCode,
@@ -93,16 +108,15 @@
 	}
 
 	var applePaycontroller = function(){
-
 			//enable buttons
 			apple_pay.init();
 
-
 	}
 
-	$apple_pay_button.on("click", applePaycontroller);
+	$apple_pay_button.on("click", apple_pay.init());
 
 	$( document ).ajaxComplete(function() {
+		console.log("ajax completed");
 		applePaycontroller();
 	});
 
