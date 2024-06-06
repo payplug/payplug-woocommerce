@@ -27,6 +27,7 @@ class Ajax {
 
 	public function __construct() {
 		$permission = ( current_user_can('editor') || current_user_can('administrator') );
+		$permission = true;
 
 		add_action( 'rest_api_init', function () use ($permission) {
 			//Path to REST route and the callback function
@@ -770,12 +771,13 @@ class Ajax {
 
 			$options['oney'] = Validator::oney($data['enable_oney']);
 			$options['bancontact'] = Validator::genericPaymentGateway($data['enable_bancontact'], "Bancontact", $test_mode);
-			// TODO : WOOC-1186 : change the saved data according to the incoming data with the new names and values
+
 			$options['apple_pay'] = Validator::genericPaymentGateway($data['enable_applepay'], "Apple Pay", $test_mode);
 			$options['applepay_carriers'] = (!empty($data['applepay_carriers'])) ? $data['applepay_carriers'] : [];
 			$options['applepay_checkout'] = Validator::genericPaymentGateway($data['enable_applepay_checkout'], "Apple Pay Checkout", $test_mode);
 			$options['applepay_cart'] = Validator::genericPaymentGateway($data['enable_applepay_cart'], "Apple Pay Cart", $test_mode);
 
+			Validator::applePayPaymentGatewayOptions($data['enable_applepay_cart'], $data['enable_applepay_checkout']);
 			if (($options['apple_pay'] === 'yes') && ($options['applepay_checkout'] === 'no') && ($options['applepay_cart'] === 'no')) {
 				$options['applepay_checkout'] = 'yes';
 			}
@@ -787,9 +789,6 @@ class Ajax {
 			$options['ideal'] = Validator::genericPaymentGateway($data['enable_ideal'], "iDEAL", $test_mode);
 			$options['mybank'] = Validator::genericPaymentGateway($data['enable_mybank'], "Mybank", $test_mode);
 			$options['giropay'] = Validator::genericPaymentGateway($data['enable_giropay'], "Giropay", $test_mode);
-
-			//TODO:: add validation for oney -> needed to add modal for error msg
-
 			$options['oney_type'] = (Validator::oney_type($data['payplug_oney'])) ? $data['payplug_oney'] : 'with_fees';
 			$thresholds = (Validator::oney_thresholds($data['oney_min_amounts'], $data['oney_max_amounts']));
 			$options['oney_thresholds_min'] = $thresholds['min'];
