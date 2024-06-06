@@ -875,13 +875,9 @@ msgstr "iDEAL payments"
 msgid "payplug_ideal_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/8089119071132"
 
+msgid "applepay_cart_checkout_option_validation"
+msgstr "Unable to save the configuration. Please select at least one page to offer Apple Pay: Checkout Page or Cart Page."
 
-
-
-
-
-
-
-
-
+msgid "applepay_cart_checkout_option_validation_title"
+msgstr "Unable to save the configuration"
 
