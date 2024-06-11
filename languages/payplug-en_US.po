@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.4.4\n"
 
 msgid "payplug_advanced_settings"
 msgstr "Advanced Settings"
@@ -629,3 +629,9 @@ msgstr " so they will not be offered to your customers (e.g., delivery to a stor
 
 msgid "applepay_active_carriers_instructions"
 msgstr "Please select the delivery methods that are not collection points."
+
+msgid "applepay_cart_checkout_option_validation"
+msgstr "Unable to save the configuration. Please select at least one page to offer Apple Pay: Checkout Page or Cart Page."
+
+msgid "applepay_cart_checkout_option_validation_title"
+msgstr "Unable to save the configuration"

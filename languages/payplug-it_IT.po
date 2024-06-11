@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.4.4\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1240,3 +1240,9 @@ msgstr "pertanto, non verranno proposte ai tuoi clienti (ex: ritiro in negozio, 
 
 msgid "applepay_active_carriers_instructions"
 msgstr "Seleziona i metodi di spedizione differenti dai punti di ritiro."
+
+msgid "applepay_cart_checkout_option_validation"
+msgstr "Impossibile salvare la configurazione. Si prega di selezionare almeno una pagina sulla quale offrire Apple Pay: Pagina di Checkout o Pagina del Carrello."
+
+msgid "applepay_cart_checkout_option_validation_title"
+msgstr "Impossibile salvare la configurazione"
