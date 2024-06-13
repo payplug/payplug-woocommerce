@@ -8,36 +8,31 @@
 		init: function () {
 			jQuery.post(
 				apple_pay_params.ajax_url_applepay_get_shippings
+
 			).done(function(results){
-
-				if(results.data){
-
-					apple_pay_params.carriers = results.data;
-
-				} else {
-					//	window.location.reload();
-					return false;
+				if(results.data.length === 0){
+					$apple_pay_button.remove();
 				}
 
+				apple_pay_params.carriers = results.data;
 			}).fail( function() {
+				$apple_pay_button.remove();
 
-				return false;
 			})
-			$apple_pay_button = $('apple-pay-button')
-			$apple_pay_button.on(
-				'click',
-				apple_pay.ProcessCheckout
-			)
+
+			$apple_pay_button.on('click', apple_pay.ProcessCheckout)
 		},
 		ProcessCheckout: function (e) {
 
 			e.preventDefault()
 			e.stopImmediatePropagation()
 
+			//loading layer
 			jQuery('.woocommerce').block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } })
 
 			jQuery.post(
 				apple_pay_params.ajax_url_place_order_with_dummy_data
+
 			).done(function(results){
 				console.log("getting shippings");
 
@@ -116,28 +111,6 @@
 			session.order_id = response.order_id
 			session.cancel_url = response.payment_data.cancel_url
 			session.return_url = response.payment_data.return_url
-			/*session.onpaymentauthorized = event => {
-
-				let data = event.payment;
-
-				jQuery.post({
-					'url' : apple_pay_params.ajax_url_update_applepay_order,
-					'data' : {
-						'order_id' : session.order_id,
-						'shipping' : data.shippingContact,
-						'billing' : data.billingContact
-					}
-				}).done(function (response) {
-					console.log(JSON.stringify(response));
-					session.completeShippingContactSelection({
-						newTotal: {
-							label: 'Total',
-							amount: parseFloat(apple_pay_params.total).toFixed(2)
-						}, // Keeping the original total
-						newLineItems: [] // Keeping the original line items
-					});
-				})
-			}*/
 
 			apple_pay.MerchantValidated(session, response.payment_data.merchant_session);
 
@@ -240,14 +213,9 @@
 	var applePaycontroller = function(){
 			//enable buttons
 			apple_pay.init();
-
 	}
 
 	$apple_pay_button.on("click", apple_pay.init());
-
-	$( document ).ajaxComplete(function() {
-		applePaycontroller();
-	});
 
 	$("[name=payment_method]").prop("checked", false);
 
