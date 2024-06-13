@@ -11,7 +11,7 @@ use Payplug\Resource\Payment as PaymentResource;
 class ApplePay extends PayplugGateway
 {
 
-	public $domain_name = "";
+	protected $domain_name = "";
 
 	public function __construct()
 	{
