@@ -5,21 +5,33 @@
 	var session = null;
 	var apple_pay = {
 		load_order_total: false,
-		init: function () {jQuery.post(
-			apple_pay_params.ajax_url_applepay_get_order_totals
-		).done(function(results){
-			if(results.success){
-				apple_pay_params.total = results.data;
-			} else {
-				window.location.reload();
-				return false;
-			}
+		init: function () {
 
-			$('apple-pay-button').removeClass("isDisabled")
-		}).fail( function() {
-			window.location.reload();
-			return false;
-		})
+			jQuery.post(
+				apple_pay_params.ajax_url_applepay_get_order_totals
+
+			).done(function(results){
+				if(results.success){
+					apple_pay_params.total = results.data;
+
+				} else {
+					$apple_pay_button.remove();
+				}
+
+				console.log("get_order_totals");
+				console.log(results);
+
+			}).done(function(){
+				apple_pay.getShippings();
+
+			}).fail( function() {
+				$apple_pay_button.remove();
+
+			});
+
+			$apple_pay_button.on('click', apple_pay.ProcessCheckout)
+		},
+		getShippings: function(){
 			jQuery.post(
 				apple_pay_params.ajax_url_applepay_get_shippings
 
@@ -28,18 +40,22 @@
 					$apple_pay_button.remove();
 				}
 
+				console.log("get_order_totals");
+				console.log(results);
+
 				apple_pay_params.carriers = results.data;
 			}).fail( function() {
 				$apple_pay_button.remove();
 
 			})
-
-			$apple_pay_button.on('click', apple_pay.ProcessCheckout)
 		},
 		ProcessCheckout: function (e) {
+			e.preventDefault();
+			e.stopImmediatePropagation();
 
-			e.preventDefault()
-			e.stopImmediatePropagation()
+			apple_pay.CreateSession();
+			apple_pay.CancelOrder()
+			apple_pay.PaymentCompleted();
 
 			//loading layer
 			jQuery('.woocommerce').block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } })
@@ -48,33 +64,24 @@
 				apple_pay_params.ajax_url_place_order_with_dummy_data
 
 			).done(function(results){
-				console.log("getting shippings");
-
 				if(results.payment_data.result === 'success'){
 					apple_pay_params.total = results.total
-					apple_pay.OrdernPaymentCreated(results);
+
+					//TODO: error handling here
+					apple_pay.OrderPaymentCreated(results);
 
 				} else {
-					//	window.location.reload();
 					return false;
+
 				}
 
 			}).fail( function() {
-
 				return false;
+
 			})
 
-			apple_pay.CreateSession();
-			apple_pay.PaymentCompleted();
-
-
-			//apple_pay.CreateSession()
-
-
 		},
-		OrdernPaymentCreated: function (response) {
-
-
+		OrderPaymentCreated: function (response) {
 			if ('success' !== response.payment_data.result) {
 				var error_messages = response.messages || ''
 
@@ -85,7 +92,6 @@
 		},
 
 		CreateSession: function () {
-
 			const request = {
 				"countryCode": apple_pay_params.countryCode,
 				"currencyCode": apple_pay_params.currencyCode,
@@ -117,13 +123,10 @@
 				],
 			}
 
-			console.log("apple_pay_params.total : " + apple_pay_params.total);
-
 			session = new ApplePaySession(3, request);
 
 		},
 		BeginSession: function (response) {
-			console.log("response.payment_data : " + JSON.stringify(response.payment_data))
 			session.payment_id = response.payment_data.payment_id
 			session.order_id = response.order_id
 			session.cancel_url = response.payment_data.cancel_url
@@ -133,39 +136,31 @@
 
 				session.onshippingmethodselected = event => {
 
-				const shippingMethod = event.shippingMethod;
+					const shippingMethod = event.shippingMethod;
+					session.shippingMethod = shippingMethod.identifier;
 
-				console.log(JSON.stringify(shippingMethod));
+					const baseTotal = apple_pay_params.total/100 ;
+					let currentShippingCost = shippingMethod.amount;
 
-				session.shippingMethod = shippingMethod.identifier;
+					const newTotalAmount = parseFloat(baseTotal) + parseFloat(currentShippingCost);
+					session.amount = newTotalAmount * 100;
 
-				const baseTotal = apple_pay_params.total/100 ;
-
-				let currentShippingCost = shippingMethod.amount;
-
-
-				const newTotalAmount = parseFloat(baseTotal) + parseFloat(currentShippingCost);
-				session.amount = newTotalAmount * 100;
-				const update = {
-					newTotal: {
-						label: 'Total',
-						amount: newTotalAmount
-					},
-					newLineItems: [
-						{
-							label: shippingMethod.label,
-							type: 'final',
-							amount: session.amount
-						}
-					]
-				};
-
-
-
+					const update = {
+						newTotal: {
+							label: 'Total',
+							amount: newTotalAmount
+						},
+						newLineItems: [
+							{
+								label: shippingMethod.label,
+								type: 'final',
+								amount: session.amount
+							}
+						]
+					};
 
 					session.completeShippingMethodSelection(update);
-			};
-
+				};
 			session.begin();
 		},
 		MerchantValidated: function(session, merchant_session) {
@@ -181,7 +176,6 @@
 		PaymentCompleted: function () {
 			session.onpaymentauthorized = event => {
 				let data = event.payment;
-
 
 				jQuery.post({
 					'url' : apple_pay_params.ajax_url_update_applepay_order,
@@ -225,22 +219,15 @@
 
 			}
 		},
-	}
-
-	var applePaycontroller = function(){
-			//enable buttons
-			apple_pay.init();
+		CancelOrder: function () {
+			session.oncancel = event => {
+				$('apple-pay-button').addClass("isDisabled")
+				window.location = session.cancel_url
+			}
+		}
 	}
 
 	$apple_pay_button.on("click", apple_pay.init());
-
-	$("[name=payment_method]").prop("checked", false);
-
-	//GET ORDER TOTALS ON SHIPPING METHOD SELECTION
-	$(document.body).on('updated_shipping_method', function() {
-
-		console.log('Shipping method updated');
-	});
 
 })(jQuery)
 
