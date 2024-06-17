@@ -297,12 +297,6 @@ class ApplePay {
 			}
 		}
 
-
-		$address_data = PayplugAddressData::from_order($order);
-
-		$order->set_shipping_country($address_data->get_shipping()['country']);
-		$order->set_billing_country($address_data->get_billing()['country']);
-
 		$address_data = PayplugAddressData::from_order($order);
 
 		$order->set_shipping_country($address_data->get_shipping()['country']);
