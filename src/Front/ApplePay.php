@@ -129,7 +129,6 @@ class ApplePay {
 				'city'       => 'payplug_applepay_city',
 				'postcode'   => 'payplug_applepay_psotcode',
 				'country'    => WC()->countries->get_base_country(),
-				'state'      => '',
 				'email'      => 'payplug_applepay_email@payplug.com'
 			], 'billing' );
 			$order->set_address( [
@@ -140,7 +139,7 @@ class ApplePay {
 				'city'       => 'payplug_applepay_city',
 				'postcode'   => 'payplug_applepay_psotcode',
 				'country'    => WC()->countries->get_base_country(),
-				'state'      => '',
+
 				'email'      => 'payplug_applepay_email@payplug.com'
 			], 'shipping' );
 
@@ -302,10 +301,13 @@ class ApplePay {
 		$order->set_shipping_country($address_data->get_shipping()['country']);
 		$order->set_billing_country($address_data->get_billing()['country']);
 
+		$shipping_address= $address_data->get_shipping();
+		$shipping_address['state'] = '';
+
 		$package = array(
 			'contents'        => array(),
 			'contents_cost'   => 0,
-			'destination'     => $address_data->get_shipping(),
+			'destination'     => $shipping_address,
 			'applied_coupons' => $order->get_used_coupons(),
 			'user'            => array(
 				'ID' => $order->get_customer_id()
