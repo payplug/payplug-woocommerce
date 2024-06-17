@@ -7,6 +7,10 @@
 		load_order_total: false,
 		init: function () {
 
+			apple_pay.updateOrderTotal();
+			$('apple-pay-button').on('click', apple_pay.ProcessCheckout)
+		},
+		updateOrderTotal: function(){
 			jQuery.post(
 				apple_pay_params.ajax_url_applepay_get_order_totals
 
@@ -18,9 +22,6 @@
 					$apple_pay_button.remove();
 				}
 
-				console.log("get_order_totals");
-				console.log(results);
-
 			}).done(function(){
 				apple_pay.getShippings();
 
@@ -28,8 +29,6 @@
 				$apple_pay_button.remove();
 
 			});
-
-			$apple_pay_button.on('click', apple_pay.ProcessCheckout)
 		},
 		getShippings: function(){
 			jQuery.post(
@@ -39,9 +38,6 @@
 				if(results.data.length === 0){
 					$apple_pay_button.remove();
 				}
-
-				console.log("get_order_totals");
-				console.log(results);
 
 				apple_pay_params.carriers = results.data;
 			}).fail( function() {
@@ -90,7 +86,6 @@
 
 			apple_pay.BeginSession(response)
 		},
-
 		CreateSession: function () {
 			const request = {
 				"countryCode": apple_pay_params.countryCode,
@@ -228,6 +223,11 @@
 	}
 
 	$apple_pay_button.on("click", apple_pay.init());
+
+	jQuery( 'body' ).on( 'updated_cart_totals', function() {
+		apple_pay.updateOrderTotal()
+		$apple_pay_button.on("click", apple_pay.init());
+	})
 
 })(jQuery)
 
