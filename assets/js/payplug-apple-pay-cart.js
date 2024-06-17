@@ -5,7 +5,21 @@
 	var session = null;
 	var apple_pay = {
 		load_order_total: false,
-		init: function () {
+		init: function () {jQuery.post(
+			apple_pay_params.ajax_url_applepay_get_order_totals
+		).done(function(results){
+			if(results.success){
+				apple_pay_params.total = results.data;
+			} else {
+				window.location.reload();
+				return false;
+			}
+
+			$('apple-pay-button').removeClass("isDisabled")
+		}).fail( function() {
+			window.location.reload();
+			return false;
+		})
 			jQuery.post(
 				apple_pay_params.ajax_url_applepay_get_shippings
 
@@ -103,10 +117,13 @@
 				],
 			}
 
+			console.log("apple_pay_params.total : " + apple_pay_params.total);
+
 			session = new ApplePaySession(3, request);
 
 		},
 		BeginSession: function (response) {
+			console.log("response.payment_data : " + JSON.stringify(response.payment_data))
 			session.payment_id = response.payment_data.payment_id
 			session.order_id = response.order_id
 			session.cancel_url = response.payment_data.cancel_url
