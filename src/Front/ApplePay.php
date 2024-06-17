@@ -32,6 +32,8 @@ class ApplePay {
 					'ajax_url_place_order_with_dummy_data' => \WC_AJAX::get_endpoint('place_order_with_dummy_data'),
 					'ajax_url_update_applepay_order' => \WC_AJAX::get_endpoint('update_applepay_order'),
 					'ajax_url_update_applepay_payment' => \WC_AJAX::get_endpoint('update_applepay_payment'),
+					'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
+
 					'countryCode' => WC()->customer->get_billing_country(),
 					'currencyCode' => get_woocommerce_currency(),
 					'apple_pay_domain' => $_SERVER['HTTP_HOST']
@@ -116,28 +118,9 @@ class ApplePay {
 
 		$cart = WC()->cart;
 
+
 		if ( ! $cart->is_empty() ) {
 			$order = wc_create_order();
-
-			foreach ( $cart->get_cart() as $cart_item_key => $values ) {
-				$product = $values['data'];
-				$quantity = $values['quantity'];
-				$item = new \WC_Order_Item_Product();
-				$item->set_product( $product );
-				$item->set_quantity( $quantity );
-
-				$item->set_subtotal( wc_format_decimal($values['line_subtotal']) );
-
-				$item->set_total( wc_format_decimal($values['line_total']) + wc_format_decimal($values['line_subtotal_tax']) );
-				$item->set_taxes( [
-					'total' => wc_format_decimal($item->get_total_tax()),
-				] );
-
-
-				$item->calculate_taxes();
-				$order->add_item( $item );
-			}
-
 			$order->set_address( [
 				'first_name' => 'payplug_applepay_first_name',
 				'last_name'  => 'payplug_applepay_last_name',
@@ -145,7 +128,8 @@ class ApplePay {
 				'address_2'  => '',
 				'city'       => 'payplug_applepay_city',
 				'postcode'   => 'payplug_applepay_psotcode',
-				'country'    => 'payplug_applepay_country',
+				'country'    => WC()->countries->get_base_country(),
+				'state'      => '',
 				'email'      => 'payplug_applepay_email@payplug.com'
 			], 'billing' );
 			$order->set_address( [
@@ -155,9 +139,25 @@ class ApplePay {
 				'address_2'  => '',
 				'city'       => 'payplug_applepay_city',
 				'postcode'   => 'payplug_applepay_psotcode',
-				'country'    => 'payplug_applepay_country',
+				'country'    => WC()->countries->get_base_country(),
+				'state'      => '',
 				'email'      => 'payplug_applepay_email@payplug.com'
 			], 'shipping' );
+
+			foreach ( WC()->cart->get_cart() as $cart_item_key => $values ) {
+				$product = $values['data'];
+				$quantity = $values['quantity'];
+				$item_id = $order->add_product( $product, $quantity );
+
+				$tax_rates = \WC_Tax::get_rates( $product->get_tax_class() );
+				$taxes = \WC_Tax::calc_tax( $product->get_price(), $tax_rates, true );
+
+				$item = new \WC_Order_Item_Product( $item_id );
+				$item->set_taxes( array( 'total' => $taxes ) );
+				$item->save();
+			}
+
+
 			$order->set_payment_method( "apple_pay" );
 
 			$packages = WC()->cart->get_shipping_packages();
@@ -183,11 +183,20 @@ class ApplePay {
 						$shipping->set_method_id( $rate->get_id() );
 						$shipping->set_total( $rate->get_cost() );
 
+
+						$shipping_taxes = \WC_Tax::calc_shipping_tax(
+							$rate->cost,
+							\WC_Tax::get_shipping_tax_rates()
+						);
+
+
 						$shipping->set_taxes( [
-							'total' => wc_format_decimal($shipping->get_total_tax())
+							'total' => $shipping_taxes
 						] );
-						$shipping->calculate_taxes();
-						$shipping->set_total(wc_format_decimal($shipping->get_total_tax()) + wc_format_decimal($shipping->get_total()));
+
+						//$shipping->calculate_taxes();
+						//$shipping->set_total($rate->get_cost() + $shipping->get_total_tax());
+						$shipping->save();
 						$order->add_item( $shipping );
 						break;
 					}
@@ -195,12 +204,13 @@ class ApplePay {
 			}
 
 			$order->calculate_taxes();
+
 			$order->calculate_totals();
 
-			$order->set_shipping_tax(wc_format_decimal($shipping->get_total_tax()));
+			$order->save();
 
 			$cart->empty_cart();
-			$order->save();
+
 			$this->process_cart_payment($order, $apple_pay);
 
 		} else {
@@ -211,7 +221,7 @@ class ApplePay {
 	public function process_cart_payment($order ,$gateway) {
 		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 		$customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
-		$amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_subtotal());
+		$amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total() - ($order->get_shipping_tax() + $order->get_shipping_total()));
 		$amount      = $gateway->validate_order_amount($amount);
 		wp_send_json([
 			'total' => $amount,
@@ -287,19 +297,16 @@ class ApplePay {
 			}
 		}
 
-		$address = array(
-			'country'   => $order->get_shipping_country(),
-			'state'     => $order->get_shipping_state(),
-			'postcode'  => $order->get_shipping_postcode(),
-			'city'      => $order->get_shipping_city(),
-			'address'   => $order->get_shipping_address_1(),
-			'address_2' => $order->get_shipping_address_2(),
-		);
+
+		$address_data = PayplugAddressData::from_order($order);
+
+		$order->set_shipping_country($address_data->get_shipping()['country']);
+		$order->set_billing_country($address_data->get_billing()['country']);
 
 		$package = array(
 			'contents'        => array(),
 			'contents_cost'   => 0,
-			'destination'     => $address,
+			'destination'     => $address_data->get_shipping(),
 			'applied_coupons' => $order->get_used_coupons(),
 			'user'            => array(
 				'ID' => $order->get_customer_id()
@@ -310,59 +317,50 @@ class ApplePay {
 			$order->remove_item($item_id);
 		}
 
-		foreach ($order->get_items() as $item_id => $item) {
-			$product = $item->get_product();
-			if ($product) {
-				$package['contents'][$item_id] = array(
-					'data'        => $product,
-					'quantity'    => $item->get_quantity(),
-					'line_total'  => $item->get_total(),
-					'line_tax'    => $item->get_total_tax(),
-				);
-				$package['contents_cost'] += $item->get_total();
-			}
-		}
 
-			$shipping_zone = \WC_Shipping_Zones::get_zone_matching_package( $package );
-			if ( $shipping_zone ) {
+		$shipping_zone = \WC_Shipping_Zones::get_zone_matching_package( $package );
+		if ( $shipping_zone ) {
 
-				$shipping_methods = $shipping_zone->get_shipping_methods( true );
+			$shipping_methods = $shipping_zone->get_shipping_methods( true );
 
-				foreach ( $shipping_methods as $shipping_method ) {
-					if ( ! $shipping_method->supports( 'shipping-zones' ) || ! $shipping_method->is_enabled() ) {
-						continue;
-					}
+			foreach ( $shipping_methods as $shipping_method ) {
+				if ( ! $shipping_method->supports( 'shipping-zones' ) || ! $shipping_method->is_enabled() ) {
+					continue;
+				}
 
-					if ($shipping_method->id === $selected_shipping_method) {
+				if ($shipping_method->id === $selected_shipping_method) {
 
-						$shipping_method->calculate_shipping( $package );
-						$rates = $shipping_method->get_rates_for_package($package);
+					$shipping_method->calculate_shipping( $package );
+					$rates = $shipping_method->get_rates_for_package($package);
 
-						if ( ! empty( $rates ) ) {
+					if ( ! empty( $rates ) ) {
 
-							$rate = reset( $rates );
-							$item = new \WC_Order_Item_Shipping();
-							$item->set_method_title( $rate->get_label() );
-							$item->set_method_id( $rate->get_id() );
-							$item->set_total( $rate->get_cost() );
+						$rate = reset( $rates );
+						$item = new \WC_Order_Item_Shipping();
+						$item->set_method_title( $rate->get_label() );
+						$item->set_method_id( $rate->get_id() );
+						$item->set_total( $rate->get_cost() );
 
-							$shipping_taxes = \WC_Tax::calc_shipping_tax(
-								$rate->cost,
-								\WC_Tax::get_shipping_tax_rates()
-							);
-							$item->set_taxes( [
-								'total' => $shipping_taxes,
-							] );
-							$item->calculate_taxes();
+						$shipping_taxes = \WC_Tax::calc_shipping_tax(
+							$rate->cost,
+							\WC_Tax::get_shipping_tax_rates()
+						);
+						$item->set_taxes( [
+							'total' => $shipping_taxes,
+						] );
 
-							$item->set_total(intval($item->get_taxes()['total'][1]) + (int)$item->get_total());
+						$item->calculate_taxes();
 
-							$order->add_item( $item );
-							break;
-						}
+						$item->save();
+
+						$order->add_item( $item );
+						break;
 					}
 				}
 			}
+		}
+
+		$order->calculate_taxes();
 
 		$order->calculate_totals();
 		$order->save();
