@@ -26,7 +26,7 @@ class ApplePay {
 		if (is_cart()) {
 			$apple_pay = new ApplePayGateway();
 			wp_enqueue_script( 'apple-pay-sdk', 'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js', array(), false, true );
-			wp_enqueue_script('payplug-apple-pay-cart', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-apple-pay-cart.js?v1.1', ['jquery', 'apple-pay-sdk'], PAYPLUG_GATEWAY_VERSION, true);
+			wp_enqueue_script('payplug-apple-pay-cart', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-apple-pay-cart.js', ['jquery', 'apple-pay-sdk'], PAYPLUG_GATEWAY_VERSION, true);
 			wp_localize_script( 'payplug-apple-pay-cart', 'apple_pay_params',
 				array(
 					'ajax_url_applepay_get_shippings' => \WC_AJAX::get_endpoint('applepay_get_shippings'),
