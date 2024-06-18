@@ -114,9 +114,7 @@ class PayplugWoocommerce {
 			$this->animationHandlers();
 		}
 
-		if (!empty(PayplugWoocommerceHelper::get_applepay_options()['cart']) && (PayplugWoocommerceHelper::get_applepay_options()['cart'] === 'yes')) {
-			$this->show_applepay_cart();
-		}
+		$this->applepay_cart();
 
 		add_action( 'woocommerce_payment_gateways', [ $this, 'register_payplug_gateway' ] );
 		add_filter( 'plugin_action_links_' . PAYPLUG_GATEWAY_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
@@ -193,7 +191,11 @@ class PayplugWoocommerce {
 		}
 	}
 
-	public function show_applepay_cart() {
-		new \Payplug\PayplugWoocommerce\Front\ApplePay();
+	public function applepay_cart() {
+		$applepay_options = PayplugWoocommerceHelper::get_applepay_options();
+		if( !empty($applepay_options['cart']) && $applepay_options['cart']) {
+			new \Payplug\PayplugWoocommerce\Front\ApplePay();
+		}
+
 	}
 }
