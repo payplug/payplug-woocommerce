@@ -635,3 +635,6 @@ msgstr "Unable to save the configuration. Please select at least one page to off
 
 msgid "applepay_cart_checkout_option_validation_title"
 msgstr "Unable to save the configuration"
+
+msgid "applepay_cart_carrier_enabled"
+msgstr "Please select at least one compatible delivery method for Apple Pay Cart or disable the feature."

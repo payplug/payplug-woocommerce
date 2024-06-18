@@ -96,13 +96,26 @@ class Validator {
 	 * @param $checkout
 	 * @return true
 	 */
-	public static function applePayPaymentGatewayOptions($cart, $checkout){
+	public static function applePayPaymentGatewayOptions($cart, $checkout, $carriers){
 
 		if(!$cart && !$checkout){
 			http_response_code(400);
 
 			$arr = [
 				"msg"=>__( 'applepay_cart_checkout_option_validation', 'payplug' ),
+				"class"=>"error",
+				"title"=>__( 'applepay_cart_checkout_option_validation_title', 'payplug' ),
+				"close"=> __( 'payplug_ok', 'payplug' )
+			];
+
+			wp_send_json_error($arr);
+		}
+
+		if($cart && empty($carriers)){
+			http_response_code(400);
+
+			$arr = [
+				"msg"=>__( 'applepay_cart_carrier_enabled', 'payplug' ),
 				"class"=>"error",
 				"title"=>__( 'applepay_cart_checkout_option_validation_title', 'payplug' ),
 				"close"=> __( 'payplug_ok', 'payplug' )
