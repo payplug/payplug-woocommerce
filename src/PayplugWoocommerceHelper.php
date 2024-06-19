@@ -493,37 +493,11 @@ class PayplugWoocommerceHelper {
 		$transient_key = self::get_transient_key($options);
 		$account = get_transient($transient_key);
 
-		//if transient is empty, it goes and get the permissions for the customer to populate it
 		if(empty($account) || !is_array($account) ){
 			self::set_account_data_from_options();
 			$account = get_transient($transient_key);
 		}
 
-		if (is_array($account)) {
-			$account['oneyEnabled'] = (isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
-			$account['bancontact'] = !empty($options['bancontact']) ? $options['bancontact'] : '';
-			$account['american_express'] = !empty($options['american_express']) ? $options['american_express'] : '';
-			$apple_pay_enabled = !empty($options['apple_pay']) ? $options['apple_pay'] : '';
-
-			if( !isset($account['payment_methods']['apple_pay']) )
-				$account['payment_methods']['apple_pay'] = [ 'enabled' => false ];
-
-			if ($account['payment_methods']['apple_pay']['enabled']) {
-				if ($apple_pay_enabled == "yes" && in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['payment_methods']['apple_pay']['allowed_domain_names'])) {
-						$account['apple_pay'] = "yes";
-
-				} else {
-					$account['apple_pay'] = "no";
-					$options['apple_pay'] = "no";
-					update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
-				}
-
-			} else {
-				$account['apple_pay'] = "no";
-				$options['apple_pay'] = "no";
-				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
-			}
-		}
 		return $account;
 	}
 
@@ -544,23 +518,12 @@ class PayplugWoocommerceHelper {
 			$account = get_transient($transient_key);
 		}
 
-		if( isset($options[$gateway_id]) && $options[$gateway_id] =="yes"){
+		if( isset($options[$gateway_id]) && $options[$gateway_id] == "yes"){
 			$account['permissions'][$gateway_id] = true;
 		}
 
 		return $account;
 
-	}
-
-	/**
-	 *
-	 * Retrieve the local oney threshold configration
-	 *
-	 * @return array
-	 */
-
-	public static function getOneySettings() {
-		return get_option('woocommerce_payplug_settings', []);
 	}
 
 	/**
@@ -613,7 +576,11 @@ class PayplugWoocommerceHelper {
 		if (!$account) {
 			return false;
 		}
-		return ($account && $account['permissions'][PayplugPermissions::USE_ONEY] == "1" && $account['oneyEnabled'] === "yes");
+
+		$options = self::get_payplug_options();
+		$oney_active = (isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
+
+		return ($account && $account['permissions'][PayplugPermissions::USE_ONEY] == "1" && $oney_active === "yes");
 	}
 
 	/**

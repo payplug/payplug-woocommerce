@@ -108,13 +108,12 @@ class PayplugWoocommerce {
 		$this->metabox  = new Metabox();
 		$this->actions  = new WoocommerceActions();
 		$this->requests = new PayplugWoocommerceRequest();
+		new Front\ApplePay();
 		$this->ajax     = new Ajax();
 
 		if( PayplugWoocommerceHelper::show_oney_popup() ) {
 			$this->animationHandlers();
 		}
-
-		$this->applepay_cart();
 
 		add_action( 'woocommerce_payment_gateways', [ $this, 'register_payplug_gateway' ] );
 		add_filter( 'plugin_action_links_' . PAYPLUG_GATEWAY_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
@@ -133,9 +132,7 @@ class PayplugWoocommerce {
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4x';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3xWithoutFees';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4xWithoutFees';
-
 		$methods[] = __NAMESPACE__ . '\\Gateway\\Bancontact';
-
 		$methods[] = __NAMESPACE__ . '\\Gateway\\AmericanExpress';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Mybank';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Giropay';
@@ -143,9 +140,7 @@ class PayplugWoocommerce {
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Sofort';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Satispay';
 
-		if (!empty(PayplugWoocommerceHelper::get_applepay_options()['checkout']) && (PayplugWoocommerceHelper::get_applepay_options()['checkout'] === 'yes')) {
-			$methods[] = __NAMESPACE__ . '\\Controller\\ApplePay';
-		}
+		$methods[] = __NAMESPACE__ . '\\Controller\\ApplePay';
 
 		return $methods;
 	}
@@ -191,11 +186,4 @@ class PayplugWoocommerce {
 		}
 	}
 
-	public function applepay_cart() {
-		$applepay_options = PayplugWoocommerceHelper::get_applepay_options();
-		if( !empty($applepay_options['cart']) && $applepay_options['cart']) {
-			new \Payplug\PayplugWoocommerce\Front\ApplePay();
-		}
-
-	}
 }
