@@ -16,6 +16,7 @@ class ApplePay {
 		add_action( 'wc_ajax_place_order_with_dummy_data', [ $this, 'place_order_with_dummy_data' ] );
 		add_action( 'wc_ajax_update_applepay_order', [ $this, 'update_applepay_order' ] );
 		add_action( 'wc_ajax_update_applepay_payment', [ $this, 'update_applepay_payment' ] );
+		add_action( 'wc_ajax_applepay_cancel_order', [ $this, 'applepay_cancel_order' ] );
 	}
 
 	/**
@@ -34,6 +35,7 @@ class ApplePay {
 					'ajax_url_update_applepay_order' => \WC_AJAX::get_endpoint('update_applepay_order'),
 					'ajax_url_update_applepay_payment' => \WC_AJAX::get_endpoint('update_applepay_payment'),
 					'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
+					'ajax_url_applepay_cancel_order' => \WC_AJAX::get_endpoint('applepay_cancel_order'),
 
 					'countryCode' => WC()->customer->get_billing_country(),
 					'currencyCode' => get_woocommerce_currency(),
@@ -121,7 +123,13 @@ class ApplePay {
 
 
 		if ( ! $cart->is_empty() ) {
-			$order = wc_create_order();
+
+			$checkout = WC()->checkout();
+
+			$order_id = $checkout->create_order(array('payment_method' => $apple_pay->id));
+			$order = wc_get_order($order_id);
+
+
 			$order->set_address( [
 				'first_name' => 'payplug_applepay_first_name',
 				'last_name'  => 'payplug_applepay_last_name',
@@ -143,21 +151,7 @@ class ApplePay {
 				'email'      => 'payplug_applepay_email@payplug.com'
 			], 'shipping' );
 
-			foreach ( WC()->cart->get_cart() as $cart_item_key => $values ) {
-				$product = $values['data'];
-				$quantity = $values['quantity'];
-				$item_id = $order->add_product( $product, $quantity );
-
-				$tax_rates = \WC_Tax::get_rates( $product->get_tax_class() );
-				$taxes = \WC_Tax::calc_tax( $product->get_price(), $tax_rates, true );
-
-				$item = new \WC_Order_Item_Product( $item_id );
-				$item->set_taxes( array( 'total' => $taxes ) );
-				$item->save();
-			}
-
-
-			$order->set_payment_method( "apple_pay" );
+			$order->set_payment_method($apple_pay);
 
 			$packages = WC()->cart->get_shipping_packages();
 
@@ -381,6 +375,7 @@ class ApplePay {
 		$payment_token = $_POST['payment_token'];
 		$amount = $_POST['amount']/100;
 
+
 		$payment = \Payplug\Payment::retrieve($payment_id);
 
 		$order = wc_get_order( $order_id );
@@ -408,6 +403,42 @@ class ApplePay {
 			'amount' => $amount,
 			'update' => $update
 		]);
+	}
+
+	public function applepay_cancel_order() {
+		$applepay = new ApplePayGateway();
+		$payment_id = $_POST['payment_id'];
+		$order_id = $_POST['order_id'];
+
+		$order = wc_get_order($order_id);
+		$items = $order->get_items();
+		foreach ($items as $item) {
+			$product_id = $item->get_product_id();
+			$quantity = $item->get_quantity();
+			$variation_id = $item->get_variation_id();
+			$variations = array();
+
+			if ($variation_id) {
+				$product = wc_get_product($variation_id);
+				$variations = $product->get_variation_attributes();
+			}
+
+			WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variations);
+		}
+
+		$payment = \Payplug\Payment::retrieve($payment_id);
+
+		$payment->abort();
+
+		if ($order->delete(true)) {
+			wp_send_json_success([
+				'message' => __('Your order was cancelled.', 'woocommerce')
+			]);
+		} else {
+			wp_send_json_error();
+		}
+
+
 	}
 
 }
