@@ -39,11 +39,34 @@
 					$apple_pay_button.remove();
 				}
 
+				apple_pay.handleApplePayButton(results);
+				results.data.map(function(v){
+					if(v.identifier === selected_shipping[0]){
+						v.selected = true;
+					}
+				});
+
 				apple_pay_params.carriers = results.data;
 			}).fail( function() {
 				$apple_pay_button.remove();
 
 			})
+		},
+		handleApplePayButton:function(results){
+			selected_shipping = jQuery('[name^="shipping_method"]:checked').val();
+			selected_shipping = selected_shipping.split(":");
+			var hide = true;
+			results.data.map(function(v){
+				if(v.identifier === selected_shipping[0]){
+					hide = false;
+				}
+			});
+
+			if (hide){
+				jQuery('apple-pay-button').hide()
+			}else{
+				jQuery('apple-pay-button').show()
+			}
 		},
 		ProcessCheckout: function (e) {
 			e.preventDefault();
@@ -129,33 +152,33 @@
 
 			apple_pay.MerchantValidated(session, response.payment_data.merchant_session);
 
-				session.onshippingmethodselected = event => {
+			session.onshippingmethodselected = event => {
 
-					const shippingMethod = event.shippingMethod;
-					session.shippingMethod = shippingMethod.identifier;
+				const shippingMethod = event.shippingMethod;
+				session.shippingMethod = shippingMethod.identifier;
 
-					const baseTotal = apple_pay_params.total/100 ;
-					let currentShippingCost = shippingMethod.amount;
+				const baseTotal = apple_pay_params.total/100 ;
+				let currentShippingCost = shippingMethod.amount;
 
-					const newTotalAmount = parseFloat(baseTotal) + parseFloat(currentShippingCost);
-					session.amount = newTotalAmount * 100;
+				const newTotalAmount = parseFloat(baseTotal) + parseFloat(currentShippingCost);
+				session.amount = newTotalAmount * 100;
 
-					const update = {
-						newTotal: {
-							label: 'Total',
-							amount: newTotalAmount
-						},
-						newLineItems: [
-							{
-								label: shippingMethod.label,
-								type: 'final',
-								amount: session.amount
-							}
-						]
-					};
-
-					session.completeShippingMethodSelection(update);
+				const update = {
+					newTotal: {
+						label: 'Total',
+						amount: newTotalAmount
+					},
+					newLineItems: [
+						{
+							label: shippingMethod.label,
+							type: 'final',
+							amount: session.amount
+						}
+					]
 				};
+
+				session.completeShippingMethodSelection(update);
+			};
 			session.begin();
 		},
 		MerchantValidated: function(session, merchant_session) {
