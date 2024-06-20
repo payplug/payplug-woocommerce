@@ -184,7 +184,7 @@ class ApplePay {
 		wp_send_json([
 			'total' => $amount,
 			'order_id' => $order_id,
-			'payment_data' => $gateway->process_standard_payment($order, $amount, $customer_id)
+			'payment_data' => $gateway->process_standard_payment($order, $amount, $customer_id, 'cart')
 		]);
 
 	}

@@ -275,7 +275,7 @@ class ApplePay extends PayplugGateway
 	 * @return array
 	 * @throws \Exception
 	 */
-	public function process_standard_payment($order, $amount, $customer_id)
+	public function process_standard_payment($order, $amount, $customer_id, $workflow = 'checkout')
 	{
 		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 		try {
@@ -320,6 +320,7 @@ class ApplePay extends PayplugGateway
 					'order_id'    => $order_id,
 					'customer_id' => ((int) $customer_id > 0) ? $customer_id : 'guest',
 					'domain'      => $this->domain_name,
+					'applepay_workflow' => $workflow
 				]
 			];
 
