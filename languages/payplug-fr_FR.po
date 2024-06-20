@@ -1246,3 +1246,6 @@ msgstr "Impossible d'enregistrer la configuration. Merci de sélectionner au moi
 
 msgid "applepay_cart_checkout_option_validation_title"
 msgstr "Impossible d'enregistrer la configuration."
+
+msgid "applepay_cart_carrier_enabled"
+msgstr "Merci de sélectionner au moins une méthode de livraison compatible pour Apple Pay Panier ou désactivez la fonctionnalité."
