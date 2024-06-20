@@ -96,7 +96,11 @@ class Validator {
 	 * @param $checkout
 	 * @return true
 	 */
-	public static function applePayPaymentGatewayOptions($cart, $checkout, $carriers){
+	public static function applePayPaymentGatewayOptions($apple_pay, $cart, $checkout, $carriers){
+
+		if($apple_pay === "no"){
+			return true;
+		}
 
 		if(!$cart && !$checkout){
 			http_response_code(400);
