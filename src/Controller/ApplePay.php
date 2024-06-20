@@ -44,13 +44,13 @@ class ApplePay extends PayplugGateway
 		}else if( $this->checkApplePay() && $this->checkDeviceComptability() && $this->isSSL()  ){
 			if (!is_admin() && is_checkout() && $this->get_button_checkout()) {
 				$this->enabled = 'yes';
-				add_action('wp_enqueue_scripts', [$this, 'add_apple_pay_css']);
+				$this->add_apple_pay_css();
 				add_action('wp_enqueue_scripts', [$this, 'add_apple_pay_js']);
 			}
 
 			if (!is_admin() && is_cart() && $this->get_button_cart()) {
 				$this->enabled = 'yes';
-				add_action('wp_enqueue_scripts', [$this, 'add_apple_pay_css']);
+				$this->add_apple_pay_css();
 				add_action('woocommerce_after_cart_totals', [$this, 'add_apple_pay_cart_js']);
 
 			}
@@ -139,6 +139,7 @@ class ApplePay extends PayplugGateway
 				'ajax_url_update_applepay_order' => \WC_AJAX::get_endpoint('update_applepay_order'),
 				'ajax_url_update_applepay_payment' => \WC_AJAX::get_endpoint('update_applepay_payment'),
 				'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
+				'ajax_url_applepay_cancel_order' => \WC_AJAX::get_endpoint('applepay_cancel_order'),
 
 				'countryCode' => WC()->customer->get_billing_country(),
 				'currencyCode' => get_woocommerce_currency(),

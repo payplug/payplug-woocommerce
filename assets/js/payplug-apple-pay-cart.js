@@ -168,7 +168,7 @@
 						{
 							label: shippingMethod.label,
 							type: 'final',
-							amount: session.amount
+							amount: currentShippingCost
 						}
 					]
 				};
@@ -246,7 +246,6 @@
 						'payment_id' : session.payment_id
 					}
 				}).done(function (response) {
-					console.log(JSON.stringify(response));
 					if (message.length > 0) {
 						apple_pay.showError(message)
 					} else {
