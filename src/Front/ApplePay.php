@@ -219,6 +219,8 @@ class ApplePay {
 		$amount      = $gateway->validate_order_amount($amount);
 		wp_send_json([
 			'total' => $amount,
+			'total_tax' => (float)$order->get_total_tax(),
+			'subtotal' => (float)$order->get_subtotal(),
 			'order_id' => $order_id,
 			'payment_data' => $gateway->process_standard_payment($order, $amount, $customer_id, 'cart')
 		]);

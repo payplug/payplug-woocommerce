@@ -85,7 +85,8 @@
 			).done(function(results){
 				if(results.payment_data.result === 'success'){
 					apple_pay_params.total = results.total
-
+					apple_pay_params.total_tax = results.total_tax
+					apple_pay_params.subtotal = results.subtotal
 					apple_pay.OrderPaymentCreated(results);
 
 				} else {
@@ -134,10 +135,10 @@
 					"name",
 					"phone",
 					"email"
-				],
+				]
 			}
 
-			session = new ApplePaySession(3, request);
+			session = new ApplePaySession(2, request);
 
 		},
 		BeginSession: function (response) {
@@ -169,6 +170,16 @@
 							label: shippingMethod.label,
 							type: 'final',
 							amount: currentShippingCost
+						},
+						{
+							label: "Estimated Tax",
+							type: "final",
+							amount: apple_pay_params.total_tax
+						},
+						{
+							"label": "Subtotal",
+							amount: apple_pay_params.subtotal,
+							"type": "final"
 						}
 					]
 				};
