@@ -50,7 +50,7 @@
 			e.stopImmediatePropagation();
 
 			apple_pay.CreateSession();
-			apple_pay.CancelOrder()
+			apple_pay.CancelOrder('')
 			apple_pay.PaymentCompleted();
 
 			//loading layer
@@ -63,25 +63,21 @@
 				if(results.payment_data.result === 'success'){
 					apple_pay_params.total = results.total
 
-					//TODO: error handling here
 					apple_pay.OrderPaymentCreated(results);
 
 				} else {
-					return false;
-
+					apple_pay.CancelOrder('');
 				}
 
 			}).fail( function() {
-				return false;
-
+				apple_pay.CancelOrder('');
 			})
 
 		},
 		OrderPaymentCreated: function (response) {
 			if ('success' !== response.payment_data.result) {
 				var error_messages = response.messages || ''
-
-				return error_messages;
+				apple_pay.CancelOrder(error_messages);
 			}
 
 			apple_pay.BeginSession(response)
@@ -129,7 +125,7 @@
 
 			apple_pay.MerchantValidated(session, response.payment_data.merchant_session);
 
-				session.onshippingmethodselected = event => {
+			session.onshippingmethodselected = event => {
 
 					const shippingMethod = event.shippingMethod;
 					session.shippingMethod = shippingMethod.identifier;
@@ -164,7 +160,7 @@
 				try {
 					session.completeMerchantValidation(merchant_session);
 				} catch (err) {
-					alert(err)
+					apple_pay.CancelOrder('');
 				}
 			}
 		},
@@ -200,25 +196,59 @@
 
 							if (res.success !== true) {
 								apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
+								apple_pay.CancelOrder('Unfortunately your order cannot be processed as the originating bank/merchant has declined your transaction. Please attempt your purchase again.')
 							}
 							session.completePayment({"status": apple_pay_Session_status})
 							window.location = session.return_url
 						},
 						error: function(err){
-							jQuery('woocommerce').unblock();
-							$('apple-pay-button').removeClass("isDisabled")
+							apple_pay.CancelOrder('Unfortunately your order cannot be processed as the originating bank/merchant has declined your transaction. Please attempt your purchase again.')
 						},
 					})
+				}).fail(function (response) {
+					apple_pay.CancelOrder('Unfortunately your order cannot be processed as the originating bank/merchant has declined your transaction. Please attempt your purchase again.');
 				})
 				$('apple-pay-button').addClass("isDisabled")
 
 			}
 		},
-		CancelOrder: function () {
+
+		CancelOrder: function (message) {
 			session.oncancel = event => {
-				$('apple-pay-button').addClass("isDisabled")
-				window.location = session.cancel_url
+				$('apple-pay-button').removeClass("isDisabled")
+				jQuery.post({
+					url : apple_pay_params.ajax_url_applepay_cancel_order,
+					data : {
+						'order_id' : session.order_id,
+						'payment_id' : session.payment_id
+					}
+				}).done(function (response) {
+					console.log(JSON.stringify(response));
+					if (message.length > 0) {
+						apple_pay.showError(message)
+					} else {
+						apple_pay.showError(response.data.message)
+					}
+				})
+
 			}
+		},
+
+		showError: function (message) {
+			jQuery('.woocommerce').unblock()
+			let notices = jQuery('.woocommerce-notices-wrapper')
+			jQuery('<div></div>')
+				.addClass('woocommerce-info')
+				.html(message)
+				.prependTo(notices)
+			jQuery('html , body').animate({
+				scrollTop: (notices.offset().top - 100)
+			}, 500)
+			setTimeout(function() {
+				notices.fadeOut('slow', function() {
+					jQuery(this).remove();
+				});
+			}, 5000);
 		}
 	}
 
