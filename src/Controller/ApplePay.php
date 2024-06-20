@@ -94,6 +94,11 @@ class ApplePay extends PayplugGateway
 			return false;
 		}
 
+		//support legacy applepay
+		if( !isset($options['applepay_checkout']) && !isset($options['applepay_cart']) && isset($options['apple_pay']) && $options['apple_pay'] ==="yes"){
+			$this->set_button_checkout(true);
+		}
+
 		if(isset($options['applepay_checkout']) && $options['applepay_checkout'] === "yes"){
 			$this->set_button_checkout(true);
 		}
