@@ -89,7 +89,11 @@ class ApplePay {
 
 
 		if ( ! $cart->is_empty() ) {
-			$order = wc_create_order();
+
+			$checkout = WC()->checkout();
+			$order_id = $checkout->create_order(array('payment_method' => 'apple_pay'));
+			$order = wc_get_order($order_id);
+
 			$order->set_address( [
 				'first_name' => 'payplug_applepay_first_name',
 				'last_name'  => 'payplug_applepay_last_name',
@@ -111,21 +115,8 @@ class ApplePay {
 				'email'      => 'payplug_applepay_email@payplug.com'
 			], 'shipping' );
 
-			foreach ( WC()->cart->get_cart() as $cart_item_key => $values ) {
-				$product = $values['data'];
-				$quantity = $values['quantity'];
-				$item_id = $order->add_product( $product, $quantity );
 
-				$tax_rates = \WC_Tax::get_rates( $product->get_tax_class() );
-				$taxes = \WC_Tax::calc_tax( $product->get_price(), $tax_rates, true );
-
-				$item = new \WC_Order_Item_Product( $item_id );
-				$item->set_taxes( array( 'total' => $taxes ) );
-				$item->save();
-			}
-
-
-			$order->set_payment_method( "apple_pay" );
+			$order->set_payment_method( $apple_pay);
 
 			$packages = WC()->cart->get_shipping_packages();
 
@@ -191,7 +182,7 @@ class ApplePay {
 		wp_send_json([
 			'total' => $amount,
 			'order_id' => $order_id,
-			'payment_data' => $gateway->process_standard_payment($order, $amount, $customer_id)
+			'payment_data' => $gateway->process_standard_payment($order, $amount, $customer_id, 'cart')
 		]);
 
 	}
