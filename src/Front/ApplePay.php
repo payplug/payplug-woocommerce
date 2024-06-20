@@ -9,7 +9,6 @@ use function is_cart;
 class ApplePay {
 
 	public function __construct() {
-		add_action( 'woocommerce_after_cart_totals', [ $this, 'applepayButton' ] );
 
 		//routes for apple_pay on cart
 		add_action( 'wc_ajax_applepay_get_shippings', [ $this, 'applepay_get_shippings' ] );
@@ -18,6 +17,7 @@ class ApplePay {
 		add_action( 'wc_ajax_update_applepay_payment', [ $this, 'update_applepay_payment' ] );
 		add_action( 'wc_ajax_applepay_cancel_order', [ $this, 'applepay_cancel_order' ] );
 	}
+
 
 	/**
 	 * Add button and Scripts
@@ -126,9 +126,9 @@ class ApplePay {
 
 			$checkout = WC()->checkout();
 
+
 			$order_id = $checkout->create_order(array('payment_method' => $apple_pay->id));
 			$order = wc_get_order($order_id);
-
 
 			$order->set_address( [
 				'first_name' => 'payplug_applepay_first_name',
@@ -151,7 +151,10 @@ class ApplePay {
 				'email'      => 'payplug_applepay_email@payplug.com'
 			], 'shipping' );
 
-			$order->set_payment_method($apple_pay);
+
+
+			$order->set_payment_method( $apple_pay);
+
 
 			$packages = WC()->cart->get_shipping_packages();
 
@@ -217,7 +220,7 @@ class ApplePay {
 		wp_send_json([
 			'total' => $amount,
 			'order_id' => $order_id,
-			'payment_data' => $gateway->process_standard_payment($order, $amount, $customer_id)
+			'payment_data' => $gateway->process_standard_payment($order, $amount, $customer_id, 'cart')
 		]);
 
 	}

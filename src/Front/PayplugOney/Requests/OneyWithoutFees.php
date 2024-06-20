@@ -9,7 +9,7 @@ class OneyWithoutFees extends OneyBase
 
 	public function __construct()
 	{
-		$this->setCountry(PayplugWoocommerceHelper::getOneySettings());
+		$this->setCountry(PayplugWoocommerceHelper::get_payplug_options());
 
 		/** @var $oney \Payplug\PayplugWoocommerce\Front\PayplugOney\Country\OneyFR */
 		$class = "\\Payplug\\PayplugWoocommerce\\Front\\PayplugOney\\Country\\Oney" . $this->getCountry();

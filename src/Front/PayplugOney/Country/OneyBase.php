@@ -74,7 +74,7 @@ Abstract Class OneyBase implements InterfaceOney
 
 	public function __construct()
 	{
-		$this->payplugOptions = PayplugWoocommerceHelper::getOneySettings();
+		$this->payplugOptions = PayplugWoocommerceHelper::get_payplug_options();
 		$max = ( !empty($this->payplugOptions['oney_thresholds_max']) && (int) $this->payplugOptions['oney_thresholds_max'] <= $this->max_default_amount ) ? $this->payplugOptions['oney_thresholds_max'] : $this->max_default_amount;
 		$min = ( !empty($this->payplugOptions['oney_thresholds_min']) && (int) $this->payplugOptions['oney_thresholds_min'] >= $this->min_default_amount) ? $this->payplugOptions['oney_thresholds_min'] : $this->min_default_amount;
 
