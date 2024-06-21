@@ -43,7 +43,7 @@ class ApplePay {
 					array_push($shippings, [
 						'identifier' => $shipping_method->id,
 						'label' => $shipping_method->method_title,
-						'detail' => $shipping_method->method_description,
+						'detail' => strip_tags($shipping_method->method_description),
 						'amount' =>$shipping_rate->get_cost()+$shipping_rate->get_shipping_tax()
 					]);
 				}
