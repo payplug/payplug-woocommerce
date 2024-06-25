@@ -9,7 +9,6 @@ apple-pay-button {
 	--apple-pay-button-border-radius: 3px;
 	--apple-pay-button-padding: 0px 0px;
 	--apple-pay-button-box-sizing: border-box;
-	margin: 10px 0px;
 }
 
 apple-pay-button.isDisabled {
