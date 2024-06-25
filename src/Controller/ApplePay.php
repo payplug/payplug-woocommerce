@@ -51,7 +51,7 @@ class ApplePay extends PayplugGateway
 			if (!is_admin() && is_cart() && $this->get_button_cart()) {
 				$this->enabled = 'yes';
 				$this->add_apple_pay_css();
-				add_action('woocommerce_after_cart_totals', [$this, 'add_apple_pay_cart_js']);
+				add_action('woocommerce_proceed_to_checkout', [$this, "add_apple_pay_cart_js"], 15);
 
 			}
 		}
