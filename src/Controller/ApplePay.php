@@ -171,6 +171,17 @@ class ApplePay extends PayplugGateway
 			)
 		);
 
+		if($this->checkButtonVisibility()){
+			echo $this->get_description();
+		}
+	}
+
+	/**
+	 * Check if the shipping address is a carrier
+	 *
+	 * @return bool
+	 */
+	private function checkButtonVisibility(){
 		$apple_carriers = $this->get_carriers();
 		$allowed = false;
 		$post = $this->get_post_data();
@@ -192,9 +203,7 @@ class ApplePay extends PayplugGateway
 			}
 		}
 
-		if($allowed){
-			echo $this->get_description();
-		}
+		return $allowed;
 	}
 
 
