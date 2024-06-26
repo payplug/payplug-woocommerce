@@ -54,6 +54,14 @@
 		},
 		handleApplePayButton:function(results){
 			selected_shipping = jQuery('[name^="shipping_method"]:checked').val();
+
+			//if there's only 1 shipping method available there is no radio
+			if(typeof selected_shipping === "undefined" ){
+				if( jQuery("ul#shipping_method li").length === 1 ){
+					selected_shipping = jQuery('[name^="shipping_method"]').val();
+				}
+			}
+
 			selected_shipping = selected_shipping.split(":");
 			var hide = true;
 			results.data.map(function(v){
