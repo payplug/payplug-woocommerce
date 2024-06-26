@@ -90,6 +90,26 @@ class ApplePay extends PayplugGateway
 		return false;
 	}
 
+	public function payment_fields()
+	{
+		$description = $this->get_description();
+
+		if (!empty($description)) {
+			echo wpautop(wptexturize($description));
+		}
+	}
+
+	/**
+	 * extend the woocommmerce get description to include personalized html
+	 *
+	 * @return mixed|string|null
+	 */
+	public function get_description()
+	{
+		return apply_filters( 'woocommerce_gateway_description', $this->description, $this->id );
+	}
+
+
 	/**
 	 * Display unauthorized error
 	 *
