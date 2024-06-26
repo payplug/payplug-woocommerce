@@ -19,6 +19,8 @@ class ApplePay extends PayplugGateway
 
 	protected $checkout = false;
 
+	protected $carriers = [];
+
 	public function __construct()
 	{
 
@@ -107,6 +109,10 @@ class ApplePay extends PayplugGateway
 			$this->set_button_cart(true);
 		}
 
+		if(isset($options['applepay_carriers']) ){
+			$this->set_carriers($options['applepay_carriers']);
+		}
+
 		//no auth
 		if(!isset($account['payment_methods']['apple_pay']) || !isset($account['payment_methods']['apple_pay']['allowed_domain_names'])  ){
 			return false;
@@ -165,7 +171,30 @@ class ApplePay extends PayplugGateway
 			)
 		);
 
-		echo $this->get_description();
+		$apple_carriers = $this->get_carriers();
+		$allowed = false;
+		$post = $this->get_post_data();
+		$chosen_method = isset($post["shipping_method"][0]) ? $post["shipping_method"][0] : null;
+		if(!$chosen_method){
+			$chosen_method = WC()->session->chosen_shipping_methods[0];
+		}
+
+		foreach ( WC()->shipping()->get_packages() as $i => $package ) {
+			$available_rates = !empty($package['rates']) ? $package['rates'] : [];
+			if(!empty($available_rates)){
+				foreach($available_rates as $method){
+					if(in_array($method->get_method_id(), $apple_carriers) ){
+						if($chosen_method === $method->get_method_id() . ":" . $method->get_instance_id()){
+							$allowed = true;
+						}
+					}
+				}
+			}
+		}
+
+		if($allowed){
+			echo $this->get_description();
+		}
 	}
 
 
@@ -396,6 +425,14 @@ class ApplePay extends PayplugGateway
 
 	private function get_button_cart(){
 		return $this->cart;
+	}
+
+	private function get_carriers(){
+		return $this->carriers;
+	}
+
+	private function set_carriers($carriers){
+		$this->carriers = $carriers;
 	}
 
 
