@@ -193,7 +193,8 @@ class ApplePay extends PayplugGateway
 
 		// Check if the Browser is Safari
 		if (stripos( $user_agent, 'Chrome') !== false) {
-			return true;
+			return false;
+
 		} elseif (stripos( $user_agent, 'Safari') !== false) {
 			// Check if the OS is Mac
 			if(!preg_match('/macintosh|mac os x/i', $user_agent)) {
