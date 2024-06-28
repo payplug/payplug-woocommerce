@@ -756,6 +756,7 @@ class Ajax {
 			$data = $request->get_params();
 			$options = get_option('woocommerce_payplug_settings', []);
 
+
 			$options['enabled'] = Validator::enabled($data['payplug_enable']);
 			$options['mode'] = Validator::mode($data['payplug_sandbox']);
 
@@ -769,16 +770,24 @@ class Ajax {
 
 			$options['oney'] = Validator::oney($data['enable_oney']);
 			$options['bancontact'] = Validator::genericPaymentGateway($data['enable_bancontact'], "Bancontact", $test_mode);
+
 			$options['apple_pay'] = Validator::genericPaymentGateway($data['enable_applepay'], "Apple Pay", $test_mode);
+			$options['applepay_carriers'] = (!empty($data['applepay_carriers'])) ? $data['applepay_carriers'] : [];
+			$options['applepay_checkout'] = Validator::genericPaymentGateway($data['enable_applepay_checkout'], "Apple Pay Checkout", $test_mode);
+			$options['applepay_cart'] = Validator::genericPaymentGateway($data['enable_applepay_cart'], "Apple Pay Cart", $test_mode);
+
+			Validator::applePayPaymentGatewayOptions($options['apple_pay'], $data['enable_applepay_cart'], $data['enable_applepay_checkout'], $options['applepay_carriers']);
+			if (($options['apple_pay'] === 'yes') && ($options['applepay_checkout'] === 'no') && ($options['applepay_cart'] === 'no')) {
+				$options['applepay_checkout'] = 'yes';
+			}
+
+
 			$options['american_express'] = Validator::genericPaymentGateway($data['enable_american_express'],"American Express", $test_mode);
 			$options['satispay'] = Validator::genericPaymentGateway($data['enable_satispay'], "Satispay", $test_mode);
 			$options['sofort'] = Validator::genericPaymentGateway($data['enable_sofort'], "Sofort", $test_mode);
 			$options['ideal'] = Validator::genericPaymentGateway($data['enable_ideal'], "iDEAL", $test_mode);
 			$options['mybank'] = Validator::genericPaymentGateway($data['enable_mybank'], "Mybank", $test_mode);
 			$options['giropay'] = Validator::genericPaymentGateway($data['enable_giropay'], "Giropay", $test_mode);
-
-			//TODO:: add validation for oney -> needed to add modal for error msg
-
 			$options['oney_type'] = (Validator::oney_type($data['payplug_oney'])) ? $data['payplug_oney'] : 'with_fees';
 			$thresholds = (Validator::oney_thresholds($data['oney_min_amounts'], $data['oney_max_amounts']));
 			$options['oney_thresholds_min'] = $thresholds['min'];

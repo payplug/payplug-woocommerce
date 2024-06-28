@@ -212,7 +212,22 @@ class PaymentMethods {
 	 *
 	 * @return array
 	 */
-	public static function payment_method_applepay( $active = false ) {
+	public static function payment_method_applepay( $active = false, $options, $carriers = [] ) {
+
+		$checkout = $cart = false;
+
+		if( !empty($options['applepay_checkout']) && ($options['applepay_checkout'] == "yes" ) ){
+			$checkout = true;
+		}
+
+		if( !empty($options['applepay_cart']) && ($options['applepay_cart'] == "yes" ) ){
+			$cart = true;
+		}
+
+		if( $active === true  && !$checkout && !$cart ){
+			$checkout = true;
+		}
+
 		return [
 			"type" => "payment_method",
 			"name" => "applepay",
@@ -230,6 +245,52 @@ class PaymentMethods {
 					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_applepay_more_url', 'payplug' ), "_blank"),
 				]
 			],
+			"options" =>
+				[
+					[
+						"type" => "payment_option",
+						"sub_type" => "IOptions",
+						"name" => "applepay_display",
+						"title" => __( 'applepay_display_choice_title', 'payplug' ),
+						"options" =>
+							[
+								[
+									"name" => "applepay_checkout",
+									"title" => __( 'applepay_display_checkout', 'payplug' ),
+									"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/cart/applepay_checkout.svg' ),
+									"label" => __( 'applepay_display_checkout', 'payplug' ),
+									"value" => "checkout",
+									"switch" => true,
+									"checked" => $checkout || ($active && !$cart)
+								],
+								[
+									"name" => "applepay_cart",
+									"title" => __( 'applepay_display_cart', 'payplug' ),
+									"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/cart/applepay_cart.svg' ),
+									"label" => __( 'applepay_display_cart', 'payplug' ),
+									"value" => "cart",
+									"switch" => true,
+									"checked" => $cart
+								]
+							],
+						"carriers" =>
+							[
+								"title" => __( 'applepay_active_carriers_title', 'payplug' ),
+								"alert" => __( 'applepay_active_carriers_alert', 'payplug' ),
+								"descriptions" => [
+									"live"    => [
+										"description"      => __( 'applepay_active_carriers_description', 'payplug' ),
+										"description_bold" => __( 'applepay_active_carriers_description_bold', 'payplug' ),
+										"description_warning" => __( 'applepay_active_carriers_description_warning', 'payplug' ),
+									],
+									"sandbox" => []
+								],
+								"instructions" => __( 'applepay_active_carriers_instructions', 'payplug' ),
+								"carriers_list" => PayplugWoocommerceHelper::available_shipping_methods($carriers),
+
+							]
+					]
+				]
 		];
 	}
 

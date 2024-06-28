@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.4.4\n"
 
 msgid "payplug_advanced_settings"
 msgstr "Advanced Settings"
@@ -599,3 +599,42 @@ msgstr "Financing cost :"
 
 msgid "oney_total"
 msgstr "Total :"
+
+msgid "applepay_display_choice_title"
+msgstr "Choose on which page(s) you would like to propose Apple Pay payment :"
+
+msgid "applepay_display_checkout"
+msgstr "Display the button on the checkout page"
+
+msgid "applepay_display_cart"
+msgstr "Display the button on the cart page"
+
+msgid "applepay_display_product"
+msgstr "Display the button on the product page"
+
+msgid "applepay_active_carriers_title"
+msgstr "Methods of delivery active on your shop."
+
+msgid "applepay_active_carriers_alert"
+msgstr "If no delivery method is selected, the Apple Pay button will not be displayed."
+
+msgid "applepay_active_carriers_description"
+msgstr "With ApplePay, deliveries are only possible to addresses stored in your customers' wallet (home address, office, etc.). "
+
+msgid "applepay_active_carriers_description_bold"
+msgstr "Deliveries to collection points are not possible, "
+
+msgid "applepay_active_carriers_description_warning"
+msgstr " so they will not be offered to your customers (e.g., delivery to a store, collection point, or pick-up station)"
+
+msgid "applepay_active_carriers_instructions"
+msgstr "Please select the delivery methods that are not collection points."
+
+msgid "applepay_cart_checkout_option_validation"
+msgstr "Unable to save the configuration. Please select at least one page to offer Apple Pay: Checkout Page or Cart Page."
+
+msgid "applepay_cart_checkout_option_validation_title"
+msgstr "Unable to save the configuration"
+
+msgid "applepay_cart_carrier_enabled"
+msgstr "Please select at least one compatible delivery method for Apple Pay Cart or disable the feature."

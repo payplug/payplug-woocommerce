@@ -108,6 +108,7 @@ class PayplugWoocommerce {
 		$this->metabox  = new Metabox();
 		$this->actions  = new WoocommerceActions();
 		$this->requests = new PayplugWoocommerceRequest();
+		new Front\ApplePay();
 		$this->ajax     = new Ajax();
 
 		if( PayplugWoocommerceHelper::show_oney_popup() ) {
@@ -131,15 +132,15 @@ class PayplugWoocommerce {
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4x';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3xWithoutFees';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4xWithoutFees';
-
 		$methods[] = __NAMESPACE__ . '\\Gateway\\Bancontact';
-		$methods[] = __NAMESPACE__ . '\\Controller\\ApplePay';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\AmericanExpress';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Mybank';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Giropay';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Ideal';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Sofort';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Satispay';
+
+		$methods[] = __NAMESPACE__ . '\\Controller\\ApplePay';
 
 		return $methods;
 	}
@@ -184,4 +185,5 @@ class PayplugWoocommerce {
 			default: new OneyWithFees();break;
 		}
 	}
+
 }
