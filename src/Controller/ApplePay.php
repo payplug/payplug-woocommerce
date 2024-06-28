@@ -96,6 +96,13 @@ class ApplePay extends PayplugGateway
 			return false;
 		}
 
+		if ( !empty( WC()->cart ) ) {
+			$order_amount = $this->get_order_total();
+			if ($order_amount < self::MIN_AMOUNT || $order_amount > self::MAX_AMOUNT) {
+				return false;
+			}
+		}
+
 		//support legacy applepay
 		if( !isset($options['applepay_checkout']) && !isset($options['applepay_cart']) && isset($options['apple_pay']) && $options['apple_pay'] ==="yes"){
 			$this->set_button_checkout(true);
