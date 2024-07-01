@@ -96,8 +96,8 @@ class ApplePay extends PayplugGateway
 			return false;
 		}
 
-		if ( !empty( WC()->cart ) ) {
-			$order_amount = $this->get_order_total();
+		if ( is_cart() && !empty( WC()->cart ) ) {
+			$order_amount = (float) WC()->cart->total;
 			if ($order_amount < self::MIN_AMOUNT || $order_amount > self::MAX_AMOUNT) {
 				return false;
 			}
@@ -331,10 +331,6 @@ class ApplePay extends PayplugGateway
 	{
 		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 		try {
-			if (!$this->checkApplePay()) {
-				throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
-			}
-
 			$address_data = PayplugAddressData::from_order($order);
 
 			$return_url = esc_url_raw($order->get_checkout_order_received_url());

@@ -84,7 +84,7 @@
 					apple_pay.CancelOrder('');
 				}
 
-			}).fail( function() {
+			}).fail( function(xhr, status, error) {
 				apple_pay.CancelOrder('');
 			})
 
@@ -227,7 +227,6 @@
 
 			}
 		},
-
 		CancelOrder: function (message) {
 			session.oncancel = event => {
 				$('apple-pay-button').removeClass("isDisabled")
