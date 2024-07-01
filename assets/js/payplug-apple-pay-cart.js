@@ -84,8 +84,9 @@
 					apple_pay.CancelOrder('');
 				}
 
-			}).fail( function() {
+			}).fail( function(xhr, status, error) {
 				apple_pay.CancelOrder('');
+				location.reload();
 			})
 
 		},
