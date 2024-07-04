@@ -415,9 +415,15 @@ class ApplePay extends PayplugGateway
 
 		} catch (HttpException $e) {
 			PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
+			if($workflow === "cart"){
+				wp_send_json_error(["code" => $e->getCode(), "msg" => __('Payment processing failed. Please retry.', 'payplug'), "order_id" => $order_id ]);
+			}
 			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
 		} catch (\Exception $e) {
 			PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, $e->getMessage()), 'error');
+			if($workflow === "cart"){
+				wp_send_json_error(["code" => $e->getCode(), "msg" => __('Payment processing failed. Please retry.', 'payplug'), "order_id" => $order_id ]);
+			}
 			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
 		}
 

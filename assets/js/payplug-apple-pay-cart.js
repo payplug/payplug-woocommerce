@@ -65,7 +65,7 @@
 			e.stopImmediatePropagation();
 
 			apple_pay.CreateSession();
-			apple_pay.CancelOrder('')
+			apple_pay.CancelOrder()
 			apple_pay.PaymentCompleted();
 
 			//loading layer
@@ -75,18 +75,15 @@
 				apple_pay_params.ajax_url_place_order_with_dummy_data
 
 			).done(function(results){
-				if(results.payment_data.result === 'success'){
-					apple_pay_params.total = results.total
-
-					apple_pay.OrderPaymentCreated(results);
-
-				} else {
-					apple_pay.CancelOrder('');
+				if(results.success === false){
+					apple_pay.showError(results.data.msg, "error");
+					apple_pay.handle_process_error(results.data.order_id);
+					return;
 				}
 
-			}).fail( function(xhr, status, error) {
-				apple_pay.CancelOrder('');
-			})
+				apple_pay_params.total = results.total
+				apple_pay.OrderPaymentCreated(results);
+			});
 
 		},
 		OrderPaymentCreated: function (response) {
@@ -175,7 +172,7 @@
 				try {
 					session.completeMerchantValidation(merchant_session);
 				} catch (err) {
-					apple_pay.CancelOrder('');
+					apple_pay.CancelOrder();
 				}
 			}
 		},
@@ -230,36 +227,39 @@
 		CancelOrder: function (message) {
 			session.oncancel = event => {
 				$('apple-pay-button').removeClass("isDisabled")
-				jQuery.post({
-					url : apple_pay_params.ajax_url_applepay_cancel_order,
-					data : {
-						'order_id' : session.order_id,
-						'payment_id' : session.payment_id
-					}
-				}).done(function (response) {
-					if (message.length > 0) {
-						apple_pay.showError(message)
-					} else {
-						apple_pay.showError(response.data.message)
-					}
-				})
+				apple_pay.cancel_order_request(session.order_id, session.payment_id);
 
 			}
 		},
-
-		showError: function (message) {
+		handle_process_error: function (order_id = null) {
+			$('apple-pay-button').removeClass("isDisabled")
+			apple_pay.cancel_order_request(order_id, null);
+		},
+		cancel_order_request: function(order_id, payment_id = null){
+			jQuery.post({
+				url : apple_pay_params.ajax_url_applepay_cancel_order,
+				data : {
+					'order_id' : order_id,
+					'payment_id' : payment_id
+				}
+			}).done(function (response) {
+				apple_pay.showError(response.data.message, "info");
+			})
+		},
+		showError: function (message="", type = "info") {
 			jQuery('.woocommerce').unblock()
 			let notices = jQuery('.woocommerce-notices-wrapper')
-			jQuery('<div></div>')
-				.addClass('woocommerce-info')
+			jQuery('<div id="apple-pay-cart-notice"></div>')
+				.addClass('woocommerce-'+type)
 				.html(message)
 				.prependTo(notices)
 			jQuery('html , body').animate({
 				scrollTop: (notices.offset().top - 100)
 			}, 500)
+			jQuery('.woocommerce-notices-wrapper').fadeIn();
 			setTimeout(function() {
 				notices.fadeOut('slow', function() {
-					jQuery(this).remove();
+					jQuery('.woocommerce-notices-wrapper #apple-pay-cart-notice').remove();
 				});
 			}, 5000);
 		}
