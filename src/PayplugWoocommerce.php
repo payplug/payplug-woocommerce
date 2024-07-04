@@ -117,6 +117,8 @@ class PayplugWoocommerce {
 
 		add_action( 'woocommerce_payment_gateways', [ $this, 'register_payplug_gateway' ] );
 		add_filter( 'plugin_action_links_' . PAYPLUG_GATEWAY_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
+		add_action( 'woocommerce_blocks_loaded', array( __CLASS__, 'woocommerce_apple_pay_block_support' ) );
+
 	}
 
 	/**
@@ -183,6 +185,22 @@ class PayplugWoocommerce {
 		Switch($options['oney_type']){
 			case "without_fees" : new OneyWithoutFees();break;
 			default: new OneyWithFees();break;
+		}
+	}
+
+	/**
+	 * Registers WooCommerce Blocks integration.
+	 *
+	 */
+	public static function woocommerce_apple_pay_block_support() {
+		if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+			require_once PAYPLUG_GATEWAY_PLUGIN_DIR . 'src/Controller/Blocks/ApplePayBlocks.php';
+			add_action(
+				'woocommerce_blocks_payment_method_type_registration',
+				function( \Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+					$payment_method_registry->register( new \Payplug\PayplugWoocommerce\Controller\Blocks\ApplePayBlocks() );
+				}
+			);
 		}
 	}
 
