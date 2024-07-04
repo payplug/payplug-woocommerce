@@ -15,6 +15,7 @@ use Payplug\PayplugWoocommerce\Controller\Bancontact;
 use Payplug\PayplugWoocommerce\Controller\ApplePay;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithFees;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithoutFees;
+use Payplug\PayplugWoocommerce\Gateway\blocks\CreditCart;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 
 class PayplugWoocommerce {
@@ -116,6 +117,10 @@ class PayplugWoocommerce {
 		}
 
 		add_action( 'woocommerce_payment_gateways', [ $this, 'register_payplug_gateway' ] );
+
+		// Registers WooCommerce Blocks integration.
+		add_action( 'woocommerce_blocks_loaded', [$this, 'woocommerce_gateway_dummy_woocommerce_block_support'] );
+
 		add_filter( 'plugin_action_links_' . PAYPLUG_GATEWAY_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
 	}
 
@@ -186,4 +191,22 @@ class PayplugWoocommerce {
 		}
 	}
 
+	/**
+	 * Registers WooCommerce Blocks integration.
+	 *
+	 */
+	public static function woocommerce_gateway_dummy_woocommerce_block_support() {
+		if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+
+			//TODO:: add here all the payment blocks of the payment methods
+			require_once PAYPLUG_GATEWAY_PLUGIN_DIR . 'src' . DIRECTORY_SEPARATOR . 'Gateway'. DIRECTORY_SEPARATOR .'blocks'. DIRECTORY_SEPARATOR .'CreditCart.php';
+
+			add_action(
+				'woocommerce_blocks_payment_method_type_registration',
+				function( \Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+					$payment_method_registry->register( new CreditCart() );
+				}
+			);
+		}
+	}
 }
