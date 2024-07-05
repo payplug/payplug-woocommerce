@@ -26,7 +26,7 @@ final class ApplePayBlocks extends AbstractPaymentMethodType {
 	 *
 	 * @var string
 	 */
-	protected $name = 'apple_pay';
+	protected $name = 'payplug';
 
 	/**
 	 * Initializes the payment method type.
@@ -44,7 +44,7 @@ final class ApplePayBlocks extends AbstractPaymentMethodType {
 	 * @return boolean
 	 */
 	public function is_active() {
-		return true;
+		return ! empty( $this->settings[ 'enabled' ] ) && 'yes' === $this->settings[ 'enabled' ];
 	}
 
 
@@ -66,33 +66,14 @@ final class ApplePayBlocks extends AbstractPaymentMethodType {
 		$script_url        = PAYPLUG_GATEWAY_PLUGIN_URL . $script_path;
 
 		wp_register_script(
-			'wc-payplug-apple_pay-blocks',
+			'wc-payplug-blocks',
 			$script_url,
 			$script_asset[ 'dependencies' ],
 			$script_asset[ 'version' ],
 			true
 		);
 
-		wp_enqueue_style('payplug-apple-pay', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-apple-pay.css', [], PAYPLUG_GATEWAY_VERSION);
-		wp_enqueue_script( 'apple-pay-sdk', 'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js', array(), false, true );
-		wp_enqueue_script('payplug-apple-pay', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-apple-pay.js',
-			[
-				'jquery',
-				'apple-pay-sdk'
-			], PAYPLUG_GATEWAY_VERSION, true);
-		wp_localize_script( 'payplug-apple-pay', 'apple_pay_params',
-			array(
-				'ajax_url_payplug_create_order' => \WC_AJAX::get_endpoint('payplug_create_order'),
-				'ajax_url_applepay_update_payment' => \WC_AJAX::get_endpoint('applepay_update_payment'),
-				'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
-				'countryCode' => WC()->customer->get_billing_country(),
-				'currencyCode' => get_woocommerce_currency(),
-				'total'  => WC()->cart->total,
-				'apple_pay_domain' => $_SERVER['HTTP_HOST']
-			)
-		);
-
-		return [ 'wc-payplug-apple_pay-blocks' ];
+		return [ 'wc-payplug-blocks' ];
 	}
 
 	/**
@@ -103,8 +84,10 @@ final class ApplePayBlocks extends AbstractPaymentMethodType {
 	public function get_payment_method_data() {
 		return [
 			'title'       => $this->gateway->method_title,
-			'description' => $this->gateway->description,
-			'local' => get_locale()
+			'name'       => $this->gateway->id,
+			'description' => $this->gateway->new_method_label,
+			'local' => get_locale(),
+			'icon' => $this->gateway->get_icon()
 		];
 	}
 }

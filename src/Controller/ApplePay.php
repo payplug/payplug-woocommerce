@@ -38,7 +38,7 @@ class ApplePay extends PayplugGateway
 		$this->description = '<div id="apple-pay-button-wrapper"><apple-pay-button buttonstyle="black" type="pay" locale="'. get_locale() .'"></apple-pay-button></div>';
 		$this->domain_name = $_SERVER['HTTP_HOST'];
 		//TODO : to rollback when blocks apple pay finished
-		$this->enabled = "yes";
+		$this->enabled = "no";
 
 
 		if( $this->checkApplePay() && is_admin()){
@@ -89,8 +89,7 @@ class ApplePay extends PayplugGateway
 	 */
 
 	private function checkApplePay(){
-		//TODO : to rollback when blocks apple pay finished
-		return true;
+
 		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options($this->id);
 		$options = PayplugWoocommerceHelper::get_payplug_options();
 
