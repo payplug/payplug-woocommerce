@@ -31,7 +31,7 @@ module.exports = {
 		'frontend/blocks': '/resources/js/frontend/index.js',
 	},
 	output: {
-		path: path.resolve( __dirname, 'assets/js' ),
+		path: path.resolve( __dirname, 'js' ),
 		filename: '[name].js',
 	},
 	plugins: [

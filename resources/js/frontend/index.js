@@ -16,7 +16,30 @@ const label = decodeEntities( settings.title ) || defaultLabel;
  * Content component
  */
 const Content = () => {
-	return window.wp.htmlEntities.decodeEntities( settings.description || '' );
+	let x = settings.description;
+	return (
+		<p>
+			<div className="payplug-oney-flex">
+				<div>{x}</div>
+				<div>11111</div>
+			</div>
+			<div className="payplug-oney-flex">
+				<small>( TEST TEXT <b>TEST TEXT</b> TAEG : <b>TEST TEXT</b></small>
+			</div>
+			<div className="payplug-oney-flex">
+				<div>TEST TEXT:</div>
+				<div>TEST TEXT</div>
+			</div>
+			<div className="payplug-oney-flex">
+				<div>TEST TEXT:</div>
+				<div>TEST TEXT</div>
+			</div>
+			<div className="payplug-oney-flex">
+				<div><b>TEST TEXT</b></div>
+				<div><b>TEST TEXT</b></div>
+			</div>
+		</p>
+	);
 };
 /**
  * Label component

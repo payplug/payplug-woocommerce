@@ -20,8 +20,8 @@ final class CreditCart extends Payplug
 	 */
 	public function get_payment_method_script_handles() {
 
-		$script_path       = '/assets/js/frontend/blocks.js';
-		$script_asset_path = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/frontend/blocks.asset.php';
+		$script_path       = '/js/frontend/blocks.js';
+		$script_asset_path = PAYPLUG_GATEWAY_PLUGIN_URL . 'js/frontend/blocks.asset.php';
 		$script_asset      = file_exists( $script_asset_path )
 			? require( $script_asset_path )
 			: array(
@@ -52,28 +52,8 @@ final class CreditCart extends Payplug
 	 */
 	public function get_payment_method_data() {
 		return [
-			'title'       => __('Pay by card in 3x with Oney', 'payplug'),
-			"description" => '<p>
-                    <div class="payplug-oney-flex">
-                        <div>TEST TEXT</div>
-                        <div>11111</div>
-                    </div>
-                    <div class="payplug-oney-flex">
-	<small>( TEST TEXT <b>TEST TEXT</b> TAEG : <b>TEST TEXT</small>
-</div>
-                    <div class="payplug-oney-flex">
-                        <div>TEST TEXT:</div>
-                        <div>TEST TEXT</div>
-                    </div>
-                    <div class="payplug-oney-flex">
-                        <div>TEST TEXT:</div>
-                        <div>TEST TEXT</div>
-                    </div>
-                    <div class="payplug-oney-flex">
-                        <div><b>TEST TEXT</b></div>
-                        <div><b>TEST TEXT</b></div>
-                    </div>
-                </p>'
+			'title'       =>$this->gateway->method_title,
+			"description" => $this->gateway->method_description
 			//'supports'    => array_filter( $this->gateway->supports, [ $this->gateway, 'supports' ] )
 		];
 	}
