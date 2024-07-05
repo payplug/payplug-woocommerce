@@ -4,7 +4,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
 
 
-const settings = getSetting( 'payplug_data', {} )
+const settings = getSetting( 'apple_pay_data', {} )
 
 const defaultLabel = __(
 	'Apple Pay',
@@ -17,7 +17,10 @@ const label = decodeEntities( settings.title ) || defaultLabel;
  * Content component
  */
 const Content = () => {
-	return window.wp.htmlEntities.decodeEntities( settings.description || '' );
+	let local = settings.local;
+	return (
+		<div id="apple-pay-button-wrapper"><apple-pay-button buttonstyle="black" type="pay" locale={local}></apple-pay-button></div>
+	);
 };
 
 const Label = ( props ) => {
