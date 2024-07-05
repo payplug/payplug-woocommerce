@@ -15,10 +15,10 @@ use Payplug\PayplugWoocommerce\Controller\ApplePay;
 final class ApplePayBlocks extends AbstractPaymentMethodType {
 
 	/**
-	 * The gateway instance.
-	 *
-	 * @var WC_Gateway_Dummy
+	 * plugin settings.
 	 */
+	protected $settings;
+
 	private $gateway;
 
 	/**
@@ -26,15 +26,15 @@ final class ApplePayBlocks extends AbstractPaymentMethodType {
 	 *
 	 * @var string
 	 */
-	protected $name = 'apple_pay';
+	protected $name = 'payplug';
 
 	/**
 	 * Initializes the payment method type.
 	 */
 	public function initialize() {
-		$this->settings['name'] = $this->name;
+		$this->settings = get_option( 'woocommerce_payplug_settings', [] );
 		$gateways       = WC()->payment_gateways->payment_gateways();
-		$this->gateway  = new ApplePay();
+		$this->gateway = $gateways[ $this->name ];
 	}
 
 	/**
@@ -43,8 +43,10 @@ final class ApplePayBlocks extends AbstractPaymentMethodType {
 	 * @return boolean
 	 */
 	public function is_active() {
-		return true;
+		return $this->gateway->is_available();
 	}
+
+
 
 	/**
 	 * Returns an array of scripts/handles to be registered for this payment method.
@@ -63,14 +65,14 @@ final class ApplePayBlocks extends AbstractPaymentMethodType {
 		$script_url        = PAYPLUG_GATEWAY_PLUGIN_URL . $script_path;
 
 		wp_register_script(
-			'wc-payplug-apple-pay-blocks',
+			'wc-payplug-cc-blocks',
 			$script_url,
 			$script_asset[ 'dependencies' ],
 			$script_asset[ 'version' ],
 			true
 		);
 
-		return [ 'wc-payplug-apple-pay-blocks' ];
+		return [ 'wc-payplug-cc-blocks' ];
 	}
 
 	/**

@@ -4,25 +4,27 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
 
 
-const settings = getSetting( 'apple_pay_data', {} )
+const settings = getSetting( 'payplug_data', {} )
 
 const defaultLabel = __(
 	'Apple Pay',
 	'woo-gutenberg-products-block'
 );
 
-const label = decodeEntities( settings.title ) || defaultLabel;
 
+const label = decodeEntities( settings.title ) || defaultLabel;
+/**
+ * Content component
+ */
 const Content = () => {
-	return  decodeEntities( settings.description || '' )
-}
+	return window.wp.htmlEntities.decodeEntities( settings.description || '' );
+};
 
 const Label = ( props ) => {
-	const { PaymentMethodLabel } = props.components
-	return <PaymentMethodLabel text={ label } />
-}
+	const { PaymentMethodLabel } = props.components;
+	return <PaymentMethodLabel text={ label } />;
+};
 
-console.log(settings.description);
 
 
 const ApplePay = {
