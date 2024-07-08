@@ -9,10 +9,19 @@ apple-pay-button {
 	--apple-pay-button-border-radius: 3px;
 	--apple-pay-button-padding: 0px 0px;
 	--apple-pay-button-box-sizing: border-box;
+	margin: 10px 0px;
 }
 
 apple-pay-button.isDisabled {
 	pointer-events: none;
 	cursor: not-allowed;
 	opacity: 0.5;
+}
+
+.cart_totals apple-pay-button {
+	--apple-pay-button-width: 100%;
+	--apple-pay-button-height: auto;
+	--apple-pay-button-padding: 1em;
+	-webkit-appearance: -apple-pay-button;
+
 }

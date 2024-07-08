@@ -89,6 +89,49 @@ class Validator {
 		wp_send_json_error(['error' => $payment . ' is missing']);
 	}
 
+	/**
+	 * prevent saving when neither cart and checkout is enabled
+	 *
+	 * @param $cart
+	 * @param $checkout
+	 * @return true
+	 */
+	public static function applePayPaymentGatewayOptions($apple_pay, $cart, $checkout, $carriers){
+
+		if($apple_pay === "no"){
+			return true;
+		}
+
+		if(!$cart && !$checkout){
+			http_response_code(400);
+
+			$arr = [
+				"msg"=>__( 'applepay_cart_checkout_option_validation', 'payplug' ),
+				"class"=>"error",
+				"title"=>__( 'applepay_cart_checkout_option_validation_title', 'payplug' ),
+				"close"=> __( 'payplug_ok', 'payplug' )
+			];
+
+			wp_send_json_error($arr);
+		}
+
+		if($cart && empty($carriers)){
+			http_response_code(400);
+
+			$arr = [
+				"msg"=>__( 'applepay_cart_carrier_enabled', 'payplug' ),
+				"class"=>"error",
+				"title"=>__( 'applepay_cart_checkout_option_validation_title', 'payplug' ),
+				"close"=> __( 'payplug_ok', 'payplug' )
+			];
+
+			wp_send_json_error($arr);
+		}
+
+		return true;
+
+	}
+
 	public static function oney($value) {
 
 		if ($value == 1){
