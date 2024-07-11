@@ -739,7 +739,15 @@ class PayplugWoocommerceHelper {
 	}
 
 	public static function check_mode(){
-		return get_option( 'woocommerce_payplug_settings', [] )['mode'] === "yes" ? true : false;
+
+		$settings = get_option( 'woocommerce_payplug_settings', [] );
+
+		if(isset($settings['mode'])){
+			return get_option( 'woocommerce_payplug_settings', [] )['mode'] === "yes" ? true : false;
+		}
+
+		return false;
+
 	}
 
 	public static function payplug_logout($gateway) {
