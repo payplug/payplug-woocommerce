@@ -1,20 +1,43 @@
 {
   "name": "payplug",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "PayPLug CSS assets management",
   "license": "GPL-3.0-or-later",
   "author": "PayPlug",
+  "engines": {
+    "node": "^20.12.0",
+    "npm": "^10.5.0"
+  },
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
     "build:css-app": "sass assets/scss/app.scss:assets/css/app.css --embed-sources --style=compressed",
     "build:css-notice": "sass assets/scss/notice.scss:assets/css/notice.css --embed-sources --style=compressed",
-    "build:css": "npm run build:css-app && npm run build:css-notice"
+    "build:css": "npm run build:css-app && npm run build:css-notice",
+    "start": "wp-scripts start",
+    "build": "wp-scripts build && npm run i18n:build",
+    "i18n": "npm run i18n:build",
+    "i18n:build": "npm run i18n:pot && ./bin/build_i18n.sh",
+    "i18n:pot": "php -d xdebug.max_nesting_level=512 $(which wp) i18n make-pot --exclude=\"node_modules/,languages/,assets/\" --headers='{\"Report-Msgid-Bugs-To\":\"https://woocommerce.com/my-account/create-a-ticket/\", \"language-team\":\"LANGUAGE <EMAIL@ADDRESS>\"}' . languages/woocommerce-gateway-dummy.pot",
+    "i18n:json": "$(which wp) i18n make-json languages --no-purge",
+    "packages-update": "wp-scripts packages-update",
+    "check-engines": "wp-scripts check-engines"
   },
   "devDependencies": {
-    "cypress": "^13.2.0"
+    "@woocommerce/dependency-extraction-webpack-plugin": "2.2.0",
+    "@wordpress/scripts": "^28.2.0",
+    "cross-env": "7.0.3",
+    "cypress": "^13.2.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.2"
   },
   "dependencies": {
     "sass": "^1.68.0",
     "trim-newlines": "^5.0.0"
-  }
+  },
+  "main": "webpack.config.js",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "keywords": []
 }
