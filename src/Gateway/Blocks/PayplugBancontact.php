@@ -2,7 +2,7 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway\Blocks;
 
-class PayplugCreditCard extends PayplugGenericBlock
+class PayplugBancontact extends PayplugGenericBlock
 {
 
 	/**
@@ -10,21 +10,23 @@ class PayplugCreditCard extends PayplugGenericBlock
 	 *
 	 * @var string
 	 */
-	protected $name = "payplug";
+	protected $name = "bancontact";
 
 	/**
 	 * Returns an associative array of data to be exposed for the payment method's client side.
 	 */
 	public function get_payment_method_data() {
-
 		$data = parent::get_payment_method_data();
 		$data['icon'] =  [
-			"src" => ('it_IT' === get_locale()) ?
-				PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_PostePay.svg' :
-				PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_CB.svg',
+			"src" => esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $this->gateway->image),
 			'icon_alt' => "Visa & Mastercard",
 		];
 		return $data;
 	}
+
+
+
+
+
 
 }
