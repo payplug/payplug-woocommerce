@@ -116,6 +116,10 @@ class PayplugWoocommerce {
 		}
 
 		add_action( 'woocommerce_payment_gateways', [ $this, 'register_payplug_gateway' ] );
+
+		// Registers WooCommerce Blocks integration.
+		add_action( 'woocommerce_blocks_loaded', [$this, 'woocommerce_gateways_block_support'] );
+
 		add_filter( 'plugin_action_links_' . PAYPLUG_GATEWAY_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
 	}
 
@@ -183,6 +187,21 @@ class PayplugWoocommerce {
 		Switch($options['oney_type']){
 			case "without_fees" : new OneyWithoutFees();break;
 			default: new OneyWithFees();break;
+		}
+	}
+
+	/**
+	 * Registers WooCommerce Blocks integration.
+	 *
+	 */
+	public function woocommerce_gateways_block_support(){
+		if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+
+			add_action(
+				'woocommerce_blocks_payment_method_type_registration',
+				function( \Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+				}
+			);
 		}
 	}
 
