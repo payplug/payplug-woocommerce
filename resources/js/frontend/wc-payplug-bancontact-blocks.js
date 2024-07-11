@@ -4,10 +4,10 @@ import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
 
-const settings = getSetting( 'payplug_data', {} );
+const settings = getSetting( 'bancontact_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
-const label = decodeEntities( settings?.title ) || defaultLabel;
 
+const label = decodeEntities( settings?.title ) || defaultLabel;
 /**
  * Content component
  */
@@ -36,8 +36,8 @@ const Icon = () => {
 /**
  * Payplug payment method config object.
  */
-const Payplug = {
-	name: "payplug",
+const Bancontact = {
+	name: "bancontact",
 	label: <Label />,
 	content: <Content />,
 	edit: <Content />,
@@ -48,5 +48,4 @@ const Payplug = {
 	},
 };
 
-registerPaymentMethod( Payplug );
-
+registerPaymentMethod( Bancontact );
