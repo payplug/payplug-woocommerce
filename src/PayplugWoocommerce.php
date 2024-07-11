@@ -15,7 +15,8 @@ use Payplug\PayplugWoocommerce\Controller\Bancontact;
 use Payplug\PayplugWoocommerce\Controller\ApplePay;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithFees;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithoutFees;
-use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
+
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugCreditCard;
 
 class PayplugWoocommerce {
 
@@ -199,6 +200,7 @@ class PayplugWoocommerce {
 			add_action(
 				'woocommerce_blocks_payment_method_type_registration',
 				function( \Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+					$payment_method_registry->register( new PayplugCreditCard() );
 				}
 			);
 		}
