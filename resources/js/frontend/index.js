@@ -4,7 +4,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
 
 
-const settings = getSetting( 'apple_pay_data', {} )
+const settings = getSetting( 'payplug_data', {} )
 
 const defaultLabel = __(
 	'Apple Pay',
@@ -17,21 +17,32 @@ const label = decodeEntities( settings.title ) || defaultLabel;
  * Content component
  */
 const Content = () => {
-	let local = settings.local;
+
 	return (
-		<div id="apple-pay-button-wrapper"><apple-pay-button buttonstyle="black" type="pay" locale={local}></apple-pay-button></div>
+		decodeEntities( settings.title ) || ''
 	);
 };
 
-const Label = ( props ) => {
-	const { PaymentMethodLabel } = props.components;
-	return <PaymentMethodLabel text={ label } />;
-};
+
+const Label = () => {
+	return (
+		<span style={{ width: '100%' }}>
+            {label}
+			<Icon />
+        </span>
+	)
+}
+
+const Icon = () => {
+	return (
+		<img src="https://woocommerce.local/wp-content/plugins/payplug//assets/images/checkout/logos_scheme_CB.svg" alt="Visa & Mastercard" className="payplug-payment-icon" style={{float: 'right'}}/>
+	)
+}
 
 
 
 const ApplePay = {
-	name: "apple_pay",
+	name: settings.name,
 	label: <Label />,
 	content: <Content />,
 	edit: <Content />,
