@@ -62,7 +62,7 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
 			'enabled'     => $this->is_active(),
 			'name'        => $this->gateway->id,
 			'title'       => $this->gateway->title,
-			'description' => $this->gateway->form_fields["description"]["description"]
+			'description' => $this->gateway->description
 		];
 	}
 
