@@ -31,6 +31,7 @@ module.exports = {
 		'payplug': '/resources/js/frontend/wc-payplug-blocks.js',
 		'bancontact': '/resources/js/frontend/wc-payplug-bancontact-blocks.js',
 		'american_express': '/resources/js/frontend/wc-payplug-american_express-blocks.js',
+		'satispay': '/resources/js/frontend/wc-payplug-satispay-blocks.js',
 	},
 	output: {
 		path: path.resolve( __dirname, 'assets/js/blocks/' ),
