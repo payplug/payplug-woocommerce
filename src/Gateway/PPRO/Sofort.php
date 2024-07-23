@@ -12,6 +12,7 @@ class Sofort extends PayplugGenericGateway
 	protected $max_thresholds;
 	protected $allowed_country_codes = [];
 	protected $enable_refund = false;
+	const ENABLE_ON_TEST_MODE = false;
 
 	public function __construct()
 	{

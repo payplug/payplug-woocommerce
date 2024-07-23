@@ -20,6 +20,7 @@ class ApplePay extends PayplugGateway
 	protected $checkout = false;
 
 	protected $carriers = [];
+	const ENABLE_ON_TEST_MODE = false;
 
 	public function __construct()
 	{
