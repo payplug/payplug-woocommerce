@@ -14,19 +14,6 @@ class PayplugSofort extends PayplugGenericBlock
 	 */
 	protected $name = 'sofort';
 
-	public function is_active()
-	{
-		$options = PayplugWoocommerceHelper::generic_get_account_data_from_options( $this->name );
-
-		if (isset($options['permissions'][$this->get_name()]) && ($options['permissions'][$this->get_name()] == true)) {
-			return true;
-		} else {
-			return false;
-		}
-
-	}
-
-
 	/**
 	 * Returns an associative array of data to be exposed for the payment method's client side.
 	 */
