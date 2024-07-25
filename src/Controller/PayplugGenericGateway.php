@@ -70,24 +70,9 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			return false;
 		}
 
-		//TODO:: MISSING saved configurations
 		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options( $this->id );
 
-		//account doesnt have permissions
-		if (
-			( isset( $account["payment_methods"] ) ) &&
-			( empty( $account["payment_methods"][ $this->id ] ) ) &&
-			( ! $account["payment_methods"][ $this->id ]['enabled'] )
-		) {
-			return false;
-		}
-
-		//check if it's activated on the BO
-		if (
-			! isset( $account['permissions'][ $this->id ] ) ||
-			( isset( $account['permissions'][ $this->id ] ) &&
-				!$account['permissions'][ $this->id ] )
-		) {
+		if( !$this->check_api_gateway_enable($account)){
 			return false;
 		}
 
@@ -100,30 +85,58 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			if (!empty(get_query_var('order-pay'))) {
 				$order = wc_get_order(get_query_var('order-pay'));
 				$items = $order->get_items();
-
 				$country_code_shipping = $order->get_shipping_country();
 				$country_code_billing = $order->get_billing_country();
-
 				$this->order_items_to_cart(WC()->cart, $items);
 			}
-
-			$order_amount = $this->get_order_total();
-
-			//threshold validations
-			$this->get_thresholds_values( $account );
-			if ((!empty($this->min_thresholds) && $order_amount < $this->min_thresholds) || (!empty($this->max_thresholds) && $order_amount > $this->max_thresholds)) {
-				$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __($this->id . '_threshold.', 'payplug') . '</div>';
-
-				return false;
-			}
 		}
-
-		$this->allowed_country_codes = !empty($account["payment_methods"][ $this->id ]['allowed_countries']) ? $account["payment_methods"][ $this->id ]['allowed_countries'] : null;
 
 		if ( empty( $country_code_billing ) || empty( $country_code_shipping ) ) {
 			$country_code_shipping = method_exists(WC()->customer, "get_shipping_country") ? WC()->customer->get_shipping_country() : null;
 			$country_code_billing  = method_exists(WC()->customer, "get_billing_country") ? WC()->customer->get_billing_country() : null;;
 		}
+
+		if( !$this->check_billing_country_permissions($account, $country_code_billing) ){
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * check if payment is enable and customer has permissions
+	 * @param $account
+	 * @return bool
+	 */
+	protected function check_api_gateway_enable($account){
+
+		if (
+			isset( $account["payment_methods"] )  &&
+			empty( $account["payment_methods"][ $this->id ] )  &&
+			!$account["payment_methods"][ $this->id ]['enabled']
+		) {
+			return false;
+		}
+
+
+		if (! isset( $account['permissions'][ $this->id ] ) ||
+			( isset( $account['permissions'][ $this->id ] ) && !$account['permissions'][ $this->id ] )
+		) {
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Check if billing country can use this payment method
+	 * @param $account
+	 * @param $billing_code
+	 * @return bool
+	 */
+	public function check_billing_country_permissions($account, $billing_code){
+		$this->allowed_country_codes = !empty($account["payment_methods"][ $this->id ]['allowed_countries']) ? $account["payment_methods"][ $this->id ]['allowed_countries'] : null;
 
 		if (is_array($this->allowed_country_codes)) {
 			if ( in_array( "ALL", $this->allowed_country_codes) || empty( $this->allowed_country_codes ) ) {
@@ -131,15 +144,13 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			}
 
 			//check if country is allowed
-			if ( in_array( $country_code_billing, $this->allowed_country_codes ) ) {
+			if ( in_array( $billing_code, $this->allowed_country_codes ) ) {
 				return true;
 
 			} else {
-				$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __( 'Unavailable for the specified country.', 'payplug' ) . '</div>';
 				return false;
 			}
 		}
-
 
 		return true;
 	}
@@ -150,7 +161,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		try {
 
 			//if there's no auth to process payment
-			if (!$this->checkGateway()) {
+			if ( !$this->checkGateway() ){
 				throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
 			}
 
