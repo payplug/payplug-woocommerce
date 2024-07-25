@@ -23,7 +23,7 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
 			$active = $this->gateway->checkGateway() && $active;
 		}
 
-		return $active;
+		return $active && $this->gateway->check_gateway(WC()->payment_gateways->payment_gateways());
 	}
 
 
