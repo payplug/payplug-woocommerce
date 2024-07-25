@@ -35,6 +35,7 @@ module.exports = {
 		'sofort': '/resources/js/frontend/wc-payplug-sofort-blocks.js',
 		'ideal': '/resources/js/frontend/wc-payplug-ideal-blocks.js',
 		'mybank': '/resources/js/frontend/wc-payplug-mybank-blocks.js',
+		'oney_x3_with_fees': '/resources/js/frontend/wc-payplug-oney_x3_with_fees-blocks.js',
 	},
 	output: {
 		path: path.resolve( __dirname, 'assets/js/blocks/' ),
