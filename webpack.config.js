@@ -33,6 +33,7 @@ module.exports = {
 		'american_express': '/resources/js/frontend/wc-payplug-american_express-blocks.js',
 		'satispay': '/resources/js/frontend/wc-payplug-satispay-blocks.js',
 		'sofort': '/resources/js/frontend/wc-payplug-sofort-blocks.js',
+		'oney_x3_with_fees': '/resources/js/frontend/wc-payplug-oney_x3_with_fees-blocks.js',
 	},
 	output: {
 		path: path.resolve( __dirname, 'assets/js/blocks/' ),

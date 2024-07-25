@@ -1,8 +1,10 @@
-#payment .payment_methods li .payplug-oney-flex {
+#payment .payment_methods li .payplug-oney-flex,
+.wc-block-checkout__payment-method .payplug-oney-flex {
     display:flex;
 	justify-content: space-between;
 }
-#payment .payment_methods li .payplug-oney-flex div:first-child {
+#payment .payment_methods li .payplug-oney-flex div:first-child,
+.wc-block-checkout__payment-method .payment_methods .payplug-oney-flex div:first-child {
     width: 78%;
 }
 
