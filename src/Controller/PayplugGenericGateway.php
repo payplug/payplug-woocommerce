@@ -92,54 +92,54 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		}
 
 		if (is_checkout()) {
-			if ( empty( WC()->cart ) ) {
+			if (empty(WC()->cart)) {
 				return false;
 			}
 
 			//for backend orders
-			if ( ! empty( get_query_var( 'order-pay' ) ) ) {
-				$order = wc_get_order( get_query_var( 'order-pay' ) );
+			if (!empty(get_query_var('order-pay'))) {
+				$order = wc_get_order(get_query_var('order-pay'));
 				$items = $order->get_items();
 
 				$country_code_shipping = $order->get_shipping_country();
-				$country_code_billing  = $order->get_billing_country();
+				$country_code_billing = $order->get_billing_country();
 
-				$this->order_items_to_cart( WC()->cart, $items );
+				$this->order_items_to_cart(WC()->cart, $items);
 			}
 
 			$order_amount = $this->get_order_total();
 
-			$this->allowed_country_codes = !empty($account["payment_methods"][ $this->id ]['allowed_countries']) ? $account["payment_methods"][ $this->id ]['allowed_countries'] : null;
-			$this->get_thresholds_values( $account );
-
-
 			//threshold validations
-			if ( ( ! empty( $this->min_thresholds ) && $order_amount < $this->min_thresholds ) || ( ! empty( $this->max_thresholds ) && $order_amount > $this->max_thresholds ) ) {
-				$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __( $this->id . '_threshold.', 'payplug' ) . '</div>';
+			$this->get_thresholds_values( $account );
+			if ((!empty($this->min_thresholds) && $order_amount < $this->min_thresholds) || (!empty($this->max_thresholds) && $order_amount > $this->max_thresholds)) {
+				$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __($this->id . '_threshold.', 'payplug') . '</div>';
 
 				return false;
 			}
-
-			if ( empty( $country_code_billing ) || empty( $country_code_shipping ) ) {
-				$country_code_shipping = WC()->customer->get_shipping_country();
-				$country_code_billing  = WC()->customer->get_billing_country();
-			}
-			if (is_array($this->allowed_country_codes)) {
-				if ( in_array( "ALL", $this->allowed_country_codes) || empty( $this->allowed_country_codes ) ) {
-					return true;
-				}
-
-				//check if country is allowed
-				if ( in_array( $country_code_billing, $this->allowed_country_codes ) ) {
-					return true;
-
-				} else {
-					$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __( 'Unavailable for the specified country.', 'payplug' ) . '</div>';
-					return false;
-				}
-			}
-
 		}
+
+		$this->allowed_country_codes = !empty($account["payment_methods"][ $this->id ]['allowed_countries']) ? $account["payment_methods"][ $this->id ]['allowed_countries'] : null;
+
+		if ( empty( $country_code_billing ) || empty( $country_code_shipping ) ) {
+			$country_code_shipping = method_exists(WC()->customer, "get_shipping_country") ? WC()->customer->get_shipping_country() : null;
+			$country_code_billing  = method_exists(WC()->customer, "get_billing_country") ? WC()->customer->get_billing_country() : null;;
+		}
+
+		if (is_array($this->allowed_country_codes)) {
+			if ( in_array( "ALL", $this->allowed_country_codes) || empty( $this->allowed_country_codes ) ) {
+				return true;
+			}
+
+			//check if country is allowed
+			if ( in_array( $country_code_billing, $this->allowed_country_codes ) ) {
+				return true;
+
+			} else {
+				$this->description = '<div class="payment_method_oney_x3_with_fees_disabled">' . __( 'Unavailable for the specified country.', 'payplug' ) . '</div>';
+				return false;
+			}
+		}
+
 
 		return true;
 	}

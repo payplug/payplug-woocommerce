@@ -4,7 +4,7 @@ namespace Payplug\PayplugWoocommerce\Gateway\Blocks;
 
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
-class PayplugSofort extends PayplugGenericBlock
+class PayplugIdeal extends PayplugGenericBlock
 {
 
 	/**
@@ -12,7 +12,8 @@ class PayplugSofort extends PayplugGenericBlock
 	 *
 	 * @var string
 	 */
-	protected $name = 'sofort';
+	protected $name = 'ideal';
+
 
 	/**
 	 * Returns an associative array of data to be exposed for the payment method's client side.
