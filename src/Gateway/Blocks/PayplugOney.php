@@ -18,12 +18,9 @@ class PayplugOney extends PayplugGenericBlock {
 	protected $total_price;
 
 
-	public function is_active() {
-		return true;
-	}
+
 
 	public function check_oney() {
-
 
 		$products_qty = (int) $this->cart->cart_contents_count;
 		// Min and max
@@ -82,6 +79,9 @@ class PayplugOney extends PayplugGenericBlock {
 		$data['translations']['1st monthly payment'] = __( '1st monthly payment', 'payplug' );
 		$data['translations']['2nd monthly payment'] = __( '2nd monthly payment', 'payplug' );
 		$data['translations']['oney_total']          = __( 'oney_total', 'payplug' );
+		$data['allowed_country_codes'] = $this->gateway->allowed_country_codes;
+
+		$data['oney_disabled'] = $this->oney_disabled();
 
 		return $data;
 	}
@@ -102,6 +102,10 @@ class PayplugOney extends PayplugGenericBlock {
 	 * Returns an associative array of data to be exposed for the payment method's client side.
 	 */
 	public function get_payment_method_data() {
+
+		$this->cart = WC()->cart;
+
+		$this->total_price = floatval(WC()->cart->total);
 
 		if ( $this->check_oney() == true ) {
 			return $this->oney_enabled();
