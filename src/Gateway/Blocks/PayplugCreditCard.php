@@ -2,6 +2,8 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway\Blocks;
 
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+
 class PayplugCreditCard extends PayplugGenericBlock
 {
 
@@ -27,4 +29,25 @@ class PayplugCreditCard extends PayplugGenericBlock
 		return $data;
 	}
 
+	/**
+	 * Returns an array of scripts/handles to be registered for this payment method.
+	 *
+	 * @return array
+	 */
+	public function get_payment_method_script_handles() {
+
+		$options = get_option('woocommerce_payplug_settings', []);
+		if( $options['payment_method'] === "integrated" && $options['can_use_integrated_payments'] ){
+			wp_register_script(
+				'payplug-integrated-payments-api',
+				'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js',
+				array(),
+				'v1.1',
+				true
+			);
+		}
+		wp_enqueue_script('payplug-integrated-payments-api');
+		return parent::get_payment_method_script_handles();
+
+	}
 }
