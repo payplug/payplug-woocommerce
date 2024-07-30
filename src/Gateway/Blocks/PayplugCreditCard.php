@@ -26,6 +26,23 @@ class PayplugCreditCard extends PayplugGenericBlock
 				PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_CB.svg',
 			'icon_alt' => "Visa & Mastercard",
 		];
+
+		$options = get_option('woocommerce_payplug_settings', []);
+		if( $options['payment_method'] === "integrated" && $options['can_use_integrated_payments'] ){
+			$data["payplug_integrated_payment_cardHolder_error"] = __('payplug_integrated_payment_cardHolder_error', 'payplug');
+			$data["payplug_integrated_payment_empty"] = __('payplug_integrated_payment_empty', 'payplug');
+			$data["payplug_integrated_payment_your_card"] = __('payplug_integrated_payment_your_card', 'payplug');
+			$data["payplug_integrated_payment_pan_error"] = __('payplug_integrated_payment_pan_error', 'payplug');
+			$data["payplug_integrated_payment_exp_error"] = __('payplug_integrated_payment_exp_error', 'payplug');
+			$data["payplug_integrated_payment_cvv_error"] = __('payplug_integrated_payment_cvv_error', 'payplug');
+			$data["payplug_integrated_payment_error"] = __('payplug_integrated_payment_error', 'payplug');
+			$data["payplug_integrated_payment_transaction_secure"] = __('payplug_integrated_payment_transaction_secure', 'payplug');
+			$data['logo'] = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/logo-payplug.png';
+			$data['lock'] = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
+			$data['payplug_integrated_payment_privacy_policy_url'] = __("payplug_integrated_payment_privacy_policy_url", "payplug");
+			$data['payplug_integrated_payment_privacy_policy'] = __('payplug_integrated_payment_privacy_policy', 'payplug');
+		}
+
 		return $data;
 	}
 
