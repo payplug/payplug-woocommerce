@@ -81,6 +81,13 @@ class PayplugOney extends PayplugGenericBlock {
 		$data['translations']['oney_total']          = __( 'oney_total', 'payplug' );
 		$data['allowed_country_codes'] = $this->gateway->allowed_country_codes;
 
+		$data['requirements'] = [
+			'max_quantity'          => $this->gateway::ONEY_PRODUCT_QUANTITY_MAXIMUM,
+			'max_threshold'         => $this->gateway->oney_thresholds_max * 100,
+			'min_threshold'         => $this->gateway->oney_thresholds_min * 100,
+			'allowed_country_codes' => $this->gateway->allowed_country_codes
+		];
+
 		$data['oney_disabled'] = $this->oney_disabled();
 
 		return $data;
@@ -93,7 +100,20 @@ class PayplugOney extends PayplugGenericBlock {
 		$data['icon']['src']      = esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $available_img );
 		$data['icon']['class']    = "payplug-payment-icon ' . $disable . '";
 		$data['icon']['icon_alt'] = $this->gateway->title;
-		$data['description']      = $this->description;
+		$data['validations']      = [
+			'amount' => [
+				'text'  => sprintf( __( 'The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug' ), $this->gateway->oney_thresholds_min, $this->gateway->oney_thresholds_max ),
+				'class' => 'payment_method_oney_x3_with_fees_disabled'
+			],
+			'country' => [
+				'text'  => __( 'Unavailable for the specified country.', 'payplug' ),
+				'class' => 'payment_method_oney_x3_with_fees_disabled'
+			],
+			'items_count' => [
+				'text'  => sprintf( __( 'The payment with Oney is unavailable because you have more than %s items in your cart.', 'payplug' ), $this->gateway::ONEY_PRODUCT_QUANTITY_MAXIMUM ),
+				'class' => 'payment_method_oney_x3_with_fees_disabled'
+			]
+		];
 
 		return $data;
 	}
@@ -103,15 +123,16 @@ class PayplugOney extends PayplugGenericBlock {
 	 */
 	public function get_payment_method_data() {
 
-		$this->cart = WC()->cart;
+		if (is_checkout()) {
+			$this->cart = WC()->cart;
 
-		$this->total_price = floatval(WC()->cart->total);
-
-		if ( $this->check_oney() == true ) {
-			return $this->oney_enabled();
-		} else {
-			return $this->oney_disabled();
+			$this->total_price = floatval(WC()->cart->total);
 		}
+
+
+
+		return $this->oney_enabled();
+
 	}
 
 
