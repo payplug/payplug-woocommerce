@@ -26,6 +26,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 				PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_CB.svg',
 			'icon_alt' => "Visa & Mastercard",
 		];
+		$data["IP"] = false;
 
 		$options = get_option('woocommerce_payplug_settings', []);
 		if( $options['payment_method'] === "integrated" && $options['can_use_integrated_payments'] ){
@@ -41,6 +42,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 			$data['lock'] = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
 			$data['payplug_integrated_payment_privacy_policy_url'] = __("payplug_integrated_payment_privacy_policy_url", "payplug");
 			$data['payplug_integrated_payment_privacy_policy'] = __('payplug_integrated_payment_privacy_policy', 'payplug');
+			$data["IP"] = true;
 		}
 
 		return $data;
