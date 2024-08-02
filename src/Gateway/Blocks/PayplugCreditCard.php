@@ -42,6 +42,10 @@ class PayplugCreditCard extends PayplugGenericBlock
 			$data['lock'] = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
 			$data['payplug_integrated_payment_privacy_policy_url'] = __("payplug_integrated_payment_privacy_policy_url", "payplug");
 			$data['payplug_integrated_payment_privacy_policy'] = __('payplug_integrated_payment_privacy_policy', 'payplug');
+			$data["payplug_integrated_payment_cardholder"] = __('payplug_integrated_payment_cardholder', 'payplug');
+			$data["payplug_integrated_payment_card_number"] = __('payplug_integrated_payment_card_number', 'payplug');
+			$data["payplug_integrated_payment_expiration_date"] = __('payplug_integrated_payment_expiration_date', 'payplug');
+			$data["payplug_integrated_payment_cvv"] = __('payplug_integrated_payment_cvv', 'payplug');
 			$data["IP"] = true;
 		}
 
