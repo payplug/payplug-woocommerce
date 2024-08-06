@@ -4,7 +4,7 @@ namespace Payplug\PayplugWoocommerce\Gateway\Blocks;
 
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
-class PayplugOney3xWithoutFees extends PayplugOney3x {
+class PayplugOney3xWithoutFees extends PayplugOney {
 
 	/**
 	 * Payment method name/id/slug.
