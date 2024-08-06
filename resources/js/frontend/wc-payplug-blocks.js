@@ -11,14 +11,14 @@ const label = decodeEntities( settings?.title ) || defaultLabel;
 /**
  * Content component
  */
-const Content = () => {
+const Content = (props) => {
 
 	if(settings?.IP === false){
 		return window.wp.htmlEntities.decodeEntities( settings?.description || '' );
 
 	}else{
 		return (
-			<IntegratedPayment />
+			<IntegratedPayment settings={settings} props={props} />
 		)
 	}
 };
