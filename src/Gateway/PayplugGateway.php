@@ -79,7 +79,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	public $min_oney_price, $oney_thresholds_min;
 	public $max_oney_price, $oney_thresholds_max;
 
-    /**
+	const ENABLE_ON_TEST_MODE = true;
+
+
+	/**
      * Logging method.
      *
      * @param string $message Log message.
@@ -179,7 +182,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
         add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
         add_action('wp_enqueue_scripts', [$this, 'scripts']);
-        add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
 		add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
 	}
@@ -768,152 +770,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     }
 
     /**
-     * Process admin options.
-     *
-     * @return bool
-     */
-    public function process_admin_options()
-    {
-        $data = $this->get_post_data();
-        $oneclick_fieldkey = $this->get_field_key('oneclick');
-
-        // Handle logout process
-        if (
-            isset($data['submit_logout'])
-            && false !== check_admin_referer('payplug_user_logout', '_logoutaction')
-        ) {
-
-            if ($this->permissions) {
-                $this->permissions->clear_permissions();
-            }
-
-            if(PayplugWoocommerceHelper::payplug_logout($this)) {
-                \WC_Admin_Settings::add_message(__('Successfully logged out.', 'payplug'));
-            }
-
-            return true;
-        }
-
-        // Handle login process
-        if (
-            isset($data['payplug_email'])
-            && false !== check_admin_referer('payplug_user_login', '_loginaction')
-        ) {
-            $email    = $data['payplug_email'];
-            $password = wp_unslash($data['payplug_password']);
-            $response = $this->retrieve_user_api_keys($email, $password);
-            if (is_wp_error($response)) {
-                \WC_Admin_Settings::add_error($response->get_error_message());
-
-                return false;
-            }
-
-            // try to use the api keys to retrieve the merchant id
-            $merchant_id = isset($response['test']) ? $this->retrieve_merchant_id($response['test']) : '';
-
-            $this->init_form_fields();
-            $fields = $this->get_form_fields();
-            $data   = [];
-
-            // Load existing values if the user is re-login.
-            foreach ($fields as $key => $field) {
-                if (in_array($field['type'], ['title', 'login'])) {
-                    continue;
-                }
-
-                switch ($key) {
-                    case 'enabled':
-                        $val = 'yes';
-                        break;
-                    case 'mode':
-                        $val = 'no';
-                        break;
-                    case 'payplug_test_key':
-                        $val = !empty($response['test']) ? esc_attr($response['test']) : null;
-                        break;
-                    case 'payplug_live_key':
-                        $val = !empty($response['live']) ? esc_attr($response['live']) : null;
-                        break;
-                    case 'payplug_merchant_id':
-                        $val = esc_attr($merchant_id);
-                        break;
-                    case 'email':
-                        $val = esc_html($email);
-                        break;
-                    default:
-                        $val = $this->get_option($key);
-                }
-
-                $data[$key] = $val;
-            }
-
-            $this->set_post_data($data);
-            update_option(
-                $this->get_option_key(),
-                apply_filters('woocommerce_settings_api_sanitized_fields_' . $this->id, $data)
-            );
-            if("payplug" === $this->id) {
-                \WC_Admin_Settings::add_message(__('Successfully logged in.', 'payplug'));
-            }
-
-            return true;
-        }
-
-        // Don't let user without live key leave TEST mode.
-        $mode_fieldkey     = $this->get_field_key('mode');
-        $live_key_fieldkey = $this->get_field_key('payplug_live_key');
-        if (isset($data[$mode_fieldkey]) && '1' === $data[$mode_fieldkey] && empty($data[$live_key_fieldkey])) {
-            $data[$mode_fieldkey] = null;
-            $this->set_post_data($data);
-            \WC_Admin_Settings::add_error(__('Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug'));
-        }
-
-        // Check user permissions before activating one-click feature.
-        $oneclick_fieldkey = $this->get_field_key('oneclick');
-        if (
-            isset($data[$oneclick_fieldkey])
-            && '1' === $data[$oneclick_fieldkey]
-            && '1' === $data[$mode_fieldkey]
-            && (!$this->user_logged_in()
-                || false === $this->permissions->has_permissions(PayplugPermissions::SAVE_CARD))
-        ) {
-            $data[$oneclick_fieldkey] = null;
-            \WC_Admin_Settings::add_error(__('Only PREMIUM accounts can enable the One Click option in LIVE mode.', 'payplug'));
-        }
-
-        // Force getAccount to set transient data on live mode
-        if (
-            $mode_fieldkey === "woocommerce_payplug_mode" &&
-            "1" === $data[$mode_fieldkey] &&
-            !empty($data[$live_key_fieldkey])
-        ) {
-			try{
-				$response = Authentication::getAccount(new Payplug($data[$live_key_fieldkey]));
-			}  catch (ForbiddenException $e){
-				PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-				\WC_Admin_Settings::add_error($e->getMessage());
-				return false;
-			}
-            PayplugWoocommerceHelper::set_transient_data($response, [
-                'mode' => 'yes'
-            ]);
-        }
-
-        // Validate Oney thresholds
-	    if($data['woocommerce_payplug_oney_thresholds_min'] < $this->min_oney_price || $data['woocommerce_payplug_oney_thresholds_max'] > $this->max_oney_price){
-		    \WC_Admin_Settings::add_error(sprintf(__('The amount must be between %s€ and %s€.', 'payplug'), $this->min_oney_price, $this->max_oney_price));
-		    return false;
-	    }
-	    if($data['woocommerce_payplug_oney_thresholds_min'] > $data['woocommerce_payplug_oney_thresholds_max']){
-		    \WC_Admin_Settings::add_error(sprintf(__('Please note that the minimum amount entered is greater than the maximum amount entered.', 'payplug'), $this->min_oney_price, $this->max_oney_price));
-		    return false;
-	    }
-
-        $this->data = $data;
-        parent::process_admin_options();
-    }
-
-    /**
      * Process payment.
      *
      * @param int $order_id
@@ -1318,7 +1174,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function retrieve_merchant_id($key = null)
     {
         try {
-            $response    = !is_null($key) ? Authentication::getAccount(new Payplug($key)) : Authentication::getAccount();
+            $response    = !is_null($key) && !empty($key) ? Authentication::getAccount(new Payplug($key)) : Authentication::getAccount();
             PayplugWoocommerceHelper::set_transient_data($response);
             $merchant_id = isset($response['httpResponse']['id']) ? $response['httpResponse']['id'] : '';
         } catch (ConfigurationException $e) {

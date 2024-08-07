@@ -7,9 +7,17 @@ use Payplug\Exception\HttpException;
 use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Admin\Vue;
+use Payplug\PayplugWoocommerce\Controller\ApplePay;
+use Payplug\PayplugWoocommerce\Gateway\AmericanExpress;
+use Payplug\PayplugWoocommerce\Gateway\Bancontact;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
+use Payplug\PayplugWoocommerce\Gateway\PPRO\Giropay;
+use Payplug\PayplugWoocommerce\Gateway\PPRO\Ideal;
+use Payplug\PayplugWoocommerce\Gateway\PPRO\Mybank;
+use Payplug\PayplugWoocommerce\Gateway\PPRO\Satispay;
+use Payplug\PayplugWoocommerce\Gateway\PPRO\Sofort;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Exception\PayplugException;
 use WP_REST_Request;
@@ -133,9 +141,6 @@ class Ajax {
 			) );
 
 		});
-
-
-
 	}
 
 	public function refresh_keys(WP_REST_Request $request) {
@@ -210,26 +215,7 @@ class Ajax {
 	}
 
 	public function api_check_bancontact_permissions(WP_REST_Request $request) {
-		$data = $request->get_params();
-
-		if($data['env']) {
-			$this->optionUnnavailableInTestMode();
-		}
-
-		$this->accountIsNotValid();
-
-		try{
-			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => $e->getMessage(),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
-			return false;
-		}
+		$account = $this->generic_get_account($request, Bancontact::ENABLE_ON_TEST_MODE);
 
 		if(isset($account['httpResponse']['payment_methods']['bancontact']['enabled']) && $account['httpResponse']['payment_methods']['bancontact']['enabled']){
 			wp_send_json_success(true);
@@ -244,28 +230,7 @@ class Ajax {
 	}
 
 	public function api_check_applepay_permissions(WP_REST_Request $request) {
-		$data = $request->get_params();
-
-		if($data['env']) {
-			$this->optionUnnavailableInTestMode();
-		}
-
-		$this->accountIsNotValid();
-
-		try{
-			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => $e->getMessage(),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
-			return false;
-		}
-
-		$applepay = false;
+		$account = $this->generic_get_account($request, ApplePay::ENABLE_ON_TEST_MODE);
 
 		if ($account['httpResponse']['payment_methods']['apple_pay']['enabled']) {
 			if (in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['httpResponse']['payment_methods']['apple_pay']['allowed_domain_names'])) {
@@ -274,38 +239,16 @@ class Ajax {
 
 		}
 
-
-		if(!$applepay){
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_applepay_access_error', 'payplug' ),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
-		}
+		wp_send_json_error(array(
+			"title" => __( 'payplug_enable_feature', 'payplug' ),
+			"msg" => __( 'payplug_applepay_access_error', 'payplug' ),
+			"close" => __( 'payplug_ok', 'payplug' )
+		));
 
 	}
 
 	public function api_check_american_express_permissions(WP_REST_Request $request) {
-		$data = $request->get_params();
-
-		if($data['env']) {
-			$this->optionUnnavailableInTestMode();
-		}
-
-		$this->accountIsNotValid();
-
-		try{
-			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => $e->getMessage(),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
-			return false;
-		}
+		$account = $this->generic_get_account($request, AmericanExpress::ENABLE_ON_TEST_MODE);
 
 		if(isset($account['httpResponse']['payment_methods']['american_express']['enabled']) && $account['httpResponse']['payment_methods']['american_express']['enabled']){
 			wp_send_json_success(true);
@@ -320,25 +263,7 @@ class Ajax {
 	}
 
 	public function api_check_oney_permissions(WP_REST_Request $request) {
-		$data = $request->get_params();
-
-		// In Test mode Oney is available
-		if($data['env']) {
-			wp_send_json_success(true);
-			return;
-		}
-
-		$this->accountIsNotValid();
-
-		// Checking in Live Mode
-		try{
-			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
-			return false;
-		}
+		$account = $this->generic_get_account($request, PayplugGatewayOney3x::ENABLE_ON_TEST_MODE);
 
 		if(isset($account['httpResponse']['permissions']['can_use_oney']) && $account['httpResponse']['permissions']['can_use_oney']){
 			wp_send_json_success(true);
@@ -362,26 +287,7 @@ class Ajax {
 	}
 
 	public function api_check_satispay_permissions(WP_REST_Request $request) {
-		$data = $request->get_params();
-
-		if($data['env']) {
-			$this->optionUnnavailableInTestMode();
-		}
-
-		$this->accountIsNotValid();
-
-		try{
-			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => $e->getMessage(),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
-			return false;
-		}
+		$account = $this->generic_get_account($request, Satispay::ENABLE_ON_TEST_MODE);
 
 		$enabled = isset($account['httpResponse']['payment_methods']['satispay']['enabled']) ? $account['httpResponse']['payment_methods']['satispay']['enabled']: false;
 		if(!$enabled){
@@ -396,26 +302,7 @@ class Ajax {
 	}
 
 	public function api_check_mybank_permissions(WP_REST_Request $request) {
-		$data = $request->get_params();
-
-		if($data['env']) {
-			$this->optionUnnavailableInTestMode();
-		}
-
-		$this->accountIsNotValid();
-
-		try{
-			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => $e->getMessage(),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
-			return false;
-		}
+		$account = $this->generic_get_account($request, Mybank::ENABLE_ON_TEST_MODE);
 
 		$enabled = isset($account['httpResponse']['payment_methods']['mybank']['enabled']) ? $account['httpResponse']['payment_methods']['mybank']['enabled']: false;
 		if(!$enabled){
@@ -430,26 +317,7 @@ class Ajax {
 	}
 
 	public function api_check_sofort_permissions(WP_REST_Request $request) {
-		$data = $request->get_params();
-
-		if($data['env']) {
-			$this->optionUnnavailableInTestMode();
-		}
-
-		$this->accountIsNotValid();
-
-		try{
-			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => $e->getMessage(),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
-			return false;
-		}
+		$account = $this->generic_get_account($request, Sofort::ENABLE_ON_TEST_MODE);
 
 		$enabled = isset($account['httpResponse']['payment_methods']['sofort']['enabled']) ? $account['httpResponse']['payment_methods']['sofort']['enabled']: false;
 		if(!$enabled){
@@ -464,26 +332,7 @@ class Ajax {
 	}
 
 	public function api_check_giropay_permissions(WP_REST_Request $request) {
-		$data = $request->get_params();
-
-		if($data['env']) {
-			$this->optionUnnavailableInTestMode();
-		}
-
-		$this->accountIsNotValid();
-
-		try{
-			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => $e->getMessage(),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
-			return false;
-		}
+		$account = $this->generic_get_account($request, Giropay::ENABLE_ON_TEST_MODE);
 
 		$enabled = isset($account['httpResponse']['payment_methods']['giropay']['enabled']) ? $account['httpResponse']['payment_methods']['giropay']['enabled']: false;
 		if(!$enabled){
@@ -498,26 +347,7 @@ class Ajax {
 	}
 
 	public function api_check_ideal_permissions(WP_REST_Request $request) {
-		$data = $request->get_params();
-
-		if($data['env']) {
-			$this->optionUnnavailableInTestMode();
-		}
-
-		$this->accountIsNotValid();
-
-		try{
-			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => $e->getMessage(),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
-			return false;
-		}
+		$account = $this->generic_get_account($request, Ideal::ENABLE_ON_TEST_MODE);
 
 		$enabled = isset($account['httpResponse']['payment_methods']['ideal']['enabled']) ? $account['httpResponse']['payment_methods']['ideal']['enabled']: false;
 		if(!$enabled){
@@ -531,23 +361,41 @@ class Ajax {
 		wp_send_json_success($enabled);
 	}
 
-	//TODO:: why repetition?
-	private function getAccount($test_mode){
-		// Checking in Live Mode
+	private function generic_get_account($request, $enable_on_test_mode){
+
+		$data = $request->get_params();
+
+		if( isset($data['env']) && $data['env'] ) {
+			if($enable_on_test_mode){
+				wp_send_json_success(true);
+			}else{
+				$this->optionUnnavailableInTestMode();
+			}
+		}
+
+		$this->accountIsNotValid();
+
+		$live_key = PayplugWoocommerceHelper::get_live_key();
+		if(empty($live_key)){
+			return false;
+		}
+
 		try{
-			// In case the account is inactive use the test key instead of live key
-			$key = $test_mode ? PayplugWoocommerceHelper::get_test_key() : PayplugWoocommerceHelper::get_live_key();
-			$account = Authentication::getAccount(new Payplug($key));
+			$account = Authentication::getAccount(new Payplug($live_key));
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => $e->getMessage(),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
 			return false;
 		}
 
 		return $account;
-	}
 
+	}
 
 	/**
 	 * Update PayPlug api keys
@@ -578,7 +426,6 @@ class Ajax {
 			'yes'
 		);
 	}
-
 
 	/**
 	 *
@@ -669,7 +516,6 @@ class Ajax {
 
 		}
 	}
-
 
 	/**
 	 *
@@ -798,10 +644,6 @@ class Ajax {
 			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
 			http_response_code(200);
 
-			//TODO:: do we need this?
-			$account = $this->getAccount($test_mode);
-			PayplugWoocommerceHelper::set_transient_data($account);
-
 			wp_send_json_success( array(
 				"title" => null,
 				"msg" => __( 'payplug_save_success_message', 'payplug' ),
@@ -821,46 +663,10 @@ class Ajax {
 		));
 	}
 
-	public function check_integrated_payment($live_key) {
-		try{
-			$account = Authentication::getAccount(new Payplug($live_key));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while fetching account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(["error" => $e->getMessage()]);
-			return false;
-		}
-
-		if(isset($account['httpResponse']['permissions']['can_use_integrated_payments']) && ($account['httpResponse']['permissions']['can_use_integrated_payments'] == true)){
-			return true;
-		}
-
-		return false;
-	}
-
 	public function api_check_integrated_payment(WP_REST_Request $request)
 	{
-		$data = $request->get_params();
 
-		if($data['env']) {
-			wp_send_json_success(true);
-			return;
-		}
-
-		$this->accountIsNotValid();
-
-		try{
-			$account = Authentication::getAccount(new Payplug(PayplugWoocommerceHelper::get_live_key()));
-
-		}  catch (PayplugException $e){
-			PayplugGateway::log('Error while getting account data : ' . $e->getMessage(), 'error');
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => $e->getMessage(),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
-			return false;
-		}
+		$account = $this->generic_get_account($request, true);
 
 		if( ! isset($account['httpResponse']['permissions']['can_use_integrated_payments'])
 		    || ! $account['httpResponse']['permissions']['can_use_integrated_payments'] ) {
