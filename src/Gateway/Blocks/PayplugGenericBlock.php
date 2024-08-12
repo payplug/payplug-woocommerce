@@ -3,28 +3,43 @@
 namespace Payplug\PayplugWoocommerce\Gateway\Blocks;
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 class PayplugGenericBlock extends AbstractPaymentMethodType
 {
 
 	protected $gateway;
 
+	protected $allowed_country_codes;
+
 	public function initialize()
 	{
-		$gateways = WC()->payment_gateways->payment_gateways();
-		$this->gateway = $gateways[$this->name];
+		if (class_exists('WC_Blocks_Utils')) {
+			if (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )) {
+				$gateways = WC()->payment_gateways->payment_gateways();
+				$this->gateway = $gateways[$this->name];
+			}
+		}
+
+
 	}
 
 	public function is_active()
 	{
-		$active = $this->gateway->is_available();
+		if (class_exists('WC_Blocks_Utils')) {
+			if (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )) {
 
-		if(method_exists($this->gateway, "checkGateway")){
-			$active = $this->gateway->checkGateway() && $active;
+				$active = $this->gateway->is_available();
+
+				if ( method_exists( $this->gateway, "checkGateway" ) ) {
+					$active = $this->gateway->checkGateway() && $active;
+				}
+
+				return $active && $this->gateway->check_gateway( WC()->payment_gateways->payment_gateways() );
+			}
+		}
 		}
 
-		return $active && $this->gateway->check_gateway(WC()->payment_gateways->payment_gateways());
-	}
 
 
 
@@ -58,11 +73,14 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
 	 * Returns an associative array of data to be exposed for the payment method's client side.
 	 */
 	public function get_payment_method_data() {
+		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options( $this->name );
+		$this->allowed_country_codes = !empty($account["payment_methods"][ $this->name ]['allowed_countries']) ? $account["payment_methods"][ $this->name ]['allowed_countries'] : null;
 		return [
 			'enabled'     => $this->is_active(),
 			'name'        => $this->gateway->id,
 			'title'       => $this->gateway->title,
-			'description' => $this->gateway->description
+			'description' => $this->gateway->description,
+			'allowed_country_codes' => $this->allowed_country_codes
 		];
 	}
 
