@@ -9,7 +9,12 @@ class PayplugOney extends PayplugGenericBlock {
 	 *
 	 * @var string
 	 */
-	protected $name = "oney";
+	protected $gatewyas_names = [
+		"oney_x3_with_fees" ,
+		"oney_x4_with_fees",
+		"oney_x3_without_fees",
+		"oney_x4_without_fees"
+	];
 
 	protected $icon = '';
 
@@ -17,6 +22,15 @@ class PayplugOney extends PayplugGenericBlock {
 
 	protected $total_price;
 
+	public function initialize()
+	{
+		$gateways = WC()->payment_gateways->payment_gateways();
+		foreach ($this->gatewyas_names as $gateway) {
+			$this->name = $gateway;
+			$this->gateway = $gateways[$gateway];
+			parent::initialize();
+		}
+	}
 
 	public function check_oney() {
 
@@ -116,19 +130,48 @@ class PayplugOney extends PayplugGenericBlock {
 		return $data;
 	}
 
+	public function get_payment_method_script_handles() {
+
+		$script_path       = '/assets/js/blocks/wc-payplug-oney-blocks.js';
+		$script_asset_path = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/blocks/frontend/wc-payplug-oney-blocks.asset.php';
+		$script_asset      = file_exists( $script_asset_path ) ? require( $script_asset_path ) : array('dependencies' => array(), 'version' => '1.0.0');
+		$script_url        = PAYPLUG_GATEWAY_PLUGIN_URL. $script_path;
+
+		wp_register_script('wc-payplug-oney-blocks', $script_url, $script_asset[ 'dependencies' ], $script_asset[ 'version' ], true );
+		wp_localize_script('wc-payplug-oney-blocks', 'wcPaymentGatewaysData', $this->get_payment_method_data());
+
+		return [ 'wc-payplug-oney-blocks' ];
+	}
+
 	/**
 	 * Returns an associative array of data to be exposed for the payment method's client side.
 	 */
 	public function get_payment_method_data() {
 
-		if ( is_checkout() ) {
+/*		if ( is_checkout() ) {
 			$this->cart = WC()->cart;
 
 			$this->total_price = floatval( WC()->cart->total );
 		}
 
 
-		return $this->oney_enabled();
+		return $this->oney_enabled();*/
+        $a = 0;
+		return [
+			'oney_gateways'     => [
+				'3x' => [
+					'name'        => $this->gateway->id,
+					'title'       => $this->gateway->title,
+					'description' => $this->gateway->description
+				],
+				'4x' => [
+					'name'        => $this->gateway->id,
+					'title'       => $this->gateway->title,
+					'description' => $this->gateway->description
+				]
+			],
+
+		];
 
 	}
 

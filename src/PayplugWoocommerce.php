@@ -19,6 +19,7 @@ use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugAmex;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugCreditCard;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugBancontact;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugMybank;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney3x;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney3xWithoutFees;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney4x;
@@ -221,6 +222,7 @@ class PayplugWoocommerce {
 					$payment_method_registry->register( new PayplugOney4x() );
 					$payment_method_registry->register( new PayplugOney3xWithoutFees() );
 					$payment_method_registry->register( new PayplugOney4xWithoutFees() );
+					$payment_method_registry->register( new PayplugOney() );
 				}
 			);
 		}
