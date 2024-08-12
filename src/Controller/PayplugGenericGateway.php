@@ -76,30 +76,28 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			return false;
 		}
 
-		if (is_checkout()) {
-			if (empty(WC()->cart)) {
-				return false;
-			}
 
-			//for backend orders
-			if (!empty(get_query_var('order-pay'))) {
-				$order = wc_get_order(get_query_var('order-pay'));
-				$items = $order->get_items();
-				$country_code_shipping = $order->get_shipping_country();
-				$country_code_billing = $order->get_billing_country();
-				$this->order_items_to_cart(WC()->cart, $items);
-			}
-
-			if ( empty( $country_code_billing ) || empty( $country_code_shipping ) ) {
-				$country_code_shipping = method_exists(WC()->customer, "get_shipping_country") ? WC()->customer->get_shipping_country() : null;
-				$country_code_billing  = method_exists(WC()->customer, "get_billing_country") ? WC()->customer->get_billing_country() : null;;
-			}
-
-			if( !$this->check_billing_country_permissions($account, $country_code_billing) ){
-				return false;
-			}
+		if (empty(WC()->cart)) {
+			return false;
 		}
 
+		//for backend orders
+		if (!empty(get_query_var('order-pay'))) {
+			$order = wc_get_order(get_query_var('order-pay'));
+			$items = $order->get_items();
+			$country_code_shipping = $order->get_shipping_country();
+			$country_code_billing = $order->get_billing_country();
+			$this->order_items_to_cart(WC()->cart, $items);
+		}
+
+		if ( empty( $country_code_billing ) || empty( $country_code_shipping ) ) {
+			$country_code_shipping = method_exists(WC()->customer, "get_shipping_country") ? WC()->customer->get_shipping_country() : null;
+			$country_code_billing  = method_exists(WC()->customer, "get_billing_country") ? WC()->customer->get_billing_country() : null;;
+		}
+
+		if( !$this->check_billing_country_permissions($account, $country_code_billing) ){
+			return false;
+		}
 
 
 		return true;
