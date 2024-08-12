@@ -27,6 +27,7 @@ class PayplugGatewayOney3x extends PayplugGateway
 
     protected $oney_response;
     protected $allowed_country_codes = [];
+	const ENABLE_ON_TEST_MODE = true;
 
     public function __construct()
     {

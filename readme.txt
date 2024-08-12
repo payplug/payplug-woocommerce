@@ -2,9 +2,9 @@
 Contributors: PayPlug
 Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, carte bancaire, paiement, one click, paiement en ligne, oney, Giropay, Satispay, MyBank, iDEAL, SOFORT
 Requires at least: 4.4
-Tested up to: 6.5.5
+Tested up to: 6.6.1
 Requires PHP: 5.6
-Stable tag: 2.8.0
+Stable tag: 2.8.1
 VueJs Payplug UI lib tag: 1.7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -81,6 +81,11 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 2.8.1 =
+* New fix
+* Tested up to Woocommerce 9.1.4
+* Tested up to Wordpress 6.6.1
+
 = 2.8.0 =
 * New feature: ApplePay On Cart
 * Tested up to Woocommerce 9.0.2

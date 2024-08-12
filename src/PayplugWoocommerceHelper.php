@@ -536,7 +536,16 @@ class PayplugWoocommerceHelper {
 		$options          = get_option('woocommerce_payplug_settings', []);
 		$payplug_test_key = !empty($options['payplug_test_key']) ? $options['payplug_test_key'] : '';
 		$payplug_live_key = !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : '';
+
 		if (empty($payplug_test_key) && empty($payplug_live_key)) {
+			return array();
+		}
+
+		if( $options['mode'] === 'yes' && empty($payplug_live_key) ){
+			return array();
+		}
+
+		if( $options['mode'] != 'yes' && empty($payplug_test_key)){
 			return array();
 		}
 
@@ -694,8 +703,10 @@ class PayplugWoocommerceHelper {
 				$options['mode'] = "no";
 			}
 
-			if (isset($key)){
-				$response = Authentication::getAccount(new Payplug($key));
+			if (isset($key) && !empty($key)){
+
+				//$response = Authentication::getAccount(new Payplug($key));
+				$response = self::get_account_data_from_options();
 			}
 
 			if (isset($response['httpResponse']['country'])) {
