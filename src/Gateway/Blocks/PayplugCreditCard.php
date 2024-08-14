@@ -46,6 +46,11 @@ class PayplugCreditCard extends PayplugGenericBlock
 			$data["payplug_integrated_payment_card_number"] = __('payplug_integrated_payment_card_number', 'payplug');
 			$data["payplug_integrated_payment_expiration_date"] = __('payplug_integrated_payment_expiration_date', 'payplug');
 			$data["payplug_integrated_payment_cvv"] = __('payplug_integrated_payment_cvv', 'payplug');
+			$data['payplug_integrated_payment_get_payment_url'] = \WC_AJAX::get_endpoint('payplug_create_order');
+			$data['payplug_integrated_payment_check_payment_url'] = \WC_AJAX::get_endpoint('payplug_check_payment');
+			$data['payplug_integrated_payment_nonce_field'] = wp_nonce_field('woocommerce-process_checkout', 'woocommerce-process-checkout-nonce');
+			$data['wp_nonce'] = wp_create_nonce( "woocommerce-process_checkout" );
+
 			$data["IP"] = true;
 		}
 
