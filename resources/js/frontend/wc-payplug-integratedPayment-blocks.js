@@ -1,5 +1,6 @@
 import { getSetting } from '@woocommerce/settings';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import {getPayment, check_payment} from "./helper/wc-payplug-requests";
 const settings = getSetting( 'payplug_data', {} );
 
 export const IntegratedPayment = (
@@ -18,29 +19,63 @@ export const IntegratedPayment = (
 		// Add each payments fields
 		ObjIntegratedPayment.form.cardHolder = ObjIntegratedPayment.api.cardHolder(document.querySelector('.cardHolder-input-container'), {default: ObjIntegratedPayment.inputStyle.default, placeholder: settings?.payplug_integrated_payment_cardholder } );
 		ObjIntegratedPayment.form.pan = ObjIntegratedPayment.api.cardNumber(document.querySelector('.pan-input-container'), {default: ObjIntegratedPayment.inputStyle.default, placeholder: settings?.payplug_integrated_payment_card_number } );
-		ObjIntegratedPayment.form.cvv = ObjIntegratedPayment.api.cvv(document.querySelector('.cvv-input-container'), {default: ObjIntegratedPayment.inputStyle.default, placeholder: settings?.payplug_integrated_payment_expiration_date } );
+		ObjIntegratedPayment.form.cvv = ObjIntegratedPayment.api.cvv(document.querySelector('.cvv-input-container'), {default: ObjIntegratedPayment.inputStyle.default, placeholder: settings?.payplug_integrated_payment_cvv } );
+
 		// With one field for expiration date
-		ObjIntegratedPayment.form.exp = ObjIntegratedPayment.api.expiration(document.querySelector('.exp-input-container'), {default: ObjIntegratedPayment.inputStyle.default, placeholder: settings?.payplug_integrated_payment_cvv } );
+		ObjIntegratedPayment.form.exp = ObjIntegratedPayment.api.expiration(document.querySelector('.exp-input-container'), {default: ObjIntegratedPayment.inputStyle.default, placeholder: settings?.payplug_integrated_payment_expiration_date } );
 		ObjIntegratedPayment.scheme = ObjIntegratedPayment.api.getSupportedSchemes();
+
+		ObjIntegratedPayment.api.onValidateForm( async ({isFormValid}) => {
+			if(isFormValid){
+				const payment = await getPayment(props);
+				ObjIntegratedPayment.paymentId = payment.payment_id;
+				ObjIntegratedPayment.return_url = payment.redirect;
+				await ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: false});
+			}
+			return false;
+		});
+
+		ObjIntegratedPayment.api.onCompleted( function (event) {
+			const data = {'payment_id' : event.token};
+			console.log(data);
+
+			check_payment(data).then( () => {
+
+				console.log("paid");
+				console.log(ObjIntegratedPayment.return_url);
+
+				window.location.href = ObjIntegratedPayment.return_url;
+			})
+			.catch((error) => {
+				//TODO:: handling errors
+			});
+		});
 
 		fieldValidation();
 
-	}, [settings, Payplug]);
+	}, []);
+
 
 	useEffect(() => {
-		const onSubmit = () => {
-
-			alert("pimbas");
-
-			console.log("stopped submit")
-			return false;
+		const onValidation = () => {
+			ObjIntegratedPayment.api.validateForm();
 		}
+		const unsubscribeAfterProcessing = onCheckoutValidation(onValidation);
+		return () => { unsubscribeAfterProcessing(); };
 
-		const unsubscribeAfterProcessing = onPaymentSetup(onSubmit);
-		return () => {unsubscribeAfterProcessing(); };
+	}, [onCheckoutValidation]);
+
+	useEffect(() => {
+		const onPayment = () => {
+			return { type: 'error' };
+		};
+
+		const unsubscribeAfterProcessing = onPaymentSetup(onPayment);
+		return () => {
+			unsubscribeAfterProcessing();
+		};
 	}, [
-		settings,
-		onPaymentSetup,
+		onPaymentSetup
 	]);
 
 	const fieldValidation = () => {
@@ -118,7 +153,7 @@ export const IntegratedPayment = (
 
 	return (
 		<>
-			<div className="payplug IntegratedPayment -loaded">
+			<div id="payplug-integrated-payment" className="payplug IntegratedPayment -loaded">
 				<div className="payplug IntegratedPayment_container -cardHolder cardHolder-input-container" data-e2e-name="cardHolder"></div>
 				<div className="payplug IntegratedPayment_error -cardHolder -hide">
 					<span className="-hide invalidField" data-e2e-error="invalidField">{ settings?.payplug_integrated_payment_cardHolder_error }</span>
