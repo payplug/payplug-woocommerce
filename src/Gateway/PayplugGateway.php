@@ -1036,7 +1036,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'payment_id' => $payment->id,
 				'result'   => 'success',
 				'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
-				'cancel'   => $payment->hosted_payment->cancel_url
+				'cancel'   => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null
 			);
 
         } catch (HttpException $e) {
