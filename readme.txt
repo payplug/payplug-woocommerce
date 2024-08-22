@@ -4,7 +4,7 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 4.4
 Tested up to: 6.6.1
 Requires PHP: 5.6
-Stable tag: 2.8.1
+Stable tag: 2.8.2
 VueJs Payplug UI lib tag: 1.7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -81,6 +81,11 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 2.8.2 =
+* New fix
+* Tested up to Woocommerce 9.1.4
+* Tested up to Wordpress 6.6.1
+
 = 2.8.1 =
 * New fix
 * Tested up to Woocommerce 9.1.4
