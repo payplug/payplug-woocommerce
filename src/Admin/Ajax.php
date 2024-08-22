@@ -13,7 +13,6 @@ use Payplug\PayplugWoocommerce\Gateway\Bancontact;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
-use Payplug\PayplugWoocommerce\Gateway\PPRO\Giropay;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Ideal;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Mybank;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Satispay;
@@ -122,12 +121,7 @@ class Ajax {
 				'permission_callback' => function () use ($permission)  {return $permission ;},
 				'show_in_index' => false
 			) );
-			register_rest_route( 'payplug_api', '/giropay_permissions/', array(
-				'methods' => 'POST',
-				'callback' => [ $this, 'api_check_giropay_permissions' ],
-				'permission_callback' => function () use ($permission)  {return $permission ;},
-				'show_in_index' => false
-			) );
+
 			register_rest_route( 'payplug_api', '/ideal_permissions/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'api_check_ideal_permissions' ],
@@ -324,21 +318,6 @@ class Ajax {
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
 				"msg" => __( 'payplug_sofort_access_error', 'payplug' ),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
-		}
-
-		wp_send_json_success($enabled);
-	}
-
-	public function api_check_giropay_permissions(WP_REST_Request $request) {
-		$account = $this->generic_get_account($request, Giropay::ENABLE_ON_TEST_MODE);
-
-		$enabled = isset($account['httpResponse']['payment_methods']['giropay']['enabled']) ? $account['httpResponse']['payment_methods']['giropay']['enabled']: false;
-		if(!$enabled){
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_giropay_access_error', 'payplug' ),
 				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
@@ -633,7 +612,6 @@ class Ajax {
 			$options['sofort'] = Validator::genericPaymentGateway($data['enable_sofort'], "Sofort", $test_mode);
 			$options['ideal'] = Validator::genericPaymentGateway($data['enable_ideal'], "iDEAL", $test_mode);
 			$options['mybank'] = Validator::genericPaymentGateway($data['enable_mybank'], "Mybank", $test_mode);
-			$options['giropay'] = Validator::genericPaymentGateway($data['enable_giropay'], "Giropay", $test_mode);
 			$options['oney_type'] = (Validator::oney_type($data['payplug_oney'])) ? $data['payplug_oney'] : 'with_fees';
 			$thresholds = (Validator::oney_thresholds($data['oney_min_amounts'], $data['oney_max_amounts']));
 			$options['oney_thresholds_min'] = $thresholds['min'];

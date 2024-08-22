@@ -857,15 +857,6 @@ msgstr "Sofort payments"
 msgid "payplug_sofort_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/8089091941660-Sofort-chez-Payplug"
 
-msgid "pay_with_giropay"
-msgstr "Pay with Giropay"
-
-msgid "payplug_giropay_activate"
-msgstr "Giropay payments"
-
-msgid "payplug_giropay_more_url"
-msgstr "https://support.payplug.com/hc/en-gb/articles/8089089179420"
-
 msgid "pay_with_ideal"
 msgstr "Pay with iDEAL"
 
