@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1089,9 +1089,6 @@ msgstr "Paga con Satispay"
 msgid "pay_with_mybank"
 msgstr "Paga con MyBank"
 
-msgid "pay_with_giropay"
-msgstr "Paga con Giropay"
-
 msgid "pay_with_sofort"
 msgstr "Paga con SOFORT"
 
@@ -1103,9 +1100,6 @@ msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ pe
 
 msgid "mybank_threshold"
 msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite MyBank."
-
-msgid "giropay_threshold"
-msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite Giropay."
 
 msgid "sofort_threshold"
 msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite SOFORT."
@@ -1131,12 +1125,6 @@ msgstr "Pagamento SOFORT"
 msgid "payplug_sofort_more_url"
 msgstr "https://support.payplug.com/hc/it/articles/8089091941660-Sofort-chez-Payplug"
 
-msgid "payplug_giropay_activate"
-msgstr "Pagamento Giropay"
-
-msgid "payplug_giropay_more_url"
-msgstr "https://support.payplug.com/hc/it/articles/8089089179420"
-
 msgid "payplug_ideal_activate"
 msgstr "Pagamento iDEAL"
 
@@ -1152,9 +1140,6 @@ msgstr "Mybank non è disponibile in modalità TEST. Per attivarlo, è necessari
 msgid "payplug_sofort_unavailable_testmode_description"
 msgstr "SOFORT non è disponibile in modalità TEST. Per attivarlo, è necessario mettere il modulo Payplug in modalità LIVE."
 
-msgid "payplug_giropay_unavailable_testmode_description"
-msgstr "Giropay non è disponibile in modalità TEST. Per attivarlo, è necessario mettere il modulo Payplug in modalità LIVE."
-
 msgid "payplug_ideal_unavailable_testmode_description"
 msgstr "iDeal non è disponibile in modalità TEST. Per attivarlo, è necessario mettere il modulo Payplug in modalità LIVE."
 
@@ -1167,9 +1152,6 @@ msgstr "Permetti ai tuoi clienti di pagare con Mybank."
 msgid "payplug_section_sofort_payment_description"
 msgstr "Permetti ai tuoi clienti di pagare con SOFORT."
 
-msgid "payplug_section_giropay_payment_description"
-msgstr "Permetti ai tuoi clienti di pagare con Giropay."
-
 msgid "payplug_section_ideal_payment_description"
 msgstr "Permetti ai tuoi clienti di pagare con iDeal."
 
@@ -1181,9 +1163,6 @@ msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare MyBank, co
 
 msgid "payplug_sofort_access_error"
 msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare SOFORT, compila <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=8248655934108' target='_blank'>questo modulo</a>"
-
-msgid "payplug_giropay_access_error"
-msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare Giropay, compila <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=8248632664476' target='_blank'>questo modulo</a>"
 
 msgid "payplug_ideal_access_error"
 msgstr "Non puoi ancora accedere a questa funzionalità. Per attivare iDEAL, compila <a href='https://support.payplug.com/hc/it/requests/new?ticket_form_id=8248663314844' target='_blank'>questo modulo</a>"

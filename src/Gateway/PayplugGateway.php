@@ -111,7 +111,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function __construct()
     {
-		$payplug_gateways = array('payplug', 'american_express', 'apple_pay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees','giropay', 'satispay', 'sofort', 'ideal', 'mybank');
+		$payplug_gateways = array('payplug', 'american_express', 'apple_pay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees', 'satispay', 'sofort', 'ideal', 'mybank');
 
 		if ((!empty($_GET['section'])) && (in_array($_GET['section'], $payplug_gateways))) {
 			$GLOBALS['hide_save_button'] = true;
@@ -262,7 +262,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         }
 
         $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express', "satispay","sofort","giropay","mybank","ideal" ])) {
+        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express', "satispay","sofort","mybank","ideal" ])) {
             return;
         }
 

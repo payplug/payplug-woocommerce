@@ -355,7 +355,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	public function hide_wc_refund_button(){
 		global $post;
 
-		$payment_methods = ['giropay', 'satispay', 'sofort', 'ideal', 'mybank'];
+		$payment_methods = ['satispay', 'sofort', 'ideal', 'mybank'];
 
 		if ( class_exists("OrderUtil") && OrderUtil::custom_orders_table_usage_is_enabled() ) {
 			$order_id = !empty($_GET["id"]) ? $_GET["id"] : null;
