@@ -46,6 +46,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 			$data["payplug_integrated_payment_card_number"] = __('payplug_integrated_payment_card_number', 'payplug');
 			$data["payplug_integrated_payment_expiration_date"] = __('payplug_integrated_payment_expiration_date', 'payplug');
 			$data["payplug_integrated_payment_cvv"] = __('payplug_integrated_payment_cvv', 'payplug');
+			$data["payplug_invalid_form"] = __('Payment processing failed. Please retry.', 'payplug');
 			$data['payplug_integrated_payment_get_payment_url'] = \WC_AJAX::get_endpoint('payplug_create_order');
 			$data['payplug_integrated_payment_check_payment_url'] = \WC_AJAX::get_endpoint('payplug_check_payment');
 			$data['payplug_integrated_payment_nonce_field'] = wp_nonce_field('woocommerce-process_checkout', 'woocommerce-process-checkout-nonce');
@@ -66,6 +67,8 @@ class PayplugCreditCard extends PayplugGenericBlock
 
 		$options = get_option('woocommerce_payplug_settings', []);
 		if( $options['payment_method'] === "integrated" && $options['can_use_integrated_payments'] ){
+
+			wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
 			wp_register_script(
 				'payplug-integrated-payments-api',
 				'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js',
@@ -73,8 +76,13 @@ class PayplugCreditCard extends PayplugGenericBlock
 				'v1.1',
 				true
 			);
+
+			wp_register_script('payplug-domain', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-domain.js', [], 'v1.0');
+			wp_enqueue_script('payplug-domain');
+
+			wp_enqueue_script('payplug-integrated-payments-api');
+
 		}
-		wp_enqueue_script('payplug-integrated-payments-api');
 		return parent::get_payment_method_script_handles();
 
 	}

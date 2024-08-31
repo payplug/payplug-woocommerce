@@ -1,22 +1,25 @@
 import { getSetting } from '@woocommerce/settings';
 import $ from 'jquery';
-import {promise} from "../../../../../../../wp-includes/js/dist/redux-routine";
 const settings = getSetting('payplug_data', {});
+import { useEffect } from 'react';
 
-export const getPayment = async (props) => {
+export const getPayment = (props) => {
 	 const data = getPaymentData(props);
 
-	 return $.ajax({
-		type: 'POST',
-		data: data,
-		url: settings.payplug_integrated_payment_get_payment_url,
-	}).done(function (response) {
-		 return response;
+	return new Promise((resolve, reject) => {
+		return $.ajax({
+			type: 'POST',
+			data: data,
+			url: settings.payplug_integrated_payment_get_payment_url,
 
-	 }).fail(function (error) {
-		 return error;
+		}).success(function (response) {
+			resolve(response);
 
-	 });
+		}).error(function (error) {
+			reject(error);
+
+		});
+	});
 
 	function getPaymentData(props) {
 		return {
@@ -56,15 +59,62 @@ export const check_payment = (data) => {
 			url: settings.payplug_integrated_payment_check_payment_url
 
 		}).success(function (response) {
-			console.log("it success");
 			resolve(response);
 
 		}).error(function (error) {
-
-			console.log("it fails");
 			reject(error); // NOT WORKING!!
 
 		});
 	});
 };
 
+/**
+ * Handles the Block Checkout onCheckoutFail event.
+ * Displays the error message returned from server in the paymentDetails object in the PAYMENTS notice context container.
+ *
+ * @param {*} onCheckoutFail The onCheckoutFail event.
+ * @param {*} emitResponse   Various helpers for usage with observer.
+ */
+export const usePaymentFailHandler = (
+	onCheckoutFail,
+	emitResponse
+) => {
+	useEffect(
+		() =>
+			onCheckoutFail( ( { processingResponse: { paymentDetails } } ) => {
+				return {
+					type: 'failure',
+					message: paymentDetails.errorMessage,
+					messageContext: emitResponse.noticeContexts.PAYMENTS,
+				};
+			} ),
+		[
+			onCheckoutFail,
+			emitResponse.noticeContexts.PAYMENTS,
+		]
+	);
+};
+
+
+export const usePaymentCompleteHandler = (
+	onCheckoutSuccess,
+	emitResponse,
+) => {
+	// Once the server has completed payment processing, confirm the intent of necessary.
+	useEffect(
+		() =>
+			onCheckoutSuccess(
+				( { processingResponse: { paymentDetails } } ) =>{
+					if(paymentDetails.result === "success"){
+						return {
+							type: 'success',
+							redirectUrl: paymentDetails.redirect,
+						}
+					}
+				}
+			),
+		// not sure if we need to disable this, but kept it as-is to ensure nothing breaks. Please consider passing all the deps.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[]
+	);
+};

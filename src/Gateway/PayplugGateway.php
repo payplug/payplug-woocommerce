@@ -18,6 +18,7 @@ use Payplug\PayplugWoocommerce\Helper\Lock;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
+use WC_Blocks_Utils;
 use WC_Payment_Gateway_CC;
 use WC_Payment_Tokens;
 
@@ -640,7 +641,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('payplug-checkout');
 
-		if ($this->payment_method == "integrated" ) {
+		if ($this->payment_method == "integrated" && !$this->is_checkout_block() ) {
 			$this->integrated_payments_scripts();
 		}
 
@@ -1736,6 +1737,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 	public function setPayplugMerchantCountry($country){
 		$this->payplug_merchant_country = $country;
+	}
+
+	function is_checkout_block() {
+		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' );
 	}
 
 }
