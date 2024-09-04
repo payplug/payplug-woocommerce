@@ -31,7 +31,6 @@ if (typeof oney_response.x3_without_fees !== 'undefined') {
 
 		let country = e.shippingData.shippingAddress.country;
 		if (allowed_country_codes.indexOf(country) === -1) {
-			settings.icon.class = 'disable-checkout-icons';
 			return (
 				<div className={settings?.oney_disabled.validations.country.class}>
 					{settings?.oney_disabled.validations.country.text}
@@ -39,7 +38,6 @@ if (typeof oney_response.x3_without_fees !== 'undefined') {
 
 			);
 		} else if (e.cartData.cartItems.length > settings?.requirements.max_quantity) {
-			settings.icon.class = 'disable-checkout-icons';
 			return (
 				<div className={settings?.oney_disabled.validations.items_count.class}>
 					{settings?.oney_disabled.validations.items_count.text}
@@ -48,7 +46,6 @@ if (typeof oney_response.x3_without_fees !== 'undefined') {
 			);
 		} else if ((e.billing.cartTotal.value > settings?.requirements.max_threshold)
 			|| (e.billing.cartTotal.value < settings?.requirements.min_threshold)) {
-			settings.icon.class = 'disable-checkout-icons';
 			return (
 				<div className={settings?.oney_disabled.validations.amount.class}>
 					{settings?.oney_disabled.validations.amount.text}
@@ -78,7 +75,7 @@ if (typeof oney_response.x3_without_fees !== 'undefined') {
 					</div>
 					<div className="payplug-oney-flex">
 						<div><b>{translations['oney_total']}</b></div>
-						<div><b>{total_price_oney} {e.billing.currency.symbol}</b></div>
+						<div><b>{total_price_oney.toFixed(2)} {e.billing.currency.symbol}</b></div>
 					</div>
 				</div>
 			);
@@ -143,8 +140,8 @@ let oney_x3_without_fees = {
 	label: <Label/>,
 	content: <Content/>,
 	edit: <Content/>,
-	canMakePayment: () => {
-		return true;
+	canMakePayment: (props) => {
+		return allowed_country_codes.indexOf(props.shippingAddress.country) !== -1;
 	},
 	ariaLabel: label,
 	supports: {
