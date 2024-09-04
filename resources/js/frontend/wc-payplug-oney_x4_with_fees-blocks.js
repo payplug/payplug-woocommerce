@@ -82,7 +82,7 @@ if (typeof oney_response.x4_with_fees !== 'undefined') {
 					</div>
 					<div className="payplug-oney-flex">
 						<div><b>{translations['oney_total']}</b></div>
-						<div><b>{total_price_oney} {e.billing.currency.symbol}</b></div>
+						<div><b>{total_price_oney.toFixed(2)} {e.billing.currency.symbol}</b></div>
 					</div>
 				</div>
 			);
@@ -147,8 +147,8 @@ let oney_x4_with_fees = {
 	label: <Label/>,
 	content: <Content/>,
 	edit: <Content/>,
-	canMakePayment: () => {
-		return true;
+	canMakePayment: (props) => {
+		return allowed_country_codes.indexOf(props.shippingAddress.country) !== -1;
 	},
 	ariaLabel: label,
 	supports: {
