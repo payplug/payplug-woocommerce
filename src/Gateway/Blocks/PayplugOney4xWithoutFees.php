@@ -13,7 +13,7 @@ class PayplugOney4xWithoutFees extends PayplugOney3xWithoutFees {
 	 */
 	protected $name = "oney_x4_without_fees";
 
-	protected $icon = 'x4_without_fees.svg';
+	protected $icon = 'x4_without_fees_';
 
 	public function oney_enabled() {
 

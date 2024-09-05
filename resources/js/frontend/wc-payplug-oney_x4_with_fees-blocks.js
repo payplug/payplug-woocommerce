@@ -148,6 +148,16 @@ let oney_x4_with_fees = {
 	content: <Content/>,
 	edit: <Content/>,
 	canMakePayment: (props) => {
+
+		if (props.cart.cartItemsCount > settings?.requirements.max_quantity) {
+			return false
+		}
+
+		if ((props.cartTotals.total_price > settings?.requirements.max_threshold) ||
+			(props.cartTotals.total_price < settings?.requirements.min_threshold)) {
+			return false;
+		}
+
 		return allowed_country_codes.indexOf(props.shippingAddress.country) !== -1;
 	},
 	ariaLabel: label,
