@@ -352,9 +352,11 @@ class PayplugWoocommerceRequest {
 			],
 		];
 
-		$payment_data['initiator'] = 'PAYER';
-		$payment_data['integration'] = 'INTEGRATED_PAYMENT';
-		unset($payment_data['hosted_payment']['cancel_url']);
+		if($this->gateway->payment_method === 'integrated') {
+			$payment_data['initiator'] = 'PAYER';
+			$payment_data['integration'] = 'INTEGRATED_PAYMENT';
+			unset($payment_data['hosted_payment']['cancel_url']);
+		}
 
 		/**
 		 * Filter the payment data before it's used
@@ -373,6 +375,10 @@ class PayplugWoocommerceRequest {
 
 		// Save transaction id on the order
 		PayplugWoocommerceHelper::is_pre_30() ? update_post_meta($order_id, '_transaction_id', $payment->id)  : $order->set_transaction_id($payment->id);
+
+		if (is_callable([$order, 'save']) && $this->gateway->payment_method === "popup") {
+			$order->save();
+		}
 
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
 		PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
