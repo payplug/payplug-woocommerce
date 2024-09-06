@@ -1,18 +1,14 @@
 import { getSetting } from '@woocommerce/settings';
 import React, { useEffect, useRef } from 'react';
-import {
-	getPayment,
-	check_payment,
-	usePaymentFailHandler,
-	usePaymentCompleteHandler
-} from "./helper/wc-payplug-requests";
+import { useSelect } from '@wordpress/data';
+import {getPayment, check_payment } from "./helper/wc-payplug-requests";
 const settings = getSetting( 'payplug_data', {} );
 
-export const IntegratedPayment = ({props: props,}) => {
-
-	const shouldSavePayment = false;
-	const { eventRegistration, emitResponse } = props;
-	const { onCheckoutValidation, onPaymentSetup, onCheckoutFail, onCheckoutSuccess } = eventRegistration;
+const IntegratedPayment = ({props: props,}) => {
+	const { eventRegistration, emitResponse, shouldSavePayment } = props;
+	const { onCheckoutValidation, onPaymentSetup, onCheckoutSuccess } = eventRegistration;
+	const { PAYMENT_STORE_KEY, CHECKOUT_STORE_KEY } = window.wc.wcBlocksData;
+	const order_id = useSelect( ( select ) => select( CHECKOUT_STORE_KEY ).getOrderId() );
 
 	useEffect(() => {
 		ObjIntegratedPayment.api = new Payplug.IntegratedPayment(false);
@@ -59,64 +55,75 @@ export const IntegratedPayment = ({props: props,}) => {
 	useEffect(() => {
 		const handlePaymentProcessing = async () => {
 			let data = {};
-			await getPayment(props).then( async (response) => {
-				ObjIntegratedPayment.paymentId = response.payment_id;
-				data = {'payment_id': response.payment_id};
+	 		await getPayment(props, order_id).then( async (response) => {
+				ObjIntegratedPayment.paymentId = response.data.payment_id;
+				data = {'payment_id': response.data.payment_id};
 				ObjIntegratedPayment.return_url = response.redirect;
-				try {
-					await ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: false});
+				let saved_card = shouldSavePayment;
 
-				}catch(error) {
+				try {
+					ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: saved_card} );
+
+				} catch (error) {
 					return {
 						type: 'error',
 						message: error.message
 					}
 				}
 
-			});
-
-			let result = {};
-			await CompleteProcessingPayment().then( (res) => {
-				if(res.success){
-					result = {
-						type: 'success',
-						meta: {}
-					}
-				}else{
-					result = {
-						type: 'error',
-						message: res.data.message,
-					};
+				return {
+					type: 'success',
 				}
-			});
-
-			return result;
-
-			function CompleteProcessingPayment(){
-				return new Promise(async (resolve, reject) => {
-					await ObjIntegratedPayment.api.onCompleted( function (event) {
-						const data = {'payment_id' : event.token};
-						check_payment(data).then( (res) => {
-							resolve(res);
-						});
-					});
-				})
-			}
-
+			})
 		}
 		const unsubscribeAfterProcessing = onPaymentSetup(handlePaymentProcessing);
 		return () => { unsubscribeAfterProcessing(); };
 
 	}, [
+		shouldSavePayment,
 		onPaymentSetup,
 		emitResponse.noticeContexts.PAYMENTS,
 		emitResponse.responseTypes.ERROR,
 		emitResponse.responseTypes.SUCCESS
 	]);
 
-	usePaymentFailHandler(onCheckoutFail, emitResponse);
+	useEffect(() => {
+		const handlePaymentProcessing = async ({processingResponse: {paymentDetails}}) => {
+			let result = {};
+			await CompleteProcessingPayment().then( (res) => {
+				result = {
+					type: res.data.result === "success" ? "success" : "error",
+					message: typeof res.data.message != "undefined" ? res.data.message : null,
+					messageContext: typeof res.data.message != "undefined" ? emitResponse.noticeContexts.PAYMENTS: null,
+					redirectUrl: typeof res.data.redirect != "undefined" ? res.data.redirect: null
+				}
+			});
 
-	usePaymentCompleteHandler(onCheckoutSuccess, emitResponse, shouldSavePayment)
+			function CompleteProcessingPayment(){
+				return new Promise((resolve, reject) => {
+					try {
+						ObjIntegratedPayment.api.onCompleted( function (event) {
+							const data = {'payment_id' : paymentDetails.payment_id};
+							check_payment(data).then( (res) => {
+								resolve(res);
+							});
+						});
+
+					}catch (e){
+						reject(e);
+					}
+				})
+			}
+			return result;
+
+		}
+		const unsubscribeAfterProcessing = onCheckoutSuccess(handlePaymentProcessing);
+		return () => { unsubscribeAfterProcessing(); };
+
+	}, [
+		onCheckoutSuccess
+	]);
+
 
 	const fieldValidation = () => {
 		jQuery.each(ObjIntegratedPayment.form, function (key, field) {
@@ -243,3 +250,5 @@ export const IntegratedPayment = ({props: props,}) => {
 		</>
 	)
 }
+
+export default IntegratedPayment;
