@@ -1,9 +1,9 @@
 
-import { sprintf, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
-import { IntegratedPayment } from "./wc-payplug-integratedPayment-blocks";
+import IntegratedPayment from "./wc-payplug-integratedPayment-blocks";
 const settings = getSetting( 'payplug_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
 const label = decodeEntities( settings?.title ) || defaultLabel;
@@ -52,7 +52,7 @@ const Payplug = {
 	canMakePayment: () => true,
 	ariaLabel: label,
 	supports: {
-		features: settings.supports,
+		features: settings.supports
 	},
 };
 

@@ -820,7 +820,32 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      * @throws \Exception
      */
     public function process_standard_payment($order, $amount, $customer_id)
-    {
+	{
+
+		//use payment intent to finish the order
+		if ($this->is_checkout_block() && $this->payment_method === 'integrated' && !empty($order->get_transaction_id())) {
+
+			try {
+				$payment = $this->api->payment_retrieve($order->get_transaction_id());
+				if (ob_get_length() > 0) {
+					ob_clean();
+				}
+
+				return array(
+					'payment_id' => $payment->id,
+					'result' => 'success',
+					'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
+					'cancel' => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null
+				);
+
+			} catch (HttpException $e) {
+				PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
+				throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+			} catch (\Exception $e) {
+				PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, $e->getMessage()), 'error');
+				throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+			}
+		}
 
         $order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 

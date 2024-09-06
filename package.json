@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@woocommerce/settings": "^1.0.0",
+    "jquery": "^3.7.1",
     "sass": "^1.68.0",
     "trim-newlines": "^5.0.0"
   },
