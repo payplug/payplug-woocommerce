@@ -27,6 +27,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 			'icon_alt' => "Visa & Mastercard",
 		];
 		$data["IP"] = false;
+		$data["popup"] = false;
 
 		$options = get_option('woocommerce_payplug_settings', []);
 		if( $options['payment_method'] === "integrated" && $options['can_use_integrated_payments'] ){
@@ -51,8 +52,14 @@ class PayplugCreditCard extends PayplugGenericBlock
 			$data['payplug_integrated_payment_check_payment_url'] = \WC_AJAX::get_endpoint('payplug_check_payment');
 			$data['payplug_integrated_payment_nonce_field'] = wp_nonce_field('woocommerce-process_checkout', 'woocommerce-process-checkout-nonce');
 			$data['wp_nonce'] = wp_create_nonce( "woocommerce-process_checkout" );
-
 			$data["IP"] = true;
+
+		}else if( $options['payment_method'] === "popup" ){
+			$data["popup"] = true;
+			$data['payplug_create_intent_payment'] = \WC_AJAX::get_endpoint('payplug_create_intent');
+			$data['payplug_create_order'] = \WC_AJAX::get_endpoint('payplug_create_order');
+			$data['wp_nonce'] = wp_create_nonce( "woocommerce-process_checkout" );
+
 		}
 
 		return $data;
@@ -67,23 +74,33 @@ class PayplugCreditCard extends PayplugGenericBlock
 
 		$options = get_option('woocommerce_payplug_settings', []);
 		if( $options['payment_method'] === "integrated" && $options['can_use_integrated_payments'] ){
-
-			wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
-			wp_register_script(
-				'payplug-integrated-payments-api',
-				'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js',
-				array(),
-				'v1.1',
-				true
-			);
-
-			wp_register_script('payplug-domain', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-domain.js', [], 'v1.0');
-			wp_enqueue_script('payplug-domain');
-
-			wp_enqueue_script('payplug-integrated-payments-api');
-
+			$this->ip_scripts();
 		}
-		return parent::get_payment_method_script_handles();
 
+		if ( $options['payment_method'] == "popup" ) {
+			$this->popup_scripts();
+		}
+
+		return parent::get_payment_method_script_handles();
+	}
+
+	private function ip_scripts(){
+		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+		wp_register_script(
+			'payplug-integrated-payments-api',
+			'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js',
+			array(),
+			'v1.1',
+			true
+		);
+
+		wp_register_script('payplug-domain', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-domain.js', [], 'v1.0');
+		wp_enqueue_script('payplug-domain');
+
+		wp_enqueue_script('payplug-integrated-payments-api');
+	}
+
+	private function popup_scripts(){
+		wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
 	}
 }
