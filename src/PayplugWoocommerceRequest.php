@@ -401,7 +401,7 @@ class PayplugWoocommerceRequest {
 
 		wp_send_json_success(array(
 			'payment_id' => $payment->id,
-			'merchant_session' => $payment->payment_method["merchant_session"],
+			'merchant_session' => isset($payment->payment_method["merchant_session"]) ? $payment->payment_method["merchant_session"]: null,
 			'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
 			'cancel'   => esc_url_raw($order->get_cancel_order_url_raw())
 		));
