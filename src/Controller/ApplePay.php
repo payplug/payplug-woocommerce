@@ -13,14 +13,17 @@ use function is_checkout;
 class ApplePay extends PayplugGateway
 {
 
-	protected $domain_name = "";
+	public $domain_name = "";
 
 	protected $cart=false;
 
 	protected $checkout = false;
 
 	protected $carriers = [];
+
 	const ENABLE_ON_TEST_MODE = false;
+
+	public $image = "apple-pay-checkout.svg";
 
 	public function __construct()
 	{
@@ -88,7 +91,7 @@ class ApplePay extends PayplugGateway
 	 * @return bool
 	 */
 
-	private function checkApplePay(){
+	public function checkApplePay(){
 		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options($this->id);
 		$options = PayplugWoocommerceHelper::get_payplug_options();
 
