@@ -1,6 +1,6 @@
 import { getSetting } from '@woocommerce/settings';
 import $ from 'jquery';
-const settings = getSetting('payplug_data', {});
+const settings = getSetting('apple_pay_data', {});
 import { useEffect } from 'react';
 
 export const getPayment = (props, order_id) => {
@@ -10,7 +10,6 @@ export const getPayment = (props, order_id) => {
 			type: 'POST',
 			data: data,
 			url: settings.payplug_create_intent_payment,
-
 		}).success(function (response) {
 			resolve(response);
 
@@ -24,23 +23,23 @@ export const getPayment = (props, order_id) => {
 		return {
 			"order_id": order_id,
 			"woocommerce-process-checkout-nonce": settings.wp_nonce,
-			"gateway": "payplug"
+			"gateway": "apple_pay"
 		}
 	}
 };
 
-export const check_payment = (data) => {
+export const apple_pay_update_payment = (data) => {
 	return new Promise((resolve, reject) => {
 		$.ajax({
 			type: 'POST',
 			data: data,
-			url: settings.payplug_integrated_payment_check_payment_url
+			url: settings.ajax_url_applepay_update_payment
 		}).success(function (response) {
 			resolve(response);
 
-		}).error(function (error) {
+		}).error(function (xhr, status, error) {
 			reject(error); // NOT WORKING!!
 
 		});
 	});
-};
+}
