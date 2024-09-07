@@ -37,10 +37,6 @@ const Popup = ({props: props,}) => {
 
 	useEffect(() => {
 		const handlePaymentProcessing = async ({processingResponse: {paymentDetails}}) => {
-
-			console.log( "####### onCheckoutSuccess ######## ");
-			console.log( getPaymentData);
-
 			await showPopupPayment(getPaymentData).then( () => {
 				setTimeotu(function(){
 					return {
@@ -62,7 +58,6 @@ const Popup = ({props: props,}) => {
 					}
 				})
 			}
-
 		}
 		const unsubscribeAfterProcessing = onCheckoutSuccess(handlePaymentProcessing);
 		return () => { unsubscribeAfterProcessing(); };
