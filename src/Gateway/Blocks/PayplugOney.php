@@ -17,10 +17,18 @@ class PayplugOney extends PayplugGenericBlock {
 
 	protected $total_price;
 
+	/**
+	 * Returns an associative array of data to be exposed for the payment method's client side.
+	 */
+	public function get_payment_method_data() {
 
-	public function oney_enabled() {
+		$data  = parent::get_payment_method_data();
 
-		$data                  = parent::get_payment_method_data();
+		if ( is_checkout() ) {
+			$this->cart = WC()->cart;
+			$this->total_price = floatval( WC()->cart->total );
+		}
+
 		$data['icon']          = [
 			'src'   => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $this->icon ),
 			'class' => 'payplug-payment-icon',
@@ -33,8 +41,8 @@ class PayplugOney extends PayplugGenericBlock {
 
 		$data['translations']['bring']               = __( 'Bring', 'payplug' );
 		$data['translations']['oney_financing_cost'] = __( 'oney_financing_cost', 'payplug' );
-		$data['translations']['1st monthly payment'] = __( '1st monthly payment', 'payplug' );
-		$data['translations']['2nd monthly payment'] = __( '2nd monthly payment', 'payplug' );
+		$data['translations']['1st_monthly_payment'] = __( '1st monthly payment', 'payplug' );
+		$data['translations']['2nd_monthly_payment'] = __( '2nd monthly payment', 'payplug' );
 		$data['translations']['oney_total']          = __( 'oney_total', 'payplug' );
 		$data['allowed_country_codes']               = $this->gateway->allowed_country_codes;
 
@@ -45,22 +53,7 @@ class PayplugOney extends PayplugGenericBlock {
 			'allowed_country_codes' => $this->gateway->allowed_country_codes
 		];
 
-
 		return $data;
-	}
-
-	/**
-	 * Returns an associative array of data to be exposed for the payment method's client side.
-	 */
-	public function get_payment_method_data() {
-
-		if ( is_checkout() ) {
-			$this->cart = WC()->cart;
-
-			$this->total_price = floatval( WC()->cart->total );
-		}
-
-		return $this->oney_enabled();
 
 	}
 

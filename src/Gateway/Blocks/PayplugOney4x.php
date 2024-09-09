@@ -14,11 +14,11 @@ class PayplugOney4x extends PayplugOney {
 	protected $icon = 'x4_with_fees.svg';
 
 
-	public function oney_enabled() {
+	public function get_payment_method_data() {
 
-		$data = parent::oney_enabled();
+		$data = parent::get_payment_method_data();
 
-		$data['translations']['3rd monthly payment'] = __( '3rd monthly payment', 'payplug' );
+		$data['translations']['3rd_monthly_payment'] = __( '3rd monthly payment', 'payplug' );
 
 		return $data;
 	}

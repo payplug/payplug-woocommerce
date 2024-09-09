@@ -2,93 +2,17 @@ import {__} from '@wordpress/i18n';
 import {registerPaymentMethod} from '@woocommerce/blocks-registry';
 import {decodeEntities} from '@wordpress/html-entities';
 import {getSetting} from '@woocommerce/settings';
-
-
+import Oney_Simulation from "./helper/wc-payplug-oney-simulation";
 
 const settings = getSetting('oney_x4_without_fees_data', {});
 const defaultLabel = __('Gateway method title', 'payplug');
 const label = decodeEntities(settings?.title) || defaultLabel;
 
-let Content;
-
-const translations = settings?.translations;
-
-const allowed_country_codes = settings?.requirements.allowed_country_codes;
-
-const oney_response = settings?.oney_response;
-
-if (typeof oney_response.x4_without_fees !== 'undefined') {
-	var down_payment_amount = parseFloat(settings?.oney_response['x4_without_fees']['down_payment_amount']) ;
-	var total_price_oney = down_payment_amount;
-	settings?.oney_response['x4_without_fees']['installments'].forEach((amount) => {
-
-		total_price_oney += parseFloat(amount['amount']);
-
-	});
-
-
-	Content = (e) => {
-
-		let country = e.shippingData.shippingAddress.country;
-		if (allowed_country_codes.indexOf(country) === -1) {
-			settings.icon.class = 'disable-checkout-icons';
-			return (
-				<div className={settings?.oney_disabled.validations.country.class}>
-					{settings?.oney_disabled.validations.country.text}
-				</div>
-
-			);
-		} else if (e.cartData.cartItems.length > settings?.requirements.max_quantity) {
-			settings.icon.class = 'disable-checkout-icons';
-			return (
-				<div className={settings?.oney_disabled.validations.items_count.class}>
-					{settings?.oney_disabled.validations.items_count.text}
-				</div>
-
-			);
-		} else if ((e.billing.cartTotal.value > settings?.requirements.max_threshold)
-			|| (e.billing.cartTotal.value < settings?.requirements.min_threshold)) {
-			settings.icon.class = 'disable-checkout-icons';
-			return (
-				<div className={settings?.oney_disabled.validations.amount.class}>
-					{settings?.oney_disabled.validations.amount.text}
-				</div>
-
-			);
-		} else {
-			settings.icon.class = 'payplug-payment-icon';
-			return (
-				<div>
-					<div className="payplug-oney-flex">
-						<div>{translations['bring']} :</div>
-						<div>{down_payment_amount} {e.billing.currency.symbol}</div>
-					</div>
-					<div className="payplug-oney-flex">
-						<small>( {translations['oney_financing_cost']}
-							<b>{settings?.oney_response['x4_without_fees']['total_cost']} {e.billing.currency.symbol}</b> TAEG
-							: <b>{settings?.oney_response['x4_without_fees']['effective_annual_percentage_rate']} %</b> )</small>
-					</div>
-					<div className="payplug-oney-flex">
-						<div>{translations['1st monthly payment']}:</div>
-						<div>{settings?.oney_response['x4_without_fees']['installments'][0]['amount']} {e.billing.currency.symbol}</div>
-					</div>
-					<div className="payplug-oney-flex">
-						<div>{translations['2nd monthly payment']}:</div>
-						<div>{settings?.oney_response['x4_without_fees']['installments'][1]['amount']} {e.billing.currency.symbol}</div>
-					</div>
-					<div className="payplug-oney-flex">
-						<div>{translations['3rd monthly payment']}:</div>
-						<div>{settings?.oney_response['x4_without_fees']['installments'][2]['amount']} {e.billing.currency.symbol}</div>
-					</div>
-					<div className="payplug-oney-flex">
-						<div><b>{translations['oney_total']}</b></div>
-						<div><b>{total_price_oney.toFixed(2)} {e.billing.currency.symbol}</b></div>
-					</div>
-				</div>
-			);
-		}
-	};
-}
+const Content = (props) => {
+	return (
+		<Oney_Simulation settings={settings} name={"x4_without_fees"} props={props} />
+	);
+};
 
 /**
  * Label component
@@ -129,7 +53,7 @@ let oney_x4_without_fees = {
 			return false;
 		}
 
-		return allowed_country_codes.indexOf(props.shippingAddress.country) !== -1;
+		return settings?.requirements.allowed_country_codes.indexOf(props.shippingAddress.country) !== -1;
 	},
 	ariaLabel: label,
 	supports: {
