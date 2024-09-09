@@ -16,8 +16,9 @@ class PayplugOney3xWithoutFees extends PayplugOney {
 	protected $icon = 'x3_without_fees_';
 
 
-	public function oney_enabled() {
-		$data    = parent::oney_enabled();
+	public function get_payment_method_data() {
+		$data    = parent::get_payment_method_data();
+
 		$country = PayplugWoocommerceHelper::getISOCountryCode();
 		if ( file_exists( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/checkout/'.$this->icon . $country . '.svg' ) ) {
 			$image = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/checkout/'. $this->icon. $country . '.svg';
