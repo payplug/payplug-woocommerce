@@ -23,7 +23,7 @@ class PayplugApplePay extends PayplugGenericBlock
 		];
 
 		$data['payplug_locale'] = get_locale();
-		$data['payplug_countryCode'] = WC()->customer->get_billing_country();
+		$data['payplug_countryCode'] = WC()->customer !== null ? WC()->customer->get_billing_country() : "FR";
 		$data['payplug_currencyCode'] = get_woocommerce_currency();
 		$data['payplug_apple_pay_domain'] = $_SERVER['HTTP_HOST'];
 		$data['ajax_url_applepay_update_payment'] = \WC_AJAX::get_endpoint('applepay_update_payment');
