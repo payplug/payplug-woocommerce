@@ -48,7 +48,7 @@ class ApplePay extends PayplugGateway
 			$this->enabled = "yes";
 
 		}else if( $this->checkApplePay() && $this->checkDeviceComptability() && $this->isSSL()  ){
-			if (!is_admin() && is_checkout() && $this->get_button_checkout()) {
+			if (!is_admin() && (is_checkout() || $this->is_checkout_block()) && $this->get_button_checkout()) {
 				$this->enabled = 'yes';
 				$this->add_apple_pay_css();
 				add_action('wp_enqueue_scripts', [$this, 'add_apple_pay_js']);
