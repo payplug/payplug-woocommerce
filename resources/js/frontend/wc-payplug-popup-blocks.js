@@ -38,24 +38,25 @@ const Popup = ({props: props,}) => {
 	useEffect(() => {
 		const handlePaymentProcessing = async ({processingResponse: {paymentDetails}}) => {
 			await showPopupPayment(getPaymentData).then( () => {
-				setTimeotu(function(){
-					return {
-						type: "error",
-						message: "Timeout",
-						messageContext: emitResponse.noticeContexts.PAYMENTS
-					}
-				},60000)
+				return {
+					type: "error",
+					message: "Timeout",
+					messageContext: emitResponse.noticeContexts.PAYMENTS
+				}
 			})
 
 			function showPopupPayment(getPaymentData) {
 				return new Promise(async (resolve, reject) => {
 					try {
 						await Payplug.showPayment(getPaymentData.data.redirect);
-						resolve();
-
 					} catch (e) {
 						reject(e);
 					}
+
+					setTimeout(function(){
+						Payplug._closeIframe();
+						reject("timeout");
+					},90000)
 				})
 			}
 		}
