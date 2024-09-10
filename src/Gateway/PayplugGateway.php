@@ -18,6 +18,7 @@ use Payplug\PayplugWoocommerce\Helper\Lock;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
+use WC_Blocks_Utils;
 use WC_Payment_Gateway_CC;
 use WC_Payment_Tokens;
 
@@ -640,7 +641,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('payplug-checkout');
 
-		if ($this->payment_method == "integrated" ) {
+		if ($this->payment_method == "integrated" && !$this->is_checkout_block() ) {
 			$this->integrated_payments_scripts();
 		}
 
@@ -814,7 +815,32 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      * @throws \Exception
      */
     public function process_standard_payment($order, $amount, $customer_id)
-    {
+	{
+
+		//use payment intent to finish the order
+		if ($this->is_checkout_block() && $this->payment_method === 'integrated' && !empty($order->get_transaction_id())) {
+
+			try {
+				$payment = $this->api->payment_retrieve($order->get_transaction_id());
+				if (ob_get_length() > 0) {
+					ob_clean();
+				}
+
+				return array(
+					'payment_id' => $payment->id,
+					'result' => 'success',
+					'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
+					'cancel' => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null
+				);
+
+			} catch (HttpException $e) {
+				PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
+				throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+			} catch (\Exception $e) {
+				PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, $e->getMessage()), 'error');
+				throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+			}
+		}
 
         $order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 
@@ -1735,6 +1761,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 	public function setPayplugMerchantCountry($country){
 		$this->payplug_merchant_country = $country;
+	}
+
+	function is_checkout_block() {
+		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' );
 	}
 
 }

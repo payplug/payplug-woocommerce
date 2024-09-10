@@ -1,82 +1,129 @@
 import { getSetting } from '@woocommerce/settings';
-import { useEffect } from 'react';
-import {getPayment, check_payment} from "./helper/wc-payplug-requests";
+import React, { useEffect, useRef } from 'react';
+import { useSelect } from '@wordpress/data';
+import {getPayment, check_payment } from "./helper/wc-payplug-requests";
 const settings = getSetting( 'payplug_data', {} );
 
-export const IntegratedPayment = (
-	{settings: settings, props: props }
-) => {
-
-	const { eventRegistration } = props;
-	const { onCheckoutValidation, onPaymentSetup } = eventRegistration;
+const IntegratedPayment = ({props: props,}) => {
+	const { eventRegistration, emitResponse, shouldSavePayment } = props;
+	const { onCheckoutValidation, onPaymentSetup, onCheckoutSuccess } = eventRegistration;
+	const { PAYMENT_STORE_KEY, CHECKOUT_STORE_KEY } = window.wc.wcBlocksData;
+	const order_id = useSelect( ( select ) => select( CHECKOUT_STORE_KEY ).getOrderId() );
 
 	useEffect(() => {
-
-		// Create an instance of Integrated Payments
 		ObjIntegratedPayment.api = new Payplug.IntegratedPayment(false);
 		ObjIntegratedPayment.api.setDisplayMode3ds(Payplug.DisplayMode3ds.LIGHTBOX)
-
-		// Add each payments fields
 		ObjIntegratedPayment.form.cardHolder = ObjIntegratedPayment.api.cardHolder(document.querySelector('.cardHolder-input-container'), {default: ObjIntegratedPayment.inputStyle.default, placeholder: settings?.payplug_integrated_payment_cardholder } );
 		ObjIntegratedPayment.form.pan = ObjIntegratedPayment.api.cardNumber(document.querySelector('.pan-input-container'), {default: ObjIntegratedPayment.inputStyle.default, placeholder: settings?.payplug_integrated_payment_card_number } );
 		ObjIntegratedPayment.form.cvv = ObjIntegratedPayment.api.cvv(document.querySelector('.cvv-input-container'), {default: ObjIntegratedPayment.inputStyle.default, placeholder: settings?.payplug_integrated_payment_cvv } );
-
-		// With one field for expiration date
 		ObjIntegratedPayment.form.exp = ObjIntegratedPayment.api.expiration(document.querySelector('.exp-input-container'), {default: ObjIntegratedPayment.inputStyle.default, placeholder: settings?.payplug_integrated_payment_expiration_date } );
 		ObjIntegratedPayment.scheme = ObjIntegratedPayment.api.getSupportedSchemes();
-
-		ObjIntegratedPayment.api.onValidateForm( async ({isFormValid}) => {
-			if(isFormValid){
-				const payment = await getPayment(props);
-				ObjIntegratedPayment.paymentId = payment.payment_id;
-				ObjIntegratedPayment.return_url = payment.redirect;
-				await ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: false});
-			}
-			return false;
-		});
-
-		ObjIntegratedPayment.api.onCompleted( function (event) {
-			const data = {'payment_id' : event.token};
-			console.log(data);
-
-			check_payment(data).then( () => {
-
-				console.log("paid");
-				console.log(ObjIntegratedPayment.return_url);
-
-				window.location.href = ObjIntegratedPayment.return_url;
-			})
-			.catch((error) => {
-				//TODO:: handling errors
-			});
-		});
-
 		fieldValidation();
 
 	}, []);
 
-
 	useEffect(() => {
-		const onValidation = () => {
+		const onValidation = async () => {
 			ObjIntegratedPayment.api.validateForm();
+
+			let isValid = false;
+			await validateForm().then( (response) => {
+				isValid = response;
+			});
+
+			if(!isValid){
+				return {
+					errorMessage: settings?.payplug_invalid_form
+				}
+			}else{
+				return isValid;
+			}
+
+			function validateForm(){
+				return new Promise(async (resolve, reject) => {
+					await ObjIntegratedPayment.api.onValidateForm(({isFormValid}) => {
+						resolve(isFormValid);
+					});
+				})
+			}
 		}
 		const unsubscribeAfterProcessing = onCheckoutValidation(onValidation);
 		return () => { unsubscribeAfterProcessing(); };
-
 	}, [onCheckoutValidation]);
 
-	useEffect(() => {
-		const onPayment = () => {
-			return { type: 'error' };
-		};
 
-		const unsubscribeAfterProcessing = onPaymentSetup(onPayment);
-		return () => {
-			unsubscribeAfterProcessing();
-		};
+	useEffect(() => {
+		const handlePaymentProcessing = async () => {
+			let data = {};
+	 		await getPayment(props, order_id).then( async (response) => {
+				ObjIntegratedPayment.paymentId = response.data.payment_id;
+				data = {'payment_id': response.data.payment_id};
+				ObjIntegratedPayment.return_url = response.redirect;
+				let saved_card = shouldSavePayment;
+
+				try {
+					ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: saved_card} );
+
+				} catch (error) {
+					return {
+						type: 'error',
+						message: error.message
+					}
+				}
+
+				return {
+					type: 'success',
+				}
+			})
+		}
+		const unsubscribeAfterProcessing = onPaymentSetup(handlePaymentProcessing);
+		return () => { unsubscribeAfterProcessing(); };
+
 	}, [
-		onPaymentSetup
+		shouldSavePayment,
+		onPaymentSetup,
+		emitResponse.noticeContexts.PAYMENTS,
+		emitResponse.responseTypes.ERROR,
+		emitResponse.responseTypes.SUCCESS
 	]);
+
+	useEffect(() => {
+		const handlePaymentProcessing = async ({processingResponse: {paymentDetails}}) => {
+			let result = {};
+			await CompleteProcessingPayment().then( (res) => {
+				result = {
+					type: res.data.result === "success" ? "success" : "error",
+					message: typeof res.data.message != "undefined" ? res.data.message : null,
+					messageContext: typeof res.data.message != "undefined" ? emitResponse.noticeContexts.PAYMENTS: null,
+					redirectUrl: typeof res.data.redirect != "undefined" ? res.data.redirect: null
+				}
+			});
+
+			function CompleteProcessingPayment(){
+				return new Promise((resolve, reject) => {
+					try {
+						ObjIntegratedPayment.api.onCompleted( function (event) {
+							const data = {'payment_id' : paymentDetails.payment_id};
+							check_payment(data).then( (res) => {
+								resolve(res);
+							});
+						});
+
+					}catch (e){
+						reject(e);
+					}
+				})
+			}
+			return result;
+
+		}
+		const unsubscribeAfterProcessing = onCheckoutSuccess(handlePaymentProcessing);
+		return () => { unsubscribeAfterProcessing(); };
+
+	}, [
+		onCheckoutSuccess
+	]);
+
 
 	const fieldValidation = () => {
 		jQuery.each(ObjIntegratedPayment.form, function (key, field) {
@@ -203,3 +250,5 @@ export const IntegratedPayment = (
 		</>
 	)
 }
+
+export default IntegratedPayment;
