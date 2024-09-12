@@ -30,7 +30,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 		$data["popup"] = false;
 
 		$options = get_option('woocommerce_payplug_settings', []);
-		if( $options['payment_method'] === "integrated" && isset($options['can_use_integrated_payments']) && $options['can_use_integrated_payments'] ){
+		if( $options['payment_method'] === "integrated" ){
 			$data["payplug_integrated_payment_cardHolder_error"] = __('payplug_integrated_payment_cardHolder_error', 'payplug');
 			$data["payplug_integrated_payment_empty"] = __('payplug_integrated_payment_empty', 'payplug');
 			$data["payplug_integrated_payment_your_card"] = __('payplug_integrated_payment_your_card', 'payplug');
@@ -73,7 +73,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 	public function get_payment_method_script_handles() {
 
 		$options = get_option('woocommerce_payplug_settings', []);
-		if( $options['payment_method'] === "integrated" && isset($options['can_use_integrated_payments']) && $options['can_use_integrated_payments'] ){
+		if( $options['payment_method'] === "integrated" ){
 			$this->ip_scripts();
 		}
 
