@@ -26,8 +26,9 @@ class PayplugGatewayOney3x extends PayplugGateway
     const ONEY_PRODUCT_QUANTITY_MAXIMUM = 1000;
 
     protected $oney_response;
-    protected $allowed_country_codes = [];
 	const ENABLE_ON_TEST_MODE = true;
+
+    public $allowed_country_codes = [];
 
     public function __construct()
     {
