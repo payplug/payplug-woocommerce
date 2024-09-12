@@ -4,6 +4,7 @@ import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
 import IntegratedPayment from "./wc-payplug-integratedPayment-blocks";
+import Popup from "./wc-payplug-popup-blocks";
 const settings = getSetting( 'payplug_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
 const label = decodeEntities( settings?.title ) || defaultLabel;
@@ -13,14 +14,20 @@ const label = decodeEntities( settings?.title ) || defaultLabel;
  */
 const Content = (props) => {
 
-	if(settings?.IP === false){
-		return window.wp.htmlEntities.decodeEntities( settings?.description || '' );
-
-	}else{
+	if(settings?.IP === true){
 		return (
 			<IntegratedPayment settings={settings} props={props} />
 		)
 	}
+
+	if(settings?.popup === true){
+		return (
+			<Popup settings={settings} props={props} />
+		)
+	}
+
+	return window.wp.htmlEntities.decodeEntities( settings?.description || '' );
+
 };
 /**
  * Label component

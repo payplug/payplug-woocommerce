@@ -326,8 +326,8 @@ class PayplugWoocommerceRequest {
 
 	public function create_payment_intent(){
 
-		$this->gateway = $this->get_payplug_gateway();
 		$order_id = $_POST["order_id"];
+		$this->gateway = $this->get_payplug_gateway($_POST['gateway']);
 		$order       = wc_get_order($order_id);
 		$customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
 		$return_url = esc_url_raw($order->get_checkout_order_received_url());
@@ -352,9 +352,27 @@ class PayplugWoocommerceRequest {
 			],
 		];
 
-		$payment_data['initiator'] = 'PAYER';
-		$payment_data['integration'] = 'INTEGRATED_PAYMENT';
-		unset($payment_data['hosted_payment']['cancel_url']);
+		if($this->gateway->id === "apple_pay"){
+			unset($payment_data["allow_save_card"]);
+
+			$payment_data["payment_method"] = $this->gateway->id;
+			$payment_data["payment_context"] = array(
+				'apple_pay' => array(
+					'domain_name' => $this->gateway->domain_name,
+					'application_data' => base64_encode(json_encode(array(
+						'apple_pay_domain' => $this->gateway->domain_name,
+					)))
+				)
+			);
+			$payment_data["hosted_payment"]["cancel_url"] = esc_url_raw($order->get_cancel_order_url_raw());
+			$payment_data["metadata"]["applepay_workflow"] = "checkout";
+		}
+
+		if($this->gateway->payment_method === 'integrated' && $this->gateway->id === "payplug") {
+			$payment_data['initiator'] = 'PAYER';
+			$payment_data['integration'] = 'INTEGRATED_PAYMENT';
+			unset($payment_data['hosted_payment']['cancel_url']);
+		}
 
 		/**
 		 * Filter the payment data before it's used
@@ -374,17 +392,19 @@ class PayplugWoocommerceRequest {
 		// Save transaction id on the order
 		PayplugWoocommerceHelper::is_pre_30() ? update_post_meta($order_id, '_transaction_id', $payment->id)  : $order->set_transaction_id($payment->id);
 
+		if (is_callable([$order, 'save']) && $this->gateway->payment_method === "popup") {
+			$order->save();
+		}
+
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
 		PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
 
 		wp_send_json_success(array(
 			'payment_id' => $payment->id,
-			'result'   => 'success',
+			'merchant_session' => isset($payment->payment_method["merchant_session"]) ? $payment->payment_method["merchant_session"]: null,
 			'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
-			'cancel'   => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null
+			'cancel'   => esc_url_raw($order->get_cancel_order_url_raw())
 		));
-
-
 	}
 
 
@@ -392,13 +412,15 @@ class PayplugWoocommerceRequest {
 	 * Returns an instantiated gateway.
 	 * @return PayplugGateway
 	 */
-	protected function get_payplug_gateway() {
+	protected function get_payplug_gateway($id) {
 		if ( ! isset( $this->gateway ) ) {
 			$gateways      = WC()->payment_gateways()->payment_gateways();
-			$this->gateway = $gateways['payplug'];
+			foreach($gateways as $gateway){
+				if($gateway->id === $id){
+					return $gateway;
+				}
+			}
 		}
-
-		return $this->gateway;
 	}
 
 
