@@ -42,9 +42,9 @@ class PayplugApplePay extends PayplugGenericBlock
 
 		wp_register_script(
 			'apple-pay-sdk',
-			'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js',
+			'https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js',
 			array(),
-			'v1',
+			'1.latest',
 			true
 		);
 
