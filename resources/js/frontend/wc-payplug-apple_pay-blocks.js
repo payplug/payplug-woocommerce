@@ -3,26 +3,38 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect } from '@wordpress/data';
 import { getSetting } from '@woocommerce/settings';
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
-import {useEffect} from "react";
+import {useEffect, useRef} from "react";
 import {apple_pay_update_payment, getPayment} from "./helper/wc-payplug-apple_pay-requests";
-import {check_payment} from "./helper/wc-payplug-requests";
 const settings = getSetting( 'apple_pay_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
 const label = decodeEntities( settings?.title ) || defaultLabel;
 
 const Content = (props) => {
+
 	const { eventRegistration, emitResponse } = props;
-	const { onPaymentSetup, onCheckoutSuccess, onCheckoutFail} = eventRegistration;
-	const { PAYMENT_STORE_KEY, CHECKOUT_STORE_KEY } = window.wc.wcBlocksData;
+	const { onPaymentSetup, onCheckoutSuccess} = eventRegistration;
+	const { CHECKOUT_STORE_KEY } = window.wc.wcBlocksData;
 	const order_id = useSelect( ( select ) => select( CHECKOUT_STORE_KEY ).getOrderId() );
 	let session = null;
 
 	useEffect(() => {
+		jQuery(function ($) {
+			let element = $("form .wp-block-woocommerce-checkout-actions-block .wc-block-components-button");
+			element.on("click", async (e) => {
+				e.preventDefault();
+				console.log("cliiikkkkiiiiing event?");
+				apple_pay.CreateSession();
+				apple_pay.CancelOrder();
+			});
+		});
+	},[]);
+
+
+
+	useEffect(() => {
 		const handlePaymentProcessing = async () => {
-			apple_pay.CreateSession();
-			apple_pay.CancelOrder();
 			await getPayment(props, order_id).then(async (response) => {
-				apple_pay.BeginSession(response);
+				await apple_pay.BeginSession(response);
 			})
 
 			return {
@@ -44,36 +56,23 @@ const Content = (props) => {
 	useEffect(() => {
 		const handlePaymentProcessing = async ({processingResponse: {paymentDetails}}) => {
 			var apple_pay_Session_status;
-			await authorizedPayment();
-			var flag = false;
-
-			function authorizedPayment(){
-				return new Promise((resolve, reject) => {
-					session.onpaymentauthorized = async event => {
-						let data = {
-							'action': 'applepay_update_payment',
-							'post_type': 'POST',
-							'payment_id': session.payment_id,
-							'payment_token': event.payment.token,
-							'order_id': session.order_id
-						};
-
-						if(flag){
-							reject();
+				session.onpaymentauthorized = async event => {
+					let data = {
+						'action': 'applepay_update_payment',
+						'post_type': 'POST',
+						'payment_id': session.payment_id,
+						'payment_token': event.payment.token,
+						'order_id': session.order_id
+					};
+					await apple_pay_update_payment(data).then((res) => {
+						apple_pay_Session_status = ApplePaySession.STATUS_SUCCESS;
+						if (res.success !== true) {
+							apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
 						}
-
-						await apple_pay_update_payment(data).then((res) => {
-							apple_pay_Session_status = ApplePaySession.STATUS_SUCCESS;
-							if (res.success !== true) {
-								apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
-							}
-							session.completePayment({"status": apple_pay_Session_status})
-							resolve();
-						});
-					}
-				});
-			}
-
+						session.completePayment({"status": apple_pay_Session_status})
+						resolve();
+					});
+				}
 			return {
 				"type":"success",
 				"redirectUrl": session.return_url,
@@ -137,8 +136,6 @@ const Content = (props) => {
 	return (
 		<></>
 	)
-
-	return window.wp.htmlEntities.decodeEntities(settings?.description || '');
 
 };
 /**
