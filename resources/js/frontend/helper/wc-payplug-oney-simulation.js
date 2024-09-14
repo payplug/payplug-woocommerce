@@ -30,11 +30,11 @@ const Oney_Simulation = ( {settings, name, props} ) => {
 					<div>{translations['2nd_monthly_payment']}:</div>
 					<div>{settings?.oney_response[name]['installments'][1]['amount']} {props.billing.currency.symbol}</div>
 				</div>
-				{ has_3rd_payment ?
+				{ has_3rd_payment ? (
 					<div className="payplug-oney-flex">
 						<div>{translations['3rd_monthly_payment']}:</div>
-						<div>{settings?.oney_response['x4_without_fees']['installments'][2]['amount']} {props.billing.currency.symbol}</div>
-					</div> : <></>
+						<div>{settings?.oney_response[name]['installments'][2]['amount']} {props.billing.currency.symbol}</div>
+					</div> ) : (<></>)
 				}
 				<div className="payplug-oney-flex">
 					<div><b>{translations['oney_total']}</b></div>
