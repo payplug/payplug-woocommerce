@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
+import Popup from "./wc-payplug-popup-blocks";
 
 const settings = getSetting( 'american_express_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
@@ -11,7 +12,16 @@ const label = decodeEntities( settings?.title ) || defaultLabel;
 /**
  * Content component
  */
-const Content = () => {
+const Content = (props) => {
+
+	if(settings?.popup === true){
+		console.log("popup");
+
+		return (
+			<Popup settings={settings} props={props} />
+		)
+	}
+
 	return window.wp.htmlEntities.decodeEntities( settings?.description || '' );
 };
 /**
