@@ -10,7 +10,7 @@ const label = decodeEntities(settings?.title) || defaultLabel;
 
 const Content = (props) => {
 	return (
-		<Oney_Simulation settings={settings} name={"x3_with_fees"} props={props} />
+		<Oney_Simulation settings={settings} name={"x4_with_fees"} props={props} />
 	);
 };
 
