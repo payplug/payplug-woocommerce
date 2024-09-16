@@ -1,18 +1,17 @@
 import { getSetting } from '@woocommerce/settings';
 import React, { useEffect, useRef } from 'react';
 import { useSelect } from '@wordpress/data';
-import {check_payment, createOrder, getPayment} from "./helper/wc-payplug-requests";
-import {apple_pay_update_payment} from "./helper/wc-payplug-apple_pay-requests";
+import { getPayment} from "./helper/wc-payplug-requests";
 const settings = getSetting( 'payplug_data', {} );
 
 const Popup = ({props: props,}) => {
 	const { eventRegistration, emitResponse, shouldSavePayment } = props;
 	const { onPaymentSetup, onCheckoutSuccess } = eventRegistration;
-	const { PAYMENT_STORE_KEY, CHECKOUT_STORE_KEY } = window.wc.wcBlocksData;
+	const { CHECKOUT_STORE_KEY } = window.wc.wcBlocksData;
 	const order_id = useSelect( ( select ) => select( CHECKOUT_STORE_KEY ).getOrderId() );
 	let getPaymentData;
 
-	useEffect((event) => {
+	useEffect(() => {
 		const handlePaymentProcessing = async () => {
 			let result = {};
 
@@ -48,15 +47,11 @@ const Popup = ({props: props,}) => {
 			function showPopupPayment(getPaymentData) {
 				return new Promise(async (resolve, reject) => {
 					try {
+						window.redirection_url = getPaymentData.data.cancel || false;
 						await Payplug.showPayment(getPaymentData.data.redirect);
 					} catch (e) {
 						reject(e);
 					}
-
-					setTimeout(function(){
-						Payplug._closeIframe();
-						reject("timeout");
-					},120000)
 				})
 			}
 		}
