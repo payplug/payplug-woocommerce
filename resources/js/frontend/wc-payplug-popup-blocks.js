@@ -56,7 +56,7 @@ const Popup = ({props: props,}) => {
 					setTimeout(function(){
 						Payplug._closeIframe();
 						reject("timeout");
-					},90000)
+					},120000)
 				})
 			}
 		}
