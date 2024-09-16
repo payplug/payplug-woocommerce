@@ -52,7 +52,6 @@ const Popup = ({props: props,}) => {
 					} catch (e) {
 						reject(e);
 					}
-
 				})
 			}
 		}
