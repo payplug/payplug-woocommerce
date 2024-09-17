@@ -83,7 +83,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
 		//for backend orders
 		if (!empty(get_query_var('order-pay'))) {
-			$order = wc_get_order(get_query_var('order-pay'));
+			$order = wc_get_order( (int) get_query_var('order-pay'));
 			$items = $order->get_items();
 			$country_code_shipping = $order->get_shipping_country();
 			$country_code_billing = $order->get_billing_country();

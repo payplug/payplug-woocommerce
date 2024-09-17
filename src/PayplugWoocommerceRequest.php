@@ -127,6 +127,11 @@ class PayplugWoocommerceRequest {
 		wp_parse_str($path['query'], $output);
 		$order_id = $output['order-pay'];
 
+		if(is_null($order_id)){
+			preg_match("/(?<=order-pay\/)\d*/", $path['path'], $matches);
+			$order_id = $matches[0];
+		}
+
 		$this->process_order_payment($order_id, $payment_method);
 
 	}

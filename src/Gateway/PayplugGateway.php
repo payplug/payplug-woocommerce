@@ -641,7 +641,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('payplug-checkout');
 
-		if ($this->payment_method == "integrated" && !$this->is_checkout_block() ) {
+		if (
+			($this->payment_method == "integrated" && !$this->is_checkout_block() ) ||
+			($this->payment_method == "integrated" && is_wc_endpoint_url('order-pay') )
+		) {
 			$this->integrated_payments_scripts();
 		}
 
@@ -818,13 +821,18 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	{
 
 		//use payment intent to finish the order
-		if ($this->is_checkout_block() && $this->payment_method === 'integrated' && !empty($order->get_transaction_id())) {
+		if ( !is_wc_endpoint_url('order-pay') &&
+			$this->is_checkout_block() &&
+			$this->payment_method === 'integrated' &&
+			!empty($order->get_transaction_id()) ) {
 
 			try {
 				$payment = $this->api->payment_retrieve($order->get_transaction_id());
 				if (ob_get_length() > 0) {
 					ob_clean();
 				}
+
+				$return_url = esc_url_raw($order->get_checkout_order_received_url());
 
 				return array(
 					'payment_id' => $payment->id,
