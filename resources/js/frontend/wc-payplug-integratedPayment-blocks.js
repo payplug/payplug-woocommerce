@@ -92,7 +92,7 @@ const IntegratedPayment = ({props: props,}) => {
 			let result = {};
 			await CompleteProcessingPayment().then( (res) => {
 				result = {
-					type: res.data.result === "success" ? "success" : "error",
+					type: res.success === true ? "success" : "error",
 					message: typeof res.data.message != "undefined" ? res.data.message : null,
 					messageContext: typeof res.data.message != "undefined" ? emitResponse.noticeContexts.PAYMENTS: null,
 					redirectUrl: typeof res.data.redirect != "undefined" ? res.data.redirect: null
