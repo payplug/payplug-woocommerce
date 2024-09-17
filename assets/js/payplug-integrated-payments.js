@@ -1,5 +1,7 @@
 /* global window, payplug_integrated_payment_params */
-const PAYPLUG_DOMAIN = "https://secure-qa.payplug.com";
+if( typeof PAYPLUG_DOMAIN === "undefined"){
+	const PAYPLUG_DOMAIN = "https://secure-qa.payplug.com";
+}
 
 var IntegratedPayment = {
 	props: {
