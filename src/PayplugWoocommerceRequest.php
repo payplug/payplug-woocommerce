@@ -379,6 +379,10 @@ class PayplugWoocommerceRequest {
 			unset($payment_data['hosted_payment']['cancel_url']);
 		}
 
+		if($this->gateway->payment_method === 'popup' && $this->gateway->id === "american_express") {
+			$payment_data['payment_method'] = $this->gateway->id;
+		}
+
 		/**
 		 * Filter the payment data before it's used
 		 *
