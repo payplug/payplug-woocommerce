@@ -1,9 +1,8 @@
 import { getSetting } from '@woocommerce/settings';
 import $ from 'jquery';
 const settings = getSetting('payplug_data', {});
-import { useEffect } from 'react';
 
-export const getPayment = (props, order_id) => {
+export const getPayment = (props, _settings, order_id) => {
 	const data = getPaymentData(props);
 	return new Promise((resolve, reject) => {
 		return $.ajax({
@@ -24,7 +23,7 @@ export const getPayment = (props, order_id) => {
 		return {
 			"order_id": order_id,
 			"woocommerce-process-checkout-nonce": settings.wp_nonce,
-			"gateway": "payplug"
+			"gateway": _settings?.payment_method
 		}
 	}
 };

@@ -4,7 +4,7 @@ import { useSelect } from '@wordpress/data';
 import { getPayment} from "./helper/wc-payplug-requests";
 const settings = getSetting( 'payplug_data', {} );
 
-const Popup = ({props: props,}) => {
+const Popup = ({props: props, settings:_settings}) => {
 	const { eventRegistration, emitResponse, shouldSavePayment } = props;
 	const { onPaymentSetup, onCheckoutSuccess } = eventRegistration;
 	const { CHECKOUT_STORE_KEY } = window.wc.wcBlocksData;
@@ -15,7 +15,7 @@ const Popup = ({props: props,}) => {
 		const handlePaymentProcessing = async () => {
 			let result = {};
 
-			await getPayment(props, order_id).then( async (response) => {
+			await getPayment(props, _settings, order_id).then( async (response) => {
 				getPaymentData = response;
 			})
 
