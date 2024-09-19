@@ -24,6 +24,7 @@ class PayplugAmex extends PayplugGenericBlock
 
 		$options = get_option('woocommerce_payplug_settings', []);
 		if( $options['payment_method'] === "popup" ){
+			$data['payment_method'] = $this->get_name();
 			$data["popup"] = true;
 			$data['payplug_create_intent_payment'] = \WC_AJAX::get_endpoint('payplug_create_intent');
 			$data['payplug_create_order'] = \WC_AJAX::get_endpoint('payplug_create_order');

@@ -55,7 +55,7 @@ const IntegratedPayment = ({props: props,}) => {
 	useEffect(() => {
 		const handlePaymentProcessing = async () => {
 			let data = {};
-	 		await getPayment(props, order_id).then( async (response) => {
+	 		await getPayment(props, settings, order_id).then( async (response) => {
 				ObjIntegratedPayment.paymentId = response.data.payment_id;
 				data = {'payment_id': response.data.payment_id};
 				ObjIntegratedPayment.return_url = response.redirect;
