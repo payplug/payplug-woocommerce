@@ -66,7 +66,8 @@ var IntegratedPayment = {
 
 		if( !IntegratedPayment.checkLoaded() ){
 
-			if(jQuery("[name=wc-payplug-payment-token]").val() !== "new" ){
+			if(typeof jQuery("[name=wc-payplug-payment-token]").val() !== "undefined" &&
+				jQuery("[name=wc-payplug-payment-token]").val() !== "new" ){
 				jQuery(".payplug.IntegratedPayment_container").hide()
 			}
 
