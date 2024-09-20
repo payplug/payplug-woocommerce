@@ -74,7 +74,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 	public function get_payment_method_script_handles() {
 
 		$options = get_option('woocommerce_payplug_settings', []);
-		if( $options['payment_method'] === "integrated" ){
+		if( $options['payment_method'] === "integrated" && !is_wc_endpoint_url('order-pay')){
 			$this->ip_scripts();
 		}
 
