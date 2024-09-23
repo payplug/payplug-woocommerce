@@ -82,9 +82,6 @@ class Validator {
 		}
 
 		return "no";
-
-		http_response_code(400);
-		wp_send_json_error(['error' => $payment . ' is missing']);
 	}
 
 	/**
@@ -100,7 +97,7 @@ class Validator {
 			return true;
 		}
 
-		if(!$cart && !$checkout){
+		if( $cart === "no" && $checkout === "no" ){
 			http_response_code(400);
 
 			$arr = [
@@ -113,7 +110,7 @@ class Validator {
 			wp_send_json_error($arr);
 		}
 
-		if($cart && empty($carriers)){
+		if( $cart === "yes" && empty($carriers)){
 			http_response_code(400);
 
 			$arr = [
