@@ -30,14 +30,9 @@ class Vue {
 			//TODO:: use the same get_option everywhere on the BO
 			$payplug_wooc_settings = get_option( 'woocommerce_payplug_settings', [] );
 
-			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $payplug_wooc_settings) );
-
 			if ((empty($payplug_wooc_settings['oney_thresholds_default_min'])) && (empty($payplug_wooc_settings['oney_thresholds_default_max']))) {
-
 				$payplug_wooc_settings['oney_thresholds_default_min'] = $payplug->min_oney_price;
 				$payplug_wooc_settings['oney_thresholds_default_max'] = $payplug->max_oney_price;
-
-				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug',$payplug_wooc_settings ) );
 			}
 
 			unset($payplug_wooc_settings["payplug_live_key"]);
