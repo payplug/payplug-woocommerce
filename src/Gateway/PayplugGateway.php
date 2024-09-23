@@ -642,7 +642,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		wp_enqueue_style('payplug-checkout');
 
 		if (
-			($this->payment_method == "integrated" && !$this->is_checkout_block() ) ||
+			( $this->payment_method == "integrated" && !$this->is_checkout_block() ) ||
 			($this->payment_method == "integrated" && is_wc_endpoint_url('order-pay') )
 		) {
 			$this->integrated_payments_scripts();
