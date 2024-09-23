@@ -626,6 +626,7 @@ class Ajax {
 
 				wp_send_json_success( array(
 					"title" => null,
+					"debug" => json_encode($options),
 					"msg" => __( 'payplug_save_success_message', 'payplug' ),
 					"close" => __( 'payplug_ok', 'payplug' )
 				));
