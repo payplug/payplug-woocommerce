@@ -77,13 +77,11 @@ class Validator {
 			return "no";
 		}
 
-		if ($value == 1){
+		if ($value == 1 || $value){
 			return "yes";
 		}
 
-		if ($value == 0){
-			return "no";
-		}
+		return "no";
 
 		http_response_code(400);
 		wp_send_json_error(['error' => $payment . ' is missing']);
