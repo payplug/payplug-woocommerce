@@ -619,14 +619,15 @@ class Ajax {
 			$options['oney_product_animation'] = Validator::oney_product_animation($data['enable_oney_product_animation']);
 			$options['debug'] = Validator::debug($data['enable_debug']);
 
+			//force save
 			if(
-				update_option( 'woocommerce_payplug_settings',  $options )
+				update_option( 'woocommerce_payplug_settings', [] ) &&
+				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) )
 			){
 				http_response_code(200);
 
 				wp_send_json_success( array(
 					"title" => null,
-					"debug" => json_encode($options),
 					"msg" => __( 'payplug_save_success_message', 'payplug' ),
 					"close" => __( 'payplug_ok', 'payplug' )
 				));
