@@ -619,14 +619,21 @@ class Ajax {
 			$options['oney_product_animation'] = Validator::oney_product_animation($data['enable_oney_product_animation']);
 			$options['debug'] = Validator::debug($data['enable_debug']);
 
-			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false );
-			http_response_code(200);
+			if(
+				update_option( 'woocommerce_payplug_settings',  $options )
+			){
+				http_response_code(200);
 
-			wp_send_json_success( array(
-				"title" => null,
-				"msg" => __( 'payplug_save_success_message', 'payplug' ),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
+				wp_send_json_success( array(
+					"title" => null,
+					"msg" => __( 'payplug_save_success_message', 'payplug' ),
+					"close" => __( 'payplug_ok', 'payplug' )
+				));
+			}else{
+				http_response_code(403);
+				wp_send_json_error("You are not logged in !");
+			}
+
 		} else {
 			http_response_code(403);
 			wp_send_json_error("You are not logged in !");
