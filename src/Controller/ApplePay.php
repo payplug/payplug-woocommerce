@@ -72,7 +72,7 @@ class ApplePay extends PayplugGateway
 	/**
 	 * @return bool|void
 	 */
-	public function process_admin_options() {
+	/*public function process_admin_options() {
 		$data = $this->get_post_data();
 		if (isset($data['woocommerce_payplug_mode'])) {
 			if ( $this->get_post_data()['woocommerce_payplug_mode'] === '0' ) {
@@ -87,7 +87,7 @@ class ApplePay extends PayplugGateway
 			}
 		}
 
-	}
+	}*/
 
 	/**
 	 *
