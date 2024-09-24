@@ -620,16 +620,15 @@ class Ajax {
 			$options['debug'] = Validator::debug($data['enable_debug']);
 
 			//force save
-			if(
-				update_option( 'woocommerce_payplug_settings', [] ) &&
-				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) )
-			){
-				http_response_code(200);
+			if(update_option( 'woocommerce_payplug_settings', $options )){
 
+				http_response_code(200);
 				wp_send_json_success( array(
 					"title" => null,
 					"msg" => __( 'payplug_save_success_message', 'payplug' ),
-					"close" => __( 'payplug_ok', 'payplug' )
+					"close" => __( 'payplug_ok', 'payplug' ),
+					"data" => $options,
+					"save" => get_option( 'woocommerce_payplug_settings', [] )
 				));
 			}else{
 				http_response_code(403);
