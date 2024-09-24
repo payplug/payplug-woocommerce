@@ -141,6 +141,13 @@ class ApplePay extends PayplugGateway
 
 		$account_auth = $auth && $auth_domains && $accepted_domain;
 
+		PayplugGateway::log( strtr(get_site_url(), array("http://" => "", "https://" => "")), 'error' );
+		PayplugGateway::log( "------------------", 'error' );
+		PayplugGateway::log( json_encode($account), 'error' );
+		PayplugGateway::log( "------------------", 'error' );
+		PayplugGateway::log( $auth . "------------------" . $auth_domains . "---------" . $accepted_domain , 'error' );
+
+
 		//lost auth
 /*		if(!$account_auth){
 			$options['apple_pay'] = "no";
