@@ -623,6 +623,11 @@ class Ajax {
 			//force save
 			if( delete_option("woocommerce_payplug_settings") && add_option("woocommerce_payplug_settings", $options) ){
 
+				//delete the transient, so it refresh the permissions on the init
+				$options = get_option('woocommerce_payplug_settings', []);
+				$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
+				delete_transient($transient_key);
+
 				http_response_code(200);
 				wp_send_json_success( array(
 					"title" => null,
