@@ -72,7 +72,7 @@ class ApplePay extends PayplugGateway
 	/**
 	 * @return bool|void
 	 */
-	/*public function process_admin_options() {
+	public function process_admin_options() {
 		$data = $this->get_post_data();
 		if (isset($data['woocommerce_payplug_mode'])) {
 			if ( $this->get_post_data()['woocommerce_payplug_mode'] === '0' ) {
@@ -87,7 +87,7 @@ class ApplePay extends PayplugGateway
 			}
 		}
 
-	}*/
+	}
 
 	/**
 	 *
@@ -97,7 +97,6 @@ class ApplePay extends PayplugGateway
 	 */
 
 	public function checkApplePay(){
-		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options($this->id);
 		$options = PayplugWoocommerceHelper::get_payplug_options();
 
 		//it's disabled
@@ -105,6 +104,7 @@ class ApplePay extends PayplugGateway
 			return false;
 		}
 
+		//Amount validations
 		if ( is_cart() && !empty( WC()->cart ) ) {
 			$order_amount = (float) WC()->cart->total;
 			if ($order_amount < self::MIN_AMOUNT || $order_amount > self::MAX_AMOUNT) {
@@ -129,6 +129,7 @@ class ApplePay extends PayplugGateway
 			$this->set_carriers($options['applepay_carriers']);
 		}
 
+		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options($this->id);
 		//no auth
 		if(!isset($account['payment_methods']['apple_pay']) || !isset($account['payment_methods']['apple_pay']['allowed_domain_names'])  ){
 			return false;
@@ -137,24 +138,12 @@ class ApplePay extends PayplugGateway
 		//$account has permissions to use apple_pay
 		$auth = isset($account['payment_methods']['apple_pay']['enabled']) && $account['payment_methods']['apple_pay']['enabled'];
 		$auth_domains = in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['payment_methods']['apple_pay']['allowed_domain_names']);
-		$accepted_domain = in_array($this->domain_name, $account['payment_methods']['apple_pay']['allowed_domain_names']);
-
-		$account_auth = $auth && $auth_domains && $accepted_domain;
-
-		PayplugGateway::log( strtr(get_site_url(), array("http://" => "", "https://" => "")), 'error' );
-		PayplugGateway::log( "------------------", 'error' );
-		PayplugGateway::log( json_encode($account), 'error' );
-		PayplugGateway::log( "------------------", 'error' );
-		PayplugGateway::log( $auth . "------------------" . $auth_domains . "---------" . $accepted_domain , 'error' );
-
 
 		//lost auth
-/*		if(!$account_auth){
-			$options['apple_pay'] = "no";
-			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
+		if(!($auth && $auth_domains)){
 			return false;
 		}
-*/
+
 		return true;
 	}
 
