@@ -142,12 +142,12 @@ class ApplePay extends PayplugGateway
 		$account_auth = $auth && $auth_domains && $accepted_domain;
 
 		//lost auth
-		if(!$account_auth){
+/*		if(!$account_auth){
 			$options['apple_pay'] = "no";
 			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
 			return false;
 		}
-
+*/
 		return true;
 	}
 
