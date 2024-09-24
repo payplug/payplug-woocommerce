@@ -509,7 +509,6 @@ class Ajax {
 		$wp = [
 			"logged" => PayplugWoocommerceHelper::user_logged_in(),
 			"mode" => PayplugWoocommerceHelper::check_mode() ? 0 : 1,
-			"options" => get_option( 'woocommerce_payplug_settings', [] ),
 			"WP" =>  [
 				"_wpnonce" => $wp_nonce,
 			]
@@ -621,7 +620,7 @@ class Ajax {
 			$options['debug'] = Validator::debug($data['enable_debug']);
 
 			//force save
-			if( delete_option("woocommerce_payplug_settings") && add_option("woocommerce_payplug_settings", $options) ){
+			if( update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false ) ){
 
 				//delete the transient, so it refresh the permissions on the init
 				$options = get_option('woocommerce_payplug_settings', []);
@@ -633,8 +632,6 @@ class Ajax {
 					"title" => null,
 					"msg" => __( 'payplug_save_success_message', 'payplug' ),
 					"close" => __( 'payplug_ok', 'payplug' ),
-					"data" => $options,
-					"save" => get_option( 'woocommerce_payplug_settings', [] )
 				));
 			}else{
 				http_response_code(403);

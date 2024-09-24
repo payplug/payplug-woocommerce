@@ -229,7 +229,6 @@ class PaymentMethods {
 		}
 
 		return [
-			"debug" => json_encode($options),
 			"type" => "payment_method",
 			"name" => "applepay",
 			"title" => __( 'payplug_section_applepay_payment_title', 'payplug' ),
