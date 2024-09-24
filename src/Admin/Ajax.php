@@ -621,7 +621,7 @@ class Ajax {
 			$options['debug'] = Validator::debug($data['enable_debug']);
 
 			//force save
-			if(update_option( 'woocommerce_payplug_settings', serialize( $options ) )){
+			if( delete_option("woocommerce_payplug_settings") && add_option("woocommerce_payplug_settings", $options) ){
 
 				http_response_code(200);
 				wp_send_json_success( array(
