@@ -509,6 +509,7 @@ class Ajax {
 		$wp = [
 			"logged" => PayplugWoocommerceHelper::user_logged_in(),
 			"mode" => PayplugWoocommerceHelper::check_mode() ? 0 : 1,
+			"options" => get_option( 'woocommerce_payplug_settings', [] ),
 			"WP" =>  [
 				"_wpnonce" => $wp_nonce,
 			]
