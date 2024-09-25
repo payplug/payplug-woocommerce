@@ -212,7 +212,7 @@ class PaymentMethods {
 	 *
 	 * @return array
 	 */
-	public static function payment_method_applepay( $active = false, $options, $carriers = [] ) {
+	public static function payment_method_applepay( $active, $options, $carriers = [] ) {
 
 		$checkout = $cart = false;
 
