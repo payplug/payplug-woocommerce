@@ -15,8 +15,6 @@ const label = decodeEntities( settings?.title ) || defaultLabel;
 const Content = (props) => {
 
 	if(settings?.popup === true){
-		console.log("popup");
-
 		return (
 			<Popup settings={settings} props={props} />
 		)
