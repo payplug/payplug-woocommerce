@@ -823,7 +823,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		//use payment intent to finish the order
 		if ( !is_wc_endpoint_url('order-pay') &&
 			$this->is_checkout_block() &&
-			($this->payment_method === 'integrated'|| $this->payment_method === 'popup') &&
+			(
+				( $this->id === "payplug" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
+				( $this->id === "american_express" && $this->payment_method === 'popup')
+			) &&
 			!empty($order->get_transaction_id()) ) {
 
 			try {
