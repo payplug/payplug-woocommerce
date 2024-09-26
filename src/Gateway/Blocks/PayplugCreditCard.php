@@ -102,6 +102,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 	}
 
 	private function popup_scripts(){
-		wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
+		wp_register_script('payplug-popup', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
+		wp_enqueue_script('payplug-popup');
 	}
 }
