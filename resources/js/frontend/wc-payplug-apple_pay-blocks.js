@@ -22,7 +22,6 @@ const Content = (props) => {
 			let element = $("form .wp-block-woocommerce-checkout-actions-block .wc-block-components-button");
 			element.on("click", async (e) => {
 				e.preventDefault();
-				console.log("cliiikkkkiiiiing event?");
 				apple_pay.CreateSession();
 				apple_pay.CancelOrder();
 			});
@@ -33,14 +32,43 @@ const Content = (props) => {
 
 	useEffect(() => {
 		const handlePaymentProcessing = async () => {
+			var apple_pay_Session_status;
+			let result = {};
+
 			await getPayment(props, order_id).then(async (response) => {
 				await apple_pay.BeginSession(response);
-			})
 
-			return {
-				type: "success"
+			}).then( async ( response) => {
+				await CheckPaymentOnPaymentAuthorized();
+				return {
+					type: "success"
+				}
+			});
+
+			function CheckPaymentOnPaymentAuthorized(){
+				return new Promise((resolve, reject) => {
+
+					session.onpaymentauthorized = async event => {
+						let data = {
+							'action': 'applepay_update_payment',
+							'post_type': 'POST',
+							'payment_id': session.payment_id,
+							'payment_token': event.payment.token,
+							'order_id': session.order_id
+						};
+
+						await apple_pay_update_payment(data).then( (res) => {
+							apple_pay_Session_status = ApplePaySession.STATUS_SUCCESS;
+
+							if (res.success !== true) {
+								apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
+							}
+							session.completePayment({"status": apple_pay_Session_status})
+							resolve();
+						});
+					}
+				})
 			}
-
 		}
 
 		const unsubscribeAfterProcessing = onPaymentSetup(handlePaymentProcessing);
@@ -55,26 +83,8 @@ const Content = (props) => {
 
 	useEffect(() => {
 		const handlePaymentProcessing = async ({processingResponse: {paymentDetails}}) => {
-			var apple_pay_Session_status;
-				session.onpaymentauthorized = async event => {
-					let data = {
-						'action': 'applepay_update_payment',
-						'post_type': 'POST',
-						'payment_id': session.payment_id,
-						'payment_token': event.payment.token,
-						'order_id': session.order_id
-					};
-					await apple_pay_update_payment(data).then((res) => {
-						apple_pay_Session_status = ApplePaySession.STATUS_SUCCESS;
-						if (res.success !== true) {
-							apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
-						}
-						session.completePayment({"status": apple_pay_Session_status})
-						resolve();
-					});
-				}
 			return {
-				"type":"success",
+				type: "success",
 				"redirectUrl": session.return_url,
 			}
 		}
