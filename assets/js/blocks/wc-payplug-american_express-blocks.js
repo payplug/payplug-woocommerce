@@ -328,7 +328,6 @@ const label = (0,_wordpress_html_entities__WEBPACK_IMPORTED_MODULE_3__.decodeEnt
  */
 const Content = props => {
   if (settings?.popup === true) {
-    console.log("popup");
     return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wc_payplug_popup_blocks__WEBPACK_IMPORTED_MODULE_5__["default"], {
       settings: settings,
       props: props

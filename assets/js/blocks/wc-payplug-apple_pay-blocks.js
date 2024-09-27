@@ -258,7 +258,6 @@ const Content = props => {
       let element = $("form .wp-block-woocommerce-checkout-actions-block .wc-block-components-button");
       element.on("click", async e => {
         e.preventDefault();
-        console.log("cliiikkkkiiiiing event?");
         apple_pay.CreateSession();
         apple_pay.CancelOrder();
       });
@@ -268,10 +267,11 @@ const Content = props => {
     const handlePaymentProcessing = async () => {
       await (0,_helper_wc_payplug_apple_pay_requests__WEBPACK_IMPORTED_MODULE_7__.getPayment)(props, order_id).then(async response => {
         await apple_pay.BeginSession(response);
+      }).then(async response => {
+        return {
+          type: "success"
+        };
       });
-      return {
-        type: "success"
-      };
     };
     const unsubscribeAfterProcessing = onPaymentSetup(handlePaymentProcessing);
     return () => {
@@ -285,29 +285,37 @@ const Content = props => {
       }
     }) => {
       var apple_pay_Session_status;
-      session.onpaymentauthorized = async event => {
-        let data = {
-          'action': 'applepay_update_payment',
-          'post_type': 'POST',
-          'payment_id': session.payment_id,
-          'payment_token': event.payment.token,
-          'order_id': session.order_id
+      let result = {};
+      await CheckPaymentOnPaymentAuthorized().then(() => {
+        result = {
+          type: "success",
+          "redirectUrl": session.return_url
         };
-        await (0,_helper_wc_payplug_apple_pay_requests__WEBPACK_IMPORTED_MODULE_7__.apple_pay_update_payment)(data).then(res => {
-          apple_pay_Session_status = ApplePaySession.STATUS_SUCCESS;
-          if (res.success !== true) {
-            apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
-          }
-          session.completePayment({
-            "status": apple_pay_Session_status
-          });
-          resolve();
+      });
+      return result;
+      function CheckPaymentOnPaymentAuthorized() {
+        return new Promise((resolve, reject) => {
+          session.onpaymentauthorized = async event => {
+            let data = {
+              'action': 'applepay_update_payment',
+              'post_type': 'POST',
+              'payment_id': session.payment_id,
+              'payment_token': event.payment.token,
+              'order_id': session.order_id
+            };
+            await (0,_helper_wc_payplug_apple_pay_requests__WEBPACK_IMPORTED_MODULE_7__.apple_pay_update_payment)(data).then(res => {
+              apple_pay_Session_status = ApplePaySession.STATUS_SUCCESS;
+              if (res.success !== true) {
+                apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
+              }
+              session.completePayment({
+                "status": apple_pay_Session_status
+              });
+              resolve();
+            });
+          };
         });
-      };
-      return {
-        "type": "success",
-        "redirectUrl": session.return_url
-      };
+      }
     };
     const unsubscribeAfterProcessing = onCheckoutSuccess(handlePaymentProcessing);
     return () => {
