@@ -32,18 +32,42 @@ const Content = (props) => {
 
 	useEffect(() => {
 		const handlePaymentProcessing = async () => {
-			var apple_pay_Session_status;
-			let result = {};
 
 			await getPayment(props, order_id).then(async (response) => {
 				await apple_pay.BeginSession(response);
 
 			}).then( async ( response) => {
-				await CheckPaymentOnPaymentAuthorized();
 				return {
 					type: "success"
 				}
 			});
+
+		}
+
+		const unsubscribeAfterProcessing = onPaymentSetup(handlePaymentProcessing);
+		return () => { unsubscribeAfterProcessing(); };
+
+	}, [
+		onPaymentSetup,
+		emitResponse.noticeContexts.PAYMENTS,
+		emitResponse.responseTypes.ERROR,
+		emitResponse.responseTypes.SUCCESS
+	]);
+
+	useEffect(() => {
+		const handlePaymentProcessing = async ({processingResponse: {paymentDetails}}) => {
+
+			var apple_pay_Session_status;
+			let result = {};
+
+			await CheckPaymentOnPaymentAuthorized().then( () => {
+				result = {
+					type: "success",
+					"redirectUrl": session.return_url,
+				}
+			})
+
+			return result;
 
 			function CheckPaymentOnPaymentAuthorized(){
 				return new Promise((resolve, reject) => {
@@ -69,24 +93,7 @@ const Content = (props) => {
 					}
 				})
 			}
-		}
 
-		const unsubscribeAfterProcessing = onPaymentSetup(handlePaymentProcessing);
-		return () => { unsubscribeAfterProcessing(); };
-
-	}, [
-		onPaymentSetup,
-		emitResponse.noticeContexts.PAYMENTS,
-		emitResponse.responseTypes.ERROR,
-		emitResponse.responseTypes.SUCCESS
-	]);
-
-	useEffect(() => {
-		const handlePaymentProcessing = async ({processingResponse: {paymentDetails}}) => {
-			return {
-				type: "success",
-				"redirectUrl": session.return_url,
-			}
 		}
 		const unsubscribeAfterProcessing = onCheckoutSuccess(handlePaymentProcessing);
 		return () => { unsubscribeAfterProcessing(); };
