@@ -251,7 +251,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return;
         }
 
-        $order_id = wc_get_order_id_by_order_key(wc_clean( (!empty($_GET['key']) ? $_GET['key'] : $id) ) );
+		$order_id = ($id) ? : $_GET['order-received'];
+
         if (empty($order_id)) {
             return;
         }
