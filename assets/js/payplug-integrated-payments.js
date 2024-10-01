@@ -1,5 +1,7 @@
 /* global window, payplug_integrated_payment_params */
-const PAYPLUG_DOMAIN = "https://secure-qa.payplug.com";
+if( typeof PAYPLUG_DOMAIN === "undefined"){
+	const PAYPLUG_DOMAIN = "https://secure-qa.payplug.com";
+}
 
 var IntegratedPayment = {
 	props: {
@@ -63,6 +65,12 @@ var IntegratedPayment = {
 		this.manageSaveCard(IntegratedPayment.props);
 
 		if( !IntegratedPayment.checkLoaded() ){
+
+			if(typeof jQuery("[name=wc-payplug-payment-token]").val() !== "undefined" &&
+				jQuery("[name=wc-payplug-payment-token]").val() !== "new" ){
+				jQuery(".payplug.IntegratedPayment_container").hide()
+			}
+
 			// Create an instance of Integrated Payments
 			IntegratedPayment.props.api = new Payplug.IntegratedPayment(payplug_integrated_payment_params.mode == 1 ? false : true);
 			IntegratedPayment.props.api.setDisplayMode3ds(Payplug.DisplayMode3ds.LIGHTBOX)
@@ -99,8 +107,10 @@ var IntegratedPayment = {
 			jQuery("[name=wc-payplug-payment-token]").on('change', function(event){
 				if( jQuery(this).val() === "new" ){
 					jQuery(".payplug.IntegratedPayment").show()
+					jQuery(".payplug.IntegratedPayment_container").show()
 				}else{
 					jQuery(".payplug.IntegratedPayment").hide()
+					jQuery(".payplug.IntegratedPayment_container").hide()
 				}
 			});
 

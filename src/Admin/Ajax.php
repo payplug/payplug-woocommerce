@@ -601,7 +601,7 @@ class Ajax {
 			$options['applepay_checkout'] = Validator::genericPaymentGateway($data['enable_applepay_checkout'], "Apple Pay Checkout", $test_mode);
 			$options['applepay_cart'] = Validator::genericPaymentGateway($data['enable_applepay_cart'], "Apple Pay Cart", $test_mode);
 
-			Validator::applePayPaymentGatewayOptions($options['apple_pay'], $data['enable_applepay_cart'], $data['enable_applepay_checkout'], $options['applepay_carriers']);
+			Validator::applePayPaymentGatewayOptions($options['apple_pay'], $options['applepay_cart'], $options['applepay_checkout'], $options['applepay_carriers']);
 			if (($options['apple_pay'] === 'yes') && ($options['applepay_checkout'] === 'no') && ($options['applepay_cart'] === 'no')) {
 				$options['applepay_checkout'] = 'yes';
 			}
@@ -619,14 +619,25 @@ class Ajax {
 			$options['oney_product_animation'] = Validator::oney_product_animation($data['enable_oney_product_animation']);
 			$options['debug'] = Validator::debug($data['enable_debug']);
 
-			update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
-			http_response_code(200);
+			//force save
+			if( update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false ) ){
 
-			wp_send_json_success( array(
-				"title" => null,
-				"msg" => __( 'payplug_save_success_message', 'payplug' ),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
+				//delete the transient, so it refresh the permissions on the init
+				$options = get_option('woocommerce_payplug_settings', []);
+				$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
+				delete_transient($transient_key);
+
+				http_response_code(200);
+				wp_send_json_success( array(
+					"title" => null,
+					"msg" => __( 'payplug_save_success_message', 'payplug' ),
+					"close" => __( 'payplug_ok', 'payplug' ),
+				));
+			}else{
+				http_response_code(403);
+				wp_send_json_error("You are not logged in !");
+			}
+
 		} else {
 			http_response_code(403);
 			wp_send_json_error("You are not logged in !");

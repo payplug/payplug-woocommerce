@@ -11,11 +11,22 @@ use Payplug\PayplugWoocommerce\Admin\Ajax;
 use Payplug\PayplugWoocommerce\Admin\Metabox;
 use Payplug\PayplugWoocommerce\Admin\Notices;
 use Payplug\PayplugWoocommerce\Admin\WoocommerceActions;
-use Payplug\PayplugWoocommerce\Controller\Bancontact;
 use Payplug\PayplugWoocommerce\Controller\ApplePay;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithFees;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithoutFees;
-use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
+
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugAmex;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugApplePay;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugCreditCard;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugBancontact;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugMybank;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney3x;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney3xWithoutFees;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney4x;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney4xWithoutFees;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugSatispay;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugIdeal;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugSofort;
 
 class PayplugWoocommerce {
 
@@ -116,6 +127,10 @@ class PayplugWoocommerce {
 		}
 
 		add_action( 'woocommerce_payment_gateways', [ $this, 'register_payplug_gateway' ] );
+
+		// Registers WooCommerce Blocks integration.
+		add_action( 'woocommerce_blocks_loaded', [$this, 'woocommerce_gateways_block_support'] );
+
 		add_filter( 'plugin_action_links_' . PAYPLUG_GATEWAY_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
 	}
 
@@ -182,6 +197,33 @@ class PayplugWoocommerce {
 		Switch($options['oney_type']){
 			case "without_fees" : new OneyWithoutFees();break;
 			default: new OneyWithFees();break;
+		}
+	}
+
+	/**
+	 * Registers WooCommerce Blocks integration.
+	 *
+	 */
+	public function woocommerce_gateways_block_support(){
+		if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+
+			add_action(
+				'woocommerce_blocks_payment_method_type_registration',
+				function( \Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+					$payment_method_registry->register( new PayplugCreditCard() );
+					$payment_method_registry->register( new PayplugBancontact() );
+					$payment_method_registry->register( new PayplugSatispay() );
+					$payment_method_registry->register( new PayplugAmex() );
+					$payment_method_registry->register( new PayplugIdeal() );
+					$payment_method_registry->register( new PayplugSofort() );
+					$payment_method_registry->register( new PayplugMybank() );
+					$payment_method_registry->register( new PayplugApplePay() );
+					$payment_method_registry->register( new PayplugOney3x() );
+					$payment_method_registry->register( new PayplugOney4x() );
+					$payment_method_registry->register( new PayplugOney3xWithoutFees() );
+					$payment_method_registry->register( new PayplugOney4xWithoutFees() );
+				}
+			);
 		}
 	}
 

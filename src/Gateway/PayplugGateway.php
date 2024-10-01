@@ -18,6 +18,7 @@ use Payplug\PayplugWoocommerce\Helper\Lock;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
+use WC_Blocks_Utils;
 use WC_Payment_Gateway_CC;
 use WC_Payment_Tokens;
 
@@ -645,11 +646,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('payplug-checkout');
 
-		if ($this->payment_method == "integrated" ) {
+		if (
+			( $this->payment_method == "integrated" && !$this->is_checkout_block() ) ||
+			($this->payment_method == "integrated" && is_wc_endpoint_url('order-pay') )
+		) {
 			$this->integrated_payments_scripts();
 		}
 
-		if (($this->payment_method == "popup" ) && ($this->id === "payplug")) {
+		if (($this->payment_method == "popup" ) && ($this->id === "payplug") && !$this->is_checkout_block() ) {
 
 			//load popup features
 			//TODO:: if integrated payment is not active please active this and comment the one bellow
@@ -819,7 +823,40 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      * @throws \Exception
      */
     public function process_standard_payment($order, $amount, $customer_id)
-    {
+	{
+
+		//use payment intent to finish the order
+		if ( !is_wc_endpoint_url('order-pay') &&
+			$this->is_checkout_block() &&
+			(
+				( $this->id === "payplug" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
+				( $this->id === "american_express" && $this->payment_method === 'popup')
+			) &&
+			!empty($order->get_transaction_id()) ) {
+
+			try {
+				$payment = $this->api->payment_retrieve($order->get_transaction_id());
+				if (ob_get_length() > 0) {
+					ob_clean();
+				}
+
+				$return_url = esc_url_raw($order->get_checkout_order_received_url());
+
+				return array(
+					'payment_id' => $payment->id,
+					'result' => 'success',
+					'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
+					'cancel' => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null
+				);
+
+			} catch (HttpException $e) {
+				PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
+				throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+			} catch (\Exception $e) {
+				PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, $e->getMessage()), 'error');
+				throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+			}
+		}
 
         $order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 
@@ -897,7 +934,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'payment_id' => $payment->id,
 				'result'   => 'success',
 				'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
-				'cancel'   => $payment->hosted_payment->cancel_url
+				'cancel'   => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null
 			);
 
         } catch (HttpException $e) {
@@ -1710,7 +1747,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             }
         }
 
-		//FIXME:: refactoring to remove this - we should see this on the oney classes and not here
 		if($this->oney_type == 'with_fees'){
 			unset($gateways['oney_x3_without_fees']);
 			unset($gateways['oney_x4_without_fees']);
@@ -1741,6 +1777,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 	public function setPayplugMerchantCountry($country){
 		$this->payplug_merchant_country = $country;
+	}
+
+	function is_checkout_block() {
+		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' );
 	}
 
 }
