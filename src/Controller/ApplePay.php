@@ -59,7 +59,7 @@ class ApplePay extends PayplugGateway
 				add_action('wp_enqueue_scripts', [$this, 'add_apple_pay_js']);
 			}
 
-			if (!is_admin() && is_cart() && $this->get_button_cart()) {
+			if (!is_admin() && $this->get_button_cart()) {
 				$this->enabled = 'yes';
 				$this->add_apple_pay_css();
 				add_action('woocommerce_proceed_to_checkout', [$this, "add_apple_pay_cart_js"], 15);
@@ -176,7 +176,7 @@ class ApplePay extends PayplugGateway
 				'ajax_url_update_applepay_payment' => \WC_AJAX::get_endpoint('update_applepay_payment'),
 				'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
 				'ajax_url_applepay_cancel_order' => \WC_AJAX::get_endpoint('applepay_cancel_order'),
-
+				'is_cart' => is_cart(),
 				'countryCode' => WC()->customer->get_billing_country(),
 				'currencyCode' => get_woocommerce_currency(),
 				'apple_pay_domain' => $_SERVER['HTTP_HOST']
