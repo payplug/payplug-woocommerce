@@ -11,7 +11,7 @@ const IntegratedPayment = ({props: props,}) => {
 	const order_id = useSelect( ( select ) => select( CHECKOUT_STORE_KEY ).getOrderId() );
 
 	useEffect(() => {
-		ObjIntegratedPayment.api = new Payplug.IntegratedPayment(false);
+		ObjIntegratedPayment.api = new Payplug.IntegratedPayment( settings?.mode == 1 ? false : true );
 		ObjIntegratedPayment.api.setDisplayMode3ds(Payplug.DisplayMode3ds.LIGHTBOX)
 		ObjIntegratedPayment.form.cardHolder = ObjIntegratedPayment.api.cardHolder(document.querySelector('.cardHolder-input-container'), {default: ObjIntegratedPayment.inputStyle.default, placeholder: settings?.payplug_integrated_payment_cardholder } );
 		ObjIntegratedPayment.form.pan = ObjIntegratedPayment.api.cardNumber(document.querySelector('.pan-input-container'), {default: ObjIntegratedPayment.inputStyle.default, placeholder: settings?.payplug_integrated_payment_card_number } );
@@ -63,7 +63,10 @@ const IntegratedPayment = ({props: props,}) => {
 
 				try {
 					ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: saved_card} );
-
+					return {
+						type: 'success',
+					}
+					
 				} catch (error) {
 					return {
 						type: 'error',
