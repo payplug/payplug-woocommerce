@@ -51,33 +51,32 @@ const IntegratedPayment = ({props: props,}) => {
 		return () => { unsubscribeAfterProcessing(); };
 	}, [onCheckoutValidation]);
 
-
 	useEffect(() => {
 		const handlePaymentProcessing = async () => {
 			let data = {};
+
+			ObjIntegratedPayment.api.onCompleted( function (event) {
+				return {
+					type: 'success',
+				}
+			});
+
 	 		await getPayment(props, settings, order_id).then( async (response) => {
 				ObjIntegratedPayment.paymentId = response.data.payment_id;
 				data = {'payment_id': response.data.payment_id};
 				ObjIntegratedPayment.return_url = response.redirect;
-				let saved_card = shouldSavePayment;
-
+				let saved_card = false;
 				try {
-					ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: saved_card} );
-					return {
-						type: 'success',
-					}
-					
+					await ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: saved_card} );
+
 				} catch (error) {
 					return {
 						type: 'error',
 						message: error.message
 					}
 				}
+			});
 
-				return {
-					type: 'success',
-				}
-			})
 		}
 		const unsubscribeAfterProcessing = onPaymentSetup(handlePaymentProcessing);
 		return () => { unsubscribeAfterProcessing(); };
