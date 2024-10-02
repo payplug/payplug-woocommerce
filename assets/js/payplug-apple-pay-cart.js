@@ -3,9 +3,14 @@
 
 	var $apple_pay_button = $('apple-pay-button')
 	var session = null;
+	var is_cart = apple_pay_params.is_cart;
 	var apple_pay = {
 		load_order_total: false,
 		init: function () {
+
+			if(!is_cart){
+				return;
+			}
 
 			apple_pay.updateOrderTotal();
 			$('apple-pay-button').on('click', apple_pay.ProcessCheckout)
