@@ -252,7 +252,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return;
         }
 
-		$order_id = $_GET['order_id'];
+		if (!empty($_GET['order-received'])) {
+			$order_id = (int) ($_GET['order-received']);
+		} elseif (!empty($id) && !is_object($id)) {
+			$order_id = (int) $id;
+		}
+
+
 
 		if (empty($order_id)) {
 			$order_id = wc_get_order_id_by_order_key(wc_clean( (!empty($_GET['key']) ? $_GET['key'] : $id) ) );
@@ -840,7 +846,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 					ob_clean();
 				}
 
-				$return_url = esc_url_raw($order->get_checkout_order_received_url()).'&order_id='.$order->get_id();
+				$return_url = esc_url_raw($order->get_checkout_order_received_url());
 
 				return array(
 					'payment_id' => $payment->id,
