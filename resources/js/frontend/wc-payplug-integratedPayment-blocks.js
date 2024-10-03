@@ -55,12 +55,6 @@ const IntegratedPayment = ({props: props,}) => {
 		const handlePaymentProcessing = async () => {
 			let data = {};
 
-			ObjIntegratedPayment.api.onCompleted( function (event) {
-				return {
-					type: 'success',
-				}
-			});
-
 	 		await getPayment(props, settings, order_id).then( async (response) => {
 				ObjIntegratedPayment.paymentId = response.data.payment_id;
 				data = {'payment_id': response.data.payment_id};
@@ -68,6 +62,7 @@ const IntegratedPayment = ({props: props,}) => {
 				let saved_card = false;
 				try {
 					await ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: saved_card} );
+					return await onCompleteEvent();
 
 				} catch (error) {
 					return {
@@ -75,7 +70,23 @@ const IntegratedPayment = ({props: props,}) => {
 						message: error.message
 					}
 				}
+			}).then( async () => {
+				await ObjIntegratedPayment.api.onCompleted(function (event) {
+					return {
+						type: 'success',
+					}
+				});
 			});
+
+			function onCompleteEvent(){
+				return new Promise(async (resolve, reject) => {
+					await ObjIntegratedPayment.api.onCompleted(function (event) {
+						resolve({
+							type: 'success',
+						});
+					});
+				})
+			}
 
 		}
 		const unsubscribeAfterProcessing = onPaymentSetup(handlePaymentProcessing);
@@ -101,17 +112,10 @@ const IntegratedPayment = ({props: props,}) => {
 
 			function CompleteProcessingPayment(){
 				return new Promise((resolve, reject) => {
-					try {
-						ObjIntegratedPayment.api.onCompleted( function (event) {
-							const data = {'payment_id' : paymentDetails.payment_id};
-							check_payment(data).then( (res) => {
-								resolve(res);
-							});
-						});
-
-					}catch (e){
-						reject(e);
-					}
+					const data = {'payment_id' : paymentDetails.payment_id};
+					check_payment(data).then( (res) => {
+						resolve(res);
+					});
 				})
 			}
 			return result;
