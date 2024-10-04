@@ -9,6 +9,7 @@ const IntegratedPayment = ({props: props,}) => {
 	const { onCheckoutValidation, onPaymentSetup, onCheckoutSuccess } = eventRegistration;
 	const { PAYMENT_STORE_KEY, CHECKOUT_STORE_KEY } = window.wc.wcBlocksData;
 	const order_id = useSelect( ( select ) => select( CHECKOUT_STORE_KEY ).getOrderId() );
+	var g_payment_id = null;
 
 	useEffect(() => {
 		ObjIntegratedPayment.api = new Payplug.IntegratedPayment( settings?.mode == 1 ? false : true );
@@ -70,17 +71,12 @@ const IntegratedPayment = ({props: props,}) => {
 						message: error.message
 					}
 				}
-			}).then( async () => {
-				await ObjIntegratedPayment.api.onCompleted(function (event) {
-					return {
-						type: 'success',
-					}
-				});
 			});
 
 			function onCompleteEvent(){
 				return new Promise(async (resolve, reject) => {
 					await ObjIntegratedPayment.api.onCompleted(function (event) {
+						g_payment_id = event.token;
 						resolve({
 							type: 'success',
 						});
@@ -112,7 +108,7 @@ const IntegratedPayment = ({props: props,}) => {
 
 			function CompleteProcessingPayment(){
 				return new Promise((resolve, reject) => {
-					const data = {'payment_id' : paymentDetails.payment_id};
+					const data = {'payment_id' : g_payment_id};
 					check_payment(data).then( (res) => {
 						resolve(res);
 					});
