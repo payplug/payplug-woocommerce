@@ -849,7 +849,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 					'cancel' => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null
 				));
 
-				return null;
+				return array("stt" => "OK");
 
 			} catch (HttpException $e) {
 				PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');

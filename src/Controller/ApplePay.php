@@ -354,7 +354,7 @@ class ApplePay extends PayplugGateway
 					)
 				);
 
-				return ;
+				return array("stt" => "OK");
 
 			} catch (HttpException $e) {
 				PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
