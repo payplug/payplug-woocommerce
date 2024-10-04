@@ -9,7 +9,6 @@ const IntegratedPayment = ({props: props,}) => {
 	const { onCheckoutValidation, onPaymentSetup, onCheckoutSuccess } = eventRegistration;
 	const { PAYMENT_STORE_KEY, CHECKOUT_STORE_KEY } = window.wc.wcBlocksData;
 	const order_id = useSelect( ( select ) => select( CHECKOUT_STORE_KEY ).getOrderId() );
-	var g_payment_id = null;
 
 	useEffect(() => {
 		ObjIntegratedPayment.api = new Payplug.IntegratedPayment( settings?.mode == 1 ? false : true );
@@ -59,7 +58,7 @@ const IntegratedPayment = ({props: props,}) => {
 	 		await getPayment(props, settings, order_id).then( async (response) => {
 				ObjIntegratedPayment.paymentId = response.data.payment_id;
 				data = {'payment_id': response.data.payment_id};
-				ObjIntegratedPayment.return_url = response.redirect;
+				ObjIntegratedPayment.return_url = response.data.redirect;
 				let saved_card = false;
 				try {
 					await ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: saved_card} );
@@ -76,7 +75,6 @@ const IntegratedPayment = ({props: props,}) => {
 			function onCompleteEvent(){
 				return new Promise(async (resolve, reject) => {
 					await ObjIntegratedPayment.api.onCompleted(function (event) {
-						g_payment_id = event.token;
 						resolve({
 							type: 'success',
 						});
@@ -89,33 +87,15 @@ const IntegratedPayment = ({props: props,}) => {
 		return () => { unsubscribeAfterProcessing(); };
 
 	}, [
-		shouldSavePayment,
-		onPaymentSetup,
-		emitResponse.noticeContexts.PAYMENTS,
-		emitResponse.responseTypes.ERROR,
-		emitResponse.responseTypes.SUCCESS
+		onPaymentSetup
 	]);
 
 	useEffect(() => {
 		const handlePaymentProcessing = async ({processingResponse: {paymentDetails}}) => {
-			let result = {};
-			await CompleteProcessingPayment().then( (res) => {
-				result = {
-					type: "success",
-					redirectUrl: res.data.redirect
-				}
-			});
-
-			function CompleteProcessingPayment(){
-				return new Promise((resolve, reject) => {
-					const data = {'payment_id' : g_payment_id};
-					check_payment(data).then( (res) => {
-						resolve(res);
-					});
-				})
+			return {
+				type: "success",
+				redirectUrl: ObjIntegratedPayment.return_url
 			}
-			return result;
-
 		}
 		const unsubscribeAfterProcessing = onCheckoutSuccess(handlePaymentProcessing);
 		return () => { unsubscribeAfterProcessing(); };
