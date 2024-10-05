@@ -401,7 +401,7 @@ class PayplugWoocommerceRequest {
 		// Save transaction id on the order
 		PayplugWoocommerceHelper::is_pre_30() ? update_post_meta($order_id, '_transaction_id', $payment->id)  : $order->set_transaction_id($payment->id);
 
-		if (is_callable([$order, 'save']) && $this->gateway->payment_method === "popup") {
+		if (is_callable([$order, 'save'])) {
 			$order->save();
 		}
 

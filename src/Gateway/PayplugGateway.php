@@ -829,8 +829,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			(
 				( $this->id === "payplug" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
 				( $this->id === "american_express" && $this->payment_method === 'popup')
-			) &&
-			!empty($order->get_transaction_id()) ) {
+			) ) {
 
 			$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 
