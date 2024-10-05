@@ -55,26 +55,30 @@ const IntegratedPayment = ({props: props,}) => {
 		const handlePaymentProcessing = async () => {
 			let data = {};
 
-	 		await getPayment(props, settings, order_id).then( async (response) => {
-				ObjIntegratedPayment.paymentId = response.data.payment_id;
-				data = {'payment_id': response.data.payment_id};
-				ObjIntegratedPayment.return_url = response.data.redirect;
-				let saved_card = false;
-				try {
-					await ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: saved_card} );
-					return await onCompleteEvent();
+			console.log(order_id);
 
-				} catch (error) {
-					return {
-						type: 'error',
-						message: error.message
+	 		await getPayment(props, settings, order_id).then(
+				 async (response) => {
+					ObjIntegratedPayment.paymentId = response.data.payment_id;
+					data = {'payment_id': response.data.payment_id};
+					ObjIntegratedPayment.return_url = response.data.redirect;
+					let saved_card = false;
+					try {
+						await ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: saved_card} );
+						return await onCompleteEvent();
+
+					} catch (error) {
+						return {
+							type: 'error',
+							message: error.message
+						}
 					}
 				}
-			});
+			);
 
 			function onCompleteEvent(){
-				return new Promise(async (resolve, reject) => {
-					await ObjIntegratedPayment.api.onCompleted(function (event) {
+				return new Promise((resolve, reject) => {
+					ObjIntegratedPayment.api.onCompleted(function (event) {
 						resolve({
 							type: 'success',
 						});

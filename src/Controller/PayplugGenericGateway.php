@@ -191,7 +191,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 					)
 				);
 
-				return ;
+				return array("stt" => "OK");
 
 			} catch (HttpException $e) {
 				PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
@@ -212,6 +212,14 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		if( !empty($intent) ){
 			return $intent;
 		}
+
+		PayplugGateway::log('intent - ' . json_encode($intent), "error");
+		PayplugGateway::log('id - ' . $this->id, "error");
+		PayplugGateway::log('payment_method - ' . $this->payment_method, "error");
+		PayplugGateway::log('transaction_id - ' . $order->get_transaction_id(), "error");
+		PayplugGateway::log('using blocks - ' . $this->is_checkout_block(), "error");
+		PayplugGateway::log('endpoint order-pay - ' . is_wc_endpoint_url('order-pay'), "error");
+
 
 		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 		try {
