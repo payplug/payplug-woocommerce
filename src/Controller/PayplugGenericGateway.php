@@ -14,6 +14,7 @@ use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\HttpException;
 use Payplug\Exception\ForbiddenException;
 use Payplug\Payplug;
+use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
 
 class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuilder
@@ -179,6 +180,29 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 				if (ob_get_length() > 0) {
 					ob_clean();
 				}
+
+
+				// Save transaction id for the order
+				PayplugWoocommerceHelper::is_pre_30()
+					? update_post_meta($order_id, '_transaction_id', $payment->id)
+					: $order->set_transaction_id($payment->id);
+
+				if (is_callable([$order, 'save'])) {
+					$order->save();
+				}
+
+				/**
+				 * Fires once a payment has been created.
+				 *
+				 * @param int $order_id Order ID
+				 * @param PaymentResource $payment Payment resource
+				 */
+				\do_action('payplug_gateway_payment_created', $order_id, $payment);
+
+				$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
+				PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
+
+				PayplugGateway::log(sprintf('Payment intent created for order #%s', $order_id));
 
 				$return_url = esc_url_raw($order->get_checkout_order_received_url());
 
