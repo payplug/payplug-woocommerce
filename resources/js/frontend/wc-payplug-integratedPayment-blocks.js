@@ -79,10 +79,7 @@ const IntegratedPayment = ({props: props,}) => {
 			function onCompleteEvent(){
 				return new Promise((resolve, reject) => {
 					ObjIntegratedPayment.api.onCompleted(function (event) {
-//						window.location = ObjIntegratedPayment.return_url
-						resolve({
-							type: 'success',
-						});
+						window.location = ObjIntegratedPayment.return_url
 					});
 				})
 			}
@@ -94,21 +91,6 @@ const IntegratedPayment = ({props: props,}) => {
 	}, [
 		onPaymentSetup
 	]);
-
-	useEffect(() => {
-		const handlePaymentProcessing = () => {
-			return {
-				type: "success",
-				redirectUrl: ObjIntegratedPayment.return_url
-			}
-		}
-		const unsubscribeAfterProcessing = onCheckoutSuccess(handlePaymentProcessing);
-		return () => { unsubscribeAfterProcessing(); };
-
-	}, [
-		onCheckoutSuccess
-	]);
-
 
 	const fieldValidation = () => {
 		jQuery.each(ObjIntegratedPayment.form, function (key, field) {
