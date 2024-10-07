@@ -95,7 +95,7 @@ const IntegratedPayment = ({props: props,}) => {
 	]);
 
 	useEffect(() => {
-		const handlePaymentProcessing = async ({processingResponse: {paymentDetails}}) => {
+		const handlePaymentProcessing = () => {
 			return {
 				type: "success",
 				redirectUrl: ObjIntegratedPayment.return_url
