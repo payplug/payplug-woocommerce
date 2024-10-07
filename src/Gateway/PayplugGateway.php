@@ -880,15 +880,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			return $intent;
 		}
 
-
-		PayplugGateway::log('intent - ' . json_encode($intent), "error");
-		PayplugGateway::log('id - ' . $this->id, "error");
-		PayplugGateway::log('payment_method - ' . $this->payment_method, "error");
-		PayplugGateway::log('transaction_id - ' . $order->get_transaction_id(), "error");
-		PayplugGateway::log('using blocks - ' . $this->is_checkout_block(), "error");
-		PayplugGateway::log('endpoint order-pay - ' . is_wc_endpoint_url('order-pay'), "error");
-
-
 		try {
             $address_data = PayplugAddressData::from_order($order);
 
