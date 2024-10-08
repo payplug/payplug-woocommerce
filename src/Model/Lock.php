@@ -64,7 +64,7 @@ class Lock
 	static function delete_lock($id){
 		global $wpdb;
 		$table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
-		$wpdb->query( $wpdb->prepare("DELETE FROM {$table_name} WHERE id = %s OR created < NOW() - INTERVAL 1 DAY;", [$id] ));
+		$wpdb->query( $wpdb->prepare("DELETE FROM {$table_name} WHERE id = %s AND created < NOW() - INTERVAL 1 DAY;", [$id] ));
 		return true;
 	}
 
@@ -75,7 +75,7 @@ class Lock
 	static function delete_lock_by_payment_id($payment_id){
 		global $wpdb;
 		$table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
-		$wpdb->query( $wpdb->prepare("DELETE FROM {$table_name} WHERE payment_id = %s OR created < NOW() - INTERVAL 1 DAY;", [$payment_id] ));
+		$wpdb->query( $wpdb->prepare("DELETE FROM {$table_name} WHERE payment_id = %s AND created < NOW() - INTERVAL 1 DAY;", [$payment_id] ));
 		return true;
 	}
 
@@ -83,21 +83,24 @@ class Lock
 	/**
 	 * @param $payment_id
 	 * @param $id
-	 * @return false
+	 * @return bool
 	 */
 	static function locked($payment_id, $id){
 		global $wpdb;
 
 		$table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
 
+		//delete older requests
+		$wpdb->query( $wpdb->prepare("DELETE FROM {$table_name} WHERE payment_id = %s AND created < NOW() - INTERVAL 1 MINUTE;", [$payment_id] ));
+
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$result = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$table_name} WHERE `payment_id` = %s AND `id` <> %s ", array( $payment_id, $id ) ) );
 
-		if ( !$result ) {
+		if ( empty($result) ) {
 			return false;
 		}
 
-		return $result;
+		return true;
 
 	}
 
