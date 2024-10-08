@@ -64,8 +64,8 @@ const IntegratedPayment = ({props: props,}) => {
 					ObjIntegratedPayment.return_url = response.data.redirect;
 					let saved_card = false;
 					try {
+						onCompleteEvent();
 						await ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: saved_card} );
-						return await onCompleteEvent();
 
 					} catch (error) {
 						return {
@@ -77,13 +77,11 @@ const IntegratedPayment = ({props: props,}) => {
 			);
 
 			function onCompleteEvent(){
-				return new Promise((resolve, reject) => {
-					ObjIntegratedPayment.api.onCompleted(function (event) {
-						resolve({
-							type: 'success',
-						});
-					});
-				})
+				ObjIntegratedPayment.api.onCompleted(function (event) {
+					check_payment({'payment_id' : event.token}).then((res) => {
+						window.location = ObjIntegratedPayment.return_url
+					})
+				});
 			}
 
 		}
@@ -92,21 +90,6 @@ const IntegratedPayment = ({props: props,}) => {
 
 	}, [
 		onPaymentSetup
-	]);
-
-	useEffect(() => {
-		const handlePaymentProcessing = () => {
-			return {
-				type: "success",
-				orderId: order_id,
-				redirectUrl: ObjIntegratedPayment.return_url
-			}
-		}
-		const unsubscribeAfterProcessing = onCheckoutSuccess(handlePaymentProcessing);
-		return () => { unsubscribeAfterProcessing(); };
-
-	}, [
-		onCheckoutSuccess
 	]);
 
 
