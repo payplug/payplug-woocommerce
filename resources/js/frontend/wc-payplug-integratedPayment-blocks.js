@@ -55,37 +55,33 @@ const IntegratedPayment = ({props: props,}) => {
 		const handlePaymentProcessing = async () => {
 			let data = {};
 
-	 		await getPayment(props, settings, order_id).then( async (response) => {
-				ObjIntegratedPayment.paymentId = response.data.payment_id;
-				data = {'payment_id': response.data.payment_id};
-				ObjIntegratedPayment.return_url = response.redirect;
-				let saved_card = false;
-				try {
-					await ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: saved_card} );
-					return await onCompleteEvent();
+			console.log(order_id);
 
-				} catch (error) {
-					return {
-						type: 'error',
-						message: error.message
+	 		await getPayment(props, settings, order_id).then(
+				 async (response) => {
+					ObjIntegratedPayment.paymentId = response.data.payment_id;
+					data = {'payment_id': response.data.payment_id};
+					ObjIntegratedPayment.return_url = response.data.redirect;
+					let saved_card = false;
+					try {
+						onCompleteEvent();
+						await ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: saved_card} );
+
+					} catch (error) {
+						return {
+							type: 'error',
+							message: error.message
+						}
 					}
 				}
-			}).then( async () => {
-				await ObjIntegratedPayment.api.onCompleted(function (event) {
-					return {
-						type: 'success',
-					}
-				});
-			});
+			);
 
 			function onCompleteEvent(){
-				return new Promise(async (resolve, reject) => {
-					await ObjIntegratedPayment.api.onCompleted(function (event) {
-						resolve({
-							type: 'success',
-						});
-					});
-				})
+				ObjIntegratedPayment.api.onCompleted(function (event) {
+					check_payment({'payment_id' : event.token}).then((res) => {
+						window.location = ObjIntegratedPayment.return_url
+					})
+				});
 			}
 
 		}
@@ -93,39 +89,7 @@ const IntegratedPayment = ({props: props,}) => {
 		return () => { unsubscribeAfterProcessing(); };
 
 	}, [
-		shouldSavePayment,
-		onPaymentSetup,
-		emitResponse.noticeContexts.PAYMENTS,
-		emitResponse.responseTypes.ERROR,
-		emitResponse.responseTypes.SUCCESS
-	]);
-
-	useEffect(() => {
-		const handlePaymentProcessing = async ({processingResponse: {paymentDetails}}) => {
-			let result = {};
-			await CompleteProcessingPayment().then( (res) => {
-				result = {
-					type: "success",
-					redirectUrl: res.data.redirect
-				}
-			});
-
-			function CompleteProcessingPayment(){
-				return new Promise((resolve, reject) => {
-					const data = {'payment_id' : paymentDetails.payment_id};
-					check_payment(data).then( (res) => {
-						resolve(res);
-					});
-				})
-			}
-			return result;
-
-		}
-		const unsubscribeAfterProcessing = onCheckoutSuccess(handlePaymentProcessing);
-		return () => { unsubscribeAfterProcessing(); };
-
-	}, [
-		onCheckoutSuccess
+		onPaymentSetup
 	]);
 
 

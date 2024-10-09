@@ -71,9 +71,9 @@ class PayplugIpnResponse {
 	 * @return void
 	 * @throws \WC_Data_Exception
 	 */
-	public function process_payment_resource( $resource ) {
+	public function process_payment_resource( $resource, $save_request = true ) {
 
-		$lock_id = \Payplug\PayplugWoocommerce\Helper\Lock::handle_insert(true, $resource->id);
+		$lock_id = \Payplug\PayplugWoocommerce\Helper\Lock::handle_insert($save_request, $resource->id);
 		if(!$lock_id){
 			return;
 		}
@@ -84,10 +84,11 @@ class PayplugIpnResponse {
 		$waiting_requests = Lock::get_lock_by_payment_id($resource->id);
 
 		if($waiting_requests){
-			$this->gateway->validate_payment($resource->metadata['order_id'], false);
 			Lock::delete_lock_by_payment_id($resource->id);
-
+			$this->gateway->validate_payment($resource->metadata['order_id'], false, true);
 		};
+
+
 	}
 
 	/**

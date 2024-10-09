@@ -66,10 +66,14 @@ class PayplugResponse {
 				return;
 			}
 			$paid_date = $order->get_date_paid();
+			if( isset($paid_date) && !$order->is_paid()){
+				$finished_status = wc_get_is_paid_statuses();
+				$order->set_status($finished_status[0]);
+			}
 
 			// Ignore paid orders
-			if ($order->is_paid() || isset($paid_date) ) {
-				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order is already complete. Ignoring IPN.', $order_id));
+			if ( $order->is_paid() ) {
+				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order is already complete. Ignoring IPN. "' . !empty($source) ? '[IPN]' : ''. '"', $order_id));
 				//$lock->deleteLock($resource->id);
 				return;
 			}

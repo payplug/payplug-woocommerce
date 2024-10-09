@@ -83,7 +83,7 @@ class Lock
 	/**
 	 * @param $payment_id
 	 * @param $id
-	 * @return false
+	 * @return bool
 	 */
 	static function locked($payment_id, $id){
 		global $wpdb;
@@ -93,11 +93,11 @@ class Lock
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$result = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$table_name} WHERE `payment_id` = %s AND `id` <> %s ", array( $payment_id, $id ) ) );
 
-		if ( !$result ) {
+		if ( empty($result) ) {
 			return false;
 		}
 
-		return $result;
+		return true;
 
 	}
 
