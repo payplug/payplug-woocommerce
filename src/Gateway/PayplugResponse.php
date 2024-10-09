@@ -67,7 +67,8 @@ class PayplugResponse {
 			}
 			$paid_date = $order->get_date_paid();
 			if( isset($paid_date) && !$order->is_paid()){
-				$order->set_status("paid");
+				$finished_status = wc_get_is_paid_statuses();
+				$order->set_status($finished_status[0]);
 			}
 
 			// Ignore paid orders
