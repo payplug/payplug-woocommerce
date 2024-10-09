@@ -72,7 +72,7 @@ class PayplugResponse {
 
 			// Ignore paid orders
 			if ( $order->is_paid() ) {
-				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order is already complete. Ignoring IPN.', $order_id));
+				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order is already complete. Ignoring IPN. "' . !empty($source) ? '[IPN]' : ''. '"', $order_id));
 				//$lock->deleteLock($resource->id);
 				return;
 			}

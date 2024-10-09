@@ -246,14 +246,17 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      *
      * @throws \WC_Data_Exception
      */
-    public function validate_payment($id = null, $save_request = true)
+    public function validate_payment($id = null, $save_request = true, $ipn = false)
     {
-        if (!is_wc_endpoint_url('order-received') || (empty($_GET['key']) && empty($id)) ) {
-            return;
-        }
+		if(!$ipn){
+			if (!is_wc_endpoint_url('order-received') || (empty($_GET['key']) && empty($id)) ) {
+				return;
+			}
+		}
 
 		if (!empty($_GET['order-received'])) {
 			$order_id = (int) ($_GET['order-received']);
+
 		} elseif (!empty($id) && !is_object($id)) {
 			$order_id = (int) $id;
 		}
@@ -291,6 +294,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 			try {
 				$payment = $this->api->payment_retrieve($transaction_id);
+
 			} catch (\Exception $e) {
 				PayplugGateway::log(
 					sprintf(
@@ -309,8 +313,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$waiting_requests = \Payplug\PayplugWoocommerce\Model\Lock::get_lock_by_payment_id($transaction_id);
 
 			if($waiting_requests){
-				$this->validate_payment($order_id, false);
 				\Payplug\PayplugWoocommerce\Model\Lock::delete_lock_by_payment_id($transaction_id);
+				$this->validate_payment($order_id, false);
 			};
 		}
     }
@@ -843,6 +847,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				PayplugWoocommerceHelper::is_pre_30()
 					? update_post_meta($order_id, '_transaction_id', $payment->id)
 					: $order->set_transaction_id($payment->id);
+
+				if($payment->is_paid){
+					$finished_status = wc_get_is_paid_statuses();
+					$order->set_status($finished_status[0]);
+				}
 
 				if (is_callable([$order, 'save'])) {
 					$order->save();

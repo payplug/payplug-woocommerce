@@ -84,10 +84,11 @@ class PayplugIpnResponse {
 		$waiting_requests = Lock::get_lock_by_payment_id($resource->id);
 
 		if($waiting_requests){
-			$this->process_payment_resource($resource->metadata['order_id'], false);
 			Lock::delete_lock_by_payment_id($resource->id);
-
+			$this->gateway->validate_payment($resource->metadata['order_id'], false, true);
 		};
+
+
 	}
 
 	/**
