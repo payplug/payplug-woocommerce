@@ -831,12 +831,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 * @throws \Exception
 	 */
 	private function process_standard_intent_payment($order){
+
+		//no order-pay page, no ajax_on_order_review_page
 		if ( !is_wc_endpoint_url('order-pay') &&
 			$this->is_checkout_block() &&
 			(
 				( $this->id === "payplug" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
 				( $this->id === "american_express" && $this->payment_method === 'popup')
-			) ) {
+			) &&
+			$_GET["wc-ajax"] !== "payplug_order_review_url"
+		) {
 
 			$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 
