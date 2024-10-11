@@ -22,6 +22,11 @@ class Lock
 		}else{
 			//saved request to be processed
 			$lock = \Payplug\PayplugWoocommerce\Model\Lock::get_lock_by_payment_id($payment_id);
+
+			if(empty($lock->id)){
+				return false;
+			}
+
 			return $lock->id;
 		}
 

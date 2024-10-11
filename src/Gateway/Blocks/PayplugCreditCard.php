@@ -53,6 +53,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 			$data['payplug_integrated_payment_check_payment_url'] = \WC_AJAX::get_endpoint('payplug_check_payment');
 			$data['payplug_integrated_payment_nonce_field'] = wp_nonce_field('woocommerce-process_checkout', 'woocommerce-process-checkout-nonce');
 			$data['wp_nonce'] = wp_create_nonce( "woocommerce-process_checkout" );
+			$data['mode'] = PayplugWoocommerceHelper::check_mode();
 			$data["IP"] = true;
 
 		}else if( $options['payment_method'] === "popup" ){
