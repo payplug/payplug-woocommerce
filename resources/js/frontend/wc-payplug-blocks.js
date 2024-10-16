@@ -59,7 +59,8 @@ const Payplug = {
 	canMakePayment: () => true,
 	ariaLabel: label,
 	supports: {
-		features: settings.supports
+		features: settings.supports,
+		showSaveOption: settings?.oneclick && settings?.IP,
 	},
 };
 
