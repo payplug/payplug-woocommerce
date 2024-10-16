@@ -967,6 +967,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 ? update_post_meta($order_id, '_transaction_id', $payment->id)
                 : $order->set_transaction_id($payment->id);
 
+			$order->set_payment_method( $this->id );
+
             if (is_callable([$order, 'save'])) {
                 $order->save();
             }
