@@ -26,12 +26,6 @@ class PayplugGatewayRequirements {
 	 */
 	private $gateway;
 
-
-    /**
-     * @var PayplugPermissions
-     */
-	private $permissions;
-
 	/**
 	 * Gateway settings.
 	 *
@@ -46,7 +40,6 @@ class PayplugGatewayRequirements {
 	 */
 	public function __construct( PayplugGateway $gateway ) {
 		$this->gateway = $gateway;
-		$this->permissions = new PayplugPermissions($gateway);
 		$this->settings = get_option( 'woocommerce_payplug_settings', [] );
 	}
 
@@ -115,15 +108,6 @@ class PayplugGatewayRequirements {
 	}
 
 	/**
-	 * @return string
-	 */
-	public function oney_requirement() {
-		return ($this->valid_oney_check())
-			? '<p class="success">' . __( 'Oney is active on your store.', 'payplug' ) . '</p>'
-			: '';
-	}
-
-	/**
 	 * Check if CURL is available and support SSL
 	 *
 	 * @return bool
@@ -178,16 +162,4 @@ class PayplugGatewayRequirements {
 		return $this->gateway->user_logged_in();
 	}
 
-
-	/**
-	 * Check if the user is in live mode and has activated oney
-	 *
-	 * @return bool
-	 */
-	public function valid_oney_check() {
-		if (!isset($this->settings['mode']) || !isset($this->settings['oney'])) {
-			return false;
-		}
-		return ("yes" === $this->settings['mode'] && "yes" === $this->settings['oney'] && $this->permissions->has_permissions(PayplugPermissions::USE_ONEY));
-	}
 }
