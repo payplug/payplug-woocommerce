@@ -75,12 +75,18 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
 	public function get_payment_method_data() {
 		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options( $this->name );
 		$this->allowed_country_codes = !empty($account["payment_methods"][ $this->name ]['allowed_countries']) ? $account["payment_methods"][ $this->name ]['allowed_countries'] : null;
+		if ($this->gateway->settings['oneclick'] === 'yes') {
+			$oneclick = true;
+		} else {
+			$oneclick = false;
+		}
 		return [
 			'enabled'     => $this->is_active(),
 			'name'        => $this->gateway->id,
 			'title'       => $this->gateway->title,
 			'description' => $this->gateway->description,
-			'allowed_country_codes' => $this->allowed_country_codes
+			'allowed_country_codes' => $this->allowed_country_codes,
+			'oneclick'    => $oneclick
 		];
 	}
 
