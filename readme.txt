@@ -81,6 +81,11 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 2.9.1 =
+* Hot Fix: Avoid calls to the Get Account endpoint with empty values
+* Tested up to: WooCommerce 9.3.3
+* Tested up to: WordPress 6.6.2
+
 = 2.9.0 =
 * New feature: Added WooCommerce Blocks compatibility on checkout page
 * New fixes: General performance improvements and stability enhancements.
