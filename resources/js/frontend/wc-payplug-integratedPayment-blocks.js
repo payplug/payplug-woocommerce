@@ -3,9 +3,12 @@ import React, { useEffect, useRef } from 'react';
 import { useSelect } from '@wordpress/data';
 import {getPayment, check_payment } from "./helper/wc-payplug-requests";
 const settings = getSetting( 'payplug_data', {} );
+let saved_card = false;
 
 const IntegratedPayment = ({props: props,}) => {
-	const { eventRegistration, emitResponse, shouldSavePayment } = props;
+	const { eventRegistration, emitResponse } = props;
+	saved_card = props.shouldSavePayment;
+
 	const { onCheckoutValidation, onPaymentSetup, onCheckoutSuccess } = eventRegistration;
 	const { PAYMENT_STORE_KEY, CHECKOUT_STORE_KEY } = window.wc.wcBlocksData;
 	const order_id = useSelect( ( select ) => select( CHECKOUT_STORE_KEY ).getOrderId() );
@@ -55,14 +58,13 @@ const IntegratedPayment = ({props: props,}) => {
 		const handlePaymentProcessing = async () => {
 			let data = {};
 
-			console.log(order_id);
 
 	 		await getPayment(props, settings, order_id).then(
 				 async (response) => {
 					ObjIntegratedPayment.paymentId = response.data.payment_id;
 					data = {'payment_id': response.data.payment_id};
 					ObjIntegratedPayment.return_url = response.data.redirect;
-					let saved_card = false;
+
 					try {
 						onCompleteEvent();
 						await ObjIntegratedPayment.api.pay(ObjIntegratedPayment.paymentId, Payplug.Scheme.AUTO, {save_card: saved_card} );

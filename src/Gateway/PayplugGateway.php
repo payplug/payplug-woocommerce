@@ -1058,8 +1058,21 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
             $payment      = $this->api->payment_create($payment_data);
 
+			// Save transaction id for the order
+			PayplugWoocommerceHelper::is_pre_30()
+				? update_post_meta($order_id, '_transaction_id', $payment->id)
+				: $order->set_transaction_id($payment->id);
+
+			if (is_callable([$order, 'save'])) {
+				$order->save();
+			}
+
             /** This action is documented in src/Gateway/PayplugGateway */
             \do_action('payplug_gateway_payment_created', $order_id, $payment);
+
+
+			$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
+			PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
 
             $this->response->process_payment($payment, true);
 
