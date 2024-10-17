@@ -200,7 +200,7 @@ class ApplePay {
 		$order_id = $_POST['order_id'];
 		$order = wc_get_order( $order_id );
 
-		$selected_shipping_method = $_POST['shipping_method'];
+		$selected_shipping_method = !empty($_POST['shipping_method']) ? $_POST['shipping_method'] : null;
 		if (!empty($_POST['shipping'])) {
 			foreach ($_POST['shipping'] as $key => $data) {
 				switch ($key) {
@@ -286,7 +286,7 @@ class ApplePay {
 
 
 		$shipping_zone = \WC_Shipping_Zones::get_zone_matching_package( $package );
-		if ( $shipping_zone ) {
+		if ( $shipping_zone && !empty( $selected_shipping_method ) ) {
 
 			$shipping_methods = $shipping_zone->get_shipping_methods( true );
 
