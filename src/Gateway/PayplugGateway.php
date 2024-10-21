@@ -815,7 +815,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             ? wc_clean($_POST['wc-' . $this->id . '-payment-token'])
             : false;
 
-        if ($payment_token_id && $this->oneclick_available() && (int) $customer_id > 0) {
+        if ($payment_token_id && (int) $customer_id > 0) {
             PayplugGateway::log(sprintf('Payment token found.', $amount));
 
             return $this->process_payment_with_token($order, $amount, $customer_id, $payment_token_id);
