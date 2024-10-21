@@ -29,6 +29,8 @@ class PayplugCreditCard extends PayplugGenericBlock
 		$data["IP"] = false;
 		$data["popup"] = false;
 		$data['payment_method'] = $this->get_name();
+		$data['supports'] = $this->get_supported_features();
+		$data['showSaveOption'] = !empty($this->gateway->oneclick) ? $this->gateway->oneclick : false;
 
 		$options = get_option('woocommerce_payplug_settings', []);
 		if( $options['payment_method'] === "integrated" ){
