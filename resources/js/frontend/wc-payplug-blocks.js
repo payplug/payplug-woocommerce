@@ -61,6 +61,7 @@ const Payplug = {
 	supports: {
 		features: settings.supports,
 		showSaveOption: settings?.oneclick && settings?.IP,
+		showSavedCards: settings.showSaveOption ?? false
 	},
 };
 

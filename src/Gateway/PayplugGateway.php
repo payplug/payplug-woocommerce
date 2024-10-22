@@ -10,9 +10,7 @@ if (!defined('ABSPATH')) {
 use Payplug\Authentication;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\HttpException;
-use Payplug\Exception\ForbiddenException;
 use Payplug\Payplug;
-use Payplug\PayplugWoocommerce\Admin\Ajax;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\Helper\Lock;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
@@ -706,6 +704,15 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         if (!is_user_logged_in() || !class_exists('WC_Payment_Gateway_CC')) {
             return $tokens;
         }
+
+		if($this->oneclick === false){
+			foreach($tokens as $token_id => $token){
+				if($token->get_gateway_id() === "payplug"){
+					unset($tokens[$token_id]);
+				}
+			}
+			return $tokens;
+		}
 
         /* @var \WC_Payment_Token_CC $token */
         foreach ($tokens as $k => $token) {
