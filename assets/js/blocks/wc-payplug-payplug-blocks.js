@@ -608,6 +608,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _woocommerce_settings__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_woocommerce_settings__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _wc_payplug_integratedPayment_blocks__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./wc-payplug-integratedPayment-blocks */ "./resources/js/frontend/wc-payplug-integratedPayment-blocks.js");
 /* harmony import */ var _wc_payplug_popup_blocks__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./wc-payplug-popup-blocks */ "./resources/js/frontend/wc-payplug-popup-blocks.js");
+var _settings$showSaveOpt;
 
 
 
@@ -671,7 +672,8 @@ const wc_payplug_blocks_Payplug = {
   ariaLabel: label,
   supports: {
     features: settings.supports,
-    showSaveOption: settings?.oneclick && settings?.IP
+    showSaveOption: settings?.oneclick && settings?.IP,
+    showSavedCards: (_settings$showSaveOpt = settings.showSaveOption) !== null && _settings$showSaveOpt !== void 0 ? _settings$showSaveOpt : false
   }
 };
 (0,_woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_2__.registerPaymentMethod)(wc_payplug_blocks_Payplug);
