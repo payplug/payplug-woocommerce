@@ -92,7 +92,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_register_script(
 			'payplug-integrated-payments-api',
-			'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js',
+			'https://cdn.payplug.com/js/integrated-payment/v1@1/index.js',
 			array(),
 			'v1.1',
 			true
