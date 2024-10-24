@@ -260,6 +260,7 @@
 				}
 			}).done(function (response) {
 				apple_pay.showError(response.data.message, "info");
+				apple_pay.updateOrderTotal();
 			})
 		},
 		showError: function (message="", type = "info") {
