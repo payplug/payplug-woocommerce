@@ -40,8 +40,11 @@
 				apple_pay_params.ajax_url_applepay_get_shippings
 
 			).done(function(results){
+
 				if(results.data.length === 0){
-					$apple_pay_button.remove();
+					//$apple_pay_button.remove();
+					apple_pay_params.carriers = [];
+					return;
 				}
 
 				selected_shipping = jQuery('[name^="shipping_method"]:checked').val();
@@ -52,6 +55,12 @@
 						selected_shipping = jQuery('[name^="shipping_method"]').val();
 					}
 				}
+
+				if(typeof selected_shipping === "undefined" ){
+					apple_pay_params.carriers = [];
+					return;
+				}
+
 				selected_shipping = selected_shipping.split(":");
 
 				results.data.map(function(v){
@@ -142,6 +151,7 @@
 
 			apple_pay.MerchantValidated(session, response.payment_data.merchant_session);
 
+			session.amount = parseFloat(apple_pay_params.total/100) * 100;
 			session.onshippingmethodselected = event => {
 
 				const shippingMethod = event.shippingMethod;
@@ -221,7 +231,8 @@
 						error: function(err){
 							apple_pay.CancelOrder('Unfortunately your order cannot be processed as the originating bank/merchant has declined your transaction. Please attempt your purchase again.')
 						},
-					})
+					});
+
 				}).fail(function (response) {
 					apple_pay.CancelOrder('Unfortunately your order cannot be processed as the originating bank/merchant has declined your transaction. Please attempt your purchase again.');
 				})

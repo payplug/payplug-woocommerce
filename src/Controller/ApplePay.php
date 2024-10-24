@@ -198,8 +198,13 @@ class ApplePay extends PayplugGateway
 		$allowed = false;
 		$post = $this->get_post_data();
 		$chosen_method = isset($post["shipping_method"][0]) ? $post["shipping_method"][0] : null;
-		if(!$chosen_method){
-			$chosen_method = WC()->session->chosen_shipping_methods[0];
+
+		if( empty($chosen_method) ){
+			$chosen_method = !empty(WC()->session->chosen_shipping_methods[0]) ? WC()->session->chosen_shipping_methods[0] : null;
+		}
+
+		if(!$this->is_shipping_required()){
+			return true;
 		}
 
 		foreach ( WC()->shipping()->get_packages() as $i => $package ) {
@@ -216,6 +221,32 @@ class ApplePay extends PayplugGateway
 		}
 
 		return $allowed;
+	}
+
+	/**
+	 *
+	 * check if the shipping is required or not
+	 * @return bool
+	 */
+	public function is_shipping_required(){
+		$cart = WC()->cart->get_cart();
+
+		$required = true;
+		foreach ($cart as $cart_item){
+			if(!empty($cart_item['product_id']) ){
+				$product = wc_get_product( $cart_item['product_id'] );
+
+				//not required if it enters here
+				if(!$product->is_virtual() && !$product->is_downloadable()){
+					return true;
+				}
+
+				$required = false;
+			}
+		}
+
+		return $required;
+
 	}
 
 

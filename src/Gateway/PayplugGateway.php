@@ -10,9 +10,7 @@ if (!defined('ABSPATH')) {
 use Payplug\Authentication;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\HttpException;
-use Payplug\Exception\ForbiddenException;
 use Payplug\Payplug;
-use Payplug\PayplugWoocommerce\Admin\Ajax;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\Helper\Lock;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
@@ -707,6 +705,15 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return $tokens;
         }
 
+		if($this->oneclick === false){
+			foreach($tokens as $token_id => $token){
+				if($token->get_gateway_id() === "payplug"){
+					unset($tokens[$token_id]);
+				}
+			}
+			return $tokens;
+		}
+
         /* @var \WC_Payment_Token_CC $token */
         foreach ($tokens as $k => $token) {
 
@@ -815,7 +822,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             ? wc_clean($_POST['wc-' . $this->id . '-payment-token'])
             : false;
 
-        if ($payment_token_id && $this->oneclick_available() && (int) $customer_id > 0) {
+        if ($payment_token_id && (int) $customer_id > 0) {
             PayplugGateway::log(sprintf('Payment token found.', $amount));
 
             return $this->process_payment_with_token($order, $amount, $customer_id, $payment_token_id);
@@ -967,6 +974,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 ? update_post_meta($order_id, '_transaction_id', $payment->id)
                 : $order->set_transaction_id($payment->id);
 
+			$order->set_payment_method( $this->id );
+
             if (is_callable([$order, 'save'])) {
                 $order->save();
             }
@@ -1056,8 +1065,21 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
             $payment      = $this->api->payment_create($payment_data);
 
+			// Save transaction id for the order
+			PayplugWoocommerceHelper::is_pre_30()
+				? update_post_meta($order_id, '_transaction_id', $payment->id)
+				: $order->set_transaction_id($payment->id);
+
+			if (is_callable([$order, 'save'])) {
+				$order->save();
+			}
+
             /** This action is documented in src/Gateway/PayplugGateway */
             \do_action('payplug_gateway_payment_created', $order_id, $payment);
+
+
+			$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
+			PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
 
             $this->response->process_payment($payment, true);
 

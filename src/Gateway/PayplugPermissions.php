@@ -33,7 +33,7 @@ class PayplugPermissions {
      * @var string
      */
     private $current_key;
-    
+
 	/**
 	 * @var array
 	 */
@@ -97,6 +97,10 @@ class PayplugPermissions {
 			$this->permissions = $payplug_permissions;
 
 			return true;
+		}
+
+		if(empty($this->current_key)){
+			return false;
 		}
 
 		try {
