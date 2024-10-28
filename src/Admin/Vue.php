@@ -287,7 +287,6 @@ class Vue {
 				PaymentMethods::payment_method_bancontact(!empty($options) && $options['bancontact'] === 'yes'),
 				PaymentMethods::payment_method_satispay(!empty($options) && $options['satispay'] === 'yes'),
 				PaymentMethods::payment_method_mybank(!empty($options) && $options['mybank'] === 'yes'),
-				PaymentMethods::payment_method_sofort(!empty($options) && $options['sofort'] === 'yes'),
 				PaymentMethods::payment_method_ideal(!empty($options) && $options['ideal'] === 'yes'),
 
 			]

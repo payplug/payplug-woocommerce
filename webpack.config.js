@@ -32,7 +32,6 @@ module.exports = {
 		'bancontact': '/resources/js/frontend/wc-payplug-bancontact-blocks.js',
 		'american_express': '/resources/js/frontend/wc-payplug-american_express-blocks.js',
 		'satispay': '/resources/js/frontend/wc-payplug-satispay-blocks.js',
-		'sofort': '/resources/js/frontend/wc-payplug-sofort-blocks.js',
 		'ideal': '/resources/js/frontend/wc-payplug-ideal-blocks.js',
 		'mybank': '/resources/js/frontend/wc-payplug-mybank-blocks.js',
 		'apple_pay': '/resources/js/frontend/wc-payplug-apple_pay-blocks.js',
