@@ -179,12 +179,12 @@ const IntegratedPayment = ({props: props,}) => {
 				<div className="payplug IntegratedPayment_container -scheme">
 					<div>{settings?.payplug_integrated_payment_your_card}</div>
 					<div className="payplug IntegratedPayment_schemes">
+						<label className="payplug IntegratedPayment_scheme -cb">
+							<input type="radio" name="schemeOptions" value="cb"/><span></span></label>
 						<label className="payplug IntegratedPayment_scheme -visa">
 							<input type="radio" name="schemeOptions" value="visa" /><span></span></label>
 						<label className="payplug IntegratedPayment_scheme -mastercard">
 							<input type="radio" name="schemeOptions" value="mastercard"/><span></span></label>
-						<label className="payplug IntegratedPayment_scheme -cb">
-							<input type="radio" name="schemeOptions" value="cb"/><span></span></label>
 					</div>
 				</div>
 				<div className="payplug IntegratedPayment_container -pan pan-input-container" data-e2e-name="pan"></div>
