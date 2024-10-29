@@ -406,35 +406,6 @@ class PaymentMethods {
 	 * @param $active
 	 * @return array
 	 */
-	public static function payment_method_sofort( $active = false ) {
-		return [
-			"type" => "payment_method",
-			"name" => "sofort",
-			"title" => __( 'payplug_sofort_activate', 'payplug' ),
-			"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/sofort.svg' ),
-			"checked" =>  $active,
-			"available_test_mode" => false,
-			"descriptions" => [
-				"live"    => [
-					"description"      => __( 'payplug_section_sofort_payment_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_sofort_more_url', 'payplug' ), "_blank"),
-				],
-				"sandbox" => [
-					"description"      => __( 'payplug_sofort_unavailable_testmode_description', 'payplug' ),
-					"link_know_more" => Component::link(__( 'payplug_know_more_label', 'payplug' ), __( 'payplug_sofort_more_url', 'payplug' ), "_blank"),
-				]
-			],
-			"options"      => [
-				self::get_allowed_countries("sofort")
-			],
-		];
-	}
-
-
-	/**
-	 * @param $active
-	 * @return array
-	 */
 	public static function payment_method_ideal( $active = false ) {
 		return [
 			"type" => "payment_method",

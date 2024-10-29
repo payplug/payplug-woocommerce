@@ -16,7 +16,6 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Ideal;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Mybank;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Satispay;
-use Payplug\PayplugWoocommerce\Gateway\PPRO\Sofort;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Exception\PayplugException;
 use WP_REST_Request;
@@ -115,13 +114,6 @@ class Ajax {
 				'permission_callback' => function () use ($permission)  {return $permission ;},
 				'show_in_index' => false
 			) );
-			register_rest_route( 'payplug_api', '/sofort_permissions/', array(
-				'methods' => 'POST',
-				'callback' => [ $this, 'api_check_sofort_permissions' ],
-				'permission_callback' => function () use ($permission)  {return $permission ;},
-				'show_in_index' => false
-			) );
-
 			register_rest_route( 'payplug_api', '/ideal_permissions/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'api_check_ideal_permissions' ],
@@ -303,21 +295,6 @@ class Ajax {
 			wp_send_json_error(array(
 				"title" => __( 'payplug_enable_feature', 'payplug' ),
 				"msg" => __( 'payplug_mybank_access_error', 'payplug' ),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
-		}
-
-		wp_send_json_success($enabled);
-	}
-
-	public function api_check_sofort_permissions(WP_REST_Request $request) {
-		$account = $this->generic_get_account($request, Sofort::ENABLE_ON_TEST_MODE);
-
-		$enabled = isset($account['httpResponse']['payment_methods']['sofort']['enabled']) ? $account['httpResponse']['payment_methods']['sofort']['enabled']: false;
-		if(!$enabled){
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_sofort_access_error', 'payplug' ),
 				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
@@ -609,7 +586,6 @@ class Ajax {
 
 			$options['american_express'] = Validator::genericPaymentGateway($data['enable_american_express'],"American Express", $test_mode);
 			$options['satispay'] = Validator::genericPaymentGateway($data['enable_satispay'], "Satispay", $test_mode);
-			$options['sofort'] = Validator::genericPaymentGateway($data['enable_sofort'], "Sofort", $test_mode);
 			$options['ideal'] = Validator::genericPaymentGateway($data['enable_ideal'], "iDEAL", $test_mode);
 			$options['mybank'] = Validator::genericPaymentGateway($data['enable_mybank'], "Mybank", $test_mode);
 			$options['oney_type'] = (Validator::oney_type($data['payplug_oney'])) ? $data['payplug_oney'] : 'with_fees';
