@@ -3,7 +3,6 @@
 namespace Payplug\PayplugWoocommerce\Gateway\PPRO;
 use Payplug\PayplugWoocommerce\Controller\PayplugGenericGateway;
 
-//TODO:: we need to import WP here to fetch/handling language versioning
 class Mybank extends PayplugGenericGateway
 {
 

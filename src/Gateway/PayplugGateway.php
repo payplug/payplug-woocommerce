@@ -116,7 +116,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$GLOBALS['hide_save_button'] = true;
 		}
 
-		//TODO: this should be properties of the class and implemented an interface on all classes (set values)
         $this->id                 = 'payplug';
         $this->icon               = '';
         $this->has_fields         = false;
@@ -148,7 +147,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$this->oney_type      = $this->get_option('oney_type', 'with_fees');
 	    $oney_range = PayplugWoocommerceHelper::get_min_max_oney();
 
-		//TODO:: remove this properties from here and add them on Oney classes
 	    $this->min_oney_price = (isset($oney_range['min'])) ? intval($oney_range['min']) : 100;
 	    $this->max_oney_price = (isset($oney_range['max'])) ? intval($oney_range['max']) : 3000;
 	    $this->oney_thresholds_min = $this->get_option('oney_thresholds_min', $this->min_oney_price );
@@ -605,7 +603,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			'check_payment_url' => \WC_AJAX::get_endpoint('payplug_check_payment')
 		);
 
-		//TODO:: if integrated payment is active please active form and comment the one above
 		/**x
 		 * Integrated payments scripts
 		 */
@@ -664,7 +661,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		if (($this->payment_method == "popup" ) && ($this->id === "payplug") && !$this->is_checkout_block() ) {
 
 			//load popup features
-			//TODO:: if integrated payment is not active please active this and comment the one bellow
 			wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
 			wp_register_script('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [
 				'jquery',
