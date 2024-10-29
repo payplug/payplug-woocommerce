@@ -1084,8 +1084,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
             $this->response->process_payment($payment, true);
 
-            PayplugGateway::log(sprintf('Payment process complete for order #%s', $order_id));
-
 			if(($payment->__get('is_paid'))){
 				$redirect =  $order->get_checkout_order_received_url();
 			}else if(isset($payment->__get('hosted_payment')->payment_url)){
