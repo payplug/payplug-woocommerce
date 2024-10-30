@@ -13,7 +13,6 @@ interface PayplugGatewayBuilder
 
 	public function process_standard_payment($order, $amount, $customer_id);
 
-	//TODO:: remove this when decouple CC from PayplugGateway only needed for old BO
 	public function process_admin_options();
 
 }

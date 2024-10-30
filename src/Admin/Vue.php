@@ -27,7 +27,6 @@ class Vue {
 			$logged = $this->payplug_section_logged();
 			$payplug = (new PayplugGateway());
 
-			//TODO:: use the same get_option everywhere on the BO
 			$payplug_wooc_settings = get_option( 'woocommerce_payplug_settings', [] );
 
 			if ((empty($payplug_wooc_settings['oney_thresholds_default_min'])) && (empty($payplug_wooc_settings['oney_thresholds_default_max']))) {
