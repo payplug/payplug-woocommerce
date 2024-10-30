@@ -465,7 +465,6 @@ class Ajax {
 			return wp_send_json_success( ["settings" => $user + $wp] + ( new Vue )->init() );
 		} catch (HttpException $e) {
 
-			//TODO:: error handler, Authentication::getPermissionsByLogin comes here
 			http_response_code(401);
 			$error = __("payplug_error_wrong_credentials", "payplug");
 			return wp_send_json_error(array('message' => $error));
@@ -562,7 +561,6 @@ class Ajax {
 			$options['enabled'] = Validator::enabled($data['payplug_enable']);
 			$options['mode'] = Validator::mode($data['payplug_sandbox']);
 
-			//TODO:: add validation for mode
 			$test_mode = $options['mode'] === 'yes' ? false : true;
 
 			$options['title'] = trim(wp_strip_all_tags($data['standard_payment_title']));

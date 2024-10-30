@@ -109,7 +109,6 @@ class PayplugWoocommerceRequest {
 
 		$payment_method = $_POST['payment_method'];
 
-		//TODO:: check if integrated or embedded is activated, if not go to ajax_create_order as well
 		if($payment_method === 'payplug'){
 			$settings = get_option('woocommerce_payplug_settings', []);
 			$method = $settings['payment_method'];
