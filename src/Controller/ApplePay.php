@@ -460,7 +460,8 @@ class ApplePay extends PayplugGateway
 					'order_id'    => $order_id,
 					'customer_id' => ((int) $customer_id > 0) ? $customer_id : 'guest',
 					'domain'      => $this->domain_name,
-					'applepay_workflow' => $workflow
+					'applepay_workflow' => $workflow,
+					'woocommerce_block' => \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )
 				]
 			];
 

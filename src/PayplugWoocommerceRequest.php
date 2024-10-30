@@ -353,6 +353,7 @@ class PayplugWoocommerceRequest {
 				'order_id'    => $order_id,
 				'customer_id' => ((int) $customer_id > 0) ? $customer_id : 'guest',
 				'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
+				'woocommerce_block' => \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )
 			],
 		];
 
