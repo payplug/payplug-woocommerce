@@ -123,7 +123,7 @@ class PayplugResponse {
 
 			} elseif ($gateway_id == "payplug") {
 				if (!$is_payment_with_token) {
-					$this->payplug_ipn($resource);
+					$this->payplug_ipn($resource, $source);
 				}
 
 			}
