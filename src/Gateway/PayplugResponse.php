@@ -122,7 +122,10 @@ class PayplugResponse {
 				}
 
 			} elseif ($gateway_id == "payplug") {
-				$this->payplug_ipn($resource, $source);
+				if (!$is_payment_with_token) {
+					$this->payplug_ipn($resource);
+				}
+
 			}
 
 			// Handle successful payments

@@ -610,8 +610,8 @@ class Ajax {
 					"close" => __( 'payplug_ok', 'payplug' ),
 				));
 			}else{
-				http_response_code(403);
-				wp_send_json_error("You are not logged in !");
+				http_response_code(200);
+				wp_send_json_error("These settings are already saved !");
 			}
 
 		} else {

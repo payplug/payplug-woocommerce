@@ -975,6 +975,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 : $order->set_transaction_id($payment->id);
 
 			$order->set_payment_method( $this->id );
+			$order->set_payment_method_title($this->method_title);
 
             if (is_callable([$order, 'save'])) {
                 $order->save();
@@ -1082,8 +1083,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
 
             $this->response->process_payment($payment, true);
-
-            PayplugGateway::log(sprintf('Payment process complete for order #%s', $order_id));
 
 			if(($payment->__get('is_paid'))){
 				$redirect =  $order->get_checkout_order_received_url();
