@@ -37,7 +37,7 @@ class PayplugResponse {
 	 * @return void
 	 * @throws \WC_Data_Exception
 	 */
-	public function process_payment($resource, $is_payment_with_token = false, $source = null)
+	public function process_payment($resource, $is_payment_with_token = false, $source = "")
 	{
 		$order_id = wc_clean($resource->metadata['order_id']);
 
