@@ -1802,7 +1802,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function oneclick_available()
     {
-        return $this->user_logged_in()
+        return $this->id === "payplug" && $this->user_logged_in()
             && $this->oneclick
             && $this->permissions->has_permissions(PayplugPermissions::SAVE_CARD);
     }
