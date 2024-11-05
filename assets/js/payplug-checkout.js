@@ -37,7 +37,7 @@
                 e.stopImmediatePropagation();
                 $.post(
                     request_url,
-                    payplug_checkout.$form.serialize()
+                    payplug_checkout.$form.serialize() + "&payplug_non_blocks=true"
                 ).done(function (response) {
                     if (response.result === "failure") {
                         payplug_checkout.$form.unblock();

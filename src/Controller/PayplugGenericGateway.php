@@ -163,6 +163,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	private function process_standard_intent_payment($order){
 
 		if ( !is_wc_endpoint_url('order-pay') &&
+			empty($_POST["payplug_non_blocks"]) &&
 			$this->is_checkout_block() &&
 			(
 				( $this->id === "payplug" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
