@@ -81,6 +81,13 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 2.10.1 =
+* Updated CB logos and images.
+* Removed SOFORT as a payment option.
+* Minor fixes and improvements
+* Tested up to: WooCommerce 9.3.3
+* Tested up to: WordPress 6.6.2
+
 = 2.10.0 =
 * OneClick Payment Support on Blocks
 * Various Bug Fixes and Performance Improvements
