@@ -110,13 +110,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function __construct()
     {
-		$payplug_gateways = array('payplug', 'american_express', 'apple_pay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees', 'satispay', 'sofort', 'ideal', 'mybank');
+		$payplug_gateways = array('payplug', 'american_express', 'apple_pay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees', 'satispay', 'ideal', 'mybank');
 
 		if ((!empty($_GET['section'])) && (in_array($_GET['section'], $payplug_gateways))) {
 			$GLOBALS['hide_save_button'] = true;
 		}
 
-		//TODO: this should be properties of the class and implemented an interface on all classes (set values)
         $this->id                 = 'payplug';
         $this->icon               = '';
         $this->has_fields         = false;
@@ -148,7 +147,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$this->oney_type      = $this->get_option('oney_type', 'with_fees');
 	    $oney_range = PayplugWoocommerceHelper::get_min_max_oney();
 
-		//TODO:: remove this properties from here and add them on Oney classes
 	    $this->min_oney_price = (isset($oney_range['min'])) ? intval($oney_range['min']) : 100;
 	    $this->max_oney_price = (isset($oney_range['max'])) ? intval($oney_range['max']) : 3000;
 	    $this->oney_thresholds_min = $this->get_option('oney_thresholds_min', $this->min_oney_price );
@@ -272,7 +270,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         }
 
         $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express', "satispay","sofort","mybank","ideal" ])) {
+        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express', "satispay","mybank","ideal" ])) {
             return;
         }
 
@@ -605,7 +603,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			'check_payment_url' => \WC_AJAX::get_endpoint('payplug_check_payment')
 		);
 
-		//TODO:: if integrated payment is active please active form and comment the one above
 		/**x
 		 * Integrated payments scripts
 		 */
@@ -664,7 +661,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		if (($this->payment_method == "popup" ) && ($this->id === "payplug") && !$this->is_checkout_block() ) {
 
 			//load popup features
-			//TODO:: if integrated payment is not active please active this and comment the one bellow
 			wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
 			wp_register_script('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [
 				'jquery',
@@ -975,6 +971,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 : $order->set_transaction_id($payment->id);
 
 			$order->set_payment_method( $this->id );
+			$order->set_payment_method_title($this->method_title);
 
             if (is_callable([$order, 'save'])) {
                 $order->save();
@@ -1082,8 +1079,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
 
             $this->response->process_payment($payment, true);
-
-            PayplugGateway::log(sprintf('Payment process complete for order #%s', $order_id));
 
 			if(($payment->__get('is_paid'))){
 				$redirect =  $order->get_checkout_order_received_url();
@@ -1807,7 +1802,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function oneclick_available()
     {
-        return $this->user_logged_in()
+        return $this->id === "payplug" && $this->user_logged_in()
             && $this->oneclick
             && $this->permissions->has_permissions(PayplugPermissions::SAVE_CARD);
     }

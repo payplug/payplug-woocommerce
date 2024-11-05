@@ -47,9 +47,9 @@ HTML;
 				<div class="payplug IntegratedPayment_container -scheme">
 					<div>{$f(__('payplug_integrated_payment_your_card', 'payplug'))}</div>
 					<div class="payplug IntegratedPayment_schemes">
+						<label class="payplug IntegratedPayment_scheme -cb"><input type="radio" name="schemeOptions" value="cb" /><span></span></label>
 						<label class="payplug IntegratedPayment_scheme -visa"><input type="radio" name="schemeOptions" value="visa"/><span></span></label>
 						<label class="payplug IntegratedPayment_scheme -mastercard"><input type="radio" name="schemeOptions" value="mastercard" /><span></span></label>
-						<label class="payplug IntegratedPayment_scheme -cb"><input type="radio" name="schemeOptions" value="cb" /><span></span></label>
 					</div>
 				</div>
 				<div class="payplug IntegratedPayment_container -pan pan-input-container" data-e2e-name="pan"></div>

@@ -1089,9 +1089,6 @@ msgstr "Payer avec Satispay"
 msgid "pay_with_mybank"
 msgstr "Payer avec MyBank"
 
-msgid "pay_with_sofort"
-msgstr "Payer avec SOFORT"
-
 msgid "pay_with_ideal"
 msgstr "Payer avec iDEAL"
 
@@ -1100,9 +1097,6 @@ msgstr "Le montant total de votre panier doit être compris entre %s€ and %s�
 
 msgid "mybank_threshold"
 msgstr "Le montant total de votre panier doit être compris entre %s€ and %s€ pour payer avec MyBank."
-
-msgid "sofort_threshold"
-msgstr "Le montant total de votre panier doit être compris entre %s€ and %s€ pour payer avec SOFORT."
 
 msgid "ideal_threshold"
 msgstr "Le montant total de votre panier doit être compris entre %s€ and %s€ pour payer avec iDEAL."
@@ -1119,12 +1113,6 @@ msgstr "Paiement MyBank"
 msgid "payplug_mybank_more_url"
 msgstr "https://support.payplug.com/hc/fr/articles/8089123857564-MyBank-chez-Payplug"
 
-msgid "payplug_sofort_activate"
-msgstr "Paiement SOFORT"
-
-msgid "payplug_sofort_more_url"
-msgstr "https://support.payplug.com/hc/fr/articles/8089091941660-Sofort-chez-Payplug"
-
 msgid "payplug_ideal_activate"
 msgstr "Paiement iDEAL"
 
@@ -1137,9 +1125,6 @@ msgstr "Satispay n’est pas disponible en mode TEST. Pour l’activer, passez v
 msgid "payplug_mybank_unavailable_testmode_description"
 msgstr "Mybank n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
 
-msgid "payplug_sofort_unavailable_testmode_description"
-msgstr "SOFORT n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
-
 msgid "payplug_ideal_unavailable_testmode_description"
 msgstr "iDeal n’est pas disponible en mode TEST. Pour l’activer, passez votre module Payplug en mode LIVE."
 
@@ -1149,9 +1134,6 @@ msgstr "Permettez à vos clients de payer via Satispay."
 msgid "payplug_section_mybank_payment_description"
 msgstr "Permettez à vos clients de payer via Mybank."
 
-msgid "payplug_section_sofort_payment_description"
-msgstr "Permettez à vos clients de payer via SOFORT."
-
 msgid "payplug_section_ideal_payment_description"
 msgstr "Permettez à vos clients de payer via iDeal."
 
@@ -1160,9 +1142,6 @@ msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer Sat
 
 msgid "payplug_mybank_access_error"
 msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer MyBank, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=8248631711516' target='_blank'>ce formulaire</a>"
-
-msgid "payplug_sofort_access_error"
-msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer SOFORT, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=8248655934108' target='_blank'>ce formulaire</a>"
 
 msgid "payplug_ideal_access_error"
 msgstr "Vous n'avez pas encore accès à cette fonctionnalité. Pour activer iDEAL, rendez-vous sur <a href='https://support.payplug.com/hc/fr/requests/new?ticket_form_id=8248663314844' target='_blank'>ce formulaire</a>"

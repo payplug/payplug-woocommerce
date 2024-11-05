@@ -27,7 +27,6 @@ class Vue {
 			$logged = $this->payplug_section_logged();
 			$payplug = (new PayplugGateway());
 
-			//TODO:: use the same get_option everywhere on the BO
 			$payplug_wooc_settings = get_option( 'woocommerce_payplug_settings', [] );
 
 			if ((empty($payplug_wooc_settings['oney_thresholds_default_min'])) && (empty($payplug_wooc_settings['oney_thresholds_default_max']))) {
@@ -287,7 +286,6 @@ class Vue {
 				PaymentMethods::payment_method_bancontact(!empty($options) && $options['bancontact'] === 'yes'),
 				PaymentMethods::payment_method_satispay(!empty($options) && $options['satispay'] === 'yes'),
 				PaymentMethods::payment_method_mybank(!empty($options) && $options['mybank'] === 'yes'),
-				PaymentMethods::payment_method_sofort(!empty($options) && $options['sofort'] === 'yes'),
 				PaymentMethods::payment_method_ideal(!empty($options) && $options['ideal'] === 'yes'),
 
 			]

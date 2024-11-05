@@ -106,6 +106,23 @@ class PayplugCreditCard extends PayplugGenericBlock
 
 	private function popup_scripts(){
 		wp_register_script('payplug-popup', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
+		if (isset($_GET['pay_for_order'])) {
+			wp_register_script('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [
+				'jquery',
+				'payplug-popup'
+			], PAYPLUG_GATEWAY_VERSION, true);
+		}
+
+		wp_localize_script('payplug-checkout', 'payplug_checkout_params', [
+			'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_order'),
+			'order_review_url' => \WC_AJAX::get_endpoint('payplug_order_review_url'),
+			'nonce'    => [
+				'checkout' => wp_create_nonce('woocommerce-process_checkout'),
+			],
+			'is_embedded' => 'redirect' !== $this->gateway->payment_method
+		]);
+
 		wp_enqueue_script('payplug-popup');
+		wp_enqueue_script('payplug-checkout');
 	}
 }

@@ -23,11 +23,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	public function __construct()
 	{
 		parent::__construct();
-
-		//this is only for PPRo payments
 		add_action('woocommerce_after_order_itemmeta', [$this, 'hide_wc_refund_button']);
-		//TODO:: add requirements here
-
 	}
 
 	/**

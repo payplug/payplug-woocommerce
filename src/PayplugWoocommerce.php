@@ -26,7 +26,6 @@ use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney4x;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney4xWithoutFees;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugSatispay;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugIdeal;
-use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugSofort;
 
 class PayplugWoocommerce {
 
@@ -151,7 +150,6 @@ class PayplugWoocommerce {
 		$methods[] = __NAMESPACE__ . '\\Gateway\\AmericanExpress';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Mybank';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Ideal';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Sofort';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Satispay';
 
 		$methods[] = __NAMESPACE__ . '\\Controller\\ApplePay';
@@ -215,7 +213,6 @@ class PayplugWoocommerce {
 					$payment_method_registry->register( new PayplugSatispay() );
 					$payment_method_registry->register( new PayplugAmex() );
 					$payment_method_registry->register( new PayplugIdeal() );
-					$payment_method_registry->register( new PayplugSofort() );
 					$payment_method_registry->register( new PayplugMybank() );
 					$payment_method_registry->register( new PayplugApplePay() );
 					$payment_method_registry->register( new PayplugOney3x() );
