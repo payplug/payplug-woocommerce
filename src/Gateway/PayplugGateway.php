@@ -658,7 +658,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$this->integrated_payments_scripts();
 		}
 
-		if (($this->payment_method == "popup" ) && ($this->id === "payplug") && !$this->is_checkout_block() ) {
+		if (($this->payment_method == "popup" ) && ($this->id === "payplug" || $this->id === "american_express") && !$this->is_checkout_block() ) {
 
 			//load popup features
 			wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);

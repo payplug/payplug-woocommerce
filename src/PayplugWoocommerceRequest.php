@@ -109,7 +109,7 @@ class PayplugWoocommerceRequest {
 
 		$payment_method = $_POST['payment_method'];
 
-		if($payment_method === 'payplug'){
+		if($payment_method === 'payplug' || $payment_method === 'american_express'){
 			$settings = get_option('woocommerce_payplug_settings', []);
 			$method = $settings['payment_method'];
 
