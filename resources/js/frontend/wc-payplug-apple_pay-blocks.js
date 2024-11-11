@@ -1,14 +1,36 @@
-import { __ } from '@wordpress/i18n';
+//import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect } from '@wordpress/data';
 import { getSetting } from '@woocommerce/settings';
-import { registerPaymentMethod } from '@woocommerce/blocks-registry';
+import { registerPaymentMethod, registerExpressPaymentMethod } from '@woocommerce/blocks-registry';
 import {useEffect, useRef} from "react";
 import {apple_pay_update_payment, getPayment} from "./helper/wc-payplug-apple_pay-requests";
 const settings = getSetting( 'apple_pay_data', {} );
-const defaultLabel = __('Gateway method title', 'payplug');
-const label = decodeEntities( settings?.title ) || defaultLabel;
+//const defaultLabel = __('Gateway method title', 'payplug');
+const label = decodeEntities( settings?.title ) || null;
 
+import ApplePayCart from './wc-payplug-apple_pay_cart-blocks';
+
+/**
+ *
+ * @param props
+ * @returns {JSX.Element}
+ * @Content for express payment method
+ */
+const ExpressContent = (props) => {
+	return (
+		<>
+		<ApplePayCart { ...props } />
+		</>
+	);
+};
+
+/**
+ *
+ * @param props
+ * @returns {JSX.Element}
+ * @constructor
+ */
 const Content = (props) => {
 
 	const { eventRegistration, emitResponse } = props;
@@ -27,8 +49,6 @@ const Content = (props) => {
 			});
 		});
 	},[]);
-
-
 
 	useEffect(() => {
 		const handlePaymentProcessing = async () => {
@@ -162,7 +182,7 @@ const Content = (props) => {
 const Label = () => {
 	return (
 		<span style={{ width: '100%' }}>
-            {label}
+            {label}q
 			<Icon />
         </span>
 	)
@@ -189,5 +209,26 @@ const ApplePay = {
 	},
 };
 
-registerPaymentMethod( ApplePay );
+
+console.log("######");
+console.log(settings?.is_cart);
+console.log("######");
+
+const ExpressApplePay = {
+	name: "apple_pay",
+	content: <ExpressContent />,
+	edit: <ExpressContent />,
+	canMakePayment: () => true,
+	paymentMethodId: "apple_pay",
+
+};
+
+//if(settings?.is_cart){
+	console.log("----->");
+	registerExpressPaymentMethod( ExpressApplePay );
+//}else{
+	registerPaymentMethod( ApplePay );
+
+//}
+
 
