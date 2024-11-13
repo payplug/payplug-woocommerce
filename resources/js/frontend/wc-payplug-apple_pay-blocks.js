@@ -211,11 +211,24 @@ const ExpressApplePay = {
 	content: <ExpressContent />,
 	edit: <ExpressContent />,
 	canMakePayment: (data) => {
-		if ( settings?.is_cart ) {
-			return true;
+
+		if ( !settings?.is_cart ) {
+			return false;
 		}
 
-		return false;
+		let payplug_authorized_carriers = settings.payplug_authorized_carriers;
+		let selected_shipping = data.selectedShippingMethods[0].split(":");
+		let authorized = false;
+
+		payplug_authorized_carriers.forEach(function(item){
+			if (selected_shipping[0] === item){
+				authorized = true
+			}
+		});
+
+
+
+		return authorized;
 	},
 	paymentMethodId: "apple_pay"
 

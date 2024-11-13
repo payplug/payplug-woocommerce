@@ -532,7 +532,7 @@ class ApplePay extends PayplugGateway
 		return $this->cart;
 	}
 
-	private function get_carriers(){
+	public function get_carriers(){
 		return $this->carriers;
 	}
 
