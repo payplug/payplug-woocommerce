@@ -200,19 +200,24 @@ const ApplePay = {
 const ExpressContent = (props) => {
 	return (
 		<>
-			<ApplePayCart { ...props } />
+			<div id="apple-pay-button-wrapper">
+				<apple-pay-button
+					buttonstyle="black"
+					type="pay"
+					locale={settings?.payplug_locale}
+				></apple-pay-button>
+			</div>
+			<ApplePayCart {...props} />
 		</>
 	);
 };
 
-
 const ExpressApplePay = {
 	name: "apple_pay",
-	content: <ExpressContent />,
-	edit: <ExpressContent />,
+	content: <ExpressContent/>,
+	edit: <ExpressContent/>,
 	canMakePayment: (data) => {
-
-		if ( !settings?.is_cart ) {
+		if (!settings?.is_cart) {
 			return false;
 		}
 
@@ -225,8 +230,6 @@ const ExpressApplePay = {
 				authorized = true
 			}
 		});
-
-
 
 		return authorized;
 	},
