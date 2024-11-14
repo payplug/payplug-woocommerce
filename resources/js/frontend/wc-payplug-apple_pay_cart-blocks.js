@@ -17,7 +17,7 @@ const ApplePayCart = ( props ) =>{
 	const { eventRegistration, emitResponse, shippingData } = props;
 	const { onCheckoutValidation, onPaymentSetup, onCheckoutSuccess, onShippingRateSelectSuccess } = eventRegistration;
 
-	let apple_pay = {
+	const apple_pay = {
 		load_order_total: false,
 		ProcessCheckout: function () {
 			apple_pay.PaymentCompleted();
