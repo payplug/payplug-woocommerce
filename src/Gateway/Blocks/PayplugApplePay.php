@@ -2,6 +2,8 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway\Blocks;
 
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+
 class PayplugApplePay extends PayplugGenericBlock
 {
 
