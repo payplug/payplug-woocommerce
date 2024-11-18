@@ -976,9 +976,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                     'order_id'    => $order_id,
                     'customer_id' => ((int) $customer_id > 0) ? $customer_id : 'guest',
                     'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
-					'woocommerce_block' => \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )
                 ],
             ];
+			if (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )) {
+				$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
+			} elseif (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' )) {
+				$payment_data['metadata']['woocommerce_block'] = "CART";
+			}
 
 			if($this->payment_method === 'integrated'){
 				$payment_data['initiator'] = 'PAYER';
