@@ -1,7 +1,6 @@
 import { getSetting } from '@woocommerce/settings';
 import $ from 'jquery';
 const settings = getSetting('apple_pay_data', {});
-import { useEffect } from 'react';
 
 export const getPayment = (props, order_id) => {
 	const data = getPaymentData(props);
@@ -34,22 +33,6 @@ export const apple_pay_update_payment = (data) => {
 			type: 'POST',
 			data: data,
 			url: settings.ajax_url_applepay_update_payment
-		}).success(function (response) {
-			resolve(response);
-
-		}).error(function (xhr, status, error) {
-			reject(error); // NOT WORKING!!
-
-		});
-	});
-}
-
-export const apple_pay_getShippings = (data) =>{
-	return new Promise((resolve, reject) => {
-		$.ajax({
-			type: 'POST',
-			data: data,
-			url: settings.ajax_url_applepay_get_shippings
 		}).success(function (response) {
 			resolve(response);
 

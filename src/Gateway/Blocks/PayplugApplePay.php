@@ -86,10 +86,6 @@ class PayplugApplePay extends PayplugGenericBlock
 	}
 
 	public function get_carriers() {
-		WC()->customer->set_shipping_country('FR');
-		WC()->customer->set_shipping_city('Paris');
-		WC()->customer->set_shipping_postcode('12345');
-		WC()->customer->set_shipping_address('Dummy Address');
 
 		$packages = WC()->cart->get_shipping_packages();
 		$shippings = [];
