@@ -7,6 +7,7 @@ const ApplePayCart = ( props ) =>{
 
 	let session = null;
 	let apple_pay_Session_status = null;
+	const apple_pay_btn = jQuery('apple-pay-button');
 	const apple_pay = {
 		load_order_total: false,
 		OrderPaymentCreated: function (response) {
@@ -52,7 +53,9 @@ const ApplePayCart = ( props ) =>{
 		},
 		CancelOrder: function () {
 			session.oncancel = event => {
-				apple_pay_CancelOrder({'order_id': session.order_id, 'payment_id': session.payment_id});
+				apple_pay_CancelOrder({'order_id': session.order_id, 'payment_id': session.payment_id}).then(() => {
+					enabled_button();
+				});
 			}
 		},
 		BeginSession: function (response) {
@@ -144,11 +147,15 @@ const ApplePayCart = ( props ) =>{
 	jQuery('apple-pay-button').on("click", (e) => {
 		e.preventDefault();
 		e.stopImmediatePropagation();
+		disabled_button();
+
 		apple_pay.CreateSession();
 		apple_pay.CancelOrder();
 		apple_pay_PlaceOrderWithDummyData().then( async (response) => {
 			if (response.payment_data.success === false) {
-				await apple_pay_CancelOrder({'order_id': response.order_id, 'payment_id': response.payment_data.payment_id});
+				apple_pay_CancelOrder({'order_id': response.order_id, 'payment_id': response.payment_data.payment_id}).then(() => {
+					enabled_button();
+				});
 				return;
 			}
 			settings.total = response.total
@@ -160,6 +167,14 @@ const ApplePayCart = ( props ) =>{
 
 		});
 	});
+
+	function disabled_button(){
+		apple_pay_btn.addClass("isDisabled");
+	}
+
+	function enabled_button(){
+		apple_pay_btn.removeClass("isDisabled");
+	}
 
 	return (<>
 		<div id="apple-pay-button-wrapper">
