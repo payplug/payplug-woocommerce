@@ -8,6 +8,7 @@ const ApplePayCart = ( props ) =>{
 	let session = null;
 	let apple_pay_Session_status = null;
 	const apple_pay_btn = jQuery('apple-pay-button');
+	const apple_pay_wrapper = jQuery("#apple-pay-button-wrapper");
 	const apple_pay = {
 		load_order_total: false,
 		OrderPaymentCreated: function (response) {
@@ -103,6 +104,14 @@ const ApplePayCart = ( props ) =>{
 					apple_pay.CancelOrder();
 				}
 			}
+		},
+		AddErrorMessage: function(message){
+			apple_pay_wrapper.append(jQuery('<div class="apple-pay-cart-notice"></div>').append("<span>" + message + "</span>"));
+		},
+		DeleteErrorMessage: function(){
+			setTimeout(function () {
+				jQuery('.apple-pay-cart-notice').contents().first().remove();
+			}, 4000);
 		}
 	}
 
@@ -134,6 +143,8 @@ const ApplePayCart = ( props ) =>{
 
 						if (result_payment.success !== true) {
 							apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
+							apple_pay.AddErrorMessage(result_payment.data.message)
+							apple_pay.DeleteErrorMessage();
 							apple_pay.CancelOrder()
 						}
 						session.completePayment({"status": apple_pay_Session_status})
@@ -152,10 +163,10 @@ const ApplePayCart = ( props ) =>{
 		apple_pay.CreateSession();
 		apple_pay.CancelOrder();
 		apple_pay_PlaceOrderWithDummyData().then( async (response) => {
-			if (response.payment_data.success === false) {
-				apple_pay_CancelOrder({'order_id': response.order_id, 'payment_id': response.payment_data.payment_id}).then(() => {
-					enabled_button();
-				});
+			if (response.success === false) {
+				apple_pay.AddErrorMessage(response.data.message)
+				apple_pay.DeleteErrorMessage();
+				enabled_button();
 				return;
 			}
 			settings.total = response.total
