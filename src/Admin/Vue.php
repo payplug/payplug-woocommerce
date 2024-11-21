@@ -284,9 +284,9 @@ class Vue {
 				PaymentMethods::payment_method_amex(!empty($options) && $options['american_express'] === 'yes'),
 				PaymentMethods::payment_method_applepay(!empty($options) && $options['apple_pay'] === 'yes', $options, $carriers),
 				PaymentMethods::payment_method_bancontact(!empty($options) && $options['bancontact'] === 'yes'),
-				PaymentMethods::payment_method_satispay(!empty($options) && $options['satispay'] === 'yes'),
-				PaymentMethods::payment_method_mybank(!empty($options) && $options['mybank'] === 'yes'),
-				PaymentMethods::payment_method_ideal(!empty($options) && $options['ideal'] === 'yes'),
+				PaymentMethods::payment_method_satispay(!empty($options) && !empty($options['satispay']) && $options['satispay'] === 'yes'),
+				PaymentMethods::payment_method_mybank(!empty($options) && !empty($options['mybank']) && $options['mybank'] === 'yes'),
+				PaymentMethods::payment_method_ideal(!empty($options) && !empty($options['ideal']) && $options['ideal'] === 'yes'),
 
 			]
 		];
@@ -377,14 +377,14 @@ class Vue {
 					"name" => "oney_min_amounts",
 					"value" => $min,
 					"placeholder" => $min,
-					"default" => get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_min']
+					"default" => !empty(get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_min']) ? get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_min'] : 100
 				],
 				"inter" => __( 'and', 'payplug' ),
 				"max_amount" => [
 					"name" => "oney_max_amounts",
 					"value" => $max,
 					"placeholder" => $max,
-					"default" => get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_max']
+					"default" => !empty(get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_max']) ? get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_max'] : 3000
 				],
 				"error" => [
 					"text" => __( 'payplug_thresholds_error_msg', 'payplug' ),

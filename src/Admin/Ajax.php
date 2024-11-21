@@ -391,10 +391,10 @@ class Ajax {
 	 */
 	public function payplug_login(WP_REST_Request $request) {
 
-		$data = $request->get_params();
+		$data = json_decode(file_get_contents('php://input'), true);
 		$email = sanitize_email($data['payplug_email']);
 		$password = base64_decode(wp_unslash($data['payplug_password']));
-		$wp_nonce = $data['_wpnonce'];
+		$wp_nonce = !empty($data['_wpnonce']) ? $data['_wpnonce'] : null;
 
 		delete_option( 'woocommerce_payplug_settings' );
 		delete_site_option( 'woocommerce_payplug_settings' );
@@ -554,7 +554,7 @@ class Ajax {
 
 		if ($payplug->user_logged_in()) {
 
-			$data = $request->get_params();
+			$data = json_decode(file_get_contents('php://input'), true);
 			$options = get_option('woocommerce_payplug_settings', []);
 
 
