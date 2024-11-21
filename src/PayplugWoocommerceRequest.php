@@ -356,9 +356,9 @@ class PayplugWoocommerceRequest {
 			],
 		];
 
-		if (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )) {
+		if (PayplugWoocommerceHelper::is_checkout_block()) {
 			$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
-		} elseif (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' )) {
+		} elseif (PayplugWoocommerceHelper::is_cart_block()) {
 			$payment_data['metadata']['woocommerce_block'] = "CART";
 		}
 

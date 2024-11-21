@@ -818,4 +818,11 @@ class PayplugWoocommerceHelper {
 		return $applepay;
 	}
 
+	public static function is_checkout_block() {
+		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' );
+	}
+
+	public static function is_cart_block() {
+		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' );
+	}
 }

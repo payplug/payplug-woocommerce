@@ -174,7 +174,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
 		if ( !is_wc_endpoint_url('order-pay') &&
 			empty($_POST["payplug_non_blocks"]) &&
-			$this->is_checkout_block() &&
+			PayplugWoocommerceHelper::is_checkout_block() &&
 			(
 				( $this->id === "payplug" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
 				( $this->id === "american_express" && $this->payment_method === 'popup')
@@ -281,9 +281,9 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 				"force_3ds"=> false
 			];
 
-			if (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )) {
+			if (PayplugWoocommerceHelper::is_checkout_block()) {
 				$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
-			} elseif (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' )) {
+			} elseif (PayplugWoocommerceHelper::is_cart_block()) {
 				$payment_data['metadata']['woocommerce_block'] = "CART";
 			}
 

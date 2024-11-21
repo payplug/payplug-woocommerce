@@ -683,13 +683,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		wp_enqueue_style('payplug-checkout');
 
 		if (
-			( $this->payment_method == "integrated" && !$this->is_checkout_block() ) ||
+			( $this->payment_method == "integrated" && !PayplugWoocommerceHelper::is_checkout_block() ) ||
 			($this->payment_method == "integrated" && is_wc_endpoint_url('order-pay') )
 		) {
 			$this->integrated_payments_scripts();
 		}
 
-		if (($this->payment_method == "popup" ) && ($this->id === "payplug" || $this->id === "american_express") && !$this->is_checkout_block() ) {
+		if (($this->payment_method == "popup" ) && ($this->id === "payplug" || $this->id === "american_express") && !PayplugWoocommerceHelper::is_checkout_block() ) {
 
 			//load popup features
 			wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
@@ -868,7 +868,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		//no order-pay page, no ajax_on_order_review_page
 		if ( !is_wc_endpoint_url('order-pay') &&
-			$this->is_checkout_block() &&
+			PayplugWoocommerceHelper::is_checkout_block() &&
 			(
 				( $this->id === "payplug" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
 				( $this->id === "american_express" && $this->payment_method === 'popup')
@@ -978,9 +978,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                     'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
                 ],
             ];
-			if (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )) {
+			if (PayplugWoocommerceHelper::is_checkout_block()) {
 				$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
-			} elseif (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' )) {
+			} elseif (PayplugWoocommerceHelper::is_cart_block()) {
 				$payment_data['metadata']['woocommerce_block'] = "CART";
 			}
 
@@ -1890,13 +1890,4 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	public function setPayplugMerchantCountry($country){
 		$this->payplug_merchant_country = $country;
 	}
-
-	function is_checkout_block() {
-		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' );
-	}
-
-	function is_cart_block() {
-		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' );
-	}
-
 }

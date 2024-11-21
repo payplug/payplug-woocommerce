@@ -53,12 +53,12 @@ class ApplePay extends PayplugGateway
 				$this->enabled = 'yes';
 			}
 
-			if (!is_admin() && is_checkout() && !$this->is_checkout_block() && $this->get_button_checkout()) {
+			if (!is_admin() && is_checkout() && !PayplugWoocommerceHelper::is_checkout_block() && $this->get_button_checkout()) {
 				$this->add_apple_pay_css();
 				add_action('wp_enqueue_scripts', [$this, 'add_apple_pay_js']);
 			}
 
-			if (!is_admin() && $this->get_button_cart() && !$this->is_cart_block()) {
+			if (!is_admin() && $this->get_button_cart() && !PayplugWoocommerceHelper::is_cart_block()) {
 				$this->enabled = 'yes';
 				$this->add_apple_pay_css();
 				add_action('woocommerce_proceed_to_checkout', [$this, "add_apple_pay_cart_js"], 15);
@@ -368,7 +368,7 @@ class ApplePay extends PayplugGateway
 	private function process_standard_intent_payment($order){
 
 		if ( !is_wc_endpoint_url('order-pay') &&
-			$this->is_checkout_block() &&
+			PayplugWoocommerceHelper::is_checkout_block() &&
 			!empty($order->get_transaction_id()) ) {
 
 			$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
@@ -464,9 +464,9 @@ class ApplePay extends PayplugGateway
 				]
 			];
 
-			if (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )) {
+			if (PayplugWoocommerceHelper::is_checkout_block()) {
 				$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
-			} elseif (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' )) {
+			} elseif (PayplugWoocommerceHelper::is_cart_block()) {
 				$payment_data['metadata']['woocommerce_block'] = "CART";
 			}
 
