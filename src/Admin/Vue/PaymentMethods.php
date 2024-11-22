@@ -13,7 +13,7 @@ class PaymentMethods {
 	 */
 	public function payment_method_standard( ) {
 
-		$option = (get_option( 'woocommerce_payplug_settings', [] )['payment_method'] != "") ? get_option( 'woocommerce_payplug_settings', [] )['payment_method'] : "";
+		$option = !empty( get_option( 'woocommerce_payplug_settings', [] )['payment_method'] ) ? get_option( 'woocommerce_payplug_settings', [] )['payment_method'] : "";
 
 		$method = [
 			"redirect" => false,
@@ -56,13 +56,13 @@ class PaymentMethods {
 	}
 
 	private function description_field(){
-		$description = get_option( 'woocommerce_payplug_settings', [] )['description'];
+		$description = !empty(get_option( 'woocommerce_payplug_settings', [] )['description']) ? get_option( 'woocommerce_payplug_settings', [] )['description'] : null;
 		return array(
 			"type"         => "payment_option",
 			"sub_type"     => "input",
 			"name"     	   => "standard_payment_description",
 			"title"		   => __("payplug_standard_payment_description_title", "payplug"),
-			"value"		   => $description ?: null,
+			"value"		   => $description,
 			"descriptions" => [
 				"live"    => [
 					"description"      => __("payplug_standard_payment_description_description", "payplug"),
@@ -76,13 +76,14 @@ class PaymentMethods {
 		);
 	}
 	private function title_field(){
-		$title = get_option( 'woocommerce_payplug_settings', [] )['title'];
+		$title = !empty( get_option( 'woocommerce_payplug_settings', [] )['title'] ) ? get_option( 'woocommerce_payplug_settings', [] )['title'] : __("payplug_standard_payment_title_placeholder", "payplug");
+
 		return array(
 				"type"         => "payment_option",
 				"sub_type"     => "input",
 				"name"     	   => "standard_payment_title",
 				"title"		   => __("payplug_standard_payment_title_title", "payplug"),
-				"value"		   => !empty($title) ? $title : __("payplug_standard_payment_title_placeholder", "payplug"),
+				"value"		   => $title,
 				"descriptions" => [
 					"live"    => [
 						"description"      => __("payplug_standard_payment_title_description", "payplug"),
