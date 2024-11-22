@@ -752,7 +752,7 @@ class PayplugWoocommerceHelper {
 	public static function check_mode(){
 
 		if(empty(get_option( 'woocommerce_payplug_settings', [] ))){
-			return true;
+			return false;
 		}
 
 		return get_option( 'woocommerce_payplug_settings', [] )['mode'] === "yes" ? true : false;
