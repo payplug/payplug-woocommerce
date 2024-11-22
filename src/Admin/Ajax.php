@@ -389,7 +389,7 @@ class Ajax {
 	 *
 	 * @return JSON
 	 */
-	public function payplug_login(WP_REST_Request $request) {
+	public function payplug_login() {
 
 		$data = json_decode(file_get_contents('php://input'), true);
 		$email = sanitize_email($data['payplug_email']);
