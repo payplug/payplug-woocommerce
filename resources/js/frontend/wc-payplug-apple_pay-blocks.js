@@ -200,13 +200,6 @@ const ApplePay = {
 const ExpressContent = (props) => {
 	return (
 		<>
-			<div id="apple-pay-button-wrapper">
-				<apple-pay-button
-					buttonstyle="black"
-					type="pay"
-					locale={settings?.payplug_locale}
-				></apple-pay-button>
-			</div>
 			<ApplePayCart {...props} />
 		</>
 	);

@@ -1858,4 +1858,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' );
 	}
 
+	function is_cart_block() {
+		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' );
+	}
+
 }
