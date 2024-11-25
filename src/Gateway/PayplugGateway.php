@@ -30,6 +30,37 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	const OPTION_NAME = "payplug_config";
 
 	/**
+	 * @var string
+	 */
+	public $mode;
+	/**
+	 * @var bool
+	 */
+	public $debug;
+	/**
+	 * @var string
+	 */
+	public $email;
+	/**
+	 * @var string
+	 */
+	public $payment_method;
+	/**
+	 * @var bool
+	 */
+	public $oneclick;
+
+	/**
+	 * @var string
+	 */
+	public $oney_type;
+
+	/**
+	 * @var string
+	 */
+	public $oney_product_animation;
+
+	/**
      * @var PayplugGatewayRequirements
      */
     private $requirements;
