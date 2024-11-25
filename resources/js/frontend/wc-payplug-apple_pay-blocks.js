@@ -2,9 +2,11 @@ import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect } from '@wordpress/data';
 import { getSetting } from '@woocommerce/settings';
-import { registerPaymentMethod } from '@woocommerce/blocks-registry';
-import {useEffect, useRef} from "react";
+import { registerPaymentMethod, registerExpressPaymentMethod } from '@woocommerce/blocks-registry';
+import {useEffect} from "react";
 import {apple_pay_update_payment, getPayment} from "./helper/wc-payplug-apple_pay-requests";
+import ApplePayCart from './wc-payplug-apple_pay_cart-blocks';
+
 const settings = getSetting( 'apple_pay_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
 const label = decodeEntities( settings?.title ) || defaultLabel;
@@ -188,6 +190,47 @@ const ApplePay = {
 		features: settings.supports
 	},
 };
+
+/**
+ *
+ * @param props
+ * @returns {JSX.Element}
+ * @Content for express payment method
+ */
+const ExpressContent = (props) => {
+	return (
+		<>
+			<ApplePayCart {...props} />
+		</>
+	);
+};
+
+const ExpressApplePay = {
+	name: "apple_pay",
+	content: <ExpressContent/>,
+	edit: <ExpressContent/>,
+	canMakePayment: (data) => {
+		if (!settings?.is_cart) {
+			return false;
+		}
+
+		let payplug_authorized_carriers = settings.payplug_authorized_carriers;
+		let selected_shipping = data.selectedShippingMethods[0].split(":");
+		let authorized = false;
+
+		payplug_authorized_carriers.forEach(function(item){
+			if (selected_shipping[0] === item){
+				authorized = true
+			}
+		});
+
+		return authorized;
+	},
+	paymentMethodId: "apple_pay"
+
+};
+
+registerExpressPaymentMethod( ExpressApplePay );
 
 registerPaymentMethod( ApplePay );
 

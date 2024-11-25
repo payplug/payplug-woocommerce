@@ -53,13 +53,12 @@ class ApplePay extends PayplugGateway
 				$this->enabled = 'yes';
 			}
 
-
 			if (!is_admin() && is_checkout() && !$this->is_checkout_block() && $this->get_button_checkout()) {
 				$this->add_apple_pay_css();
 				add_action('wp_enqueue_scripts', [$this, 'add_apple_pay_js']);
 			}
 
-			if (!is_admin() && $this->get_button_cart()) {
+			if (!is_admin() && $this->get_button_cart() && !$this->is_cart_block()) {
 				$this->enabled = 'yes';
 				$this->add_apple_pay_css();
 				add_action('woocommerce_proceed_to_checkout', [$this, "add_apple_pay_cart_js"], 15);
@@ -528,11 +527,11 @@ class ApplePay extends PayplugGateway
 		return $this->checkout;
 	}
 
-	private function get_button_cart(){
+	public function get_button_cart(){
 		return $this->cart;
 	}
 
-	private function get_carriers(){
+	public function get_carriers(){
 		return $this->carriers;
 	}
 

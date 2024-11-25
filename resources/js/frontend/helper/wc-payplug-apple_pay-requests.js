@@ -1,7 +1,6 @@
 import { getSetting } from '@woocommerce/settings';
 import $ from 'jquery';
 const settings = getSetting('apple_pay_data', {});
-import { useEffect } from 'react';
 
 export const getPayment = (props, order_id) => {
 	const data = getPaymentData(props);
@@ -43,3 +42,64 @@ export const apple_pay_update_payment = (data) => {
 		});
 	});
 }
+
+export const apple_pay_UpdateOrder = (data) =>{
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			type: 'POST',
+			data: data,
+			url: settings.ajax_url_update_applepay_order
+		}).success(function (response) {
+			resolve(response);
+
+		}).error(function (xhr, status, error) {
+			reject(error); // NOT WORKING!!
+		});
+	});
+}
+
+export const apple_pay_Payment = (data) =>{
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			type: 'POST',
+			data: data,
+			url: settings.ajax_url_update_applepay_payment
+		}).success(function (response) {
+			resolve(response);
+
+		}).error(function (xhr, status, error) {
+			reject(error); // NOT WORKING!!
+		});
+	});
+}
+
+export const apple_pay_PlaceOrderWithDummyData = (data) =>{
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			type: 'POST',
+			data: data,
+			url: settings.ajax_url_place_order_with_dummy_data
+		}).success(function (response) {
+			resolve(response);
+
+		}).error(function (xhr, status, error) {
+			reject(error); // NOT WORKING!!
+		});
+	});
+}
+
+export const apple_pay_CancelOrder = (data) =>{
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			type: 'POST',
+			data: data,
+			url: settings.ajax_url_applepay_cancel_order
+		}).success(function (response) {
+			resolve(response);
+
+		}).error(function (xhr, status, error) {
+			reject(error); // NOT WORKING!!
+		});
+	});
+}
+
