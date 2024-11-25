@@ -20,6 +20,16 @@ use Payplug\Resource\Refund as RefundResource;
 class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuilder
 {
 
+	/**
+	 * @var string
+	 */
+	public $image;
+
+	/**
+	 * @var array
+	 */
+	protected $allowed_country_codes;
+
 	public function __construct()
 	{
 		parent::__construct();
