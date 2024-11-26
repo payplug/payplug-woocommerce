@@ -8,7 +8,6 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\Resource\Payment as PaymentResource;
 use function is_cart;
-use function is_checkout;
 
 class ApplePay extends PayplugGateway
 {
@@ -53,7 +52,7 @@ class ApplePay extends PayplugGateway
 				$this->enabled = 'yes';
 			}
 
-			if (!is_admin() && is_checkout() && !PayplugWoocommerceHelper::is_checkout_block() && $this->get_button_checkout()) {
+			if (!is_admin() && $this->available_for_checkout() && !$this->is_checkout_block() && $this->get_button_checkout()) {
 				$this->add_apple_pay_css();
 				add_action('wp_enqueue_scripts', [$this, 'add_apple_pay_js']);
 			}
@@ -323,22 +322,22 @@ class ApplePay extends PayplugGateway
 	 */
 	public function add_apple_pay_js() {
 		wp_enqueue_script( 'apple-pay-sdk', 'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js', array(), false, true );
-			wp_enqueue_script('payplug-apple-pay', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-apple-pay.js',
-				[
-					'jquery',
-					'apple-pay-sdk'
-				], PAYPLUG_GATEWAY_VERSION, true);
-			wp_localize_script( 'payplug-apple-pay', 'apple_pay_params',
-				array(
-					'ajax_url_payplug_create_order' => \WC_AJAX::get_endpoint('payplug_create_order'),
-					'ajax_url_applepay_update_payment' => \WC_AJAX::get_endpoint('applepay_update_payment'),
-					'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
-					'countryCode' => WC()->customer->get_billing_country(),
-					'currencyCode' => get_woocommerce_currency(),
-					'total'  => WC()->cart->total,
-					'apple_pay_domain' => $this->domain_name
-				)
-			);
+		wp_enqueue_script('payplug-apple-pay', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-apple-pay.js',
+			[
+				'jquery',
+				'apple-pay-sdk'
+			], PAYPLUG_GATEWAY_VERSION, true);
+		wp_localize_script( 'payplug-apple-pay', 'apple_pay_params',
+			array(
+				'ajax_url_payplug_create_order' => \WC_AJAX::get_endpoint('payplug_create_order'),
+				'ajax_url_applepay_update_payment' => \WC_AJAX::get_endpoint('applepay_update_payment'),
+				'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
+				'countryCode' => WC()->customer->get_billing_country(),
+				'currencyCode' => get_woocommerce_currency(),
+				'total'  => WC()->cart->total,
+				'apple_pay_domain' => $this->domain_name
+			)
+		);
 	}
 
 	/**
@@ -551,6 +550,15 @@ class ApplePay extends PayplugGateway
 
 	private function set_carriers($carriers){
 		$this->carriers = $carriers;
+	}
+
+	private function available_for_checkout(){
+
+		$page_id = !empty($_GET['page_id']) ? $_GET['page_id'] : null;
+		$checkout_page_id = wc_get_page_id( 'checkout' );
+		$ajax_call = !empty($_GET['wc-ajax']) ? $_GET['wc-ajax'] : null;
+
+		return $page_id == $checkout_page_id || $ajax_call == "update_order_review";
 	}
 
 
