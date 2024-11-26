@@ -155,27 +155,29 @@ const ApplePayCart = ( props ) =>{
 		})
 	}
 
-	jQuery('apple-pay-button').on("click", (e) => {
-		e.preventDefault();
-		e.stopImmediatePropagation();
-		disabled_button();
+	jQuery(function ($) {
+		jQuery('apple-pay-button').on("click", (e) => {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			disabled_button();
 
-		apple_pay.CreateSession();
-		apple_pay.CancelOrder();
-		apple_pay_PlaceOrderWithDummyData().then( async (response) => {
-			if (response.success === false) {
-				apple_pay.AddErrorMessage(response.data.message)
-				apple_pay.DeleteErrorMessage();
-				enabled_button();
-				return;
-			}
-			settings.total = response.total
-			apple_pay.OrderPaymentCreated(response);
+			apple_pay.CreateSession();
+			apple_pay.CancelOrder();
+			apple_pay_PlaceOrderWithDummyData().then(async (response) => {
+				if (response.success === false) {
+					apple_pay.AddErrorMessage(response.data.message)
+					apple_pay.DeleteErrorMessage();
+					enabled_button();
+					return;
+				}
+				settings.total = response.total
+				apple_pay.OrderPaymentCreated(response);
 
-			await CheckPaymentOnPaymentAuthorized().then((res) => {
-				window.location = session.return_url
+				await CheckPaymentOnPaymentAuthorized().then((res) => {
+					window.location = session.return_url
+				});
+
 			});
-
 		});
 	});
 
@@ -187,15 +189,7 @@ const ApplePayCart = ( props ) =>{
 		apple_pay_btn.removeClass("isDisabled");
 	}
 
-	return (<>
-		<div id="apple-pay-button-wrapper">
-			<apple-pay-button
-				buttonstyle="black"
-				type="pay"
-				locale={settings?.payplug_locale}
-			></apple-pay-button>
-		</div>
-	</>)
+	return (<> </>);
 }
 
 export default ApplePayCart;
