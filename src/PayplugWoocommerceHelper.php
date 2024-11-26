@@ -825,4 +825,8 @@ class PayplugWoocommerceHelper {
 	public static function is_cart_block() {
 		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' );
 	}
+
+	public static function is_page_with_blocks() {
+		return has_blocks(get_the_ID());
+	}
 }

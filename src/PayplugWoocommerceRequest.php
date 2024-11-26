@@ -356,10 +356,13 @@ class PayplugWoocommerceRequest {
 			],
 		];
 
-		if (PayplugWoocommerceHelper::is_checkout_block()) {
-			$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
-		} elseif (PayplugWoocommerceHelper::is_cart_block()) {
-			$payment_data['metadata']['woocommerce_block'] = "CART";
+		if (PayplugWoocommerceHelper::is_page_with_blocks()) {
+			if (PayplugWoocommerceHelper::is_checkout_block() && is_checkout()) {
+				$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
+
+			} elseif (PayplugWoocommerceHelper::is_cart_block() && is_cart()) {
+				$payment_data['metadata']['woocommerce_block'] = "CART";
+			}
 		}
 
 		if($this->gateway->id === "apple_pay"){
