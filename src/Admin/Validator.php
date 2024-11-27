@@ -98,7 +98,7 @@ class Validator {
 		}
 
 		if( $cart === "no" && $checkout === "no" ){
-			http_response_code(400);
+			http_response_code(200);
 
 			$arr = [
 				"msg"=>__( 'applepay_cart_checkout_option_validation', 'payplug' ),
@@ -111,7 +111,7 @@ class Validator {
 		}
 
 		if( $cart === "yes" && empty($carriers)){
-			http_response_code(400);
+			http_response_code(200);
 
 			$arr = [
 				"msg"=>__( 'applepay_cart_carrier_enabled', 'payplug' ),
