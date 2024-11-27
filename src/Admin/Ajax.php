@@ -609,7 +609,10 @@ class Ajax {
 				));
 			}else{
 				http_response_code(200);
-				wp_send_json_error("These settings are already saved !");
+				wp_send_json_error([
+					"title" => null,
+					"close" => __( 'payplug_ok', 'payplug' ),
+					"msg" => "These settings are already saved !"]);
 			}
 
 		} else {
