@@ -979,13 +979,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 ],
             ];
 
-			if (PayplugWoocommerceHelper::is_page_with_blocks()) {
-				if (PayplugWoocommerceHelper::is_checkout_block() && is_checkout()) {
-					$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
+			if (PayplugWoocommerceHelper::is_checkout_block() && is_checkout()) {
+				$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
 
-				} elseif (PayplugWoocommerceHelper::is_cart_block() && is_cart()) {
-					$payment_data['metadata']['woocommerce_block'] = "CART";
-				}
+			} elseif (PayplugWoocommerceHelper::is_cart_block() && is_cart()) {
+				$payment_data['metadata']['woocommerce_block'] = "CART";
 			}
 
 			if($this->payment_method === 'integrated'){
