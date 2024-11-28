@@ -352,9 +352,16 @@ class PayplugWoocommerceRequest {
 			'metadata'         => [
 				'order_id'    => $order_id,
 				'customer_id' => ((int) $customer_id > 0) ? $customer_id : 'guest',
-				'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
+				'domain'      => $this->limit_length(esc_url_raw(home_url()), 500)
 			],
 		];
+
+		if (PayplugWoocommerceHelper::is_checkout_block() && is_checkout()) {
+			$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
+
+		} elseif (PayplugWoocommerceHelper::is_cart_block() && is_cart()) {
+			$payment_data['metadata']['woocommerce_block'] = "CART";
+		}
 
 		if($this->gateway->id === "apple_pay"){
 			unset($payment_data["allow_save_card"]);

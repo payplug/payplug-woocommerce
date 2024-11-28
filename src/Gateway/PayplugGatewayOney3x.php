@@ -317,6 +317,12 @@ HTML;
                 ],
             ];
 
+	        if (PayplugWoocommerceHelper::is_checkout_block() && is_checkout()) {
+		        $payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
+
+	        } elseif (PayplugWoocommerceHelper::is_cart_block() && is_cart()) {
+		        $payment_data['metadata']['woocommerce_block'] = "CART";
+	        }
 
             /**
              * Filter the payment data before it's used
