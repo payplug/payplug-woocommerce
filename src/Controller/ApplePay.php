@@ -52,7 +52,7 @@ class ApplePay extends PayplugGateway
 				$this->enabled = 'yes';
 			}
 
-			if (!is_admin() && $this->available_for_checkout() && !$this->is_checkout_block() && $this->get_button_checkout()) {
+			if (!is_admin() && !PayplugWoocommerceHelper::is_checkout_block() && $this->get_button_checkout()) {
 				$this->add_apple_pay_css();
 				add_action('wp_enqueue_scripts', [$this, 'add_apple_pay_js']);
 			}
@@ -335,6 +335,7 @@ class ApplePay extends PayplugGateway
 				'countryCode' => WC()->customer->get_billing_country(),
 				'currencyCode' => get_woocommerce_currency(),
 				'total'  => WC()->cart->total,
+				"is_checkout" => is_checkout(),
 				'apple_pay_domain' => $this->domain_name
 			)
 		);
@@ -551,15 +552,5 @@ class ApplePay extends PayplugGateway
 	private function set_carriers($carriers){
 		$this->carriers = $carriers;
 	}
-
-	private function available_for_checkout(){
-
-		$page_id = !empty($_GET['page_id']) ? $_GET['page_id'] : null;
-		$checkout_page_id = wc_get_page_id( 'checkout' );
-		$ajax_call = !empty($_GET['wc-ajax']) ? $_GET['wc-ajax'] : null;
-
-		return $page_id == $checkout_page_id || $ajax_call == "update_order_review";
-	}
-
 
 }
