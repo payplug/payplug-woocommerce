@@ -275,6 +275,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function validate_payment($id = null, $save_request = true, $ipn = false)
     {
+		global $wp;
+
 		if(!$ipn){
 			if (!is_wc_endpoint_url('order-received') || (empty($_GET['key']) && empty($id)) ) {
 				return;
@@ -286,6 +288,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		} elseif (!empty($id) && !is_object($id)) {
 			$order_id = (int) $id;
+		}
+
+		if (empty($order_id)) {
+			$order_id = apply_filters(
+				'woocommerce_thankyou_order_id',
+				absint($wp->query_vars['order-received'])
+			);
+			if (empty($order_id)) {
+				return;
+			}
 		}
 
 		if (empty($order_id)) {
