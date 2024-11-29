@@ -295,9 +295,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'woocommerce_thankyou_order_id',
 				absint($wp->query_vars['order-received'])
 			);
-			if (empty($order_id)) {
-				return;
-			}
 		}
 
 		if (empty($order_id)) {
