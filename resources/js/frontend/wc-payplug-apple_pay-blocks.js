@@ -7,7 +7,7 @@ import {useEffect} from "react";
 import {apple_pay_update_payment, getPayment} from "./helper/wc-payplug-apple_pay-requests";
 import ApplePayCart from './wc-payplug-apple_pay_cart-blocks';
 
-const settings = getSetting( 'apple_pay_data', {} );
+let settings = getSetting( 'apple_pay_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
 const label = decodeEntities( settings?.title ) || defaultLabel;
 
@@ -217,11 +217,34 @@ const ExpressApplePay = {
 	content: <ExpressContent/>,
 	edit: <ExpressContent/>,
 	canMakePayment: (data) => {
+
+		jQuery(function ($) {
+
+				new Promise((resolve, reject) => {
+					$.ajax({
+						url: settings.ajax_url_applepay_shipping_required_url,
+						type: 'POST',
+						success: function (response) {
+							resolve(response);
+							settings.payplug_apple_pay_shipping_required = response;
+						},
+						error: function (error) {
+							reject(error);
+						}
+					});
+				});
+
+		});
+
 		if (!settings?.is_cart) {
 			return false;
 		}
 
-		let payplug_authorized_carriers = settings.payplug_authorized_carriers;
+		if (!settings?.payplug_apple_pay_shipping_required) {
+			return true;
+		}
+
+		let payplug_authorized_carriers = settings?.payplug_authorized_carriers;
 		let selected_shipping = data.selectedShippingMethods[0].split(":");
 		let authorized = false;
 
