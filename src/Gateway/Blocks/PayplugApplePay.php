@@ -77,7 +77,7 @@ class PayplugApplePay extends PayplugGenericBlock
 			if ( \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' ) ||
 			     \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' ) ) {
 
-				if( $this->gateway->checkApplePay() && $this->gateway->checkDeviceComptability() && $this->gateway->isSSL() ){
+				if( !empty($this->gateway) && $this->gateway->checkApplePay() && $this->gateway->checkDeviceComptability() && $this->gateway->isSSL() ){
 					return true;
 				}
 
