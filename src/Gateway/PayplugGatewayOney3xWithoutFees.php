@@ -38,17 +38,24 @@ class PayplugGatewayOney3xWithoutFees extends PayplugGatewayOney3x
         if ($this->check_oney_is_available() === true) {
 	        $total_price = floatval(WC()->cart->total);
 	        $this->oney_response = $this->api->simulate_oney_payment($total_price,'without_fees');
+
+			if( empty($this->oney_response)){
+				$disable='disable-checkout-icons';
+			}
+
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
             $f = function ($fn) {
                 return $fn;
             };
 
-	        $total_price_oney = floatval($this->oney_response['x3_without_fees']['down_payment_amount']);
-	        foreach ($this->oney_response['x3_without_fees']['installments'] as $installment) {
-		        $total_price_oney = $total_price_oney + floatval($installment['amount']);
-	        }
 
             if(is_array($this->oney_response)) {
+
+	            $total_price_oney = floatval($this->oney_response['x3_without_fees']['down_payment_amount']);
+	            foreach ($this->oney_response['x3_without_fees']['installments'] as $installment) {
+		            $total_price_oney = $total_price_oney + floatval($installment['amount']);
+	            }
+
                 $this->description = <<<HTML
                		<div class="payplug-oney-flex">
                         <div><b>{$f(__('oney_total', 'payplug'))}</b></div>
