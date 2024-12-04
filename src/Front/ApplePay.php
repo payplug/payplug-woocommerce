@@ -446,7 +446,7 @@ class ApplePay {
 
 				//not required if it enters here
 				if ( ! $product->is_virtual() && ! $product->is_downloadable() ) {
-					return true;
+					return wp_send_json(true);
 				}
 
 				$required = false;

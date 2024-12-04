@@ -218,29 +218,13 @@ const ExpressApplePay = {
 	edit: <ExpressContent/>,
 	canMakePayment: (data) => {
 
-		jQuery(function ($) {
-
-				new Promise((resolve, reject) => {
-					$.ajax({
-						url: settings.ajax_url_applepay_shipping_required_url,
-						type: 'POST',
-						success: function (response) {
-							resolve(response);
-							settings.payplug_apple_pay_shipping_required = response;
-						},
-						error: function (error) {
-							reject(error);
-						}
-					});
-				});
-
-		});
+		settings.payplug_apple_pay_shipping_required = data.cartNeedsShipping;
 
 		if (!settings?.is_cart) {
 			return false;
 		}
 
-		if (!settings?.payplug_apple_pay_shipping_required) {
+		if (!data.cartNeedsShipping) {
 			return true;
 		}
 
