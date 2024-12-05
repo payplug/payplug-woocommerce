@@ -99,6 +99,8 @@ class PayplugWoocommerceRequest {
 	 */
 	public function ajax_create_payment() {
 
+		global $wp;
+
 		if ( WC()->cart->is_empty() ) {
 			wp_send_json_error( __( 'Empty cart', 'payplug' ) );
 		}
@@ -124,12 +126,14 @@ class PayplugWoocommerceRequest {
 		$https_referer = $_POST['_wp_http_referer'];
 		$path = parse_url($https_referer);
 		wp_parse_str($path['query'], $output);
-		$order_id = $output['order-pay'];
 
-		if(is_null($order_id)){
+		if (isset($output['order-pay'])) {
+			$order_id = $output['order-pay'];
+		} else {
 			preg_match("/(?<=order-pay\/)\d*/", $path['path'], $matches);
 			$order_id = $matches[0];
 		}
+
 
 		$this->process_order_payment($order_id, $payment_method);
 
