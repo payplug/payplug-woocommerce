@@ -48,10 +48,6 @@ const ApplePayCart = ( props ) =>{
 				"phone",
 				"email"
 			];
-			request.requiredBillingContactFields = [
-				'postalAddress',
-				'name',
-			];
 
 			if (settings.payplug_apple_pay_shipping_required) {
 
