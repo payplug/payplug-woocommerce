@@ -38,14 +38,12 @@ class PayplugApplePay extends PayplugGenericBlock
 		$data['ajax_url_update_applepay_payment'] = \WC_AJAX::get_endpoint('update_applepay_payment');
 		$data['ajax_url_applepay_get_order_totals'] = \WC_AJAX::get_endpoint('applepay_get_order_totals');
 		$data['ajax_url_applepay_cancel_order'] = \WC_AJAX::get_endpoint('applepay_cancel_order');
-		$data['ajax_url_applepay_shipping_required_url'] = \WC_AJAX::get_endpoint('applepay_shipping_required');
 
 		$data['countryCode'] = WC()->customer->get_billing_country();
 		$data['currencyCode'] = get_woocommerce_currency();
 		$data['apple_pay_domain'] = $_SERVER['HTTP_HOST'];
 		$data['payplug_authorized_carriers'] = $this->gateway->get_carriers();
 		$data['payplug_carriers'] = $this->get_carriers();
-		$data['payplug_apple_pay_shipping_required'] = $this->gateway->is_shipping_required();
 
 		return $data;
 	}

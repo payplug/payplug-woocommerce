@@ -17,7 +17,6 @@ class ApplePay {
 		add_action( 'wc_ajax_update_applepay_order', [ $this, 'update_applepay_order' ] );
 		add_action( 'wc_ajax_update_applepay_payment', [ $this, 'update_applepay_payment' ] );
 		add_action( 'wc_ajax_applepay_cancel_order', [ $this, 'applepay_cancel_order' ] );
-		add_action( 'wc_ajax_applepay_shipping_required', [ $this, 'is_shipping_required' ] );
 	}
 
 	public function applepay_get_shippings() {
@@ -435,26 +434,5 @@ class ApplePay {
 
 
 	}
-
-	public function is_shipping_required() {
-		$cart = WC()->cart->get_cart();
-
-		$required = true;
-		foreach ( $cart as $cart_item ) {
-			if ( ! empty( $cart_item['product_id'] ) ) {
-				$product = wc_get_product( $cart_item['product_id'] );
-
-				//not required if it enters here
-				if ( ! $product->is_virtual() && ! $product->is_downloadable() ) {
-					return wp_send_json(true);
-				}
-
-				$required = false;
-			}
-		}
-
-		return wp_send_json($required);
-	}
-
 
 }

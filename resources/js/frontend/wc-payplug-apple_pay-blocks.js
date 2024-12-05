@@ -7,7 +7,7 @@ import {useEffect} from "react";
 import {apple_pay_update_payment, getPayment} from "./helper/wc-payplug-apple_pay-requests";
 import ApplePayCart from './wc-payplug-apple_pay_cart-blocks';
 
-let settings = getSetting( 'apple_pay_data', {} );
+const settings = getSetting( 'apple_pay_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
 const label = decodeEntities( settings?.title ) || defaultLabel;
 
@@ -219,6 +219,7 @@ const ExpressApplePay = {
 	canMakePayment: (data) => {
 
 		settings.payplug_apple_pay_shipping_required = data.cartNeedsShipping;
+		settings.total_amount = data.cartTotals.total_price;
 
 		if (!settings?.is_cart) {
 			return false;
