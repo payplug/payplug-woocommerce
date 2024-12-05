@@ -157,15 +157,18 @@ const ApplePayCart = props => {
         "total": {
           "label": "Apple Pay",
           "type": "final",
-          "amount": props.billing.cartTotal.value / 100
+          "amount": settings.total_amount / 100
         },
-        'shippingMethods': settings.payplug_carriers,
         'applicationData': btoa(JSON.stringify({
           'apple_pay_domain': settings.apple_pay_domain
         })),
-        'requiredBillingContactFields': ['postalAddress', 'name'],
-        'requiredShippingContactFields': ["postalAddress", "name", "phone", "email"]
+        'requiredBillingContactFields': ['postalAddress', 'name']
       };
+      if (settings.payplug_apple_pay_shipping_required) {
+        request.requiredShippingContactFields = ["postalAddress", "name", "phone", "email"];
+        request.requiredBillingContactFields = ['postalAddress', 'name'];
+        request.shippingMethods = settings.payplug_carriers;
+      }
       session = new ApplePaySession(3, request);
     },
     CancelOrder: function () {
@@ -661,10 +664,15 @@ const ExpressApplePay = {
   content: (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(ExpressContent, null),
   edit: (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(ExpressContent, null),
   canMakePayment: data => {
+    settings.payplug_apple_pay_shipping_required = data.cartNeedsShipping;
+    settings.total_amount = data.cartTotals.total_price;
     if (!settings?.is_cart) {
       return false;
     }
-    let payplug_authorized_carriers = settings.payplug_authorized_carriers;
+    if (!data.cartNeedsShipping) {
+      return true;
+    }
+    let payplug_authorized_carriers = settings?.payplug_authorized_carriers;
     let selected_shipping = data.selectedShippingMethods[0].split(":");
     let authorized = false;
     payplug_authorized_carriers.forEach(function (item) {
