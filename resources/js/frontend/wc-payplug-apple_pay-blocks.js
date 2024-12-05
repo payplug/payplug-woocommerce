@@ -217,11 +217,19 @@ const ExpressApplePay = {
 	content: <ExpressContent/>,
 	edit: <ExpressContent/>,
 	canMakePayment: (data) => {
+
+		settings.payplug_apple_pay_shipping_required = data.cartNeedsShipping;
+		settings.total_amount = data.cartTotals.total_price;
+
 		if (!settings?.is_cart) {
 			return false;
 		}
 
-		let payplug_authorized_carriers = settings.payplug_authorized_carriers;
+		if (!data.cartNeedsShipping) {
+			return true;
+		}
+
+		let payplug_authorized_carriers = settings?.payplug_authorized_carriers;
 		let selected_shipping = data.selectedShippingMethods[0].split(":");
 		let authorized = false;
 

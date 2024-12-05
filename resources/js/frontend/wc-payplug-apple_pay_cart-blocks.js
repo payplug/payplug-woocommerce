@@ -32,9 +32,8 @@ const ApplePayCart = ( props ) =>{
 				"total": {
 					"label": "Apple Pay",
 					"type": "final",
-					"amount": props.billing.cartTotal.value/100
+					"amount": settings.total_amount/100
 				},
-				'shippingMethods': settings.payplug_carriers,
 				'applicationData': btoa(JSON.stringify({
 					'apple_pay_domain': settings.apple_pay_domain
 				})),
@@ -42,12 +41,21 @@ const ApplePayCart = ( props ) =>{
 					'postalAddress',
 					'name',
 				],
-				'requiredShippingContactFields' : [
+			}
+
+			if (settings.payplug_apple_pay_shipping_required) {
+				request.requiredShippingContactFields = [
 					"postalAddress",
 					"name",
 					"phone",
 					"email"
-				],
+				];
+				request.requiredBillingContactFields = [
+					'postalAddress',
+					'name',
+				];
+				request.shippingMethods = settings.payplug_carriers;
+
 			}
 			session = new ApplePaySession(3, request);
 
