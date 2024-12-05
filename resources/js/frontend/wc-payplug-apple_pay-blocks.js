@@ -218,6 +218,14 @@ const ExpressApplePay = {
 	edit: <ExpressContent/>,
 	canMakePayment: (data) => {
 
+		settings.payplug_carriers.forEach(function(item){
+
+			if (item.identifier === data.selectedShippingMethods[0].split(":")[0]){
+				item.selected = true;
+			}
+
+		})
+
 		settings.payplug_apple_pay_shipping_required = data.cartNeedsShipping;
 		settings.total_amount = data.cartTotals.total_price;
 
