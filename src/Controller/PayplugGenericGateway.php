@@ -304,6 +304,9 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 				? update_post_meta($order_id, '_transaction_id', $payment->id)
 				: $order->set_transaction_id($payment->id);
 
+			$order->set_payment_method( $this->id );
+			$order->set_payment_method_title($this->method_title);
+
 			if (is_callable([$order, 'save'])) {
 				$order->save();
 			}
