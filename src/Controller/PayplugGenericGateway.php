@@ -410,6 +410,11 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		try {
 			$refund = $this->api->refund_create($transaction_id, $data);
 
+			if($refund->object === "error"){
+				PayplugGateway::log(__('payplug_ppro_flag_error', 'payplug'), 'error');
+				return new \WP_Error('process_refund_error', __('payplug_ppro_flag_error', 'payplug'));
+			}
+
 			/**
 			 * Fires once a refund has been created.
 			 *
