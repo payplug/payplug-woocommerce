@@ -413,6 +413,11 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		try {
 			$refund = $this->api->refund_create($transaction_id, $data);
 
+			if($refund->object === "error"){
+				PayplugGateway::log(__('payplug_ppro_flag_error', 'payplug'), 'error');
+				return new \WP_Error('process_refund_error', __('payplug_ppro_flag_error', 'payplug'));
+			}
+
 			/**
 			 * Fires once a refund has been created.
 			 *
@@ -461,10 +466,14 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	}
 
 
+	/**
+	 * Avoid usage of button refund on the BO
+	 * @return false|void
+	 */
 	public function hide_wc_refund_button(){
 		global $post;
 
-		$payment_methods = ['satispay', 'sofort', 'ideal', 'mybank'];
+		$payment_methods = [];
 
 		if ( class_exists("OrderUtil") && OrderUtil::custom_orders_table_usage_is_enabled() ) {
 			$order_id = !empty($_GET["id"]) ? $_GET["id"] : null;
@@ -506,7 +515,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	 */
 	public function refund_not_available($order)
 	{
-		if ($this->id === $order->get_payment_method() ) {
+		if ($this->id === $order->get_payment_method() && isset($this->enable_refund) && $this->enable_refund === false) {
 			echo "<p style='color: red;'>" . __('payplug_refund_disabled_error', 'payplug') . "</p>";
 		}
 	}

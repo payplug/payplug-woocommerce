@@ -10,7 +10,7 @@ class Satispay  extends PayplugGenericGateway
 	protected $min_thresholds;
 	protected $max_thresholds;
 	protected $allowed_country_codes = [];
-	protected $enable_refund = false;
+	protected $enable_refund = true;
 	const ENABLE_ON_TEST_MODE = false;
 
 	public function __construct()

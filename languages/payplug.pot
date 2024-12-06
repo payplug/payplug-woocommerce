@@ -865,3 +865,8 @@ msgstr "Unable to save the configuration"
 
 msgid "applepay_cart_carrier_enabled"
 msgstr "Please select at least one compatible delivery method for Apple Pay Cart or disable the feature."
+
+msgid "payplug_ppro_flag_error"
+msgstr
+"Refund recorded. It will be processed manually by our team. \n"
+"For more information, please visit our help center."
