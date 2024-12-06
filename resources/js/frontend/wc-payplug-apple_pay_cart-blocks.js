@@ -7,7 +7,6 @@ const ApplePayCart = ( props ) =>{
 
 	let session = null;
 	let apple_pay_Session_status = null;
-	const apple_pay_btn = jQuery('apple-pay-button');
 	const apple_pay_wrapper = jQuery("#apple-pay-button-wrapper");
 	const apple_pay = {
 		load_order_total: false,
@@ -187,11 +186,11 @@ const ApplePayCart = ( props ) =>{
 	});
 
 	function disabled_button(){
-		apple_pay_btn.addClass("isDisabled");
+		jQuery('apple-pay-button').addClass("isDisabled");
 	}
 
 	function enabled_button(){
-		apple_pay_btn.removeClass("isDisabled");
+		jQuery('apple-pay-button').removeClass("isDisabled");
 	}
 
 	return (<> </>);
