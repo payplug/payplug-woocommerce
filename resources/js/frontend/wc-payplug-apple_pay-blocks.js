@@ -229,9 +229,11 @@ const ExpressApplePay = {
 			return true;
 		}
 
+		let selectedShippingMethods = data.selectedShippingMethods[0].split(":");
+
 		settings.payplug_carriers.forEach(function(item){
 
-			if (item.identifier === data.selectedShippingMethods[0].split(":")[0]){
+			if (item.identifier === selectedShippingMethods){
 				item.selected = true;
 			}
 
