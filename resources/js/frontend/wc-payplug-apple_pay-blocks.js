@@ -218,6 +218,17 @@ const ExpressApplePay = {
 	edit: <ExpressContent/>,
 	canMakePayment: (data) => {
 
+		if (!settings?.is_cart) {
+			return false;
+		}
+
+		settings.payplug_apple_pay_shipping_required = data.cartNeedsShipping;
+		settings.total_amount = data.cartTotals.total_price;
+
+		if (!data.cartNeedsShipping) {
+			return true;
+		}
+
 		settings.payplug_carriers.forEach(function(item){
 
 			if (item.identifier === data.selectedShippingMethods[0].split(":")[0]){
@@ -225,17 +236,6 @@ const ExpressApplePay = {
 			}
 
 		})
-
-		settings.payplug_apple_pay_shipping_required = data.cartNeedsShipping;
-		settings.total_amount = data.cartTotals.total_price;
-
-		if (!settings?.is_cart) {
-			return false;
-		}
-
-		if (!data.cartNeedsShipping) {
-			return true;
-		}
 
 		let payplug_authorized_carriers = settings?.payplug_authorized_carriers;
 		let selected_shipping = data.selectedShippingMethods[0].split(":");
