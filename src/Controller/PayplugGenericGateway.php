@@ -84,7 +84,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		}
 
 
-		if(!is_admin()){
+		if(!is_admin() && !PayplugWoocommerceHelper::is_checkout_block()){
 			if (empty(WC()->cart) && !is_admin()) {
 				return false;
 			}
