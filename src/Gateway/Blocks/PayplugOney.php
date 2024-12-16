@@ -2,6 +2,8 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway\Blocks;
 
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+
 class PayplugOney extends PayplugGenericBlock {
 
 	/**
@@ -27,6 +29,10 @@ class PayplugOney extends PayplugGenericBlock {
 		if ( is_checkout() ) {
 			$this->cart = WC()->cart;
 			$this->total_price = floatval( WC()->cart->total );
+		}
+
+		if ( PayplugWoocommerceHelper::is_cart_block() && is_cart() ) {
+			$data['oney_cart_logo'] = '';
 		}
 
 		$data['icon']          = [

@@ -1,5 +1,5 @@
 import {__} from '@wordpress/i18n';
-import {registerPaymentMethod} from '@woocommerce/blocks-registry';
+import {registerPaymentMethod, registerExpressPaymentMethod} from '@woocommerce/blocks-registry';
 import {decodeEntities} from '@wordpress/html-entities';
 import {getSetting} from '@woocommerce/settings';
 import Oney_Simulation from './helper/wc-payplug-oney-simulation';
@@ -62,3 +62,35 @@ let oney_x3_with_fees = {
 };
 
 registerPaymentMethod(oney_x3_with_fees);
+
+(() => {
+	const { registerCheckoutFilters, applyCheckoutFilter } = wc.blocksCheckout;
+	const { select } = wp.data;
+
+	// Register the filter
+	registerCheckoutFilters('my-custom-cart-text', {
+
+		renderCartTotalsBefore: (content) => {
+			console.log(settings);
+			const oney_logo = `<img src="${settings.icon.src}" alt="${settings?.icon.alt}" class="${settings.icon.class}" />`;
+			return content + oney_logo;
+		}
+	});
+
+	// Use the store to get cart data
+	const store = select('wc/store/cart');
+	if (store) {
+		const newContent = applyCheckoutFilter({
+			filterName: 'renderCartTotalsBefore',
+			defaultValue: '',
+			arg: {}
+		});
+
+		// Since we're on the frontend, we might still need to use querySelector
+		// but we can be more specific with the selector
+		const cartTotalsBlock = document.querySelector('.wp-block-woocommerce-cart-order-summary-block');
+		if (cartTotalsBlock) {
+			cartTotalsBlock.innerHTML += newContent;
+		}
+	}
+})();
