@@ -30,6 +30,37 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	const OPTION_NAME = "payplug_config";
 
 	/**
+	 * @var string
+	 */
+	public $mode;
+	/**
+	 * @var bool
+	 */
+	public $debug;
+	/**
+	 * @var string
+	 */
+	public $email;
+	/**
+	 * @var string
+	 */
+	public $payment_method;
+	/**
+	 * @var bool
+	 */
+	public $oneclick;
+
+	/**
+	 * @var string
+	 */
+	public $oney_type;
+
+	/**
+	 * @var string
+	 */
+	public $oney_product_animation;
+
+	/**
      * @var PayplugGatewayRequirements
      */
     private $requirements;
@@ -244,6 +275,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function validate_payment($id = null, $save_request = true, $ipn = false)
     {
+		global $wp;
+
 		if(!$ipn){
 			if (!is_wc_endpoint_url('order-received') || (empty($_GET['key']) && empty($id)) ) {
 				return;
@@ -258,10 +291,24 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		}
 
 		if (empty($order_id)) {
-			$order_id = wc_get_order_id_by_order_key(wc_clean( (!empty($_GET['key']) ? $_GET['key'] : $id) ) );
-			if (empty($order_id)) {
+			$order_id = apply_filters(
+				'woocommerce_thankyou_order_id',
+				absint($wp->query_vars['order-received'])
+			);
+		}
+
+		if (empty($order_id)) {
+
+			if (empty($_GET['key']) && empty($id) && !is_object($id)) {
 				return;
 			}
+
+			$order_id = wc_get_order_id_by_order_key(wc_clean( (!empty($_GET['key']) ? $_GET['key'] : (int) $id) ) );
+
+		}
+
+		if (empty($order_id)) {
+			return;
 		}
 
         $order = wc_get_order($order_id);
@@ -652,13 +699,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		wp_enqueue_style('payplug-checkout');
 
 		if (
-			( $this->payment_method == "integrated" && !$this->is_checkout_block() ) ||
+			( $this->payment_method == "integrated" && !PayplugWoocommerceHelper::is_checkout_block() ) ||
 			($this->payment_method == "integrated" && is_wc_endpoint_url('order-pay') )
 		) {
 			$this->integrated_payments_scripts();
 		}
 
-		if (($this->payment_method == "popup" ) && ($this->id === "payplug") && !$this->is_checkout_block() ) {
+		if (($this->payment_method == "popup" ) && ($this->id === "payplug" || $this->id === "american_express") && !PayplugWoocommerceHelper::is_checkout_block() ) {
 
 			//load popup features
 			wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
@@ -837,7 +884,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		//no order-pay page, no ajax_on_order_review_page
 		if ( !is_wc_endpoint_url('order-pay') &&
-			$this->is_checkout_block() &&
+			PayplugWoocommerceHelper::is_checkout_block() &&
 			(
 				( $this->id === "payplug" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
 				( $this->id === "american_express" && $this->payment_method === 'popup')
@@ -948,6 +995,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 ],
             ];
 
+			if (PayplugWoocommerceHelper::is_checkout_block() && is_checkout()) {
+				$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
+
+			} elseif (PayplugWoocommerceHelper::is_cart_block() && is_cart()) {
+				$payment_data['metadata']['woocommerce_block'] = "CART";
+			}
+
 			if($this->payment_method === 'integrated'){
 				$payment_data['initiator'] = 'PAYER';
 				$payment_data['integration'] = 'INTEGRATED_PAYMENT';
@@ -1055,7 +1109,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                     'order_id'    => $order_id,
                     'customer_id' => ((int) $customer_id > 0) ? $customer_id : 'guest',
                     'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
-                ],
+					'woocommerce_block' => \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )
+				],
             ];
 
             /** This filter is documented in src/Gateway/PayplugGateway */
@@ -1853,9 +1908,4 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	public function setPayplugMerchantCountry($country){
 		$this->payplug_merchant_country = $country;
 	}
-
-	function is_checkout_block() {
-		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' );
-	}
-
 }

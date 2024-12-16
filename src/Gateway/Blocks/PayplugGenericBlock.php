@@ -15,7 +15,9 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
 	public function initialize()
 	{
 		if (class_exists('WC_Blocks_Utils')) {
-			if (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )) {
+			if (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' ) ||
+			    \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' )
+			) {
 				$gateways = WC()->payment_gateways->payment_gateways();
 				$this->gateway = $gateways[$this->name];
 			}
@@ -29,7 +31,14 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
 		if (class_exists('WC_Blocks_Utils')) {
 			if (\WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )) {
 
-				$active = $this->gateway->is_available();
+				if(empty($this->gateway)){
+					return false;
+				}
+
+				$active = false;
+				if ( method_exists( $this->gateway, "is_available" ) ) {
+					$active = $this->gateway->is_available();
+				}
 
 				if ( method_exists( $this->gateway, "checkGateway" ) ) {
 					$active = $this->gateway->checkGateway() && $active;

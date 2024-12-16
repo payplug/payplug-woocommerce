@@ -99,6 +99,8 @@ class PayplugWoocommerceRequest {
 	 */
 	public function ajax_create_payment() {
 
+		global $wp;
+
 		if ( WC()->cart->is_empty() ) {
 			wp_send_json_error( __( 'Empty cart', 'payplug' ) );
 		}
@@ -109,7 +111,7 @@ class PayplugWoocommerceRequest {
 
 		$payment_method = $_POST['payment_method'];
 
-		if($payment_method === 'payplug'){
+		if($payment_method === 'payplug' || $payment_method === 'american_express'){
 			$settings = get_option('woocommerce_payplug_settings', []);
 			$method = $settings['payment_method'];
 
@@ -124,12 +126,14 @@ class PayplugWoocommerceRequest {
 		$https_referer = $_POST['_wp_http_referer'];
 		$path = parse_url($https_referer);
 		wp_parse_str($path['query'], $output);
-		$order_id = $output['order-pay'];
 
-		if(is_null($order_id)){
+		if (isset($output['order-pay'])) {
+			$order_id = $output['order-pay'];
+		} else {
 			preg_match("/(?<=order-pay\/)\d*/", $path['path'], $matches);
 			$order_id = $matches[0];
 		}
+
 
 		$this->process_order_payment($order_id, $payment_method);
 
@@ -352,9 +356,16 @@ class PayplugWoocommerceRequest {
 			'metadata'         => [
 				'order_id'    => $order_id,
 				'customer_id' => ((int) $customer_id > 0) ? $customer_id : 'guest',
-				'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
+				'domain'      => $this->limit_length(esc_url_raw(home_url()), 500)
 			],
 		];
+
+		if (PayplugWoocommerceHelper::is_checkout_block() && is_checkout()) {
+			$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
+
+		} elseif (PayplugWoocommerceHelper::is_cart_block() && is_cart()) {
+			$payment_data['metadata']['woocommerce_block'] = "CART";
+		}
 
 		if($this->gateway->id === "apple_pay"){
 			unset($payment_data["allow_save_card"]);

@@ -14,6 +14,7 @@ use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
+use WC_Blocks_Utils;
 
 /**
  * Helper class.
@@ -750,6 +751,11 @@ class PayplugWoocommerceHelper {
 	}
 
 	public static function check_mode(){
+
+		if(empty(get_option( 'woocommerce_payplug_settings', [] ))){
+			return false;
+		}
+
 		return get_option( 'woocommerce_payplug_settings', [] )['mode'] === "yes" ? true : false;
 	}
 
@@ -811,6 +817,14 @@ class PayplugWoocommerceHelper {
 		];
 
 		return $applepay;
+	}
+
+	public static function is_checkout_block() {
+		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' );
+	}
+
+	public static function is_cart_block() {
+		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' );
 	}
 
 }

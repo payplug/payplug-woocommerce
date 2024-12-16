@@ -37,7 +37,7 @@
                 e.stopImmediatePropagation();
                 $.post(
                     request_url,
-                    payplug_checkout.$form.serialize()
+                    payplug_checkout.$form.serialize() + "&payplug_non_blocks=true"
                 ).done(function (response) {
                     if (response.result === "failure") {
                         payplug_checkout.$form.unblock();
@@ -63,7 +63,7 @@
             payplug_checkout.$form.block({ message: null, overlayCSS: { background: '#fff', opacity: 0.6 } });
             $.post(
                 request_url,
-                payplug_checkout.$form.serialize()
+                payplug_checkout.$form.serialize() + "&payplug_non_blocks=true"
             ).done(payplug_checkout.openModal);
         },
         openModal: function (response) {

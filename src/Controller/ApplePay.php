@@ -8,7 +8,6 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\Resource\Payment as PaymentResource;
 use function is_cart;
-use function is_checkout;
 
 class ApplePay extends PayplugGateway
 {
@@ -53,13 +52,12 @@ class ApplePay extends PayplugGateway
 				$this->enabled = 'yes';
 			}
 
-
-			if (!is_admin() && is_checkout() && !$this->is_checkout_block() && $this->get_button_checkout()) {
+			if (!is_admin() && !PayplugWoocommerceHelper::is_checkout_block() && $this->get_button_checkout()) {
 				$this->add_apple_pay_css();
 				add_action('wp_enqueue_scripts', [$this, 'add_apple_pay_js']);
 			}
 
-			if (!is_admin() && $this->get_button_cart()) {
+			if (!is_admin() && $this->get_button_cart() && !PayplugWoocommerceHelper::is_cart_block()) {
 				$this->enabled = 'yes';
 				$this->add_apple_pay_css();
 				add_action('woocommerce_proceed_to_checkout', [$this, "add_apple_pay_cart_js"], 15);
@@ -98,6 +96,12 @@ class ApplePay extends PayplugGateway
 
 	public function checkApplePay(){
 		$options = PayplugWoocommerceHelper::get_payplug_options();
+
+
+		//check if module is enabled
+		if(!empty($options['enabled']) && 'no' === $options['enabled']){
+			return false;
+		}
 
 		//it's disabled
 		if(isset($options['apple_pay']) && $options['apple_pay'] === "no"){
@@ -318,22 +322,23 @@ class ApplePay extends PayplugGateway
 	 */
 	public function add_apple_pay_js() {
 		wp_enqueue_script( 'apple-pay-sdk', 'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js', array(), false, true );
-			wp_enqueue_script('payplug-apple-pay', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-apple-pay.js',
-				[
-					'jquery',
-					'apple-pay-sdk'
-				], PAYPLUG_GATEWAY_VERSION, true);
-			wp_localize_script( 'payplug-apple-pay', 'apple_pay_params',
-				array(
-					'ajax_url_payplug_create_order' => \WC_AJAX::get_endpoint('payplug_create_order'),
-					'ajax_url_applepay_update_payment' => \WC_AJAX::get_endpoint('applepay_update_payment'),
-					'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
-					'countryCode' => WC()->customer->get_billing_country(),
-					'currencyCode' => get_woocommerce_currency(),
-					'total'  => WC()->cart->total,
-					'apple_pay_domain' => $this->domain_name
-				)
-			);
+		wp_enqueue_script('payplug-apple-pay', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-apple-pay.js',
+			[
+				'jquery',
+				'apple-pay-sdk'
+			], PAYPLUG_GATEWAY_VERSION, true);
+		wp_localize_script( 'payplug-apple-pay', 'apple_pay_params',
+			array(
+				'ajax_url_payplug_create_order' => \WC_AJAX::get_endpoint('payplug_create_order'),
+				'ajax_url_applepay_update_payment' => \WC_AJAX::get_endpoint('applepay_update_payment'),
+				'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
+				'countryCode' => WC()->customer->get_billing_country(),
+				'currencyCode' => get_woocommerce_currency(),
+				'total'  => WC()->cart->total,
+				"is_checkout" => is_checkout(),
+				'apple_pay_domain' => $this->domain_name
+			)
+		);
 	}
 
 	/**
@@ -363,7 +368,7 @@ class ApplePay extends PayplugGateway
 	private function process_standard_intent_payment($order){
 
 		if ( !is_wc_endpoint_url('order-pay') &&
-			$this->is_checkout_block() &&
+			PayplugWoocommerceHelper::is_checkout_block() &&
 			!empty($order->get_transaction_id()) ) {
 
 			$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
@@ -459,6 +464,14 @@ class ApplePay extends PayplugGateway
 				]
 			];
 
+			if (PayplugWoocommerceHelper::is_checkout_block() && is_checkout()) {
+				$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
+
+			} elseif (PayplugWoocommerceHelper::is_cart_block() && is_cart()) {
+				$payment_data['metadata']['woocommerce_block'] = "CART";
+			}
+
+
 			/**
 			 * Filter the payment data before it's used
 			 *
@@ -528,17 +541,16 @@ class ApplePay extends PayplugGateway
 		return $this->checkout;
 	}
 
-	private function get_button_cart(){
+	public function get_button_cart(){
 		return $this->cart;
 	}
 
-	private function get_carriers(){
+	public function get_carriers(){
 		return $this->carriers;
 	}
 
 	private function set_carriers($carriers){
 		$this->carriers = $carriers;
 	}
-
 
 }

@@ -3,6 +3,7 @@
 
 	var $apple_pay_button = $('apple-pay-button')
 	var session = null;
+	var is_checkout = apple_pay_params.is_checkout;
 	var apple_pay = {
 		load_order_total: false,
 		init: function () {
@@ -160,18 +161,22 @@
 		}
 	}
 
-	jQuery(document).on("change click", "[name=payment_method]", applePaycontroller);
+	if( is_checkout ){
+		jQuery(document).on("change click", "[name=payment_method]", applePaycontroller);
 
-	$( document ).ajaxComplete(function() {
-		applePaycontroller();
-	});
+		$( document ).ajaxComplete(function() {
+			applePaycontroller();
+		});
 
-	jQuery("[name=payment_method]").prop("checked", false);
+		jQuery("[name=payment_method]").prop("checked", false);
 
-	//GET ORDER TOTALS ON SHIPPING METHOD SELECTION
-	jQuery( 'body' ).on( 'updated_checkout', function() {
-		apple_pay.getOrderTotals();
-	})
+		//GET ORDER TOTALS ON SHIPPING METHOD SELECTION
+		jQuery( 'body' ).on( 'updated_checkout', function() {
+			apple_pay.getOrderTotals();
+		})
+	}
+
+
 })(jQuery)
 
 

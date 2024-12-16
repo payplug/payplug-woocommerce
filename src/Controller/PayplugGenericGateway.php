@@ -20,6 +20,16 @@ use Payplug\Resource\Refund as RefundResource;
 class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuilder
 {
 
+	/**
+	 * @var string
+	 */
+	public $image;
+
+	/**
+	 * @var array
+	 */
+	protected $allowed_country_codes;
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -74,7 +84,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		}
 
 
-		if(!is_admin()){
+		if(!is_admin() && !PayplugWoocommerceHelper::is_checkout_block()){
 			if (empty(WC()->cart) && !is_admin()) {
 				return false;
 			}
@@ -163,7 +173,8 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	private function process_standard_intent_payment($order){
 
 		if ( !is_wc_endpoint_url('order-pay') &&
-			$this->is_checkout_block() &&
+			empty($_POST["payplug_non_blocks"]) &&
+			PayplugWoocommerceHelper::is_checkout_block() &&
 			(
 				( $this->id === "payplug" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
 				( $this->id === "american_express" && $this->payment_method === 'popup')
@@ -270,6 +281,13 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 				"force_3ds"=> false
 			];
 
+			if (PayplugWoocommerceHelper::is_checkout_block() && is_checkout()) {
+				$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
+
+			} elseif (PayplugWoocommerceHelper::is_cart_block() && is_cart()) {
+				$payment_data['metadata']['woocommerce_block'] = "CART";
+			}
+
 			/**
 			 * Filter the payment data before it's used
 			 *
@@ -285,6 +303,9 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			PayplugWoocommerceHelper::is_pre_30()
 				? update_post_meta($order_id, '_transaction_id', $payment->id)
 				: $order->set_transaction_id($payment->id);
+
+			$order->set_payment_method( $this->id );
+			$order->set_payment_method_title($this->method_title);
 
 			if (is_callable([$order, 'save'])) {
 				$order->save();
@@ -392,6 +413,11 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		try {
 			$refund = $this->api->refund_create($transaction_id, $data);
 
+			if($refund->object === "error"){
+				PayplugGateway::log(__('payplug_ppro_flag_error', 'payplug'), 'error');
+				return new \WP_Error('process_refund_error', __('payplug_ppro_flag_error', 'payplug'));
+			}
+
 			/**
 			 * Fires once a refund has been created.
 			 *
@@ -440,10 +466,14 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	}
 
 
+	/**
+	 * Avoid usage of button refund on the BO
+	 * @return false|void
+	 */
 	public function hide_wc_refund_button(){
 		global $post;
 
-		$payment_methods = ['satispay', 'sofort', 'ideal', 'mybank'];
+		$payment_methods = [];
 
 		if ( class_exists("OrderUtil") && OrderUtil::custom_orders_table_usage_is_enabled() ) {
 			$order_id = !empty($_GET["id"]) ? $_GET["id"] : null;
@@ -485,7 +515,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	 */
 	public function refund_not_available($order)
 	{
-		if ($this->id === $order->get_payment_method() ) {
+		if ($this->id === $order->get_payment_method() && isset($this->enable_refund) && $this->enable_refund === false) {
 			echo "<p style='color: red;'>" . __('payplug_refund_disabled_error', 'payplug') . "</p>";
 		}
 	}
