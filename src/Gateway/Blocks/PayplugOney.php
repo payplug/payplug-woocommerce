@@ -32,7 +32,12 @@ class PayplugOney extends PayplugGenericBlock {
 		}
 
 		if ( PayplugWoocommerceHelper::is_cart_block() && is_cart() ) {
-			$data['oney_cart_logo'] = '';
+			$data['oney_cart_label'] = __( 'OR PAY IN', 'payplug' );
+			if ($this->gateway->settings['oney_type'] == 'without_fees') {
+				$data['oney_cart_logo'] = esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/Oneywithoutfees3x4x.png' );
+			} else {
+				$data['oney_cart_logo'] = esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/lg-3x4xoney.png' );
+			}
 		}
 
 		$data['icon']          = [
