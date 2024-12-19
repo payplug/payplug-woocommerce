@@ -1,4 +1,3 @@
-
 var IntegratedPayment = {
 	props: {
 		cartId: null,
