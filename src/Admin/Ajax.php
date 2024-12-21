@@ -219,7 +219,7 @@ class Ajax {
 		$account = $this->generic_get_account($request, ApplePay::ENABLE_ON_TEST_MODE);
 
 		if ($account['httpResponse']['payment_methods']['apple_pay']['enabled']) {
-			if (in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['httpResponse']['payment_methods']['apple_pay']['allowed_domain_names'])) {
+			if (in_array($_SERVER['HTTP_HOST'], $account['httpResponse']['payment_methods']['apple_pay']['allowed_domain_names'])) {
 				wp_send_json_success(true);
 			}
 
