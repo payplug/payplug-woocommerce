@@ -25,7 +25,7 @@ define('WP_CORE_DIR', $_core_dir);
 require_once dirname(__FILE__) . '/../vendor/autoload.php';
 
 // Load test functions
-require_once '/Users/dghabri/Documents/wordpress/tmp/wordpress-tests-lib/includes/functions.php';
+require_once $_tests_dir . '/includes/functions.php';
 
 tests_add_filter('muplugins_loaded', function() {
 	// Load your plugin - adjust the path based on your plugin's main file name
@@ -41,11 +41,11 @@ tests_add_filter('muplugins_loaded', function() {
 	require_once WP_CORE_DIR . '/wp-content/plugins/woocommerce/woocommerce.php';
 
 	// Load your plugin - adjust the path based on your plugin's main file name
-	require dirname(dirname(__FILE__)) . '/your-plugin-main.php';
+	require dirname(dirname(__FILE__)) . '/payplug.php';
 });
 
 activate_plugin('woocommerce/woocommerce.php');
 
 // Activate your plugin
-$plugin_basename = basename(dirname(dirname(__FILE__))) . '/your-plugin-main.php';
+$plugin_basename = basename(dirname(dirname(__FILE__))) . '/payplug.php';
 activate_plugin($plugin_basename);
