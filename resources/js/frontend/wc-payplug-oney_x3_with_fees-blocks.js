@@ -64,7 +64,6 @@ let oney_x3_with_fees = {
 
 registerPaymentMethod(oney_x3_with_fees);
 
-
 /**
  * Cart page Oney logo
  */
