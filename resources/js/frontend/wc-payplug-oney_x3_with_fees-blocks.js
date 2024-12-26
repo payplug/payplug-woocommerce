@@ -1,9 +1,8 @@
 import {__} from '@wordpress/i18n';
-import {registerPaymentMethod, registerExpressPaymentMethod} from '@woocommerce/blocks-registry';
+import {registerPaymentMethod} from '@woocommerce/blocks-registry';
 import {decodeEntities} from '@wordpress/html-entities';
 import {getSetting} from '@woocommerce/settings';
 import Oney_Simulation from './helper/wc-payplug-oney-simulation';
-import {createRoot} from "react-dom/client";
 
 const settings = getSetting('oney_x3_with_fees_data', {});
 const defaultLabel = __('Gateway method title', 'payplug');
@@ -68,8 +67,11 @@ registerPaymentMethod(oney_x3_with_fees);
  * Cart page Oney logo
  */
 (() => {
-	if (!!window?.wp?.data?.select('wc/store/cart') &&
-		document.body.classList.contains('woocommerce-cart')) {
+	if (
+		!!window?.wp?.data?.select('wc/store/cart') &&
+		document.body.classList.contains('woocommerce-cart')
+	)
+	{
 		const { createElement } = window.wp.element;
 		const { select } = window.wp.data;
 		const { createRoot } = require('react-dom/client');
@@ -82,10 +84,10 @@ registerPaymentMethod(oney_x3_with_fees);
 			let qty = 0;
 
 			cartStore?.getCartData().items.forEach((item) => {
-				qty += item.quantity;
+				qty += parseFloat(item.quantity);
 			});
 
-			let oney_available = '';
+			let oney_available = false;
 			if ((cartTotal >= settings?.requirements['min_threshold']) && (cartTotal <= settings?.requirements['max_threshold']) && (qty <= settings?.requirements['max_quantity'])) {
 				oney_available = true;
 			} else {

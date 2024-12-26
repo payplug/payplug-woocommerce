@@ -164,6 +164,8 @@ module.exports = window["wp"]["i18n"];
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
 /*!**********************************************************************!*\
   !*** ./resources/js/frontend/wc-payplug-oney_x4_with_fees-blocks.js ***!
   \**********************************************************************/
@@ -241,6 +243,8 @@ let oney_x4_with_fees = {
   }
 };
 (0,_woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_2__.registerPaymentMethod)(oney_x4_with_fees);
+})();
+
 /******/ })()
 ;
 //# sourceMappingURL=wc-payplug-oney_x4_with_fees-blocks.js.map
