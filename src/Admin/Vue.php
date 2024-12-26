@@ -17,6 +17,12 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
  */
 class Vue {
 
+	private $options;
+
+	public function __construct() {
+		$this->options = PayplugWoocommerceHelper::get_payplug_options();
+	}
+
 	/**
 	 * @return array
 	 */
@@ -27,26 +33,24 @@ class Vue {
 			$logged = $this->payplug_section_logged();
 			$payplug = (new PayplugGateway());
 
-			$payplug_wooc_settings = get_option( 'woocommerce_payplug_settings', [] );
-
-			if ((empty($payplug_wooc_settings['oney_thresholds_default_min'])) && (empty($payplug_wooc_settings['oney_thresholds_default_max']))) {
-				$payplug_wooc_settings['oney_thresholds_default_min'] = $payplug->min_oney_price;
-				$payplug_wooc_settings['oney_thresholds_default_max'] = $payplug->max_oney_price;
+			if ((empty($this->options['oney_thresholds_default_min'])) && (empty($this->options['oney_thresholds_default_max']))) {
+				$this->options['oney_thresholds_default_min'] = $payplug->min_oney_price;
+				$this->options['oney_thresholds_default_max'] = $payplug->max_oney_price;
 			}
 
-			unset($payplug_wooc_settings["payplug_live_key"]);
-			unset($payplug_wooc_settings["payplug_test_key"]);
-			unset($payplug_wooc_settings["payplug_password"]);
-			unset($payplug_wooc_settings["payplug_merchant_id"]);
+			unset($this->options["payplug_live_key"]);
+			unset($this->options["payplug_test_key"]);
+			unset($this->options["payplug_password"]);
+			unset($this->options["payplug_merchant_id"]);
 
 			return [
-				"payplug_wooc_settings" => $payplug_wooc_settings,
+				"payplug_wooc_settings" => $this->options,
 				"header"           		=> $header,
 				"login"     			=> $this->payplug_section_login(),
 				"logged"           		=> $logged,
-				"payment_methods"  		=> $this->payplug_section_payment_methods($payplug_wooc_settings),
-				"payment_paylater"  	=> $this->payplug_section_paylater($payplug_wooc_settings),
-				"status" 				=> $this->payplug_section_status($payplug_wooc_settings),
+				"payment_methods"  		=> $this->payplug_section_payment_methods($this->options),
+				"payment_paylater"  	=> $this->payplug_section_paylater($this->options),
+				"status" 				=> $this->payplug_section_status($this->options),
 				"footer" 				=> $this->payplug_section_footer(),
 			];
 		}
@@ -224,7 +228,7 @@ class Vue {
 	 * @return array
 	 */
 	public function payplug_section_header() {
-		$enable = ( !empty( get_option( 'woocommerce_payplug_settings', [] )['enabled'] ) && get_option( 'woocommerce_payplug_settings', [] )['enabled'] === "yes") ? true : false;
+		$enable = ( !empty( $this->options['enabled'] ) && $this->options['enabled'] === "yes") ? true : false;
 		$enable = $enable && $this->payplug_requirements();
 		$disabled = !$this->payplug_requirements();
 
@@ -280,7 +284,7 @@ class Vue {
 				]
 			],
 			"options"      => [
-				(new PaymentMethods())->payment_method_standard(),
+				(new PaymentMethods($options))->payment_method_standard(),
 				PaymentMethods::payment_method_amex(!empty($options) && $options['american_express'] === 'yes'),
 				PaymentMethods::payment_method_applepay(!empty($options) && $options['apple_pay'] === 'yes', $options, $carriers),
 				PaymentMethods::payment_method_bancontact(!empty($options) && $options['bancontact'] === 'yes'),
@@ -377,14 +381,14 @@ class Vue {
 					"name" => "oney_min_amounts",
 					"value" => $min,
 					"placeholder" => $min,
-					"default" => !empty(get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_min']) ? get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_min'] : 100
+					"default" => !empty($this->options['oney_thresholds_default_min']) ? $this->options['oney_thresholds_default_min'] : 100
 				],
 				"inter" => __( 'and', 'payplug' ),
 				"max_amount" => [
 					"name" => "oney_max_amounts",
 					"value" => $max,
 					"placeholder" => $max,
-					"default" => !empty(get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_max']) ? get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_max'] : 3000
+					"default" => !empty($this->options['oney_thresholds_default_max']) ? $this->options['oney_thresholds_default_max'] : 3000
 				],
 				"error" => [
 					"text" => __( 'payplug_thresholds_error_msg', 'payplug' ),

@@ -40,7 +40,7 @@ class PayplugGatewayRequirements {
 	 */
 	public function __construct( PayplugGateway $gateway ) {
 		$this->gateway = $gateway;
-		$this->settings = get_option( 'woocommerce_payplug_settings', [] );
+		$this->settings = PayplugWoocommerceHelper::get_payplug_options();
 	}
 
 	/**

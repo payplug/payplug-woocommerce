@@ -16,7 +16,10 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
  */
 class Notices {
 
+	private $options;
+
 	public function __construct() {
+		$this->options = PayplugWoocommerceHelper::get_payplug_options();
 		//add_action( 'admin_notices', [ $this, 'admin_notices' ] );
 		//add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 	}
@@ -27,9 +30,9 @@ class Notices {
      * @return void
 	 */
 	public function admin_enqueue_scripts() {
-		$options          = get_option( 'woocommerce_payplug_settings' );
-		$payplug_test_key = ! empty( $options['payplug_test_key'] ) ? $options['payplug_test_key'] : '';
-		$payplug_live_key = ! empty( $options['payplug_live_key'] ) ? $options['payplug_live_key'] : '';
+
+		$payplug_test_key = ! empty( $this->options['payplug_test_key'] ) ? $this->options['payplug_test_key'] : '';
+		$payplug_live_key = ! empty( $this->options['payplug_live_key'] ) ? $this->options['payplug_live_key'] : '';
 		if ( empty( $payplug_test_key ) && empty( $payplug_live_key ) ) {
 			wp_enqueue_style(
 				'payplug-notice',
@@ -77,10 +80,9 @@ class Notices {
 	}
 
 	public function display_notice() {
-		$options          = get_option( 'woocommerce_payplug_settings' );
-		$testmode         = ( isset( $options['mode'] ) && 'no' === $options['mode'] ) ? true : false;
-		$payplug_test_key = ! empty( $options['payplug_test_key'] ) ? $options['payplug_test_key'] : '';
-		$payplug_live_key = ! empty( $options['payplug_live_key'] ) ? $options['payplug_live_key'] : '';
+		$testmode         = ( isset( $this->options['mode'] ) && 'no' === $this->options['mode'] ) ? true : false;
+		$payplug_test_key = ! empty( $this->options['payplug_test_key'] ) ? $this->options['payplug_test_key'] : '';
+		$payplug_live_key = ! empty( $this->options['payplug_live_key'] ) ? $this->options['payplug_live_key'] : '';
 
 		if ( empty( $payplug_test_key ) && empty( $payplug_live_key ) ) {
 			?>
