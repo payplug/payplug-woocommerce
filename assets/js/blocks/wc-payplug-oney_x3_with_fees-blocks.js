@@ -45,6 +45,38 @@ const Oney_Simulation = ({
 
 /***/ }),
 
+/***/ "./node_modules/react-dom/client.js":
+/*!******************************************!*\
+  !*** ./node_modules/react-dom/client.js ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+
+var m = __webpack_require__(/*! react-dom */ "react-dom");
+if (false) {} else {
+  var i = m.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+  exports.createRoot = function(c, o) {
+    i.usingClientEntryPoint = true;
+    try {
+      return m.createRoot(c, o);
+    } finally {
+      i.usingClientEntryPoint = false;
+    }
+  };
+  exports.hydrateRoot = function(c, h, o) {
+    i.usingClientEntryPoint = true;
+    try {
+      return m.hydrateRoot(c, h, o);
+    } finally {
+      i.usingClientEntryPoint = false;
+    }
+  };
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/react/cjs/react-jsx-runtime.development.js":
 /*!*****************************************************************!*\
   !*** ./node_modules/react/cjs/react-jsx-runtime.development.js ***!
@@ -1413,6 +1445,16 @@ module.exports = window["React"];
 
 /***/ }),
 
+/***/ "react-dom":
+/*!***************************!*\
+  !*** external "ReactDOM" ***!
+  \***************************/
+/***/ ((module) => {
+
+module.exports = window["ReactDOM"];
+
+/***/ }),
+
 /***/ "@woocommerce/blocks-registry":
 /*!******************************************!*\
   !*** external ["wc","wcBlocksRegistry"] ***!
@@ -1532,6 +1574,8 @@ module.exports = window["wp"]["i18n"];
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
 /*!**********************************************************************!*\
   !*** ./resources/js/frontend/wc-payplug-oney_x3_with_fees-blocks.js ***!
   \**********************************************************************/
@@ -1609,6 +1653,112 @@ let oney_x3_with_fees = {
   }
 };
 (0,_woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_1__.registerPaymentMethod)(oney_x3_with_fees);
+
+/**
+ * Cart page Oney logo
+ */
+(() => {
+  if (!!window?.wp?.data?.select('wc/store/cart') && document.body.classList.contains('woocommerce-cart')) {
+    const {
+      createElement
+    } = window.wp.element;
+    const {
+      select
+    } = window.wp.data;
+    const {
+      createRoot
+    } = __webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js");
+    let root = null;
+    const createCustomElement = () => {
+      // Get cart total
+      const cartStore = select('wc/store/cart');
+      let cartTotal = cartStore?.getCartTotals()?.total_price || 0;
+      let qty = 0;
+      cartStore?.getCartData().items.forEach(item => {
+        qty += parseFloat(item.quantity);
+      });
+      let oney_available = false;
+      if (cartTotal >= settings?.requirements['min_threshold'] && cartTotal <= settings?.requirements['max_threshold'] && qty <= settings?.requirements['max_quantity']) {
+        oney_available = true;
+      } else {
+        oney_available = false;
+      }
+      return createElement('div', {
+        className: 'wc-block-components-totals-item payplug-oney',
+        style: {
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }
+      }, [createElement('div', {
+        className: 'oney-message',
+        style: {
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }
+      }, settings.oney_cart_label), createElement('img', {
+        src: settings?.oney_cart_logo,
+        alt: 'Oney Payplug',
+        className: `oney-3x4x ${oney_available ? '' : 'disable-checkout-icons'}`,
+        style: {
+          maxWidth: '50%',
+          height: 'auto',
+          display: 'block',
+          margin: '10px 0'
+        }
+      })]);
+    };
+    const renderCustomContent = () => {
+      try {
+        const cartTotalsBlock = document.querySelector('.wc-block-components-totals-wrapper');
+        if (cartTotalsBlock) {
+          // Look for existing container
+          let container = document.querySelector('.payplug-totals-container');
+          const totalsWrapper = document.querySelector('.wc-block-components-totals-wrapper');
+
+          // Create container if it doesn't exist
+          if (!container) {
+            container = document.createElement('div');
+            container.className = 'payplug-totals-container';
+            totalsWrapper.insertBefore(container, totalsWrapper.firstChild);
+            root = createRoot(container);
+          }
+
+          // Use regular render
+          if (root) {
+            root.render(createCustomElement());
+          }
+        }
+      } catch (error) {
+        console.error('Render error:', error);
+      }
+    };
+
+    // Initial setup
+    const observer = new MutationObserver((mutations, obs) => {
+      if (document.querySelector('.wc-block-components-totals-wrapper') && window.wc?.blocksCheckout) {
+        obs.disconnect();
+        renderCustomContent();
+
+        // Subscribe to store changes
+        wp.data.subscribe(() => {
+          const cartStore = select('wc/store/cart');
+          const cartTotals = cartStore?.getCartTotals();
+          if (cartTotals) {
+            renderCustomContent();
+          }
+        });
+      }
+    });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  }
+})();
+})();
+
 /******/ })()
 ;
 //# sourceMappingURL=wc-payplug-oney_x3_with_fees-blocks.js.map
