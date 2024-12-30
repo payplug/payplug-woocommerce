@@ -126,7 +126,19 @@ class PaymentMethods {
 	 * @return array|bool[]|false[]
 	 */
 	public function one_click_option( $active = null ) {
-		$option = [
+
+		$option = [];
+
+		if (isset($this->options['oneclick'])) {
+			if ($this->options['oneclick'] != 'no') {
+				$option = $option + ["checked" => true];
+			} elseif ($this->options['oneclick'] == 'no') {
+				$option = $option + ["checked" => false];
+			}
+
+		};
+
+		$option = $option + [
 			"type"         => "payment_option",
 			"sub_type"     => "switch",
 			"name"         => "one_click",
@@ -148,14 +160,7 @@ class PaymentMethods {
 				]
 			]
 		];
-		if (isset($this->options['oneclick'])) {
-			if ($this->options['oneclick'] != 'no') {
-				$option = $option + ["checked" => true];
-			} elseif ($this->options['oneclick'] == 'no') {
-				$option = $option + ["checked" => false];
-			}
 
-		}
 		return $option;
 	}
 
