@@ -299,6 +299,8 @@ module.exports = window["wp"]["i18n"];
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
 /*!*********************************************************************!*\
   !*** ./resources/js/frontend/wc-payplug-american_express-blocks.js ***!
   \*********************************************************************/
@@ -372,6 +374,8 @@ const Amex = {
   }
 };
 (0,_woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_2__.registerPaymentMethod)(Amex);
+})();
+
 /******/ })()
 ;
 //# sourceMappingURL=wc-payplug-american_express-blocks.js.map

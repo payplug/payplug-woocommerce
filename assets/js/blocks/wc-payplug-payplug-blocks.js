@@ -592,6 +592,8 @@ module.exports = window["wp"]["i18n"];
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
 /*!****************************************************!*\
   !*** ./resources/js/frontend/wc-payplug-blocks.js ***!
   \****************************************************/
@@ -663,7 +665,7 @@ const Icon = () => {
 /**
  * Payplug payment method config object.
  */
-const wc_payplug_blocks_Payplug = {
+const Payplug = {
   name: "payplug",
   label: (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(Label, null),
   content: (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(Content, null),
@@ -676,7 +678,9 @@ const wc_payplug_blocks_Payplug = {
     showSavedCards: (_settings$showSaveOpt = settings.showSaveOption) !== null && _settings$showSaveOpt !== void 0 ? _settings$showSaveOpt : false
   }
 };
-(0,_woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_2__.registerPaymentMethod)(wc_payplug_blocks_Payplug);
+(0,_woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_2__.registerPaymentMethod)(Payplug);
+})();
+
 /******/ })()
 ;
 //# sourceMappingURL=wc-payplug-payplug-blocks.js.map
