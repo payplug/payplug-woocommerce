@@ -534,23 +534,4 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		}
 	}
 
-	/**
-	 * get threshold values for the current payment method
-	 * @param $account
-	 * @return void
-	 */
-	private function get_thresholds_values($account){
-
-		if(!empty($account["payment_methods"][$this->id]['min_amounts']['EUR'])){
-			$this->min_thresholds = floatval($account["payment_methods"][$this->id]['min_amounts']['EUR']/100);
-
-		}
-
-		if(!empty($account["payment_methods"][$this->id]['max_amounts']['EUR'])){
-			$this->max_thresholds =  floatval($account["payment_methods"][$this->id]['max_amounts']['EUR']/100);
-
-		}
-
-	}
-
 }
