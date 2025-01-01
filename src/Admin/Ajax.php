@@ -569,6 +569,7 @@ class Ajax {
 			$options['oneclick'] = Validator::oneclick($data['enable_one_click']);
 
 			$options['oney'] = Validator::oney($data['enable_oney']);
+			$options['payplug'] = Validator::genericPaymentGateway($data['enable_standard'], "Payplug", $test_mode);
 			$options['bancontact'] = Validator::genericPaymentGateway($data['enable_bancontact'], "Bancontact", $test_mode);
 
 			$options['apple_pay'] = Validator::genericPaymentGateway($data['enable_applepay'], "Apple Pay", $test_mode);
