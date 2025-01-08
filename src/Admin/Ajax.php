@@ -551,11 +551,11 @@ class Ajax {
 	public function payplug_save_data( WP_REST_Request $request ) {
 
 		$payplug = new PayplugGateway();
-
+		$options = $payplug->settings;
 		if ($payplug->user_logged_in()) {
 
 			$data = json_decode(file_get_contents('php://input'), true);
-			$options = get_option('woocommerce_payplug_settings', []);
+
 
 
 			$options['enabled'] = Validator::enabled($data['payplug_enable']);
@@ -597,7 +597,6 @@ class Ajax {
 			if( update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false ) ){
 
 				//delete the transient, so it refresh the permissions on the init
-				$options = get_option('woocommerce_payplug_settings', []);
 				$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
 				delete_transient($transient_key);
 

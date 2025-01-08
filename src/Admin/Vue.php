@@ -17,6 +17,18 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
  */
 class Vue {
 
+	private $options;
+
+	public function __construct() {
+		$payplug = (new PayplugGateway());
+		$this->options = $payplug->settings;
+
+		if ((empty($this->options['oney_thresholds_default_min'])) && (empty($this->options['oney_thresholds_default_max']))) {
+			$this->options['oney_thresholds_default_min'] = $payplug->min_oney_price;
+			$this->options['oney_thresholds_default_max'] = $payplug->max_oney_price;
+		}
+	}
+
 	/**
 	 * @return array
 	 */
@@ -25,28 +37,22 @@ class Vue {
 		if ( PayplugWoocommerceHelper::user_logged_in() ) {
 			$header = $this->payplug_section_header();
 			$logged = $this->payplug_section_logged();
-			$payplug = (new PayplugGateway());
 
-			$payplug_wooc_settings = get_option( 'woocommerce_payplug_settings', [] );
 
-			if ((empty($payplug_wooc_settings['oney_thresholds_default_min'])) && (empty($payplug_wooc_settings['oney_thresholds_default_max']))) {
-				$payplug_wooc_settings['oney_thresholds_default_min'] = $payplug->min_oney_price;
-				$payplug_wooc_settings['oney_thresholds_default_max'] = $payplug->max_oney_price;
-			}
 
-			unset($payplug_wooc_settings["payplug_live_key"]);
-			unset($payplug_wooc_settings["payplug_test_key"]);
-			unset($payplug_wooc_settings["payplug_password"]);
-			unset($payplug_wooc_settings["payplug_merchant_id"]);
+			unset($this->options["payplug_live_key"]);
+			unset($this->options["payplug_test_key"]);
+			unset($this->options["payplug_password"]);
+			unset($this->options["payplug_merchant_id"]);
 
 			return [
-				"payplug_wooc_settings" => $payplug_wooc_settings,
+				"payplug_wooc_settings" => $this->options,
 				"header"           		=> $header,
 				"login"     			=> $this->payplug_section_login(),
 				"logged"           		=> $logged,
-				"payment_methods"  		=> $this->payplug_section_payment_methods($payplug_wooc_settings),
-				"payment_paylater"  	=> $this->payplug_section_paylater($payplug_wooc_settings),
-				"status" 				=> $this->payplug_section_status($payplug_wooc_settings),
+				"payment_methods"  		=> $this->payplug_section_payment_methods($this->options),
+				"payment_paylater"  	=> $this->payplug_section_paylater(),
+				"status" 				=> $this->payplug_section_status($this->options),
 				"footer" 				=> $this->payplug_section_footer(),
 			];
 		}
@@ -224,7 +230,7 @@ class Vue {
 	 * @return array
 	 */
 	public function payplug_section_header() {
-		$enable = ( !empty( get_option( 'woocommerce_payplug_settings', [] )['enabled'] ) && get_option( 'woocommerce_payplug_settings', [] )['enabled'] === "yes") ? true : false;
+		$enable = ( !empty( $this->options['enabled'] ) && $this->options['enabled'] === "yes") ? true : false;
 		$enable = $enable && $this->payplug_requirements();
 		$disabled = !$this->payplug_requirements();
 
@@ -266,7 +272,7 @@ class Vue {
 	 */
 	public function payplug_section_payment_methods($options = array()) {
 
-		$carriers = (!empty($options) && !empty($options['applepay_carriers'])) ? $options['applepay_carriers'] : [];
+		$carriers = (!empty($this->options) && !empty($this->options['applepay_carriers'])) ? $this->options['applepay_carriers'] : [];
 
 		$section = [
 			"name"         => "paymentMethodsBlock",
@@ -280,13 +286,13 @@ class Vue {
 				]
 			],
 			"options"      => [
-				(new PaymentMethods())->payment_method_standard(),
-				PaymentMethods::payment_method_amex(!empty($options) && $options['american_express'] === 'yes'),
-				PaymentMethods::payment_method_applepay(!empty($options) && $options['apple_pay'] === 'yes', $options, $carriers),
-				PaymentMethods::payment_method_bancontact(!empty($options) && $options['bancontact'] === 'yes'),
-				PaymentMethods::payment_method_satispay(!empty($options) && !empty($options['satispay']) && $options['satispay'] === 'yes'),
-				PaymentMethods::payment_method_mybank(!empty($options) && !empty($options['mybank']) && $options['mybank'] === 'yes'),
-				PaymentMethods::payment_method_ideal(!empty($options) && !empty($options['ideal']) && $options['ideal'] === 'yes'),
+				(new PaymentMethods($this->options))->payment_method_standard(),
+				PaymentMethods::payment_method_amex(!empty($this->options) && $this->options['american_express'] === 'yes'),
+				PaymentMethods::payment_method_applepay(!empty($this->options) && $this->options['apple_pay'] === 'yes', $this->options, $carriers),
+				PaymentMethods::payment_method_bancontact(!empty($this->options) && $this->options['bancontact'] === 'yes'),
+				PaymentMethods::payment_method_satispay(!empty($this->options) && !empty($this->options['satispay']) && $this->options['satispay'] === 'yes'),
+				PaymentMethods::payment_method_mybank(!empty($options) && !empty($options['mybank']) && $this->options['mybank'] === 'yes'),
+				PaymentMethods::payment_method_ideal(!empty($this->options) && !empty($this->options['ideal']) && $this->options['ideal'] === 'yes'),
 
 			]
 		];
@@ -299,11 +305,11 @@ class Vue {
 	 *
 	 * @return array
 	 */
-	public function payplug_section_paylater($options = array() ) {
+	public function payplug_section_paylater() {
 
-		$max = !empty($options['oney_thresholds_max']) ? $options['oney_thresholds_max'] : 3000;
-		$min = !empty($options['oney_thresholds_min']) ? $options['oney_thresholds_min'] : 100;
-		$product_page = !empty($options['oney_product_animation']) && $options['oney_product_animation'] === 'yes' ? true : false;
+		$max = !empty($this->options['oney_thresholds_max']) ? $this->options['oney_thresholds_max'] : 3000;
+		$min = !empty($this->options['oney_thresholds_min']) ? $this->options['oney_thresholds_min'] : 100;
+		$product_page = !empty($this->options['oney_product_animation']) && $this->options['oney_product_animation'] === 'yes' ? true : false;
 
 		$section = [
 			"name"         => "paymentMethodsBlock",
@@ -320,7 +326,7 @@ class Vue {
 				"name" => "oney",
 				"title" => __( 'payplug_section_oney_title', 'payplug' ),
 				"image" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/lg-oney.png' ),
-				"checked" => !empty($options) && $options['oney'] === 'yes',
+				"checked" => !empty($this->options) && $this->options['oney'] === 'yes',
 				"descriptions" => [
 					"live"    => [
 						"description"      => __( 'payplug_section_paylater_description_oney', 'payplug' ),
@@ -341,7 +347,7 @@ class Vue {
 						"label" => __( 'payplug_label_with_fees', 'payplug' ),
 						"subText" => __( 'payplug_text_with_fees', 'payplug' ),
 						"value" => "with_fees",
-						"checked" => !empty($options) && $options['oney_type'] === 'with_fees',
+						"checked" => !empty($this->options) && $this->options['oney_type'] === 'with_fees',
 					],
 					[
 						"name" => "payplug_oney_type",
@@ -349,7 +355,7 @@ class Vue {
 						"label" => __( 'payplug_label_without_fees', 'payplug' ),
 						"subText" => __( 'payplug_text_without_fees', 'payplug' ),
 						"value" => "without_fees",
-						"checked" => !empty($options) && $options['oney_type'] === 'without_fees',
+						"checked" => !empty($this->options) && $this->options['oney_type'] === 'without_fees',
 					]
 				],
 				"advanced_options" => [
@@ -377,14 +383,14 @@ class Vue {
 					"name" => "oney_min_amounts",
 					"value" => $min,
 					"placeholder" => $min,
-					"default" => !empty(get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_min']) ? get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_min'] : 100
+					"default" => !empty($this->options['oney_thresholds_default_min']) ? $this->options['oney_thresholds_default_min'] : 100
 				],
 				"inter" => __( 'and', 'payplug' ),
 				"max_amount" => [
 					"name" => "oney_max_amounts",
 					"value" => $max,
 					"placeholder" => $max,
-					"default" => !empty(get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_max']) ? get_option( 'woocommerce_payplug_settings', [] )['oney_thresholds_default_max'] : 3000
+					"default" => !empty($this->options['oney_thresholds_default_max']) ? $this->options['oney_thresholds_default_max'] : 3000
 				],
 				"error" => [
 					"text" => __( 'payplug_thresholds_error_msg', 'payplug' ),

@@ -6,6 +6,17 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 class PaymentMethods {
 
+	private $options;
+
+	public function __construct( $options ) {
+
+		if ( empty( $options )) {
+			$this->options = PayplugWoocommerceHelper::get_payplug_options();
+		} else {
+			$this->options = $options;
+		}
+	}
+
 	/**
 	 * @param $active
 	 *
@@ -13,7 +24,7 @@ class PaymentMethods {
 	 */
 	public function payment_method_standard( ) {
 
-		$option = !empty( get_option( 'woocommerce_payplug_settings', [] )['payment_method'] ) ? get_option( 'woocommerce_payplug_settings', [] )['payment_method'] : "";
+		$option = !empty( $this->options['payment_method'] ) ? $this->options['payment_method'] : "";
 
 		$method = [
 			"redirect" => false,
@@ -56,7 +67,7 @@ class PaymentMethods {
 	}
 
 	private function description_field(){
-		$description = !empty(get_option( 'woocommerce_payplug_settings', [] )['description']) ? get_option( 'woocommerce_payplug_settings', [] )['description'] : null;
+		$description = !empty($this->options['description']) ? $this->options['description'] : null;
 		return array(
 			"type"         => "payment_option",
 			"sub_type"     => "input",
@@ -76,7 +87,7 @@ class PaymentMethods {
 		);
 	}
 	private function title_field(){
-		$title = !empty( get_option( 'woocommerce_payplug_settings', [] )['title'] ) ? get_option( 'woocommerce_payplug_settings', [] )['title'] : __("payplug_standard_payment_title_placeholder", "payplug");
+		$title = !empty( $this->options['title'] ) ? $this->options['title'] : __("payplug_standard_payment_title_placeholder", "payplug");
 
 		return array(
 				"type"         => "payment_option",
@@ -120,7 +131,19 @@ class PaymentMethods {
 	 * @return array|bool[]|false[]
 	 */
 	public function one_click_option( $active = null ) {
-		$option = [
+
+		$option = [];
+
+		if (isset($this->options['oneclick'])) {
+			if ($this->options['oneclick'] != 'no') {
+				$option = $option + ["checked" => true];
+			} elseif ($this->options['oneclick'] == 'no') {
+				$option = $option + ["checked" => false];
+			}
+
+		};
+
+		$option = $option + [
 			"type"         => "payment_option",
 			"sub_type"     => "switch",
 			"name"         => "one_click",
@@ -142,14 +165,7 @@ class PaymentMethods {
 				]
 			]
 		];
-		if (isset(get_option( 'woocommerce_payplug_settings', [] )['oneclick'])) {
-			if (get_option( 'woocommerce_payplug_settings', [] )['oneclick'] != 'no') {
-				$option = $option + ["checked" => true];
-			} elseif (get_option( 'woocommerce_payplug_settings', [] )['oneclick'] == 'no') {
-				$option = $option + ["checked" => false];
-			}
 
-		}
 		return $option;
 	}
 

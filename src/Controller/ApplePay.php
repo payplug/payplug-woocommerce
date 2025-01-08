@@ -95,7 +95,7 @@ class ApplePay extends PayplugGateway
 	 */
 
 	public function checkApplePay(){
-		$options = PayplugWoocommerceHelper::get_payplug_options();
+		$options = $this->settings;
 
 
 		//check if module is enabled
