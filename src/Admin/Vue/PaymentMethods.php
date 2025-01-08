@@ -8,8 +8,13 @@ class PaymentMethods {
 
 	private $options;
 
-	public function __construct($options) {
-		$this->options = $options;
+	public function __construct( $options ) {
+
+		if ( empty( $options )) {
+			$this->options = PayplugWoocommerceHelper::get_payplug_options();
+		} else {
+			$this->options = $options;
+		}
 	}
 
 	/**
