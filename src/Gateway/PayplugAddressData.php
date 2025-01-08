@@ -160,7 +160,7 @@ class PayplugAddressData {
 		$billing_city       = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_city : $order->get_billing_city();
 		$billing_country    = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();
 		$billing_company    = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_company : $order->get_billing_company();
-		if (empty($billing_company)) { 
+		if (empty($billing_company)) {
 			$billing_company = $billing_first_name .' '. $billing_last_name;
 		}
 
@@ -185,7 +185,7 @@ class PayplugAddressData {
 
 		// We need to know if current cart contain products we will be shipped to the customer
 		// to set the correct `delivery_type` value
-		if ( WC()->cart->needs_shipping() ) {
+		if ( $order->needs_shipping_address()) {
 			$has_shipping_address = PayplugWoocommerceHelper::is_pre_30()
 				? $order->shipping_address_1
 				: $order->get_shipping_address_1();
@@ -201,7 +201,7 @@ class PayplugAddressData {
 				$shipping_city     = PayplugWoocommerceHelper::is_pre_30() ? $order->shipping_city : $order->get_shipping_city();
 				$shipping_country  = PayplugWoocommerceHelper::is_pre_30() ? $order->shipping_country : $order->get_shipping_country();
 				$shipping_company = PayplugWoocommerceHelper::is_pre_30() ? $order->shipping_company : $order->get_shipping_company();
-                
+
                 if (empty($shipping_company)) {
                     $shipping_company = $shipping_first_name .' '. $shipping_last_name;
                 }

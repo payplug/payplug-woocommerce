@@ -222,6 +222,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_action('wp_enqueue_scripts', [$this, 'scripts']);
 		add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
+		add_action('woocommerce_scheduled_subscription_payment_' . $this->id,
+			array($this, 'scheduled_subscription_payment'), 10, 2);
 	}
 
 	/**
@@ -1918,4 +1920,35 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	public function setPayplugMerchantCountry($country){
 		$this->payplug_merchant_country = $country;
 	}
+
+	/**
+	 * Process the subscription payment
+	 */
+	public function process_subscription_payment($order, $amount) {
+		// Your payment processing code here
+		// Return true if payment successful, false if failed
+		PayplugGateway::log(
+			sprintf(
+				'Order  : An error occurred while retrieving the payment data with the message : '
+			));
+		var_dump($order, $amount);
+		die();
+	}
+
+	/**
+	 * Process the subscription payment
+	 */
+	public function scheduled_subscription_payment($amount, $order) {
+		// Your payment processing code here
+		// Return true if payment successful, false if failed
+		$tokens = WC_Payment_Tokens::get_customer_tokens(get_current_user_id(), 'payplug');
+		$first_token = reset($tokens);
+		$payment_token_id = $first_token->get_id();
+		$amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($amount);
+		return $this->process_payment_with_token($order, $amount, get_current_user_id(), $payment_token_id);
+
+	}
+
+
+
 }
