@@ -20,7 +20,13 @@ class Vue {
 	private $options;
 
 	public function __construct() {
-		$this->options = PayplugWoocommerceHelper::get_payplug_options();
+		$payplug = (new PayplugGateway());
+		$this->options = $payplug->settings;
+
+		if ((empty($this->options['oney_thresholds_default_min'])) && (empty($this->options['oney_thresholds_default_max']))) {
+			$this->options['oney_thresholds_default_min'] = $payplug->min_oney_price;
+			$this->options['oney_thresholds_default_max'] = $payplug->max_oney_price;
+		}
 	}
 
 	/**
@@ -31,12 +37,8 @@ class Vue {
 		if ( PayplugWoocommerceHelper::user_logged_in() ) {
 			$header = $this->payplug_section_header();
 			$logged = $this->payplug_section_logged();
-			$payplug = (new PayplugGateway());
 
-			if ((empty($this->options['oney_thresholds_default_min'])) && (empty($this->options['oney_thresholds_default_max']))) {
-				$this->options['oney_thresholds_default_min'] = $payplug->min_oney_price;
-				$this->options['oney_thresholds_default_max'] = $payplug->max_oney_price;
-			}
+
 
 			unset($this->options["payplug_live_key"]);
 			unset($this->options["payplug_test_key"]);

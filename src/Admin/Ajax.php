@@ -551,7 +551,7 @@ class Ajax {
 	public function payplug_save_data( WP_REST_Request $request ) {
 
 		$payplug = new PayplugGateway();
-		$options = PayplugWoocommerceHelper::get_payplug_options();
+		$options = $payplug->settings;
 		if ($payplug->user_logged_in()) {
 
 			$data = json_decode(file_get_contents('php://input'), true);
