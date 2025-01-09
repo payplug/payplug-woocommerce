@@ -45,7 +45,7 @@ class PayplugCreditCard extends PayplugGateway {
 			$this->has_fields = true;
 		}
 
-		$this->enabled = $this->settings[$this->id];
+		$this->enabled = empty($this->settings[$this->id]) || $this->settings[$this->id];
 
 		add_action('wp_enqueue_scripts', [$this, 'scripts']);
 
