@@ -141,7 +141,7 @@ class PayplugWoocommerce {
 	 * @return array
 	 */
 	public function register_payplug_gateway( $methods ) {
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGateway';
+		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugCreditCard';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3x';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4x';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3xWithoutFees';

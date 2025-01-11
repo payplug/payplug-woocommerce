@@ -22,9 +22,9 @@ class PaymentMethods {
 	 *
 	 * @return array
 	 */
-	public function payment_method_standard( ) {
+	public function payment_method_standard() {
 
-		$option = !empty( $this->options['payment_method'] ) ? $this->options['payment_method'] : "";
+		$options = !empty(get_option( 'woocommerce_payplug_settings', [] )) ? get_option( 'woocommerce_payplug_settings', [] ) : "";
 
 		$method = [
 			"redirect" => false,
@@ -32,19 +32,20 @@ class PaymentMethods {
 			"integrated" => false,
 		];
 
-		switch($option){
+		$payment_method = !empty( $options ) ? $options['payment_method'] : "";
+		switch($payment_method){
 			case "popup" : $method["popup"] = true;break;
 			case "integrated" : $method["integrated"] = true;break;
 			default: $method["redirect"] = true;break;
 		}
 
+		$active = (empty($options['payplug'])) || ( $options['payplug'] === 'yes' ) ;
 		return [
 			"type"         => "payment_method",
 			"name"         => "standard",
 			"title"        => __( 'payplug_section_standard_payment_title', 'payplug' ),
 			"image"        => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/standard.svg' ),
-			"checked"      => true,
-			"hide"			=> true,
+			"checked"      => $active,
 			"available_test_mode" => true,
 			"descriptions" => [
 				"live"    => [
