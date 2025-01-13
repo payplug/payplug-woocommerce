@@ -4,7 +4,7 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 4.4
 Tested up to: 6.7.1
 Requires PHP: 5.6
-Stable tag: 2.11.0
+Stable tag: 2.11.1
 VueJs Payplug UI lib tag: 1.7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -81,6 +81,13 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 2.11.1 =
+* Added Oney logo on blocks on cart.
+* Improved Bedrock structure compatibility.
+* Various improvements
+* Tested up to: WooCommerce 9.5.2
+* Tested up to: WordPress 6.7.1
+
 = 2.11.0 =
 * New feature: Apple Pay as an express payment method on cart block.
 * Performance improvements and optimizations.
