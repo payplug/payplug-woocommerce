@@ -19,6 +19,7 @@ use Payplug\Resource\Refund as RefundResource;
 use WC_Blocks_Utils;
 use WC_Payment_Gateway_CC;
 use WC_Payment_Tokens;
+use WC_Subscriptions_Renewal_Order;
 
 /**
  * PayPlug WooCommerce Gateway.
@@ -150,6 +151,30 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$GLOBALS['hide_save_button'] = true;
 		}
 
+        $this->id                 = 'payplug';
+        $this->icon               = '';
+        $this->has_fields         = false;
+        $this->method_title       = _x('PayPlug', 'Gateway method title', 'payplug');
+        $this->method_description = __('Enable PayPlug for your customers.', 'payplug');
+        $this->supports           = array(
+            'products',
+            'refunds',
+            'tokenization',
+
+			'subscriptions',
+			'subscription_cancellation',
+			'subscription_suspension',
+			'subscription_reactivation',
+			'subscription_amount_changes',
+			'subscription_date_changes',
+			'subscription_payment_method_change',
+			'subscription_payment_method_change_customer',
+			'subscription_payment_method_change_admin',
+			'multiple_subscriptions',
+
+        );
+        $this->new_method_label   = __('Pay with another credit card', 'payplug');
+
         $this->init_settings();
         $this->requirements = new PayplugGatewayRequirements($this);
         if ($this->user_logged_in()) {
@@ -182,10 +207,146 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
         self::$log_enabled = $this->debug;
 
-        add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
+        // Ensure the description is not empty to correctly display users's save cards
+        if (empty($this->description) && 0 !== count($this->get_tokens()) && $this->oneclick_available()) {
+            $this->description = ' ';
+        }
+
+
+        if ('test' === $this->mode) {
+            $this->description .= " \n";
+            $this->description .= __('You are in TEST MODE. In test mode you can use the card 4242424242424242 with any valid expiration date and CVC.', 'payplug');
+            $this->description = trim($this->description);
+        }
+
+		//add fields of IP to the description
+		if($this->payment_method === 'integrated'){
+			$this->has_fields = true;
+		}
+
+		// Check if subscriptions are enabled and add support for them.
+		if(PayplugWoocommerceHelper::is_subscriptions_enabled()){
+			add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id,
+				[ $this, 'process_subscription_payment' ], 10, 2 );
+
+		}
+
+		add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
+        add_action('wp_enqueue_scripts', [$this, 'scripts']);
 		add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
 	}
+
+	public function process_subscription_payment( $amount_to_charge, $renewal_order ){
+
+		$customer_id = PayplugWoocommerceHelper::is_pre_30() ? $renewal_order->customer_user : $renewal_order->get_customer_id();
+		$parent_order = WC_Subscriptions_Renewal_Order::get_parent_order( $renewal_order->id );
+		$tokens = WC_Payment_Tokens::get_order_tokens($parent_order);
+		$payment_tokens = $parent_order->get_payment_tokens();
+
+		return $this->process_payment_subscriptions($renewal_order, $amount_to_charge, $customer_id, $payment_tokens[0]);
+
+// treat the results
+
+// finished
+
+	}
+
+	public function process_payment_subscriptions( $order, $amount, $customer_id, $token_id ){
+
+		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
+		$payment_token = WC_Payment_Tokens::get($token_id);
+
+		$amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total());
+		$amount      = $this->validate_order_amount($amount);
+
+		try {
+			$address_data = PayplugAddressData::from_order( $order );
+
+			$return_url = esc_url_raw( $order->get_checkout_order_received_url() );
+
+			if ( ! ( substr( $return_url, 0, 4 ) === "http" ) ) {
+				$return_url = get_site_url() . $return_url;
+			}
+
+			$payment_data = [
+				'amount'   => $amount,
+				'currency' => get_woocommerce_currency(),
+
+				//this is subscription payment
+				'payment_method'   => $payment_token->get_token(),
+				'initiator'        => 'MERCHANT',
+
+				'billing'          => $address_data->get_billing(),
+				'shipping'         => $address_data->get_shipping(),
+				'hosted_payment'   => [
+					'return_url' => $return_url,
+					'cancel_url' => esc_url_raw( $order->get_cancel_order_url_raw() ),
+				],
+				'notification_url' => esc_url_raw( WC()->api_request_url( 'PayplugGateway' ) ),
+				'metadata'         => [
+					'order_id'    => $order_id,
+					'customer_id' => ( (int) $customer_id > 0 ) ? $customer_id : 'guest',
+					'domain'      => $this->limit_length( esc_url_raw( home_url() ), 500 ),
+				],
+			];
+
+			/**
+			 * Filter the payment data before it's used
+			 *
+			 * @param array $payment_data
+			 * @param int $order_id
+			 * @param array $customer_details
+			 * @param PayplugAddressData $address_data
+			 */
+			$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
+			$payment      = $this->api->payment_create($payment_data);
+
+			// Save transaction id for the order
+			PayplugWoocommerceHelper::is_pre_30()
+				? update_post_meta($order_id, '_transaction_id', $payment->id)
+				: $order->set_transaction_id($payment->id);
+
+			$order->set_payment_method( $this->id );
+			$order->set_payment_method_title($this->method_title);
+
+			if (is_callable([$order, 'save'])) {
+				$order->save();
+			}
+
+			/**
+			 * Fires once a payment has been created.
+			 *
+			 * @param int $order_id Order ID
+			 * @param PaymentResource $payment Payment resource
+			 */
+			\do_action('payplug_gateway_payment_created', $order_id, $payment);
+
+			$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
+			PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
+
+			PayplugGateway::log(sprintf('Payment creation complete for order #%s', $order_id));
+
+			if(ob_get_length() > 0){
+				ob_clean();
+			}
+
+			return [
+				'payment_id' => $payment->id,
+				'result'   => 'success',
+				'is_paid'  => $payment->__get('is_paid'), // Use for path redirect before DSP2
+			];
+
+		} catch (HttpException $e) {
+			PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
+			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+		} catch (\Exception $e) {
+			PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, $e->getMessage()), 'error');
+			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+		}
+
+	}
+
 
 	/**
 	 * @param $option
@@ -835,7 +996,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$payment_data = [
                 'amount'           => $amount,
                 'currency'         => get_woocommerce_currency(),
-                'allow_save_card'  => $this->oneclick_available() && (int) $customer_id > 0,
+
+                'allow_save_card'  => false,
+				'save_card'  	   => true,
+				"force_3ds"		   => true,
+
                 'billing'          => $address_data->get_billing(),
                 'shipping'         => $address_data->get_shipping(),
                 'hosted_payment'   => [
@@ -946,6 +1111,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			if (!(substr( $return_url, 0, 4 ) === "http")) {
 				$return_url = get_site_url().$return_url;
 			}
+
+			//TODO:: save token id onto Order
+			$order->add_payment_token($payment_token);
 
             $payment_data = [
                 'amount'           => $amount,

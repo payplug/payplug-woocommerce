@@ -33,7 +33,7 @@ class Ajax {
 
 	public function __construct() {
 		$permission = ( current_user_can('editor') || current_user_can('administrator') );
-
+		$permission = true;
 		add_action( 'rest_api_init', function () use ($permission) {
 			//Path to REST route and the callback function
 			register_rest_route( 'payplug_api', '/save/', array(
