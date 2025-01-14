@@ -22,6 +22,8 @@ class PayplugCreditCard extends PayplugGateway {
 		$this->description        = $this->get_option('description');
 		$this->oneclick       = (('yes' === $this->get_option('oneclick', 'no')) && (is_user_logged_in()));
 		$this->payment_method = $this->get_option('payment_method');
+		$this->domain_name = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : strtr(get_site_url(), array("http://" => "", "https://" => "")) ;
+
 		$this->supports           = array(
 			'products',
 			'refunds',
