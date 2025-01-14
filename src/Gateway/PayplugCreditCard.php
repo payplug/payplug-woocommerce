@@ -27,6 +27,17 @@ class PayplugCreditCard extends PayplugGateway {
 			'products',
 			'refunds',
 			'tokenization',
+
+			'subscriptions',
+			'subscription_cancellation',
+			'subscription_suspension',
+			'subscription_reactivation',
+			'subscription_amount_changes',
+			'subscription_date_changes',
+			'subscription_payment_method_change',
+			'subscription_payment_method_change_customer',
+			'subscription_payment_method_change_admin',
+			'multiple_subscriptions',
 		);
 
 		// Ensure the description is not empty to correctly display users's save cards
@@ -54,6 +65,13 @@ class PayplugCreditCard extends PayplugGateway {
 		}
 
 		add_action('wp_enqueue_scripts', [$this, 'scripts']);
+
+		// Check if subscriptions are enabled and add support for them.
+		if(PayplugWoocommerceHelper::is_subscriptions_enabled()){
+			add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id,
+				[ $this, 'process_subscription_payment' ], 10, 2 );
+
+		}
 
 
 	}

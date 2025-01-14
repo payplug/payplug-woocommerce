@@ -151,30 +151,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$GLOBALS['hide_save_button'] = true;
 		}
 
-        $this->id                 = 'payplug';
-        $this->icon               = '';
-        $this->has_fields         = false;
-        $this->method_title       = _x('PayPlug', 'Gateway method title', 'payplug');
-        $this->method_description = __('Enable PayPlug for your customers.', 'payplug');
-        $this->supports           = array(
-            'products',
-            'refunds',
-            'tokenization',
-
-			'subscriptions',
-			'subscription_cancellation',
-			'subscription_suspension',
-			'subscription_reactivation',
-			'subscription_amount_changes',
-			'subscription_date_changes',
-			'subscription_payment_method_change',
-			'subscription_payment_method_change_customer',
-			'subscription_payment_method_change_admin',
-			'multiple_subscriptions',
-
-        );
-        $this->new_method_label   = __('Pay with another credit card', 'payplug');
-
         $this->init_settings();
         $this->requirements = new PayplugGatewayRequirements($this);
         if ($this->user_logged_in()) {
@@ -206,35 +182,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_filter('woocommerce_get_customer_payment_tokens', [$this, 'filter_tokens'], 10, 3);
 
         self::$log_enabled = $this->debug;
-
-        // Ensure the description is not empty to correctly display users's save cards
-        if (empty($this->description) && 0 !== count($this->get_tokens()) && $this->oneclick_available()) {
-            $this->description = ' ';
-        }
-
-
-        if ('test' === $this->mode) {
-            $this->description .= " \n";
-            $this->description .= __('You are in TEST MODE. In test mode you can use the card 4242424242424242 with any valid expiration date and CVC.', 'payplug');
-            $this->description = trim($this->description);
-        }
-
-		//add fields of IP to the description
-		if($this->payment_method === 'integrated'){
-			$this->has_fields = true;
-		}
-
-		// Check if subscriptions are enabled and add support for them.
-		if(PayplugWoocommerceHelper::is_subscriptions_enabled()){
-			add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id,
-				[ $this, 'process_subscription_payment' ], 10, 2 );
-
-		}
-
 		add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
-        add_action('wp_enqueue_scripts', [$this, 'scripts']);
 		add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
+
 	}
 
 	public function process_subscription_payment( $amount_to_charge, $renewal_order ){
