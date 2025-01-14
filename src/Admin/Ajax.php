@@ -219,7 +219,7 @@ class Ajax {
 		$account = $this->generic_get_account($request, ApplePay::ENABLE_ON_TEST_MODE);
 
 		if ($account['httpResponse']['payment_methods']['apple_pay']['enabled']) {
-			if (in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['httpResponse']['payment_methods']['apple_pay']['allowed_domain_names'])) {
+			if (in_array($_SERVER['HTTP_HOST'], $account['httpResponse']['payment_methods']['apple_pay']['allowed_domain_names'])) {
 				wp_send_json_success(true);
 			}
 
@@ -551,11 +551,11 @@ class Ajax {
 	public function payplug_save_data( WP_REST_Request $request ) {
 
 		$payplug = new PayplugGateway();
-
+		$options = $payplug->settings;
 		if ($payplug->user_logged_in()) {
 
 			$data = json_decode(file_get_contents('php://input'), true);
-			$options = get_option('woocommerce_payplug_settings', []);
+
 
 
 			$options['enabled'] = Validator::enabled($data['payplug_enable']);
@@ -569,6 +569,7 @@ class Ajax {
 			$options['oneclick'] = Validator::oneclick($data['enable_one_click']);
 
 			$options['oney'] = Validator::oney($data['enable_oney']);
+			$options['payplug'] = Validator::genericPaymentGateway($data['enable_standard'], "Payplug", false);
 			$options['bancontact'] = Validator::genericPaymentGateway($data['enable_bancontact'], "Bancontact", $test_mode);
 
 			$options['apple_pay'] = Validator::genericPaymentGateway($data['enable_applepay'], "Apple Pay", $test_mode);
@@ -597,7 +598,6 @@ class Ajax {
 			if( update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false ) ){
 
 				//delete the transient, so it refresh the permissions on the init
-				$options = get_option('woocommerce_payplug_settings', []);
 				$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
 				delete_transient($transient_key);
 

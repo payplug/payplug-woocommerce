@@ -111,7 +111,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 	const ENABLE_ON_TEST_MODE = true;
 
-
 	/**
      * Logging method.
      *
@@ -141,48 +140,41 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function __construct()
     {
+		//required plugin id
+		$this->id = 'payplug';
+
 		$payplug_gateways = array('payplug', 'american_express', 'apple_pay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees', 'satispay', 'ideal', 'mybank');
 
+		//save buttom admin
 		if ((!empty($_GET['section'])) && (in_array($_GET['section'], $payplug_gateways))) {
 			$GLOBALS['hide_save_button'] = true;
 		}
-
-        $this->id                 = 'payplug';
-        $this->icon               = '';
-        $this->has_fields         = false;
-        $this->method_title       = _x('PayPlug', 'Gateway method title', 'payplug');
-        $this->method_description = __('Enable PayPlug for your customers.', 'payplug');
-        $this->supports           = array(
-            'products',
-            'refunds',
-            'tokenization',
-        );
-        $this->new_method_label   = __('Pay with another credit card', 'payplug');
 
         $this->init_settings();
         $this->requirements = new PayplugGatewayRequirements($this);
         if ($this->user_logged_in()) {
             $this->init_payplug();
+
         }else{
 			delete_option('woocommerce_payplug_settings');
 			set_transient( PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', [])), null );
 		}
 
-        $this->title          = $this->get_option('title');
-        $this->description    = $this->get_option('description');
         $this->mode           = 'yes' === $this->get_option('mode', 'no') ? 'live' : 'test';
         $this->debug          = 'yes' === $this->get_option('debug', 'no');
         $this->email          = $this->get_option('email');
-        $this->payment_method = $this->get_option('payment_method');
-        $this->oneclick       = (('yes' === $this->get_option('oneclick', 'no')) && (is_user_logged_in()));
+
 		$this->oney_type      = $this->get_option('oney_type', 'with_fees');
 	    $oney_range = PayplugWoocommerceHelper::get_min_max_oney();
-
 	    $this->min_oney_price = (isset($oney_range['min'])) ? intval($oney_range['min']) : 100;
 	    $this->max_oney_price = (isset($oney_range['max'])) ? intval($oney_range['max']) : 3000;
 	    $this->oney_thresholds_min = $this->get_option('oney_thresholds_min', $this->min_oney_price );
 	    $this->oney_thresholds_max = $this->get_option('oney_thresholds_max', $this->max_oney_price );
+
+		//admin form
         $this->init_form_fields();
+
+		//used for oney
         $this->payplug_merchant_country = PayplugWoocommerceHelper::get_payplug_merchant_country();
         $this->oney_product_animation = $this->get_option('oney_product_animation');
 
@@ -190,26 +182,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
         self::$log_enabled = $this->debug;
 
-
-        // Ensure the description is not empty to correctly display users's save cards
-        if (empty($this->description) && 0 !== count($this->get_tokens()) && $this->oneclick_available()) {
-            $this->description = ' ';
-        }
-
-
-        if ('test' === $this->mode) {
-            $this->description .= " \n";
-            $this->description .= __('You are in TEST MODE. In test mode you can use the card 4242424242424242 with any valid expiration date and CVC.', 'payplug');
-            $this->description = trim($this->description);
-        }
-
-		//add fields of IP to the description
-		if($this->payment_method === 'integrated'){
-			$this->has_fields = true;
-		}
-
         add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
-        add_action('wp_enqueue_scripts', [$this, 'scripts']);
 		add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
 	}
@@ -360,30 +333,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				$this->validate_payment($order_id, false);
 			};
 		}
-    }
-
-    /**
-     * Get payment icons.
-     *
-     * @return string
-     */
-    public function get_icon()
-    {
-
-        $src = ('it_IT' === get_locale())
-            ? PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_PostePay.svg'
-            : PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_CB.svg';
-
-        $icons = apply_filters('payplug_payment_icons', [
-            'payplug' => sprintf('<img src="%s" alt="Visa & Mastercard" class="payplug-payment-icon" />', esc_url($src)),
-        ]);
-
-        $icons_str = '';
-        foreach ($icons as $icon) {
-            $icons_str .= $icon;
-        }
-
-        return $icons_str;
     }
 
     /**
@@ -634,100 +583,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
     }
 
-	public function integrated_payments_scripts(){
-
-		$translations = array(
-			"cardholder" =>  __('payplug_integrated_payment_cardholder', 'payplug'),
-			"your_card" =>  __('payplug_integrated_payment_your_card', 'payplug'),
-			"card_number" =>  __('payplug_integrated_payment_card_number', 'payplug'),
-			"expiration_date" =>  __('payplug_integrated_payment_expiration_date', 'payplug'),
-			"cvv" =>  __('payplug_integrated_payment_cvv', 'payplug'),
-			"one_click" =>  __('payplug_integrated_payment_oneClick', 'payplug'),
-			'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_order'),
-			'order_review_url' => \WC_AJAX::get_endpoint('payplug_order_review_url'),
-			'nonce'    =>  wp_create_nonce('woocommerce-process_checkout'),
-			'mode' => PayplugWoocommerceHelper::check_mode(), // true for TEST, false for LIVE
-			'check_payment_url' => \WC_AJAX::get_endpoint('payplug_check_payment')
-		);
-
-		/**x
-		 * Integrated payments scripts
-		 */
-		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
-
-		wp_register_script('payplug-domain', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-domain.js', [], 'v1.0');
-		wp_enqueue_script('payplug-domain');
-
-		wp_register_script('payplug-integrated-payments-api', 'https://cdn.payplug.com/js/integrated-payment/v1@1/index.js', [], 'v1.1', true);
-		wp_enqueue_script('payplug-integrated-payments-api');
-
-		wp_register_script( 'jquery-bind-first', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/jquery.bind-first-0.2.3.min.js', array( 'jquery' ), '1.0.0', true );
-		wp_enqueue_script('jquery-bind-first');
-
-		wp_register_script('payplug-integrated-payments', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-integrated-payments.js', ['jquery', 'jquery-bind-first', 'payplug-integrated-payments-api'], 'v1.1', true);
-		wp_enqueue_script('payplug-integrated-payments');
-
-		wp_localize_script( 'payplug-integrated-payments', 'payplug_integrated_payment_params', $translations);
-	}
-
 	/**
-	 * Embedded payment form scripts.
-	 *
-	 * Register scripts and additionnal data needed for the
-	 * embedded payment form.
-	 */
-	public function scripts()
-	{
-		if (!is_cart() && !is_checkout() && !isset($_GET['pay_for_order']) && !is_add_payment_method_page() && !isset($_GET['change_payment_method'])) {
-			return;
-		}
-
-		// If PayPlug is not enabled bail.
-		if ('no' === $this->enabled) {
-			return;
-		}
-
-		// If keys are not set bail.
-		if (empty($this->get_api_key($this->mode))) {
-			PayplugGateway::log('Keys are not set correctly.');
-
-			return;
-		}
-
-		// Register checkout styles.
-		wp_register_style('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-checkout.css', [], PAYPLUG_GATEWAY_VERSION);
-		wp_enqueue_style('payplug-checkout');
-
-		if (
-			( $this->payment_method == "integrated" && !PayplugWoocommerceHelper::is_checkout_block() ) ||
-			($this->payment_method == "integrated" && is_wc_endpoint_url('order-pay') )
-		) {
-			$this->integrated_payments_scripts();
-		}
-
-		if (($this->payment_method == "popup" ) && ($this->id === "payplug" || $this->id === "american_express") && !PayplugWoocommerceHelper::is_checkout_block() ) {
-
-			//load popup features
-			wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
-			wp_register_script('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [
-				'jquery',
-				'payplug'
-			], PAYPLUG_GATEWAY_VERSION, true);
-			wp_localize_script('payplug-checkout', 'payplug_checkout_params', [
-				'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_order'),
-				'order_review_url' => \WC_AJAX::get_endpoint('payplug_order_review_url'),
-				'nonce'    => [
-					'checkout' => wp_create_nonce('woocommerce-process_checkout'),
-				],
-				'is_embedded' => 'redirect' !== $this->payment_method
-			]);
-
-			wp_enqueue_script('payplug-checkout');
-		}
-
-    }
-
-    /**
      * Filter saved tokens for the gateway.
      *
      * A token will be removed if :
@@ -794,16 +650,15 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         return $tokens;
     }
 
+	/**
+	 * extra payment fields
+	 */
     public function payment_fields()
     {
         $description = $this->get_description();
 
 		if (!empty($description)) {
 			echo wpautop(wptexturize($description));
-		}
-
-		if(($this->payment_method === 'integrated') && ($this->id == 'payplug')){
-				echo IntegratedPayment::template_form($this->oneclick);
 		}
 
         if ($this->oneclick_available()) {
@@ -1367,420 +1222,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     }
 
     /**
-     * Generate Hidden HTML.
-     *
-     * @param string $key
-     * @param array $data
-     *
-     * @return string
-     */
-    public function generate_hidden_html($key, $data)
-    {
-        $field_key = $this->get_field_key($key);
-        $defaults  = array(
-            'title'             => '',
-            'disabled'          => false,
-            'class'             => '',
-            'css'               => '',
-            'placeholder'       => '',
-            'type'              => 'text',
-            'desc_tip'          => false,
-            'description'       => '',
-            'custom_attributes' => array(),
-        );
-
-        $data = wp_parse_args($data, $defaults);
-
-        ob_start();
-        ?>
-        <input type="<?php echo esc_attr($data['type']); ?>" name="<?php echo esc_attr($field_key); ?>" id="<?php echo esc_attr($field_key); ?>" value="<?php echo esc_attr($this->get_option($key)); ?>" />
-    <?php
-
-        return ob_get_clean();
-    }
-
-    /**
-     * Generate Yes/No Input HTML.
-     *
-     * @param string $key
-     * @param array $data
-     *
-     * @return string
-     */
-    public function generate_yes_no_html($key, $data)
-    {
-        $field_key = $this->get_field_key($key);
-        $defaults  = array(
-            'title'             => '',
-            'no'                => 'No',
-            'yes'               => 'Yes',
-            'disabled'          => false,
-            'class'             => '',
-            'css'               => '',
-            'placeholder'       => '',
-            'type'              => 'text',
-            'desc_tip'          => false,
-            'description'       => '',
-            'custom_attributes' => [],
-            'hide_label'        => false,
-        );
-
-        $data    = wp_parse_args($data, $defaults);
-        $checked = 'yes' === $this->get_option($key) ? '1' : '0';
-
-        ob_start();
-    ?>
-        <tr valign="top">
-            <?php if (!$data['hide_label']) : ?>
-                <th scope="row" class="titledesc">
-                    <label for="<?php echo esc_attr($field_key); ?>">
-                        <?php echo wp_kses_post($data['title']); ?>
-                        <?php echo $this->get_tooltip_html($data); ?>
-                    </label>
-                </th>
-            <?php endif; ?>
-            <td class="forminp">
-                <fieldset>
-                    <legend class="screen-reader-text"><span><?php echo wp_kses_post($data['title']); ?></span>
-                    </legend>
-                    <div class="radio--custom">
-                        <input class="radio radio-yes <?php echo esc_attr($data['class']); ?>" type="radio" name="<?php echo esc_attr($field_key); ?>" id="<?php echo esc_attr($field_key); ?>-yes" value="1" <?php checked('1', $checked); ?> <?php disabled($data['disabled'], true); ?> <?php echo $this->get_custom_attribute_html($data); ?>>
-                        <label for="<?php echo esc_attr($field_key); ?>-yes"><?php echo esc_html($data['yes']); ?></label>
-                    </div>
-                    <div class="radio--custom">
-                        <input class="radio radio-no <?php echo esc_attr($data['class']); ?>" type="radio" name="<?php echo esc_attr($field_key); ?>" id="<?php echo esc_attr($field_key); ?>-no" value="0" <?php checked('0', $checked); ?> <?php disabled($data['disabled'], true); ?> <?php echo $this->get_custom_attribute_html($data); ?>>
-                        <label for="<?php echo esc_attr($field_key); ?>-no"><?php echo esc_html($data['no']); ?></label>
-                    </div>
-                    <div id="live-mode-test-p"><?php echo $this->get_description_html($data); ?></div>
-                </fieldset>
-            </td>
-        </tr>
-    <?php
-
-        return ob_get_clean();
-    }
-
-    /**
-     * Generate Radio Input HTML.
-     *
-     * @param string $key
-     * @param array $data
-     *
-     * @return string
-     */
-    public function generate_radio_html($key, $data)
-    {
-        $field_key = $this->get_field_key($key);
-        $defaults  = array(
-            'title'             => '',
-            'disabled'          => false,
-            'class'             => '',
-            'css'               => '',
-            'placeholder'       => '',
-            'type'              => 'text',
-            'desc_tip'          => false,
-            'description'       => '',
-            'custom_attributes' => [],
-            'options'           => [],
-        );
-
-        $data = wp_parse_args($data, $defaults);
-
-        ob_start();
-    ?>
-        <tr valign="top">
-            <th scope="row" class="titledesc">
-                <label for="<?php echo esc_attr($field_key); ?>">
-                    <?php echo wp_kses_post($data['title']); ?>
-                    <?php echo $this->get_tooltip_html($data); ?>
-                </label>
-            </th>
-            <td class="forminp">
-                <fieldset>
-                    <legend class="screen-reader-text"><span><?php echo wp_kses_post($data['title']); ?></span>
-                    </legend>
-                    <?php foreach ($data['options'] as $option_key => $option_value) : ?>
-                        <input class="radio <?php echo esc_attr($data['class']); ?>" type="radio" name="<?php echo esc_attr($field_key); ?>" id="<?php echo esc_attr($field_key); ?>-<?php echo esc_attr($option_key); ?>" value="<?php echo esc_attr($option_key); ?>" <?php checked($option_key, $this->get_option($key)); ?> <?php disabled($data['disabled'], true); ?> <?php echo $this->get_custom_attribute_html($data); ?>>
-                        <label for="<?php echo esc_attr($field_key); ?>-<?php echo esc_attr($option_key); ?>"><?php echo esc_html($option_value); ?></label>
-                    <?php endforeach; ?>
-					<?php echo $this->get_description_html($data); ?>
-                </fieldset>
-            </td>
-        </tr>
-    <?php
-
-        return ob_get_clean();
-    }
-
-    /**
-     * Generate Login HTML.
-     *
-     * @param string $key
-     * @param array $data
-     *
-     * @return string
-     */
-    public function generate_login_html($key, $data)
-    {
-        $field_key = $this->get_field_key($key);
-        $defaults  = [];
-
-        $data = wp_parse_args($data, $defaults);
-
-        ob_start();
-    ?>
-        <tr valign="top">
-            <td class="forminp">
-                <p><?php echo $this->get_option('email'); ?></p>
-                <p>
-                    <input id="payplug-logout" type="submit" name="submit_logout" value="<?php _e('Logout', 'payplug'); ?>">
-                    <input type="hidden" name="save" value="logout">
-                    <?php wp_nonce_field('payplug_user_logout', '_logoutaction'); ?>
-                    |
-                    <a href="https://portal.payplug.com" target="_blank"><?php _e('Go to your PayPlug Portal', 'payplug'); ?></a>
-                </p>
-            </td>
-        </tr>
-<?php
-
-        return ob_get_clean();
-    }
-
-
-	/**
-	 * Generate Oney popup option HTML.
-	 *
-	 * @param string $key
-	 * @param array $data
-	 *
-	 * @return string
-	 */
-	public function generate_oney_product_animation_html($key, $data)
-	{
-		$field_key = $this->get_field_key($key);
-
-		$defaults  = array(
-			'title'             => '',
-			'disabled'          => false,
-			'class'             => '',
-			'css'               => '',
-			'placeholder'       => '',
-			'type'              => 'checkbox',
-			'desc_tip'          => false,
-			'description'       => '',
-			'custom_attributes' => [],
-			'options'           => [],
-		);
-
-		$data = wp_parse_args($data, $defaults);
-
-		ob_start();
-		?>
-		<tr valign="top" id="oney_installments_pop_up">
-			<th scope="row" class="titledesc">
-				<label for="<?php echo esc_attr($field_key); ?>">
-					<?php echo wp_kses_post($data['title']); ?>
-					<?php echo $this->get_tooltip_html($data); ?>
-				</label>
-			</th>
-			<td class="forminp">
-				<fieldset>
-					<legend class="screen-reader-text"><span><?php echo wp_kses_post($data['title']); ?></span></legend>
-					<label for="woocommerce_payplug_oney_product_animation">
-						<input class="" type="checkbox" name="woocommerce_payplug_oney_product_animation" id="woocommerce_payplug_oney_product_animation" style="" <?php echo (($this->oney_product_animation == 'yes') ? "checked" : ''); ?>> <?php echo wp_kses_post($data['label']); ?></label><br>
-					<p class="description"> <?php echo wp_kses_post($data['description']); ?></p>
-				</fieldset>
-			</td>
-		</tr>
-		<?php
-
-		return ob_get_clean();
-	}
-
-	/**
-	 * Generate Oney Type Input HTML.
-	 *
-	 * @param string $key
-	 * @param array $data
-	 *
-	 * @return string
-	 */
-	public function generate_oney_type_html($key, $data)
-	{
-		$field_key = $this->get_field_key($key);
-		$defaults  = array(
-			'title'             => '',
-			'disabled'          => false,
-			'class'             => '',
-			'css'               => '',
-			'placeholder'       => '',
-			'type'              => 'text',
-			'desc_tip'          => false,
-			'description'       => '',
-			'custom_attributes' => [],
-			'options'           => [],
-		);
-
-		$data = wp_parse_args($data, $defaults);
-
-		ob_start();
-		?>
-        <tr valign="top" id="woocommerce_payplug_oney_type">
-            <th scope="row" class="titledesc" style="padding-top: 0px;">
-                <label for="<?php echo esc_attr($field_key); ?>">
-					<?php echo wp_kses_post($data['title']); ?>
-					<?php echo $this->get_tooltip_html($data); ?>
-                </label>
-            </th>
-            <td class="forminp" style="padding-top: 0px;">
-                <fieldset>
-                    <legend class="screen-reader-text"><span><?php echo wp_kses_post($data['title']); ?></span>
-                    </legend>
-					<?php foreach ($data['options'] as $option_key => $option_value) : ?>
-                        <input class="radio <?php echo esc_attr($data['class']); ?>" type="radio" name="<?php echo esc_attr($field_key); ?>" id="<?php echo esc_attr($field_key); ?>-<?php echo esc_attr($option_key); ?>" value="<?php echo esc_attr($option_key); ?>" <?php checked($option_key, $this->get_option($key)); ?> <?php disabled($data['disabled'], true); ?> <?php echo $this->get_custom_attribute_html($data); ?>>
-                        <label for="<?php echo esc_attr($field_key); ?>-<?php echo esc_attr($option_key); ?>" style="margin-right: 20px !important;">
-                            <span style="font-weight: 500;"><?php echo esc_html($option_value); ?></span>
-                            <span style="color:#646970;"> : <?php echo $data['descriptions'][$option_key] ;?></span>
-                        </label>
-					<?php endforeach; ?>
-					<?php echo $this->get_description_html($data); ?>
-                </fieldset>
-            </td>
-        </tr>
-		<?php
-
-		return ob_get_clean();
-	}
-
-	/**
-	 * Generate Oney Thresholds Input HTML.
-	 *
-	 * @param string $key
-	 * @param array $data
-	 *
-	 * @return string
-	 */
-	public function generate_oney_thresholds_html($key, $data)
-	{
-		$field_key = $this->get_field_key($key);
-		$defaults  = array(
-			'title'             => '',
-			'disabled'          => false,
-			'class'             => '',
-			'css'               => '',
-			'placeholder'       => '',
-			'type'              => 'text',
-			'desc_tip'          => false,
-			'description'       => '',
-			'custom_attributes' => [],
-			'options'           => [],
-		);
-
-		$data = wp_parse_args($data, $defaults);
-
-		ob_start();
-		?>
-        <tr valign="top" id="woocommerce_payplug_oney_thresholds">
-            <th scope="row" class="titledesc" style="padding-top: 0px;">
-                <label for="<?php echo esc_attr($field_key); ?>">
-					<?php echo wp_kses_post($data['title']); ?>
-					<?php echo $this->get_tooltip_html($data); ?>
-                </label>
-            </th>
-            <td class="forminp" style="padding-top: 0px;">
-                <fieldset>
-					<div id="oney_thresholds_description"><?php echo $this->get_description_html($data); ?></div>
-					 <input type="number" id="payplug_oney_thresholds_min" min="<?php echo $this->min_oney_price;?>" max="<?php echo $this->max_oney_price;?>" class="payplug-admin-oney-threshold-input">
-                    <b class="d-inline-block">€</b>
-                    <div class="d-inline-block" id="slider-range"></div>
-					<input type="number" id="payplug_oney_thresholds_max" min="<?php echo $this->min_oney_price;?>" max="<?php echo $this->max_oney_price;?>" class="payplug-admin-oney-threshold-input">
-					<b class="d-inline-block">€</b>
-                </fieldset>
-            </td>
-        </tr>
-		<?php
-
-		return ob_get_clean();
-	}
-
-    /**
-     * Validate Radio Field.
-     *
-     * Make sure the data is escaped correctly, etc.
-     *
-     * @param string $key
-     * @param string|null $value Posted Value
-     *
-     * @return string
-     */
-    public function validate_radio_field($key, $value)
-    {
-        $value = is_null($value) ? '' : $value;
-
-        return wc_clean(stripslashes($value));
-    }
-
-    /**
-     * Validate Yes/No Field.
-     *
-     * @param string $key
-     * @param string $value Posted Value
-     *
-     * @return string
-     */
-    public function validate_yes_no_field($key, $value)
-    {
-        return ('1' === (string) $value) ? 'yes' : 'no';
-    }
-
-	/**
-	 * Validate Yes/No Field.
-	 *
-	 * @param string $key
-	 * @param string $value Posted Value
-	 *
-	 * @return string
-	 */
-	public function validate_oney_product_animation_field($key, $value)
-	{
-		return ('on' === (string) $value) ? 'yes' : 'no';
-	}
-
-	/**
-	 * Validate Oney Type Field.
-	 *
-	 * Make sure the data is escaped correctly, etc.
-	 *
-	 * @param string $key
-	 * @param string|null $value Posted Value
-	 *
-	 * @return string
-	 */
-	public function validate_oney_type_field($key, $value)
-	{
-		$value = is_null($value) ? 'with_fees' : $value;
-
-		return wc_clean(stripslashes($value));
-	}
-
-	/**
-	 * Validate Oney Thresholds Field.
-	 *
-	 * Make sure the data is escaped correctly, etc.
-	 *
-	 * @param string $key
-	 * @param string|null $value Posted Value
-	 *
-	 * @return string
-	 */
-	public function validate_oney_thresholds_field($key, $value)
-	{
-		$value = is_null($value) ? [100, 3000] : $value;
-
-		return wc_clean($value);
-	}
-
-    /**
      * Get PayPlug gateway mode.
      *
      * @return string
@@ -1813,21 +1254,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         }
 
         return $key;
-    }
-
-    /**
-     * Check if an api key exist for a mode.
-     *
-     * @param string $mode
-     *
-     * @return bool
-     */
-    public function has_api_key($mode = 'test')
-    {
-        $key = $this->get_api_key($mode);
-        $key = trim($key);
-
-        return !empty($key);
     }
 
     /**
@@ -1901,11 +1327,4 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         return $order && $this->supports('refunds') && $status !== "cancelled" && $status !== "failed";
     }
 
-	public function getPayplugMerchantCountry(){
-		return $this->payplug_merchant_country;
-	}
-
-	public function setPayplugMerchantCountry($country){
-		$this->payplug_merchant_country = $country;
-	}
 }
