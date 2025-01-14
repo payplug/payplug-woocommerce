@@ -1941,11 +1941,92 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	public function scheduled_subscription_payment($amount, $order) {
 		// Your payment processing code here
 		// Return true if payment successful, false if failed
+		$order_id      = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
+
 		$tokens = WC_Payment_Tokens::get_customer_tokens(get_current_user_id(), 'payplug');
 		$first_token = reset($tokens);
 		$payment_token_id = $first_token->get_id();
+
 		$amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($amount);
-		return $this->process_payment_with_token($order, $amount, get_current_user_id(), $payment_token_id);
+
+		if (!$first_token || (int) get_current_user_id() !== (int) $first_token->get_user_id()) {
+			PayplugGateway::log('Could not find the payment token or the payment doesn\'t belong to the current user.', 'error');
+			throw new \Exception(__('Invalid payment method.', 'payplug'));
+		}
+
+		try {
+			$address_data = PayplugAddressData::from_order($order);
+
+			$return_url = esc_url_raw($order->get_checkout_order_received_url());
+
+			if (!(substr( $return_url, 0, 4 ) === "http")) {
+				$return_url = get_site_url().$return_url;
+			}
+
+			$payment_data = [
+				'amount'           => $amount,
+				'currency'         => get_woocommerce_currency(),
+				'payment_method'   => $first_token->get_token(),
+				'allow_save_card'  => false,
+				'billing'          => $address_data->get_billing(),
+				'shipping'         => $address_data->get_shipping(),
+				'initiator'        => 'MERCHANT',
+				'hosted_payment'   => [
+					'return_url' => $return_url,
+					'cancel_url' => esc_url_raw($order->get_cancel_order_url_raw()),
+				],
+				'notification_url' => esc_url_raw(WC()->api_request_url('PayplugGateway')),
+				'metadata'         => [
+					'order_id'    => $order->get_id(),
+					'customer_id' => ((int) get_current_user_id() > 0) ? get_current_user_id() : 'guest',
+					'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
+					'woocommerce_block' => \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )
+				],
+			];
+
+			/** This filter is documented in src/Gateway/PayplugGateway */
+			$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
+			$payment      = $this->api->payment_create($payment_data);
+
+			// Save transaction id for the order
+			PayplugWoocommerceHelper::is_pre_30()
+				? update_post_meta($order_id, '_transaction_id', $payment->id)
+				: $order->set_transaction_id($payment->id);
+
+			if (is_callable([$order, 'save'])) {
+				$order->save();
+			}
+
+			/** This action is documented in src/Gateway/PayplugGateway */
+			\do_action('payplug_gateway_payment_created', $order_id, $payment);
+
+
+			$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
+			PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
+
+			$this->response->process_payment($payment, true);
+
+			if(($payment->__get('is_paid'))){
+				$redirect =  $order->get_checkout_order_received_url();
+			}else if(isset($payment->__get('hosted_payment')->payment_url)){
+				$redirect = $payment->__get('hosted_payment')->payment_url;
+			}else{
+				$redirect = $return_url;
+			}
+
+			return [
+				'payment_id' => $payment->id,
+				'result'   => 'success',
+				'is_paid'  => $payment->__get('is_paid'), // Use for path redirect before DSP2
+				'redirect' => $redirect
+			];
+		} catch (HttpException $e) {
+			PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
+			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+		} catch (\Exception $e) {
+			PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, $e->getMessage()), 'error');
+			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+		}
 
 	}
 
