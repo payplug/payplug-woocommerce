@@ -3,7 +3,6 @@
 namespace Payplug\PayplugWoocommerce\Gateway;
 
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
-use Payplug\PayplugWoocommerce\Controller\PayplugGenericGateway;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 class PayplugCreditCard extends PayplugGateway {
@@ -69,6 +68,33 @@ class PayplugCreditCard extends PayplugGateway {
 		add_action('wp_enqueue_scripts', [$this, 'scripts']);
 
 
+	}
+
+	/**
+	 * Cart has any subscriptions
+	 * @return bool
+	 */
+	protected function is_subscription() {
+
+		$cart_content = WC()->cart->get_cart();
+		if ( empty( $cart_content ) ) {
+			return false;
+		}
+
+		foreach ( $cart_content as $prod ) {
+			if ( empty( $prod["product_id"] ) ) {
+				return false;
+			}
+
+			$pid     = $prod["product_id"];
+			$product = wc_get_product( $pid );
+
+			if ( $product->is_type( 'subscription' ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
