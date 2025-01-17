@@ -857,10 +857,21 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				$payment_data['metadata']['woocommerce_block'] = "CART";
 			}
 
+			//IP request required variables
 			if($this->payment_method === 'integrated'){
 				$payment_data['initiator'] = 'PAYER';
 				$payment_data['integration'] = 'INTEGRATED_PAYMENT';
 				unset($payment_data['hosted_payment']['cancel_url']);
+			}
+
+			//for subscriptions the card needs to be saved
+			if(method_exists($this, "is_subscription")){
+				$is_subscription = $this->is_subscription();
+				if( !empty($is_subscription) && $is_subscription === true ){
+					$payment_data['allow_save_card'] = false;
+					$payment_data['save_card'] = true;
+					$payment_data['force_3ds'] = true;
+				}
 			}
 
             /**
