@@ -871,6 +871,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 					$payment_data['allow_save_card'] = false;
 					$payment_data['save_card'] = true;
 					$payment_data['force_3ds'] = true;
+					$payment_data['metadata']['subscription'] = true;
 				}
 			}
 
