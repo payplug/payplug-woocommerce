@@ -15,6 +15,7 @@ use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use WC_Blocks_Utils;
+use WC_Subscriptions;
 
 /**
  * Helper class.
