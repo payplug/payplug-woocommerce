@@ -64,8 +64,10 @@ class PayplugCreditCard extends PayplugGateway {
 		}
 
 		add_action('wp_enqueue_scripts', [$this, 'scripts']);
-		add_action('woocommerce_scheduled_subscription_payment_' . $this->id,
-			array($this, 'scheduled_subscription_payment'), 10, 2);
+		if (PayplugWoocommerceHelper::is_subscriptions_enabled()) {
+			add_action('woocommerce_scheduled_subscription_payment_' . $this->id,
+				array($this, 'scheduled_subscription_payment'), 10, 2);
+		}
 
 	}
 
