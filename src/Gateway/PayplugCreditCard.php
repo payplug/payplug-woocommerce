@@ -22,8 +22,6 @@ class PayplugCreditCard extends PayplugGateway {
 		$this->description        = $this->get_option('description');
 		$this->oneclick       = (('yes' === $this->get_option('oneclick', 'no')) && (is_user_logged_in()));
 		$this->payment_method = $this->get_option('payment_method');
-		$this->domain_name = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : strtr(get_site_url(), array("http://" => "", "https://" => "")) ;
-
 		$this->supports           = array(
 			'products',
 			'refunds',
@@ -66,7 +64,10 @@ class PayplugCreditCard extends PayplugGateway {
 		}
 
 		add_action('wp_enqueue_scripts', [$this, 'scripts']);
-
+		if (PayplugWoocommerceHelper::is_subscriptions_enabled()) {
+			add_action('woocommerce_scheduled_subscription_payment_' . $this->id,
+				array($this, 'scheduled_subscription_payment'), 10, 2);
+		}
 
 	}
 
@@ -246,6 +247,113 @@ class PayplugCreditCard extends PayplugGateway {
 		if ($this->oneclick_available()) {
 			$this->tokenization_script();
 			$this->saved_payment_methods();
+		}
+	}
+
+	/**
+	 * Process the subscription scheduled payment
+	 */
+	public function scheduled_subscription_payment($amount, $order) {
+
+		$order_id      = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
+		$subscription = wcs_get_subscription($order->get_meta('_subscription_renewal'));
+		$payplug_parent_meta = $subscription->get_parent()->get_meta("_payplug_metadata");
+
+		if (!$payplug_parent_meta ) {
+			PayplugGateway::log('Could not find the intial payment data belong to the current user and the current subscription.', 'error');
+			throw new \Exception(__('Invalid payment method.', 'payplug'));
+		}
+
+		$parent_order = $subscription->get_parent();
+		$parent_tokens = $parent_order->get_payment_tokens();
+
+		if (!empty($parent_tokens)) {
+			$token = $parent_tokens[0];
+		} else {
+			$token = $this->api->payment_retrieve($payplug_parent_meta['transaction_id'])->card->id;
+		}
+
+		if (!$token) {
+			PayplugGateway::log('Could not find the payment token or the payment doesn\'t belong to the current user.', 'error');
+			throw new \Exception(__('Invalid payment method.', 'payplug'));
+		}
+
+		$amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($amount);
+
+		try {
+			$address_data = PayplugAddressData::from_order($order);
+			$return_url = esc_url_raw($order->get_checkout_order_received_url());
+
+			if (!(substr( $return_url, 0, 4 ) === "http")) {
+				$return_url = get_site_url().$return_url;
+			}
+
+			$payment_data = [
+				'amount'           => $amount,
+				'currency'         => get_woocommerce_currency(),
+				'payment_method'   => $token,
+				'allow_save_card'  => false,
+				'billing'          => $address_data->get_billing(),
+				'shipping'         => $address_data->get_shipping(),
+				'initiator'        => 'MERCHANT',
+				'hosted_payment'   => [
+					'return_url' => $return_url,
+					'cancel_url' => esc_url_raw($order->get_cancel_order_url_raw()),
+				],
+				'notification_url' => esc_url_raw(WC()->api_request_url('PayplugGateway')),
+				'metadata'         => [
+					'order_id'    => $order->get_id(),
+					'customer_id' => ((int) get_current_user_id() > 0) ? get_current_user_id() : 'guest',
+					'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
+					'woocommerce_block' => \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )
+				],
+			];
+
+			PayplugGateway::log(sprintf('Processing payment for order #%s', $order_id));
+			PayplugGateway::log(sprintf('Processing payment for subscription #%s', $order->get_meta('_subscription_renewal')));
+
+			/** This filter is documented in src/Gateway/PayplugGateway */
+			$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
+			$payment      = $this->api->payment_create($payment_data);
+
+			// Save transaction id for the order
+			PayplugWoocommerceHelper::is_pre_30()
+				? update_post_meta($order_id, '_transaction_id', $payment->id)
+				: $order->set_transaction_id($payment->id);
+
+			if (is_callable([$order, 'save'])) {
+				$order->save();
+			}
+
+			/** This action is documented in src/Gateway/PayplugGateway */
+			\do_action('payplug_gateway_payment_created', $order_id, $payment);
+
+
+			$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
+			PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
+
+			$this->response->process_payment($payment, true);
+
+			if(($payment->__get('is_paid'))){
+				$redirect =  $order->get_checkout_order_received_url();
+			}else if(isset($payment->__get('hosted_payment')->payment_url)){
+				$redirect = $payment->__get('hosted_payment')->payment_url;
+			}else{
+				$redirect = $return_url;
+			}
+
+			return [
+				'payment_id' => $payment->id,
+				'result'   => 'success',
+				'is_paid'  => $payment->__get('is_paid'), // Use for path redirect before DSP2
+				'redirect' => $redirect
+			];
+		} catch (HttpException $e) {
+			PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
+			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
+		} catch (\Exception $e) {
+			PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, $e->getMessage()), 'error');
+			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
 		}
 	}
 }
