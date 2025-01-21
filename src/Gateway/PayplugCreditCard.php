@@ -258,10 +258,12 @@ class PayplugCreditCard extends PayplugGateway {
 		$order_id      = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 		$customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
 
-		$payplug_meta = wcs_get_subscription($order->get_meta('_subscription_renewal'))->get_parent()->get_meta("_payplug_metadata");
+		$subscription = wcs_get_subscription($order->get_meta('_subscription_renewal'));
+
+		$payplug_meta = $subscription->get_parent()->get_meta("_payplug_metadata");
 
 		if (!$payplug_meta ) {
-			PayplugGateway::log('Could not find the payment token or the payment doesn\'t belong to the current user.', 'error');
+			PayplugGateway::log('Could not find the intial payment data belong to the current user and the current subscription.', 'error');
 			throw new \Exception(__('Invalid payment method.', 'payplug'));
 		}
 
@@ -270,7 +272,7 @@ class PayplugCreditCard extends PayplugGateway {
 		$token = $this->api->payment_retrieve($payplug_meta['transaction_id'])->card->id;
 
 
-		if (!$token || (int) $customer_id !== (int) $token->get_user_id()) {
+		if (!$token) {
 			PayplugGateway::log('Could not find the payment token or the payment doesn\'t belong to the current user.', 'error');
 			throw new \Exception(__('Invalid payment method.', 'payplug'));
 		}
@@ -290,7 +292,7 @@ class PayplugCreditCard extends PayplugGateway {
 			$payment_data = [
 				'amount'           => $amount,
 				'currency'         => get_woocommerce_currency(),
-				'payment_method'   => $token->get_token(),
+				'payment_method'   => $token,
 				'allow_save_card'  => false,
 				'billing'          => $address_data->get_billing(),
 				'shipping'         => $address_data->get_shipping(),
