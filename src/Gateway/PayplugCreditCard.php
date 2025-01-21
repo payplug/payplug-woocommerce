@@ -256,21 +256,22 @@ class PayplugCreditCard extends PayplugGateway {
 	public function scheduled_subscription_payment($amount, $order) {
 
 		$order_id      = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
-		$customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
-
 		$subscription = wcs_get_subscription($order->get_meta('_subscription_renewal'));
+		$payplug_parent_meta = $subscription->get_parent()->get_meta("_payplug_metadata");
 
-		$payplug_meta = $subscription->get_parent()->get_meta("_payplug_metadata");
-
-		if (!$payplug_meta ) {
+		if (!$payplug_parent_meta ) {
 			PayplugGateway::log('Could not find the intial payment data belong to the current user and the current subscription.', 'error');
 			throw new \Exception(__('Invalid payment method.', 'payplug'));
 		}
 
-		// Retrrienve the saved token
+		$parent_order = $subscription->get_parent();
+		$parent_tokens = $parent_order->get_payment_tokens();
 
-		$token = $this->api->payment_retrieve($payplug_meta['transaction_id'])->card->id;
-
+		if (!empty($parent_tokens)) {
+			$token = $parent_tokens[0];
+		} else {
+			$token = $this->api->payment_retrieve($payplug_parent_meta['transaction_id'])->card->id;
+		}
 
 		if (!$token) {
 			PayplugGateway::log('Could not find the payment token or the payment doesn\'t belong to the current user.', 'error');
@@ -279,10 +280,8 @@ class PayplugCreditCard extends PayplugGateway {
 
 		$amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($amount);
 
-
 		try {
 			$address_data = PayplugAddressData::from_order($order);
-
 			$return_url = esc_url_raw($order->get_checkout_order_received_url());
 
 			if (!(substr( $return_url, 0, 4 ) === "http")) {
@@ -356,6 +355,5 @@ class PayplugCreditCard extends PayplugGateway {
 			PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, $e->getMessage()), 'error');
 			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
 		}
-
 	}
 }
