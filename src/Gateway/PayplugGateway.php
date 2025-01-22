@@ -980,6 +980,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				],
             ];
 
+			if(method_exists($this, "is_subscription")){
+				$is_subscription = $this->is_subscription();
+				if( !empty($is_subscription) && $is_subscription === true ){
+					$payment_data['metadata']['subscription'] = 'subscription';
+				}
+			}
+
             /** This filter is documented in src/Gateway/PayplugGateway */
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
             $payment      = $this->api->payment_create($payment_data);
