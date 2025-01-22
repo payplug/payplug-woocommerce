@@ -305,7 +305,8 @@ class PayplugCreditCard extends PayplugGateway {
 					'order_id'    => $order->get_id(),
 					'customer_id' => ((int) get_current_user_id() > 0) ? get_current_user_id() : 'guest',
 					'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
-					'woocommerce_block' => \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )
+					'woocommerce_block' => \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' ),
+					'subscription' => 'renewal'
 				],
 			];
 
