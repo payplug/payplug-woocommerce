@@ -865,14 +865,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			}
 
 			//for subscriptions the card needs to be saved
-			if(method_exists($this, "is_subscription")){
-				$is_subscription = $this->is_subscription();
-				if( !empty($is_subscription) && $is_subscription === true ){
-					$payment_data['allow_save_card'] = false;
-					$payment_data['save_card'] = true;
-					$payment_data['force_3ds'] = true;
-					$payment_data['metadata']['subscription'] = 'subscription';
-				}
+			$is_subscription = PayplugWoocommerceHelper::is_subscription();
+			if( !empty($is_subscription) && $is_subscription === true ){
+				$payment_data['allow_save_card'] = false;
+				$payment_data['save_card'] = true;
+				$payment_data['force_3ds'] = true;
+				$payment_data['metadata']['subscription'] = 'subscription';
 			}
 
             /**
@@ -980,12 +978,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				],
             ];
 
-			if(method_exists($this, "is_subscription")){
-				$is_subscription = $this->is_subscription();
-				if( !empty($is_subscription) && $is_subscription === true ){
-					$payment_data['metadata']['subscription'] = 'subscription';
-				}
+			$is_subscription = PayplugWoocommerceHelper::is_subscription();
+			if( !empty($is_subscription) && $is_subscription === true ){
+				$payment_data['metadata']['subscription'] = 'subscription';
 			}
+
 
             /** This filter is documented in src/Gateway/PayplugGateway */
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);

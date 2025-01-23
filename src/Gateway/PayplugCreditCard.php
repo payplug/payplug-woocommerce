@@ -72,33 +72,6 @@ class PayplugCreditCard extends PayplugGateway {
 	}
 
 	/**
-	 * Cart has any subscriptions
-	 * @return bool
-	 */
-	protected function is_subscription() {
-
-		$cart_content = WC()->cart->get_cart();
-		if ( empty( $cart_content ) ) {
-			return false;
-		}
-
-		foreach ( $cart_content as $prod ) {
-			if ( empty( $prod["product_id"] ) ) {
-				return false;
-			}
-
-			$pid     = $prod["product_id"];
-			$product = wc_get_product( $pid );
-
-			if ( $product->is_type( 'subscription' ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Get payment icons.
 	 *
 	 * @return string
