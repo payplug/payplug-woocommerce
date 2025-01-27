@@ -31,7 +31,7 @@ class PayplugOney extends PayplugGenericBlock {
 			$this->total_price = floatval( WC()->cart->total );
 		}
 
-		if ( PayplugWoocommerceHelper::is_cart_block() && is_cart() ) {
+		if ( PayplugWoocommerceHelper::is_cart_block() && is_cart() && !PayplugWoocommerceHelper::is_subscription() ) {
 			$data['oney_cart_label'] = __( 'OR PAY IN', 'payplug' );
 			if ($this->gateway->settings['oney_type'] == 'without_fees') {
 				$data['oney_cart_logo'] = esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/Oneywithoutfees3x4x.png' );

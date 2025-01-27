@@ -95,7 +95,7 @@ HTML;
 	public function showOneyAnimationCart()
 	{
 
-		if ( ( is_cart() ) && PayplugWoocommerceHelper::is_oney_available()) {
+		if ( ( is_cart() ) && PayplugWoocommerceHelper::is_oney_available() && !PayplugWoocommerceHelper::is_subscription()) {
 			global $product;
 
 			$total_price = (is_numeric( floatval(WC()->cart->total))) ? floatval(WC()->cart->total) : (float)($product->get_price());

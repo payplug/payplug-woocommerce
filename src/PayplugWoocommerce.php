@@ -12,6 +12,7 @@ use Payplug\PayplugWoocommerce\Admin\Metabox;
 use Payplug\PayplugWoocommerce\Admin\Notices;
 use Payplug\PayplugWoocommerce\Admin\WoocommerceActions;
 use Payplug\PayplugWoocommerce\Controller\ApplePay;
+use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyAnimation;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithFees;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithoutFees;
 
@@ -190,12 +191,11 @@ class PayplugWoocommerce {
 			return ;
 		}
 
-
-		//check if the options has the Country setted
 		Switch($options['oney_type']){
-			case "without_fees" : new OneyWithoutFees();break;
-			default: new OneyWithFees();break;
+			case "without_fees" : $class = "PayplugGatewayOney3xWithoutFees";break;
+			default: $class = "PayplugGatewayOney3x"; break;
 		}
+		new OneyAnimation( $options['oney_type'], $class );
 	}
 
 	/**
