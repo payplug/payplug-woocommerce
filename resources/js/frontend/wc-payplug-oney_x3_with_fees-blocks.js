@@ -80,6 +80,10 @@ registerPaymentMethod(oney_x3_with_fees);
 
 			// Get cart total
 			const cartStore = select('wc/store/cart');
+			if(is_subscription()){
+				return false;
+			}
+
 			let cartTotal = cartStore?.getCartTotals()?.total_price || 0;
 			let qty = 0;
 
@@ -92,6 +96,16 @@ registerPaymentMethod(oney_x3_with_fees);
 				oney_available = true;
 			} else {
 				oney_available = false;
+			}
+
+			function is_subscription(){
+				let bool = false;
+				cartStore.getCartData().items.forEach(function(item){
+					if(item.type === "subscription"){
+						bool = true;
+					}
+				})
+				return bool;
 			}
 
 			return createElement('div',
@@ -179,6 +193,8 @@ registerPaymentMethod(oney_x3_with_fees);
 			childList: true,
 			subtree: true
 		});
+
+
 	}
 
 })();
