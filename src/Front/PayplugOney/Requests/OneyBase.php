@@ -123,8 +123,9 @@ HTML;
 	 */
 	public function showOneyAnimationProduct()
 	{
-		if ( (is_product()) && PayplugWoocommerceHelper::is_oney_available()) {
-			global $product;
+		global $product;
+
+		if ( (is_product()) && PayplugWoocommerceHelper::is_oney_available() && $product->get_type() !== "subscription" ) {
 			$price = $product->get_price();
 
 			if(method_exists($product,"get_available_variations")){
