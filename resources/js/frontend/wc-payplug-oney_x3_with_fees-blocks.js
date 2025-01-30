@@ -101,7 +101,7 @@ registerPaymentMethod(oney_x3_with_fees);
 			function is_subscription(){
 				let bool = false;
 				cartStore.getCartData().items.forEach(function(item){
-					if(item.type === "subscription"){
+					if( ["subscription", "downloadable_subscription", "virtual_subscription", "variable-subscription", "subscription_variation"].includes(item.type) ){
 						bool = true;
 					}
 				})
