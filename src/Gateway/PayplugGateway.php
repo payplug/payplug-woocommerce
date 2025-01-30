@@ -142,6 +142,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 		//required plugin id
 		$this->id = 'payplug';
+		$this->supports           = array(
+			'products',
+			'refunds',
+			'tokenization',
+		);
 
 		$payplug_gateways = array('payplug', 'american_express', 'apple_pay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees', 'satispay', 'ideal', 'mybank');
 
