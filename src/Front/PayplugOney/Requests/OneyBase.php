@@ -125,7 +125,7 @@ HTML;
 	{
 		global $product;
 
-		if ( (is_product()) && PayplugWoocommerceHelper::is_oney_available() && $product->get_type() !== "subscription" ) {
+		if ( (is_product()) && PayplugWoocommerceHelper::is_oney_available() && !in_array($product->get_type(), array("subscription", "downloadable_subscription", "virtual_subscription", "variable-subscription")) ) {
 			$price = $product->get_price();
 
 			if(method_exists($product,"get_available_variations")){
