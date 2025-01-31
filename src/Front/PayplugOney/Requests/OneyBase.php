@@ -95,7 +95,7 @@ HTML;
 	public function showOneyAnimationCart()
 	{
 
-		if ( ( is_cart() ) && PayplugWoocommerceHelper::is_oney_available()) {
+		if ( ( is_cart() ) && PayplugWoocommerceHelper::is_oney_available() && !PayplugWoocommerceHelper::is_subscription()) {
 			global $product;
 
 			$total_price = (is_numeric( floatval(WC()->cart->total))) ? floatval(WC()->cart->total) : (float)($product->get_price());
@@ -123,8 +123,9 @@ HTML;
 	 */
 	public function showOneyAnimationProduct()
 	{
-		if ( (is_product()) && PayplugWoocommerceHelper::is_oney_available()) {
-			global $product;
+		global $product;
+
+		if ( (is_product()) && PayplugWoocommerceHelper::is_oney_available() && !in_array($product->get_type(), array("subscription", "downloadable_subscription", "virtual_subscription", "variable-subscription")) ) {
 			$price = $product->get_price();
 
 			if(method_exists($product,"get_available_variations")){

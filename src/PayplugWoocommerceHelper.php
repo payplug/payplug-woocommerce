@@ -15,6 +15,7 @@ use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use WC_Blocks_Utils;
+use WC_Subscriptions;
 
 /**
  * Helper class.
@@ -825,6 +826,45 @@ class PayplugWoocommerceHelper {
 
 	public static function is_cart_block() {
 		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' );
+	}
+
+	/**
+	 * Checks if subscriptions are enabled on the site.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @return bool Whether subscriptions is enabled or not.
+	 */
+	public static function is_subscriptions_enabled() {
+		return class_exists( 'WC_Subscriptions' ) && class_exists( 'WC_Subscription' ) && version_compare( WC_Subscriptions::$version, '2.2.0', '>=' );
+	}
+
+	/**
+	 * Cart has any subscriptions
+	 * @return bool
+	 */
+	public static function is_subscription() {
+
+		$cart_content = WC()->cart->get_cart();
+
+		if ( empty( $cart_content ) ) {
+			return false;
+		}
+
+		foreach ( $cart_content as $prod ) {
+			if ( empty( $prod["product_id"] ) ) {
+				return false;
+			}
+
+			$pid     = $prod["product_id"];
+			$product = wc_get_product( $pid );
+
+			if ( $product->is_type( 'subscription' ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }

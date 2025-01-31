@@ -142,6 +142,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 		//required plugin id
 		$this->id = 'payplug';
+		$this->supports           = array(
+			'products',
+			'refunds',
+			'tokenization',
+		);
 
 		$payplug_gateways = array('payplug', 'american_express', 'apple_pay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees', 'satispay', 'ideal', 'mybank');
 
@@ -857,10 +862,20 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				$payment_data['metadata']['woocommerce_block'] = "CART";
 			}
 
+			//IP request required variables
 			if($this->payment_method === 'integrated'){
 				$payment_data['initiator'] = 'PAYER';
 				$payment_data['integration'] = 'INTEGRATED_PAYMENT';
 				unset($payment_data['hosted_payment']['cancel_url']);
+			}
+
+			//for subscriptions the card needs to be saved
+			$is_subscription = PayplugWoocommerceHelper::is_subscription();
+			if( !empty($is_subscription) && $is_subscription === true ){
+				$payment_data['allow_save_card'] = false;
+				$payment_data['save_card'] = true;
+				$payment_data['force_3ds'] = true;
+				$payment_data['metadata']['subscription'] = 'subscription';
 			}
 
             /**
@@ -967,6 +982,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 					'woocommerce_block' => \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' )
 				],
             ];
+
+			$is_subscription = PayplugWoocommerceHelper::is_subscription();
+			if( !empty($is_subscription) && $is_subscription === true ){
+				$payment_data['metadata']['subscription'] = 'subscription';
+			}
+
 
             /** This filter is documented in src/Gateway/PayplugGateway */
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
