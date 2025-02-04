@@ -2,7 +2,7 @@
 
 namespace phpunit\Controller;
 
-use Payplug\PayplugWoocommerce\Controller\Bancontact;
+use Payplug\PayplugWoocommerce\Gateway\Bancontact;
 use PHPUnit\Framework\TestCase;
 use WC_Payment_Gateways;
 use WC_Unit_Test_Case;

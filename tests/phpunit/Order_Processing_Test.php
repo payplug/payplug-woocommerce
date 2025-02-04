@@ -1,4 +1,8 @@
 <?php
+
+namespace phpunit;
+
+use Payplug\PayplugWoocommerce\Gateway\Bancontact;
 use WP_UnitTestCase;
 /**
  * Order Processing Unit Tests
@@ -8,7 +12,7 @@ class Order_Processing_Test extends WP_UnitTestCase {
 
 	public function setUp(): void {
 		parent::setUp();
-		$this->gateway = new My_Payment_Gateway();
+		$this->gateway = new Bancontact();
 	}
 
 	public function test_process_payment() {

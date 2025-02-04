@@ -1,15 +1,17 @@
 <?php
 
-namespace unit;
+namespace phpunit;
+
 use Payplug;
+use WP_UnitTestCase;
 
 
-class Payment_Gateway_Test extends WP_UnitTestCase {
+class PaymentGatewayCreditCard_test extends WP_UnitTestCase {
 	private $gateway;
 
 	public function setUp(): void {
 		parent::setUp();
-		$this->gateway = new Payplug();
+		$this->gateway = new Payplug\PayplugWoocommerce\Gateway\PayplugCreditCard();
 	}
 
 	public function test_gateway_initialization() {

@@ -1,5 +1,6 @@
 <?php
-namespace Payplug\PayplugWoocommerce\Tests\Unit;
+
+namespace phpunit;
 
 use PHPUnit\Framework\TestCase;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
