@@ -6,10 +6,10 @@
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
-	>
+>
 	<testsuites>
-		<testsuite>
-			<directory prefix="test-" suffix=".php">./tests/</directory>
+		<testsuite name="testing">
+			<directory suffix="_test.php">./tests/phpunit</directory>
 			<exclude>./tests/test-sample.php</exclude>
 		</testsuite>
 	</testsuites>
