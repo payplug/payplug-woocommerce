@@ -40,7 +40,7 @@ class PayplugCreditCard extends PayplugGateway {
 		);
 
 		// Ensure the description is not empty to correctly display users's save cards
-		if (empty($this->description) && 0 !== count($this->get_tokens()) && $this->oneclick_available()) {
+		if (empty($this->description) && $this->oneclick_available()) {
 			$this->description = ' ';
 		}
 
