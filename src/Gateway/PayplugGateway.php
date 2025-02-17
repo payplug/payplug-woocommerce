@@ -160,10 +160,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         if ($this->user_logged_in()) {
             $this->init_payplug();
 
-        }else{
-			delete_option('woocommerce_payplug_settings');
-			set_transient( PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', [])), null );
-		}
+        }
 
         $this->mode           = 'yes' === $this->get_option('mode', 'no') ? 'live' : 'test';
         $this->debug          = 'yes' === $this->get_option('debug', 'no');
