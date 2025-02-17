@@ -205,15 +205,18 @@ var IntegratedPayment = {
 				IntegratedPayment.props.return_url = response.redirect;
 			},
 			complete: function(response) {
-				if (response.responseJSON.result != "failure") {
-					if (IntegratedPayment.oneClickSelected()) {
-						return;
+				if (response.responseJSON != null) {
+					if (response.responseJSON.result != "failure") {
+						if (IntegratedPayment.oneClickSelected()) {
+							return;
 
-					} else {
-						IntegratedPayment.SubmitPayment();
+						} else {
+							IntegratedPayment.SubmitPayment();
 
+						}
 					}
 				}
+
 			}
 		});
 	},
