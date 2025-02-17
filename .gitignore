@@ -35,3 +35,6 @@ vendor
 # Temporary files
 *~
 /cypress/
+
+#raw block files
+/src/Gateway/Blocks/
