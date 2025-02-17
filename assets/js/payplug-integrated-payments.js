@@ -205,7 +205,6 @@ var IntegratedPayment = {
 				IntegratedPayment.props.return_url = response.redirect;
 			},
 			complete: function(response) {
-				debugger;
 				if (response.responseJSON != null) {
 					if (response.responseJSON.result != "failure") {
 						if (IntegratedPayment.oneClickSelected()) {
