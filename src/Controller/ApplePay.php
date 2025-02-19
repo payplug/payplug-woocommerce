@@ -145,7 +145,8 @@ class ApplePay extends PayplugGateway
 
 		//$account has permissions to use apple_pay
 		$auth = isset($account['payment_methods']['apple_pay']['enabled']) && $account['payment_methods']['apple_pay']['enabled'];
-		$auth_domains = in_array(strtr(get_site_url(), array("http://" => "", "https://" => "")), $account['payment_methods']['apple_pay']['allowed_domain_names']);
+		$domain = parse_url(get_site_url());
+		$auth_domains = in_array($domain["host"], $account['payment_methods']['apple_pay']['allowed_domain_names']);
 
 		//lost auth
 		if(!($auth && $auth_domains)){
