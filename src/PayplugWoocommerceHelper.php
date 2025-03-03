@@ -555,6 +555,8 @@ class PayplugWoocommerceHelper {
 			$parameters_account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
 			self::set_transient_data($parameters_account, $options);
 		} catch (\Payplug\Exception\UnauthorizedException $e) {
+			self::exception_handler_400_logout($e->getCode(), __( 'payplug_enable_feature', 'payplug' ), sprintf('Account request error from PayPlug API : %s <br><b> ' . __('Successfully logged out.', 'payplug') . '</b>', wc_print_r($e->getMessage(), true)));
+
 		} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
 		} catch( \Payplug\Exception\ForbiddenException $e){
 		} catch (\Payplug\Exception\ForbiddenException $e){return array();}
@@ -706,8 +708,6 @@ class PayplugWoocommerceHelper {
 			}
 
 			if (isset($key) && !empty($key)){
-
-				//$response = Authentication::getAccount(new Payplug($key));
 				$response = self::get_account_data_from_options();
 			}
 
@@ -760,26 +760,9 @@ class PayplugWoocommerceHelper {
 		return get_option( 'woocommerce_payplug_settings', [] )['mode'] === "yes" ? true : false;
 	}
 
-	public static function payplug_logout($gateway) {
-
-		if ($gateway->user_logged_in()) {
-			$data                        = get_option($gateway->get_option_key());
-			$data['payplug_test_key']    = '';
-			$data['payplug_live_key']    = '';
-			$data['payplug_merchant_id'] = '';
-			$data['enabled']             = 'no';
-			$data['mode']                = 'no';
-			$data['oneclick']            = 'no';
-			update_option(
-				$gateway->get_option_key(),
-				apply_filters('woocommerce_settings_api_sanitized_fields_' . $gateway->id, $data)
-			);
-			if("payplug" === $gateway->id) {
-				return true;
-			}
-		} else {
-			return false;
-		}
+	public static function payplug_logout() {
+		delete_option('woocommerce_payplug_settings');
+		set_transient( PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', [])), null );
 	}
 
 	public static function plugin_deactivation(){
@@ -865,6 +848,29 @@ class PayplugWoocommerceHelper {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Handling 400 errors from API (get_account, get_permissions) and return JSON rest response
+	 *
+	 * @param $title
+	 * @param $msg
+	 *
+	 * @return false
+	 */
+	public static function exception_handler_400_logout($error_code, $title, $msg){
+
+		if( !empty($error_code) && ($error_code === 401 || $error_code === 403) ){
+
+			PayplugWoocommerceHelper::payplug_logout();
+			wp_send_json_error( array(
+				"title" => $title,
+				'msg' => $msg,
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+		}
+
+		return  false;
 	}
 
 }
