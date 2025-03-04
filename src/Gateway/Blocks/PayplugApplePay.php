@@ -90,8 +90,18 @@ class PayplugApplePay extends PayplugGenericBlock
 
 	public function get_carriers() {
 
-		$packages = WC()->cart->get_shipping_packages();
 		$shippings = [];
+
+		if ( is_null( WC()->cart ) ) {
+			wc_load_cart();
+			WC()->cart->get_cart_from_session();
+		}
+
+		if ( empty( WC()->cart ) || empty( WC()->cart->get_shipping_packages() ) ) {
+			return false;
+		}
+
+		$packages = WC()->cart->get_shipping_packages();
 
 		foreach ( $packages as $package_key => $package ) {
 			$shipping_methods = $this->get_shipping_methods_from_package($package);
