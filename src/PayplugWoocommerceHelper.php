@@ -845,13 +845,17 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function is_subscription() {
 
-		$cart_content = WC()->cart->get_cart();
+		if ( is_null( WC()->cart ) ) {
+			wc_load_cart();
+			WC()->cart->get_cart_from_session();
 
-		if ( empty( $cart_content ) ) {
+		}
+
+		if ( empty( WC()->cart ) || empty( WC()->cart->get_cart() ) ) {
 			return false;
 		}
 
-		foreach ( $cart_content as $prod ) {
+		foreach ( WC()->cart->get_cart() as $prod ) {
 			if ( empty( $prod["product_id"] ) ) {
 				return false;
 			}
