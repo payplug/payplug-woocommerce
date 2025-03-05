@@ -1222,22 +1222,21 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function retrieve_merchant_id($key = null)
     {
+		$merchant_id = '';
         try {
             $response    = !is_null($key) && !empty($key) ? Authentication::getAccount(new Payplug($key)) : Authentication::getAccount();
             PayplugWoocommerceHelper::set_transient_data($response);
             $merchant_id = isset($response['httpResponse']['id']) ? $response['httpResponse']['id'] : '';
+
         } catch (ConfigurationException $e) {
             PayplugGateway::log(sprintf('Missing API key for PayPlug client : %s', wc_print_r($e->getMessage(), true)), 'error');
 
-            $merchant_id = '';
         } catch (HttpException $e) {
-            PayplugGateway::log(sprintf('Account request error from PayPlug API : %s', wc_print_r($e->getErrorObject(), true)), 'error');
+			PayplugGateway::log(sprintf('Account request error from PayPlug API : %s', wc_print_r($e->getErrorObject(), true)), 'error');
+			PayplugWoocommerceHelper::exception_handler_400_logout($e->getCode(), '', sprintf('Account request error from PayPlug API : %s', wc_print_r($e->getMessage(), true)) );
 
-            $merchant_id = '';
         } catch (\Exception $e) {
             PayplugGateway::log(sprintf('Account request error : %s', wc_clean($e->getMessage())), 'error');
-
-            $merchant_id = '';
         }
 
         return $merchant_id;

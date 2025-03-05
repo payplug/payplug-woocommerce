@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\Exception\PayplugException;
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 class PayplugPermissions {
 
@@ -110,6 +111,10 @@ class PayplugPermissions {
 
 			return true;
 		} catch ( PayplugException $e ) {
+
+			//logout
+			PayplugGateway::log(sprintf('Account request error from PayPlug API : %s', wc_print_r($e->getErrorObject(), true)), 'error');
+			PayplugWoocommerceHelper::payplug_logout();
 			$this->permissions = [];
 		}
 
