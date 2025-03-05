@@ -709,6 +709,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         PayplugGateway::log(sprintf('Processing payment for order #%s', $order_id));
 
         $order       = wc_get_order($order_id);
+		if (!$order instanceof \WC_Order) {
+			PayplugGateway::log(sprintf('Order #%s not found.', $order_id), 'error');
+			throw new \Exception(__('Order not found.', 'payplug'));
+		}
         $customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
         $amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total());
         $amount      = $this->validate_order_amount($amount);
