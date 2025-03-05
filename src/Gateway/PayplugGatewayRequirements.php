@@ -7,9 +7,6 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 // Exit if accessed directly
 use const OPENSSL_VERSION_TEXT;
 use const PHP_VERSION;
-use function sprintf;
-use function var_dump;
-use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

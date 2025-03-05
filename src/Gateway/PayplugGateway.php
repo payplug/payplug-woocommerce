@@ -185,7 +185,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         self::$log_enabled = $this->debug;
 
         add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
-		add_action('the_post', [$this, 'validate_payment']);
+		add_action('woocommerce_checkout_order_processed', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
 	}
 
@@ -709,6 +709,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         PayplugGateway::log(sprintf('Processing payment for order #%s', $order_id));
 
         $order       = wc_get_order($order_id);
+		if (!$order instanceof \WC_Order) {
+			PayplugGateway::log(sprintf('Order #%s not found.', $order_id), 'error');
+			throw new \Exception(__('Order not found.', 'payplug'));
+		}
         $customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
         $amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total());
         $amount      = $this->validate_order_amount($amount);
@@ -1218,22 +1222,21 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function retrieve_merchant_id($key = null)
     {
+		$merchant_id = '';
         try {
             $response    = !is_null($key) && !empty($key) ? Authentication::getAccount(new Payplug($key)) : Authentication::getAccount();
             PayplugWoocommerceHelper::set_transient_data($response);
             $merchant_id = isset($response['httpResponse']['id']) ? $response['httpResponse']['id'] : '';
+
         } catch (ConfigurationException $e) {
             PayplugGateway::log(sprintf('Missing API key for PayPlug client : %s', wc_print_r($e->getMessage(), true)), 'error');
 
-            $merchant_id = '';
         } catch (HttpException $e) {
-            PayplugGateway::log(sprintf('Account request error from PayPlug API : %s', wc_print_r($e->getErrorObject(), true)), 'error');
+			PayplugGateway::log(sprintf('Account request error from PayPlug API : %s', wc_print_r($e->getErrorObject(), true)), 'error');
+			PayplugWoocommerceHelper::exception_handler_400_logout($e->getCode(), '', sprintf('Account request error from PayPlug API : %s', wc_print_r($e->getMessage(), true)) );
 
-            $merchant_id = '';
         } catch (\Exception $e) {
             PayplugGateway::log(sprintf('Account request error : %s', wc_clean($e->getMessage())), 'error');
-
-            $merchant_id = '';
         }
 
         return $merchant_id;
