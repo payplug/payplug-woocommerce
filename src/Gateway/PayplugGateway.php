@@ -185,7 +185,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         self::$log_enabled = $this->debug;
 
         add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
-		add_action('woocommerce_checkout_order_processed', [$this, 'validate_payment']);
+		add_action('woocommerce_thankyou', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
 	}
 
