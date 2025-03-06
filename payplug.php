@@ -44,6 +44,11 @@ function init() {
 	if ( file_exists( plugin_dir_path( __FILE__ ) . '/vendor/autoload.php' ) ) {
 		require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 	}
+
+	if ( file_exists( plugin_dir_path( __FILE__ ) . DIRECTORY_SEPARATOR . 'payplug-config.php' ) ) {
+		require_once plugin_dir_path( __FILE__ ) . DIRECTORY_SEPARATOR . 'payplug-config.php';
+	}
+
 	PayplugWoocommerceHelper::load_plugin_textdomain( plugin_basename( dirname( __FILE__ ) ) . '/languages' );
 	PayplugWoocommerce::get_instance();
 
