@@ -55,19 +55,27 @@ class PayplugCreditCard extends PayplugGateway {
 			$this->has_fields = true;
 		}
 
-		if(empty($this->settings[$this->id])){
-			$this->enabled = "yes";
-
-		}else{
-			$this->enabled = $this->settings[$this->id];
-
-		}
+		$this->handle_cc_enabled();
 
 		add_action('wp_enqueue_scripts', [$this, 'scripts']);
 		if (PayplugWoocommerceHelper::is_subscriptions_enabled()) {
 			add_action('woocommerce_scheduled_subscription_payment_' . $this->id,
 				array($this, 'scheduled_subscription_payment'), 10, 2);
 		}
+
+	}
+
+	/**
+	 * if the plugin is disabled the gateways should be disabled
+	 * @return mixed|string
+	 */
+	private function handle_cc_enabled(){
+
+		if(!empty($this->settings[$this->id]) && !empty($this->settings["enabled"]) && $this->settings["enabled"] === "yes"){
+			return $this->enabled = $this->settings[$this->id];
+		}
+
+		return $this->enabled = "no";
 
 	}
 
