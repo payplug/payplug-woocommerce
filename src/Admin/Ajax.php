@@ -339,7 +339,6 @@ class Ajax {
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			PayplugWoocommerceHelper::exception_handler_400_logout($e->getCode(), __( 'payplug_enable_feature', 'payplug' ), sprintf('Account request error from PayPlug API : %s <br><b> ' . __('Successfully logged out.', 'payplug') . '</b>', wc_print_r($e->getMessage(), true)));
 			return false;
 		}
 
