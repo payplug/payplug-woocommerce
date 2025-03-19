@@ -120,7 +120,10 @@ class PayplugWoocommerce {
 		$this->actions  = new WoocommerceActions();
 		$this->requests = new PayplugWoocommerceRequest();
 		new Front\ApplePay();
-		$this->ajax     = new Ajax();
+		if (is_admin()) {
+			$this->ajax     = new Ajax();
+		}
+
 
 		if( PayplugWoocommerceHelper::show_oney_popup() ) {
 			$this->animationHandlers();
