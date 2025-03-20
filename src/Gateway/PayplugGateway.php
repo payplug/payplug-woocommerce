@@ -252,7 +252,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 		global $wp;
 
-		if(!$ipn || !is_checkout()){
+		if(!$ipn && !is_checkout()){
 			if (!is_wc_endpoint_url('order-received') || (empty($_GET['key']) && empty($id)) ) {
 				return;
 			}
