@@ -185,7 +185,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         self::$log_enabled = $this->debug;
 
         add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
-		add_action('template_redirect', [$this, 'validate_payment']);
+		add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
 	}
 
@@ -252,7 +252,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 		global $wp;
 
-		if(!$ipn && !is_checkout()){
+		if(!$ipn){
 			if (!is_wc_endpoint_url('order-received') || (empty($_GET['key']) && empty($id)) ) {
 				return;
 			}
