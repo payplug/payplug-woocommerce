@@ -429,10 +429,8 @@ class PayplugWoocommerceHelper {
 			update_post_meta( $order->id, '_payplug_metadata', $metadata );
 		} else {
 			$order->add_meta_data( '_payplug_metadata', $metadata, true );
+			$order->save_meta_data();
 
-			if ( is_callable( [ $order, 'save' ] ) ) {
-				$order->save();
-			}
 		}
 	}
 
