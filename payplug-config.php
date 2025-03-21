@@ -10,4 +10,5 @@
 /**
  *  CDN path to integrated-payment lib
  */
+
 define( 'IP_API', 'https://cdn.payplug.com/js/integrated-payment/v1@1/index.js' );
