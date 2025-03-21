@@ -122,6 +122,7 @@ class PayplugWoocommerce {
 		new Front\ApplePay();
 		$this->ajax     = new Ajax();
 
+
 		if( PayplugWoocommerceHelper::show_oney_popup() ) {
 			$this->animationHandlers();
 		}

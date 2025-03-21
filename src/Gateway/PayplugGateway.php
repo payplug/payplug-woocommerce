@@ -185,7 +185,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         self::$log_enabled = $this->debug;
 
         add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
-		add_action('woocommerce_thankyou', [$this, 'validate_payment']);
+		add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
 	}
 
@@ -265,7 +265,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$order_id = (int) $id;
 		}
 
-		if (empty($order_id)) {
+		if (empty($order_id) && (isset($wp->query_vars['order-received']))) {
 			$order_id = apply_filters(
 				'woocommerce_thankyou_order_id',
 				absint($wp->query_vars['order-received'])
@@ -296,14 +296,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return;
         }
 
-
-        $transaction_id = PayplugWoocommerceHelper::is_pre_30() ? get_post_meta($order_id, '_transaction_id', true) : $order->get_transaction_id();
-        if (empty($transaction_id)) {
-            PayplugGateway::log(sprintf('Order #%s : Missing transaction id.', $order_id), 'error');
-            return;
-        }
-
 		if($payment_method === $this->id) {
+
+
+			$transaction_id = PayplugWoocommerceHelper::is_pre_30() ? get_post_meta($order_id, '_transaction_id', true) : $order->get_transaction_id();
+			if (empty($transaction_id)) {
+				PayplugGateway::log(sprintf('Order #%s : Missing transaction id.', $order_id), 'error');
+				return;
+			}
 
 			$lock_id = Lock::handle_insert($save_request, $transaction_id);
 			if(!$lock_id){
