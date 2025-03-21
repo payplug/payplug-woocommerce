@@ -238,6 +238,11 @@ class PayplugWoocommerceRequest {
 
 		$payment_id = $_POST['payment_id'];
 
+		if(empty($payment_id)){
+			wp_send_json_error( __("Invalid request.", "payplug") );
+		}
+
+
 		if (PayplugWoocommerceHelper::check_mode()) {
 			$key = PayplugWoocommerceHelper::get_live_key();
 		} else {
@@ -265,7 +270,7 @@ class PayplugWoocommerceRequest {
 				)
 			);
 
-			return wp_send_json_error( $e->getMessage());
+			wp_send_json_error( $e->getMessage());
 		}
 
 		$order_id = $this->getOrderFromPaymentId($payment_id);

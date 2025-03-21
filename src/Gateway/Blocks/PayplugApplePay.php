@@ -39,7 +39,7 @@ class PayplugApplePay extends PayplugGenericBlock
 		$data['ajax_url_applepay_get_order_totals'] = \WC_AJAX::get_endpoint('applepay_get_order_totals');
 		$data['ajax_url_applepay_cancel_order'] = \WC_AJAX::get_endpoint('applepay_cancel_order');
 
-		$data['countryCode'] = WC()->customer->get_billing_country();
+		$data['countryCode'] = WC()->customer !== null ? WC()->customer->get_billing_country() : "FR";
 		$data['currencyCode'] = get_woocommerce_currency();
 		$data['apple_pay_domain'] = $_SERVER['HTTP_HOST'];
 		$data['payplug_authorized_carriers'] = $this->gateway->get_carriers();
@@ -90,31 +90,43 @@ class PayplugApplePay extends PayplugGenericBlock
 
 	public function get_carriers() {
 
-		$packages = WC()->cart->get_shipping_packages();
 		$shippings = [];
 
-		foreach ( $packages as $package_key => $package ) {
-			$shipping_methods = $this->get_shipping_methods_from_package($package);
+		if ( is_null( WC()->cart ) ) {
+			wc_load_cart();
+			WC()->cart->get_cart_from_session();
+		}
 
-			foreach ( $shipping_methods as $shipping_method ) {
+		if ( empty( WC()->cart ) || empty( WC()->cart->get_shipping_packages() ) ) {
+			return false;
+		}
 
-				if (!$shipping_method->supports('shipping-zones') || !$shipping_method->is_enabled()) {
-					continue;
-				}
+		$packages = WC()->cart !== null ? WC()->cart->get_shipping_packages() : null;
 
-				$rates = $shipping_method->get_rates_for_package($package);
-				if($this->checkApplePayShipping($shipping_method)){
-					$shipping_rate = $rates[$shipping_method->get_rate_id()];
+		if(!empty($packages)) {
+			foreach ( $packages as $package_key => $package ) {
+				$shipping_methods = $this->get_shipping_methods_from_package( $package );
+				foreach ( $shipping_methods as $shipping_method ) {
 
-					array_push($shippings, [
-						'identifier' => $shipping_method->id,
-						'label' => $shipping_method->method_title,
-						'detail' => strip_tags($shipping_method->method_description),
-						'amount' =>$shipping_rate->get_cost()+$shipping_rate->get_shipping_tax()
-					]);
+					if ( ! $shipping_method->supports( 'shipping-zones' ) || ! $shipping_method->is_enabled() ) {
+						continue;
+					}
+
+					$rates = $shipping_method->get_rates_for_package( $package );
+					if ( $this->checkApplePayShipping( $shipping_method ) ) {
+						$shipping_rate = $rates[ $shipping_method->get_rate_id() ];
+
+						array_push( $shippings, [
+							'identifier' => $shipping_method->id,
+							'label'      => $shipping_method->method_title,
+							'detail'     => strip_tags( $shipping_method->method_description ),
+							'amount'     => $shipping_rate->get_cost() + $shipping_rate->get_shipping_tax()
+						] );
+					}
 				}
 			}
 		}
+
 		return $shippings;
 	}
 
