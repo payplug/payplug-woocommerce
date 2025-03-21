@@ -4,6 +4,7 @@ ehthumbs.db
 
 # Folder config file
 Desktop.ini
+payplug-config.php
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
@@ -34,9 +35,9 @@ vendor
 # unit tests
 tests
 
-# raw block files
-/src/Gateway/Blocks/
-
 # Temporary files
 *~
 /cypress/
+
+#raw block files
+/src/Gateway/Blocks/
