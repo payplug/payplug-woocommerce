@@ -33,7 +33,7 @@ node_modules
 vendor
 
 # unit tests
-tests
+tests/phpunit
 
 # Temporary files
 *~
