@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ec5883429b96d342cbe34084d8ed0fd2",
+    "content-hash": "6acbbdd2d996e4f1d31208fb3b84b4bd",
     "packages": [
         {
             "name": "composer/installers",
@@ -206,54 +206,6 @@
                 "source": "https://github.com/payplug/payplug-php/tree/3.6.0"
             },
             "time": "2015-05-06T00:00:00+00:00"
-        },
-        {
-            "name": "wp-phpunit/wp-phpunit",
-            "version": "6.7.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/wp-phpunit/wp-phpunit.git",
-                "reference": "e63eb1c0980839853c569d3f04ff70263b7795e3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/e63eb1c0980839853c569d3f04ff70263b7795e3",
-                "reference": "e63eb1c0980839853c569d3f04ff70263b7795e3",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "__loaded.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Evan Mattson",
-                    "email": "me@aaemnnost.tv"
-                },
-                {
-                    "name": "WordPress Community",
-                    "homepage": "https://wordpress.org/about/"
-                }
-            ],
-            "description": "WordPress core PHPUnit library",
-            "homepage": "https://github.com/wp-phpunit",
-            "keywords": [
-                "phpunit",
-                "test",
-                "wordpress"
-            ],
-            "support": {
-                "docs": "https://github.com/wp-phpunit/docs",
-                "issues": "https://github.com/wp-phpunit/issues",
-                "source": "https://github.com/wp-phpunit/wp-phpunit"
-            },
-            "time": "2024-11-22T01:27:46+00:00"
         }
     ],
     "packages-dev": [
@@ -707,16 +659,16 @@
         },
         {
             "name": "jawira/plantuml",
-            "version": "v1.2025.0",
+            "version": "v1.2025.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jawira/plantuml.git",
-                "reference": "f96d6523a30947001d0a9cb8d591d55aac33bea6"
+                "reference": "13ba6ee7b4f44db546a9931847bcec1b1728b77a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jawira/plantuml/zipball/f96d6523a30947001d0a9cb8d591d55aac33bea6",
-                "reference": "f96d6523a30947001d0a9cb8d591d55aac33bea6",
+                "url": "https://api.github.com/repos/jawira/plantuml/zipball/13ba6ee7b4f44db546a9931847bcec1b1728b77a",
+                "reference": "13ba6ee7b4f44db546a9931847bcec1b1728b77a",
                 "shasum": ""
             },
             "bin": [
@@ -742,22 +694,22 @@
             ],
             "support": {
                 "issues": "https://github.com/jawira/plantuml/issues",
-                "source": "https://github.com/jawira/plantuml/tree/v1.2025.0"
+                "source": "https://github.com/jawira/plantuml/tree/v1.2025.2"
             },
-            "time": "2025-01-10T14:00:43+00:00"
+            "time": "2025-03-07T14:00:51+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
-            "version": "2.1.0",
+            "version": "2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Jean85/pretty-package-versions.git",
-                "reference": "3c4e5f62ba8d7de1734312e4fff32f67a8daaf10"
+                "reference": "4d7aa5dab42e2a76d99559706022885de0e18e1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Jean85/pretty-package-versions/zipball/3c4e5f62ba8d7de1734312e4fff32f67a8daaf10",
-                "reference": "3c4e5f62ba8d7de1734312e4fff32f67a8daaf10",
+                "url": "https://api.github.com/repos/Jean85/pretty-package-versions/zipball/4d7aa5dab42e2a76d99559706022885de0e18e1a",
+                "reference": "4d7aa5dab42e2a76d99559706022885de0e18e1a",
                 "shasum": ""
             },
             "require": {
@@ -767,8 +719,9 @@
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.2",
                 "jean85/composer-provided-replaced-stub-package": "^1.0",
-                "phpstan/phpstan": "^1.4",
+                "phpstan/phpstan": "^2.0",
                 "phpunit/phpunit": "^7.5|^8.5|^9.6",
+                "rector/rector": "^2.0",
                 "vimeo/psalm": "^4.3 || ^5.0"
             },
             "type": "library",
@@ -801,9 +754,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Jean85/pretty-package-versions/issues",
-                "source": "https://github.com/Jean85/pretty-package-versions/tree/2.1.0"
+                "source": "https://github.com/Jean85/pretty-package-versions/tree/2.1.1"
             },
-            "time": "2024-11-18T16:19:46+00:00"
+            "time": "2025-03-19T14:43:43+00:00"
         },
         {
             "name": "league/commonmark",
@@ -1162,16 +1115,16 @@
         },
         {
             "name": "league/tactician-bundle",
-            "version": "v1.5.1",
+            "version": "v1.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/tactician-bundle.git",
-                "reference": "165d9fa14eb55bf84257fc40af0a69beca9c3611"
+                "reference": "8acdfffc227295cca945ff1a964f88e4f034cdf9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/tactician-bundle/zipball/165d9fa14eb55bf84257fc40af0a69beca9c3611",
-                "reference": "165d9fa14eb55bf84257fc40af0a69beca9c3611",
+                "url": "https://api.github.com/repos/thephpleague/tactician-bundle/zipball/8acdfffc227295cca945ff1a964f88e4f034cdf9",
+                "reference": "8acdfffc227295cca945ff1a964f88e4f034cdf9",
                 "shasum": ""
             },
             "require": {
@@ -1243,9 +1196,9 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/tactician-bundle/issues",
-                "source": "https://github.com/thephpleague/tactician-bundle/tree/v1.5.1"
+                "source": "https://github.com/thephpleague/tactician-bundle/tree/v1.5.2"
             },
-            "time": "2024-01-30T18:43:03+00:00"
+            "time": "2025-02-19T08:17:44+00:00"
         },
         {
             "name": "league/tactician-container",
@@ -1711,16 +1664,16 @@
         },
         {
             "name": "myclabs/deep-copy",
-            "version": "1.12.1",
+            "version": "1.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myclabs/DeepCopy.git",
-                "reference": "123267b2c49fbf30d78a7b2d333f6be754b94845"
+                "reference": "024473a478be9df5fdaca2c793f2232fe788e414"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/123267b2c49fbf30d78a7b2d333f6be754b94845",
-                "reference": "123267b2c49fbf30d78a7b2d333f6be754b94845",
+                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/024473a478be9df5fdaca2c793f2232fe788e414",
+                "reference": "024473a478be9df5fdaca2c793f2232fe788e414",
                 "shasum": ""
             },
             "require": {
@@ -1759,7 +1712,7 @@
             ],
             "support": {
                 "issues": "https://github.com/myclabs/DeepCopy/issues",
-                "source": "https://github.com/myclabs/DeepCopy/tree/1.12.1"
+                "source": "https://github.com/myclabs/DeepCopy/tree/1.13.0"
             },
             "funding": [
                 {
@@ -1767,7 +1720,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-11-08T17:47:46+00:00"
+            "time": "2025-02-12T12:17:51+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -2475,16 +2428,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "2.0.0",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "c00d78fb6b29658347f9d37ebe104bffadf36299"
+                "reference": "9b30d6fd026b2c132b3985ce6b23bec09ab3aa68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/c00d78fb6b29658347f9d37ebe104bffadf36299",
-                "reference": "c00d78fb6b29658347f9d37ebe104bffadf36299",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/9b30d6fd026b2c132b3985ce6b23bec09ab3aa68",
+                "reference": "9b30d6fd026b2c132b3985ce6b23bec09ab3aa68",
                 "shasum": ""
             },
             "require": {
@@ -2516,9 +2469,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.0.0"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.1.0"
             },
-            "time": "2024-10-13T11:29:49+00:00"
+            "time": "2025-02-19T13:28:12+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -4157,16 +4110,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.11.3",
+            "version": "3.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "ba05f990e79cbe69b9f35c8c1ac8dca7eecc3a10"
+                "reference": "2d1b63db139c3c6ea0c927698e5160f8b3b8d630"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/ba05f990e79cbe69b9f35c8c1ac8dca7eecc3a10",
-                "reference": "ba05f990e79cbe69b9f35c8c1ac8dca7eecc3a10",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/2d1b63db139c3c6ea0c927698e5160f8b3b8d630",
+                "reference": "2d1b63db139c3c6ea0c927698e5160f8b3b8d630",
                 "shasum": ""
             },
             "require": {
@@ -4233,11 +4186,11 @@
                     "type": "open_collective"
                 },
                 {
-                    "url": "https://thanks.dev/phpcsstandards",
+                    "url": "https://thanks.dev/u/gh/phpcsstandards",
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-01-23T17:04:15+00:00"
+            "time": "2025-03-18T05:04:51+00:00"
         },
         {
             "name": "symfony/cache",
@@ -5199,16 +5152,16 @@
         },
         {
             "name": "symfony/flex",
-            "version": "v1.21.8",
+            "version": "v1.22.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/flex.git",
-                "reference": "bda5f869ac51c8e985a6fe9f964c4cb78228a369"
+                "reference": "5cc985971b1a700cb74bedd9e01cfa93eb4747f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/flex/zipball/bda5f869ac51c8e985a6fe9f964c4cb78228a369",
-                "reference": "bda5f869ac51c8e985a6fe9f964c4cb78228a369",
+                "url": "https://api.github.com/repos/symfony/flex/zipball/5cc985971b1a700cb74bedd9e01cfa93eb4747f7",
+                "reference": "5cc985971b1a700cb74bedd9e01cfa93eb4747f7",
                 "shasum": ""
             },
             "require": {
@@ -5247,7 +5200,7 @@
             "description": "Composer plugin for Symfony",
             "support": {
                 "issues": "https://github.com/symfony/flex/issues",
-                "source": "https://github.com/symfony/flex/tree/v1.21.8"
+                "source": "https://github.com/symfony/flex/tree/v1.22.0"
             },
             "funding": [
                 {
@@ -5263,7 +5216,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-10-07T08:51:39+00:00"
+            "time": "2025-03-03T07:50:24+00:00"
         },
         {
             "name": "symfony/framework-bundle",
@@ -7184,17 +7137,65 @@
             "time": "2021-02-27T15:53:37+00:00"
         },
         {
-            "name": "yoast/phpunit-polyfills",
-            "version": "3.1.1",
+            "name": "wp-phpunit/wp-phpunit",
+            "version": "6.7.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Yoast/PHPUnit-Polyfills.git",
-                "reference": "e6381c62c4df51677b657fbac79b79dfce7acdab"
+                "url": "https://github.com/wp-phpunit/wp-phpunit.git",
+                "reference": "e2bb06bacc92a8e9e405e83f56989e8ed9359db1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Yoast/PHPUnit-Polyfills/zipball/e6381c62c4df51677b657fbac79b79dfce7acdab",
-                "reference": "e6381c62c4df51677b657fbac79b79dfce7acdab",
+                "url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/e2bb06bacc92a8e9e405e83f56989e8ed9359db1",
+                "reference": "e2bb06bacc92a8e9e405e83f56989e8ed9359db1",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "__loaded.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Evan Mattson",
+                    "email": "me@aaemnnost.tv"
+                },
+                {
+                    "name": "WordPress Community",
+                    "homepage": "https://wordpress.org/about/"
+                }
+            ],
+            "description": "WordPress core PHPUnit library",
+            "homepage": "https://github.com/wp-phpunit",
+            "keywords": [
+                "phpunit",
+                "test",
+                "wordpress"
+            ],
+            "support": {
+                "docs": "https://github.com/wp-phpunit/docs",
+                "issues": "https://github.com/wp-phpunit/issues",
+                "source": "https://github.com/wp-phpunit/wp-phpunit"
+            },
+            "time": "2025-02-12T01:22:52+00:00"
+        },
+        {
+            "name": "yoast/phpunit-polyfills",
+            "version": "3.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Yoast/PHPUnit-Polyfills.git",
+                "reference": "9cf2ccd990eadfc4a1e390592d4731e590b2c618"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Yoast/PHPUnit-Polyfills/zipball/9cf2ccd990eadfc4a1e390592d4731e590b2c618",
+                "reference": "9cf2ccd990eadfc4a1e390592d4731e590b2c618",
                 "shasum": ""
             },
             "require": {
@@ -7209,7 +7210,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "3.x-dev"
+                    "dev-main": "4.x-dev"
                 }
             },
             "autoload": {
@@ -7244,7 +7245,7 @@
                 "security": "https://github.com/Yoast/PHPUnit-Polyfills/security/policy",
                 "source": "https://github.com/Yoast/PHPUnit-Polyfills"
             },
-            "time": "2025-01-12T08:41:37+00:00"
+            "time": "2025-02-09T18:36:24+00:00"
         }
     ],
     "aliases": [],
