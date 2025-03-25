@@ -17,8 +17,7 @@
   "require": {
     "php": ">=5.6.0",
     "composer/installers": "^1.9",
-    "payplug/payplug-php": "^3.5",
-    "wp-phpunit/wp-phpunit": "^6.7"
+    "payplug/payplug-php": "^3.5"
   },
   "require-dev": {
     "phpdocumentor/phpdocumentor": "3.*",
@@ -28,7 +27,8 @@
     "phpcompatibility/php-compatibility": "*",
     "phpunit/phpunit": "^9.6",
     "yoast/phpunit-polyfills": "^3.0",
-    "mockery/mockery": "^1.6"
+    "mockery/mockery": "^1.6",
+    "wp-phpunit/wp-phpunit": "^6.7"
   },
   "autoload": {
     "psr-4": {
