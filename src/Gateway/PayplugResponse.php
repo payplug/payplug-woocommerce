@@ -341,8 +341,8 @@ class PayplugResponse {
 				array(
 					'field_query' => array(
 						array(
-							'key'        => 'transaction_id',
-							'comparison' => $transaction_id
+							'field'        => 'transaction_id',
+							'value' => $transaction_id
 						),
 					),
 				)

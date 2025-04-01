@@ -32,6 +32,9 @@ node_modules
 # Vendor
 vendor
 
+# raw block files
+/src/Gateway/Blocks/
+
 # unit tests
 tests/phpunit
 
