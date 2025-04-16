@@ -70,16 +70,49 @@ const IntegratedPayment = ({props: props,}) => {
 					$element.addClass("-hide");
 					$element.parent().addClass("-hide");
 				}
+			},
+			validateInput : function(input, $error_targer){
+
+				// Check if the input value has more than 4 letters
+				if (jQuery(input).val().length < 5 && jQuery(input).val().length > 0) {
+					jQuery(input).addClass("hosted-fields-invalid-state");
+					jQuery($error_targer).removeClass("-hide");
+					jQuery($error_targer).parent().removeClass("-hide");
+
+				}else{
+					jQuery(input).removeClass("hosted-fields-invalid-state");
+					jQuery($error_targer).addClass("-hide");
+					jQuery($error_targer).parent().addClass("-hide");
+				}
 			}
 		}
 
 	useEffect(() => {
 		hfields.init.load();
+		jQuery("[name=hosted-fields-cardHolder]").on("input", function (event) {
+			hfields.validateInput(event.target, jQuery(".IntegratedPayment_error.-cardHolder .invalidField"));
+		});
 
 	}, []);
 
 	return (
 		<>
+			<div className="payplug IntegratedPayment_container -cardHolder cardHolder-input-container"
+				 data-e2e-name="cardHolder">
+				<p className="cardHolder-container">
+			            <span className="input-container" id="cardHolder-container">
+			            	<input type="text" name="hosted-fields-cardHolder" id="hosted-fields-cardHolder"
+								   className="hosted-fields hosted-fields-input-state"
+								   placeholder={settings?.payplug_integrated_payment_cardholder}/>
+						</span>
+				</p>
+			</div>
+			<div className="payplug IntegratedPayment_error -cardHolder -hide">
+				<span className="-hide invalidField"
+					  data-e2e-error="invalidField">{settings?.payplug_integrated_payment_cardHolder_error}</span>
+				<span className="-hide emptyField"
+					  data-e2e-error="paymentError">{settings?.payplug_integrated_payment_empty}</span>
+			</div>
 			<div className="payplug IntegratedPayment_container -scheme">
 				<div>{settings?.payplug_integrated_payment_your_card}</div>
 				<div className="payplug IntegratedPayment_schemes">

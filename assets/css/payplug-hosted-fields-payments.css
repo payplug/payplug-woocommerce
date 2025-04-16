@@ -27,3 +27,32 @@ div.IntegratedPayment_container:has(.hosted-fields-invalid-state) {
 .IntegratedPayment_container span iframe{
 	width: inherit !important;
 }
+#payment-form .cardHolder-input-container span {
+	margin-top: 0px;
+}
+#payment-form .cardHolder-input-container input.hosted-fields {
+	box-shadow: none !important;
+	display: block;
+	outline: none;
+	width: 100%;
+	background-color: transparent !important;
+	padding: 0 !important;
+	margin-top: 0px;
+}
+
+p.cardHolder-container{
+	width: 100%;
+}
+
+#hosted-fields-cardHolder{
+	box-shadow: none !important;
+	display: block;
+	outline: none;
+	width: 100%;
+	background-color: transparent !important;
+	padding: 0 !important;
+	margin-top: -2px;
+	border: none;
+}
+
+

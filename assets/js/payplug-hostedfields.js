@@ -60,9 +60,23 @@ var hfields = {
 			$element.parent().removeClass("-hide");
 		}
 
-		if(event["type"] === "valid"){
+		if(event["type"] === "valid" || event["type"] === "empty"){
 			$element.addClass("-hide");
 			$element.parent().addClass("-hide");
+		}
+	},
+	validateInput : function(input, $error_targer){
+
+		// Check if the input value has more than 4 letters
+		if (jQuery(input).val().length < 5 && jQuery(input).val().length > 0) {
+			jQuery(input).addClass("hosted-fields-invalid-state");
+			jQuery($error_targer).removeClass("-hide");
+			jQuery($error_targer).parent().removeClass("-hide");
+
+		}else{
+			jQuery(input).removeClass("hosted-fields-invalid-state");
+			jQuery($error_targer).addClass("-hide");
+			jQuery($error_targer).parent().addClass("-hide");
 		}
 	}
 }
@@ -71,10 +85,8 @@ var hfields = {
 
 jQuery( 'body' ).on( 'updated_checkout', function() {
 	hfields.init.load();
+	jQuery("[name=hosted-fields-cardHolder]").on("input", function (event) {
+		hfields.validateInput(event.target, jQuery(".IntegratedPayment_error.-cardHolder .invalidField"));
+	});
 });
 
-(function ($) {
-	// Load the hosted-fields library
-	hfields.init.load();
-
-})(jQuery);
