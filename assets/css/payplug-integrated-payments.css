@@ -24,7 +24,11 @@
 	width: 100%;
 	position: relative;
 }
-.IntegratedPayment_container.-cardHolder, .IntegratedPayment_container.-pan, .IntegratedPayment_container.-exp, .IntegratedPayment_container.-cvv {
+
+.wp-block-woocommerce-checkout-payment-block .IntegratedPayment_container.-cardHolder,
+.wp-block-woocommerce-checkout-payment-block .IntegratedPayment_container.-pan,
+.wp-block-woocommerce-checkout-payment-block .IntegratedPayment_container.-exp,
+.wp-block-woocommerce-checkout-payment-block .IntegratedPayment_container.-cvv {
 	height: 40px;
 	line-height: 40px;
 	border-radius: 2px;
@@ -32,6 +36,17 @@
 	cursor: text;
 	border: solid 1px #d5d6d8
 }
+
+.IntegratedPayment_container.-cardHolder, .IntegratedPayment_container.-pan, .IntegratedPayment_container.-exp, .IntegratedPayment_container.-cvv {
+	height: 40px;
+	line-height: 40px;
+	border-radius: 2px;
+	padding: 0px 16px 0 50px;
+	cursor: text;
+	border: solid 1px #d5d6d8
+}
+
+
 .IntegratedPayment_container.-cardHolder:before, .IntegratedPayment_container.-pan:before, .IntegratedPayment_container.-exp:before, .IntegratedPayment_container.-cvv:before {
 	content: "";
 	position: absolute;
