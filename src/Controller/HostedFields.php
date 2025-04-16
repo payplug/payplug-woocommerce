@@ -22,6 +22,17 @@ class HostedFields {
 
 		return <<<HTML
 			<form id="payment-form" class="payplug IntegratedPayment -loaded">
+				<div class="payplug IntegratedPayment_container -cardHolder cardHolder-input-container" data-e2e-name="cardHolder">
+					<p>
+			            <span class="input-container" id="cardHolder-container">
+			            	<input type="text" name="hosted-fields-cardHolder" value="" id="hosted-fields-cardHolder" class="hosted-fields hosted-fields-input-state" placeholder="{$f(__('payplug_integrated_payment_cardholder', 'payplug'))}">
+						</span>
+			        </p>
+				</div>
+				<div class="payplug IntegratedPayment_error -cardHolder -hide">
+					<span class="-hide invalidField" data-e2e-error="invalidField">{$f(__('payplug_integrated_payment_cardHolder_error', 'payplug'))}</span>
+					<span class="-hide emptyField" data-e2e-error="paymentError">{$f(__('payplug_integrated_payment_empty', 'payplug'))}</span>
+				</div>
 				<div class="payplug IntegratedPayment_container -scheme">
 					<div>{$f(__('payplug_integrated_payment_your_card', 'payplug'))}</div>
 					<div class="payplug IntegratedPayment_schemes">
