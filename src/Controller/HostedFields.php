@@ -67,7 +67,7 @@ class HostedFields {
 				</div>
 			</form>
 
-		HTML;
+HTML;
 	}
 
 }
