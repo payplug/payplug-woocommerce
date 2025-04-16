@@ -11,9 +11,6 @@ var style = {
 	":invalid": {
 		"color": "#FF0000",
 		"font-size": "1em"
-	},
-	"iframe": {
-		"all": "initial"
 	}
 };
 
