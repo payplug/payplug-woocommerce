@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
-import IntegratedPayment from "./wc-payplug-integratedPayment-blocks";
+import IntegratedPayment from "./wc-payplug-hosted-fields-blocks";
 import Popup from "./wc-payplug-popup-blocks";
 const settings = getSetting( 'payplug_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');

@@ -34,6 +34,8 @@ class PayplugCreditCard extends PayplugGenericBlock
 
 		$options = get_option('woocommerce_payplug_settings', []);
 		if( $options['payment_method'] === "integrated" ){
+
+			//translations
 			$data["payplug_integrated_payment_cardHolder_error"] = __('payplug_integrated_payment_cardHolder_error', 'payplug');
 			$data["payplug_integrated_payment_empty"] = __('payplug_integrated_payment_empty', 'payplug');
 			$data["payplug_integrated_payment_your_card"] = __('payplug_integrated_payment_your_card', 'payplug');
@@ -51,10 +53,6 @@ class PayplugCreditCard extends PayplugGenericBlock
 			$data["payplug_integrated_payment_expiration_date"] = __('payplug_integrated_payment_expiration_date', 'payplug');
 			$data["payplug_integrated_payment_cvv"] = __('payplug_integrated_payment_cvv', 'payplug');
 			$data["payplug_invalid_form"] = __('payplug_required_fields_error', 'payplug');
-			$data['payplug_create_intent_payment'] = \WC_AJAX::get_endpoint('payplug_create_intent');
-			$data['payplug_integrated_payment_check_payment_url'] = \WC_AJAX::get_endpoint('payplug_check_payment');
-			$data['payplug_integrated_payment_nonce_field'] = wp_nonce_field('woocommerce-process_checkout', 'woocommerce-process-checkout-nonce');
-			$data['wp_nonce'] = wp_create_nonce( "woocommerce-process_checkout" );
 			$data['mode'] = PayplugWoocommerceHelper::check_mode();
 			$data["IP"] = true;
 
@@ -90,18 +88,10 @@ class PayplugCreditCard extends PayplugGenericBlock
 
 	private function ip_scripts(){
 		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
-		wp_register_script(
-			'payplug-integrated-payments-api',
-			IP_API,
-			array(),
-			'v1.1',
-			true
-		);
+		wp_enqueue_style('payplug-hosted-fields-style', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-hosted-fields-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+		wp_register_script('payplug-hosted-fields-payments-api', HF_API, [], 'v2.1.0', true);
+		wp_enqueue_script('payplug-hosted-fields-payments-api');
 
-		wp_register_script('payplug-domain', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-domain.js', [], 'v1.0');
-		wp_enqueue_script('payplug-domain');
-
-		wp_enqueue_script('payplug-integrated-payments-api');
 	}
 
 	private function popup_scripts(){
