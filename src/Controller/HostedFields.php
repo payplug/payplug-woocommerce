@@ -21,7 +21,7 @@ class HostedFields {
 		};
 
 		return <<<HTML
-			<form id="payment-form" class="payplug IntegratedPayment -loaded">
+			<form id="payment-form" class="payplug IntegratedPayment -loaded" onsubmit="event.preventDefault(); HostedFields.tokenizeHandler();">
 				<div class="payplug IntegratedPayment_container -cardHolder cardHolder-input-container" data-e2e-name="cardHolder">
 					<p>
 			            <span class="input-container" id="cardHolder-container">
@@ -76,6 +76,7 @@ class HostedFields {
 				<div class="payplug IntegratedPayment_container -privacy-policy">
 					<a href="$privacy_policy_url" target="_blank">{$f(__('payplug_integrated_payment_privacy_policy', 'payplug'))}</a>
 				</div>
+			    <input type="hidden" name="hf-token" id="hf-token" />
 			</form>
 
 HTML;
