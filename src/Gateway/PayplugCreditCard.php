@@ -71,12 +71,13 @@ class PayplugCreditCard extends PayplugGateway {
 	 */
 	private function handle_cc_enabled(){
 
-		if(!empty($this->settings[$this->id]) && !empty($this->settings["enabled"]) && $this->settings["enabled"] === "yes"){
-			return $this->enabled = $this->settings[$this->id];
+		if (!empty($this->settings["enabled"]) && $this->settings["enabled"] === "yes") {
+			$this->enabled = !empty($this->settings[$this->id]) ? $this->settings[$this->id] : $this->settings["enabled"];
+		} else {
+			$this->enabled = "no";
 		}
 
-		return $this->enabled = "no";
-
+		return $this->enabled;
 	}
 
 	/**
