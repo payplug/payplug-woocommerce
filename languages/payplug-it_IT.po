@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.5\n"
+"X-Generator: Poedit 3.6\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1215,3 +1215,15 @@ msgid "payplug_ppro_flag_error"
 msgstr ""
 "Rimborso registrato. Verrà elaborato manualmente dal nostro team. \n"
 " Per maggiori informazioni, consulta il nostro centro assistenza."
+
+msgid "payplug_section_oauth_login_description"
+msgstr "Accedi al tuo conto"
+
+msgid "payplug_section_oauth_login_content"
+msgstr "Accedi tramite il mio portale PayPlug"
+
+msgid "payplug_section_oauth_login_create_account"
+msgstr "Non hai  un conto?"
+
+msgid "payplug_section_oauth_login_btn_connect"
+msgstr "Accedi al tuo conto"
