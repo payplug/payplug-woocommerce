@@ -62,7 +62,6 @@ class PayplugResponse {
 			// Ignore cancelled orders
 			if ($order->has_status('refunded')) {
 				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order has been refunded. Ignoring IPN', $order_id));
-				//$lock->deleteLock($resource->id);
 				return;
 			}
 			$paid_date = $order->get_date_paid();
@@ -74,24 +73,20 @@ class PayplugResponse {
 			// Ignore paid orders
 			if ( $order->is_paid() ) {
 				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order is already complete. Ignoring IPN. "' . !empty($source) ? '[IPN]' : ''. '"', $order_id));
-				//$lock->deleteLock($resource->id);
 				return;
 			}
 
 			// Handle failed payments
 			if (!empty($resource->failure)) {
-				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
-				$order->update_status(
-					'failed',
-					sprintf(__('PayPlug %s OK | Transaction %s failed : %s', 'payplug'), strtoupper($source), $resource->id, wc_clean($resource->failure->message))
-				);
+				if($order->get_status() != "failed"){
+					$order->update_status( 'failed', sprintf(__('PayPlug %s OK | Transaction %s failed : %s', 'payplug'), strtoupper($source), $resource->id, wc_clean($resource->failure->message)) );
+				}
+
 				/** This action is documented in src/Gateway/PayplugResponse */
 				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
 				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
 				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed but failed.', $order_id, $resource->id));
 				wc_increase_stock_levels($order);
-
-				//$lock->deleteLock($resource->id);
 				return;
 			}
 
@@ -130,7 +125,6 @@ class PayplugResponse {
 
 			// Handle successful payments
 			if ($resource->is_paid) {
-				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, true);
 				if (!$is_payment_with_token) {
 					$this->maybe_save_card($resource);
 				}
@@ -347,8 +341,8 @@ class PayplugResponse {
 				array(
 					'field_query' => array(
 						array(
-							'key'        => 'transaction_id',
-							'comparison' => $transaction_id
+							'field'        => 'transaction_id',
+							'value' => $transaction_id
 						),
 					),
 				)

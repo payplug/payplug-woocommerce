@@ -6,13 +6,11 @@ namespace Payplug\PayplugWoocommerce\Admin;
 use Payplug\Exception\HttpException;
 use Payplug\Payplug;
 use Payplug\Authentication;
-use Payplug\PayplugWoocommerce\Admin\Vue;
 use Payplug\PayplugWoocommerce\Controller\ApplePay;
 use Payplug\PayplugWoocommerce\Gateway\AmericanExpress;
 use Payplug\PayplugWoocommerce\Gateway\Bancontact;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
-use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Ideal;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Mybank;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Satispay;
@@ -341,11 +339,6 @@ class Ajax {
 
 		}  catch (PayplugException $e){
 			PayplugGateway::log('Error while saving account : ' . $e->getMessage(), 'error');
-			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => $e->getMessage(),
-				"close" => __( 'payplug_ok', 'payplug' )
-			));
 			return false;
 		}
 
@@ -387,7 +380,7 @@ class Ajax {
 	 *
 	 * Ajax paypal login
 	 *
-	 * @return JSON
+	 * @return void
 	 */
 	public function payplug_login() {
 
@@ -400,18 +393,14 @@ class Ajax {
 		delete_site_option( 'woocommerce_payplug_settings' );
 
 		try {
-			$response = Authentication::getKeysByLogin($email, $password);
-			if (empty($response) || !isset($response)) {
-				http_response_code(401);
-				return wp_send_json_error(array(
-					'message' => __( 'payplug_error_wrong_credentials.', 'payplug' ),
-				));
-			}
+
 			$payplug = new PayplugGateway();
-			$form_fields = $payplug->get_form_fields();
-
 			$api_keys = $payplug->retrieve_user_api_keys($email, $password);
+			if ( is_wp_error( $api_keys ) ) {
+				$this->login_wrong_credentials_error();
+			}
 
+			$form_fields = $payplug->get_form_fields();
 			$merchant_id = isset($api_keys['test']) ? $payplug->retrieve_merchant_id($api_keys['test']) : '';
 
 			foreach ($form_fields as $key => $field) {
@@ -462,14 +451,19 @@ class Ajax {
 				]
 			];
 
-			return wp_send_json_success( ["settings" => $user + $wp] + ( new Vue )->init() );
+			wp_send_json_success( ["settings" => $user + $wp] + ( new Vue )->init() );
 		} catch (HttpException $e) {
-
-			http_response_code(401);
-			$error = __("payplug_error_wrong_credentials", "payplug");
-			return wp_send_json_error(array('message' => $error));
+			$this->login_wrong_credentials_error();
 
 		}
+	}
+
+	/**
+	 * Response Json Error WP Format for wrong credentials
+	 * @return void
+	 */
+	private function login_wrong_credentials_error(){
+		wp_send_json_error( array( 'message' => __("payplug_error_wrong_credentials", "payplug") ) );
 	}
 
 	/**
@@ -501,25 +495,19 @@ class Ajax {
 	 */
 	public function payplug_logout() {
 
-		$payplug = new PayplugGateway();
+		PayplugWoocommerceHelper::payplug_logout();
+		$wp = [
+			"logged" => PayplugWoocommerceHelper::user_logged_in(),
+			"mode" => PayplugWoocommerceHelper::check_mode() ? 0 : 1
+		];
 
-		if (PayplugWoocommerceHelper::payplug_logout($payplug)) {
-			$wp = [
-				"logged" => PayplugWoocommerceHelper::user_logged_in(),
-				"mode" => PayplugWoocommerceHelper::check_mode() ? 0 : 1
-			];
-
-			http_response_code(200);
-			return wp_send_json_success(array(
-				"message" => __('Successfully logged out.', 'payplug'),
-				"status" => ( new Vue )->payplug_section_status(),
-				"settings" => $wp,
-				"subscribe" => ( new Vue )->payplug_section_subscribe() // When Logging out the Status Block needs to be updated
-			));
-		} else {
-			http_response_code(400);
-			return wp_send_json_error(__('Already logged out.', 'payplug'));
-		}
+		http_response_code(200);
+		wp_send_json_success(array(
+			"message" => __('Successfully logged out.', 'payplug'),
+			"status" => ( new Vue )->payplug_section_status(),
+			"settings" => $wp,
+			"subscribe" => ( new Vue )->payplug_section_subscribe() // When Logging out the Status Block needs to be updated
+		));
 
 	}
 

@@ -7,8 +7,8 @@
  * Author URI:      https://www.payplug.com/
  * Text Domain:     payplug
  * Domain Path:     /languages
- * Version:         2.12.0
- * WC tested up to: 9.6.0
+ * Version:         2.12.2
+ * WC tested up to: 9.7.0
  * Requires plugins: woocommerce
  * License:         GPLv3 or later
  * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-define( 'PAYPLUG_GATEWAY_VERSION', '2.12.0' );
+define( 'PAYPLUG_GATEWAY_VERSION', '2.12.2' );
 define( 'PAYPLUG_GATEWAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -44,6 +44,11 @@ function init() {
 	if ( file_exists( plugin_dir_path( __FILE__ ) . '/vendor/autoload.php' ) ) {
 		require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 	}
+
+	if ( file_exists( plugin_dir_path( __FILE__ ) . DIRECTORY_SEPARATOR . 'payplug-config.php' ) ) {
+		require_once plugin_dir_path( __FILE__ ) . DIRECTORY_SEPARATOR . 'payplug-config.php';
+	}
+
 	PayplugWoocommerceHelper::load_plugin_textdomain( plugin_basename( dirname( __FILE__ ) ) . '/languages' );
 	PayplugWoocommerce::get_instance();
 
