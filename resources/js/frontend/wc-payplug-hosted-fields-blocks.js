@@ -121,36 +121,35 @@ const IntegratedPayment = ({props: props,}) => {
 	useEffect(() => {
 		const onValidation = async () => {
 
-			let isValid = false;
-			await tokenizeHandler().then((response) => {
-				isValid = true;
+			try {
+				const response = await tokenizeHandler();
 
-			});
-
-
-			console.log("isValid", isValid);
-
-
-			if(!isValid){
+				if (response.execCode === "0000") {
+					return true; // Validation successful
+				} else {
+					return {
+						errorMessage: settings?.payplug_invalid_form
+					};
+				}
+			} catch (error) {
 				return {
 					errorMessage: settings?.payplug_invalid_form
-				}
-			}else{
-				return isValid;2
+				};
 			}
+		};
 
-			function tokenizeHandler(){
-				return new Promise(async (resolve, reject) => {
-					await HostedFields.hfields.createToken(function (result) {
-						if (HostedFields.submitValidation(jQuery("[name=hosted-fields-cardHolder]"), jQuery(".IntegratedPayment_error.-cardHolder .invalidField")) && result.execCode == "0000") {
-							document.getElementById("hf-token").value = result.hfToken;
-							resolve(result);
+		async function tokenizeHandler() {
+			return new Promise((resolve, reject) => {
+				HostedFields.hfields.createToken(function (result) {
+					if (HostedFields.submitValidation(jQuery("[name=hosted-fields-cardHolder]"), jQuery(".IntegratedPayment_error.-cardHolder .invalidField")) && result.execCode == "0000") {
+						document.getElementById("hf-token").value = result.hfToken;
+						resolve(result);
 
-						}
-					});
+					} else {
+						reject(new Error("Tokenization failed"));
+					}
 				});
-			}
-
+			});
 		}
 
 
