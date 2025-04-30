@@ -11,7 +11,6 @@ use Payplug\Authentication;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\HttpException;
 use Payplug\Payplug;
-use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\Helper\Lock;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\Payment as PaymentResource;

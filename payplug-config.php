@@ -8,6 +8,6 @@
  */
 
 /**
- *  CDN path to integrated-payment lib
+ *  CDN path to Hosted-Fields lib
  */
-define( 'IP_API', 'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js' );
+define( 'HF_API', 'https://js.sandbox.dalenys.com/hosted-fields/v2.1.0/hosted-fields.min.js');

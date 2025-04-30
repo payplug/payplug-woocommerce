@@ -2,14 +2,8 @@
 
 namespace Payplug\PayplugWoocommerce\Controller;
 
-use Payplug\Payplug;
-use Payplug\Authentication;
-use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
-use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
-use Payplug\Exception\ForbiddenException;
+class HostedFields {
 
-class IntegratedPayment
-{
 	protected $options;
 
 	public function __construct($options)
@@ -17,7 +11,7 @@ class IntegratedPayment
 		$this->options = $options;
 	}
 
-	static public function template_form($oneClick){
+	static public function template_form(){
 
 		$logo = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/logo-payplug.png';
 		$lock = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
@@ -26,20 +20,15 @@ class IntegratedPayment
 			return $fn;
 		};
 
-		if($oneClick) {
-			$saved = <<<HTML
-					<div class="payplug IntegratedPayment_container -saveCard" data-e2e-name="saveCard">
-						<label><input type="checkbox" name="savecard"><span></span>{$f(__('payplug_integrated_payment_oneClick', 'payplug'))}</label>
-					</div>
-HTML;
-		} else {
-			$saved = "";
-		}
-
-
 		return <<<HTML
-			<form class="payplug IntegratedPayment -loaded">
-				<div class="payplug IntegratedPayment_container -cardHolder cardHolder-input-container" data-e2e-name="cardHolder"></div>
+			<form id="payment-form" class="payplug IntegratedPayment -loaded" onsubmit="event.preventDefault(); HostedFields.tokenizeHandler();">
+				<div class="payplug IntegratedPayment_container -cardHolder cardHolder-input-container" data-e2e-name="cardHolder">
+					<p>
+			            <span class="input-container" id="cardHolder-container">
+			            	<input type="text" name="hosted-fields-cardHolder" value="" id="hosted-fields-cardHolder" class="hosted-fields hosted-fields-input-state" placeholder="{$f(__('payplug_integrated_payment_cardholder', 'payplug'))}">
+						</span>
+			        </p>
+				</div>
 				<div class="payplug IntegratedPayment_error -cardHolder -hide">
 					<span class="-hide invalidField" data-e2e-error="invalidField">{$f(__('payplug_integrated_payment_cardHolder_error', 'payplug'))}</span>
 					<span class="-hide emptyField" data-e2e-error="paymentError">{$f(__('payplug_integrated_payment_empty', 'payplug'))}</span>
@@ -52,13 +41,26 @@ HTML;
 						<label class="payplug IntegratedPayment_scheme -mastercard"><input type="radio" name="schemeOptions" value="mastercard" /><span></span></label>
 					</div>
 				</div>
-				<div class="payplug IntegratedPayment_container -pan pan-input-container" data-e2e-name="pan"></div>
+				<div class="payplug IntegratedPayment_container -pan pan-input-container" data-e2e-name="pan">
+					<p>
+			            <span class="input-container" id="card-container"></span>
+			        </p>
+				</div>
 				<div class="payplug IntegratedPayment_error -pan -hide">
 					<span class="-hide invalidField" data-e2e-error="invalidField">{$f(__('payplug_integrated_payment_pan_error', 'payplug'))}</span>
 					<span class="-hide emptyField" data-e2e-error="paymentError">{$f(__('payplug_integrated_payment_empty', 'payplug'))}</span>
 				</div>
-				<div class="payplug IntegratedPayment_container -exp exp-input-container" data-e2e-name="expiration"></div>
-				<div class="payplug IntegratedPayment_container -cvv cvv-input-container" data-e2e-name="cvv"></div>
+
+				<div class="payplug IntegratedPayment_container -exp exp-input-container" data-e2e-name="expiration">
+					<p>
+			            <span class="input-container" id="expiry-container"></span>
+			        </p>
+				</div>
+				<div class="payplug IntegratedPayment_container -cvv cvv-input-container" data-e2e-name="cvv">
+					<p>
+			            <span class="input-container" id="cvv-container"></span>
+			        </p>
+				</div>
 				<div class="payplug IntegratedPayment_error -exp -hide">
 					<span class="-hide invalidField" data-e2e-error="invalidField">{$f(__('payplug_integrated_payment_exp_error', 'payplug'))}</span>
 					<span class="-hide emptyField" data-e2e-error="paymentError">{$f(__('payplug_integrated_payment_empty', 'payplug'))}</span>
@@ -67,20 +69,16 @@ HTML;
 					<span class="-hide invalidField" data-e2e-error="invalidField">{$f(__('payplug_integrated_payment_cvv_error', 'payplug'))}</span>
 					<span class="-hide emptyField" data-e2e-error="paymentError">{$f(__('payplug_integrated_payment_empty', 'payplug'))}</span>
 				</div>
-
-				{$saved}
-
-				 <div class="payplug IntegratedPayment_error -payment">
-					<span>{$f(__('payplug_integrated_payment_error', 'payplug'))}</span>
-    			</div>
-
+				 <div class="payplug IntegratedPayment_error -payment"><span>{$f(__('payplug_integrated_payment_error', 'payplug'))}</span></div>
 				<div class="payplug IntegratedPayment_container -transaction">
 					<img class="lock-icon" src="$lock" /><label class="transaction-label">{$f(__('payplug_integrated_payment_transaction_secure', 'payplug'))}</label><img class="payplug-logo" src="$logo" />
 				</div>
 				<div class="payplug IntegratedPayment_container -privacy-policy">
 					<a href="$privacy_policy_url" target="_blank">{$f(__('payplug_integrated_payment_privacy_policy', 'payplug'))}</a>
 				</div>
+			    <input type="hidden" name="hf-token" id="hf-token" />
 			</form>
+
 HTML;
 	}
 
