@@ -106,8 +106,8 @@ var HostedFields = {
 
 const IntegratedPayment = ({props: props,}) => {
 
-	const { eventRegistration } = props;
-	const { onCheckoutValidation, onPaymentSetup } = eventRegistration;
+	const { eventRegistration, emitResponse } = props;
+	const { onCheckoutValidation, onPaymentProcessing } = eventRegistration;
 
 	//on init
 	useEffect(() => {
@@ -117,6 +117,28 @@ const IntegratedPayment = ({props: props,}) => {
 		});
 
 	}, []);
+
+	useEffect(() => {
+		const handlePaymentProcessing = () => {
+			const hftoken = document.getElementById("hf-token").value;
+
+			return {
+				type: emitResponse.responseTypes.SUCCESS,
+				meta: {
+					paymentMethodData: {
+						hftoken,
+					},
+				},
+			};
+
+		};
+
+		// Register the handler for payment processing
+		const unsubscribe = onPaymentProcessing(handlePaymentProcessing);
+
+		// Cleanup the event listener on unmount
+		return () => { unsubscribe(); };
+	}, [onPaymentProcessing]);
 
 	useEffect(() => {
 		const onValidation = async () => {
