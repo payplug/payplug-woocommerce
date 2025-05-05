@@ -1348,4 +1348,34 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         return $order && $this->supports('refunds') && $status !== "cancelled" && $status !== "failed";
     }
 
+	public function tmp_generate_jwt()
+	{
+		$options = get_option( 'woocommerce_payplug_settings' );
+
+		if (isset($options['client_data']) || empty($options['client_data'])) {
+			return false;
+		}
+
+		$client_data = $options['client_data'];
+		$jwt = [];
+
+		$this->api = new PayplugApi($this);
+
+		foreach ($client_data as $key => $data) {
+			if (empty($data)) {
+				$jwt[$key] = [];
+				continue;
+			}
+
+			$generated_jwt = $this->api->generateJWT($data['client_id'], $data['client_secret']);
+
+			if (empty($generated_jwt['httpResponse'])) {
+				return false;
+			}
+
+			$jwt[$key] = $generated_jwt['httpResponse'];
+		}
+
+		return update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false );
+	}
 }

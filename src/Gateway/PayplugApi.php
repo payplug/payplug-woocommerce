@@ -56,6 +56,33 @@ class PayplugApi {
 	}
 
 	/**
+	 * Get register url
+	 *
+	 * @param string $callback_uri
+	 *
+	 * @return object
+	 * @throws \Payplug\Exception\ConfigurationException
+	 */
+	public function retrieve_register_url($callback_uri)
+	{
+		return $this->do_request_with_fallback( '\Payplug\Authentication::getRegisterUrl', [$callback_uri, $callback_uri] );
+	}
+
+	/**
+	 * Generate the JWT from API
+	 *
+	 * @param string $client_id
+	 * @param string $client_secret
+	 *
+	 * @return array
+	 * @throws \Payplug\Exception\ConfigurationException
+	 */
+	public function generateJWT($client_id = '', $client_secret = '')
+	{
+		return $this->do_request_with_fallback( '\Payplug\Authentication::generateJWT', [$client_id, $client_secret]);
+	}
+
+	/**
 	 * Retrieve payment data from PayPlug API.
 	 *
 	 * @param string $transaction_id
