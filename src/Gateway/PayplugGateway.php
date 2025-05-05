@@ -323,7 +323,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 				return;
 			}
-
 			$this->response->process_payment($payment);
 
 			\Payplug\PayplugWoocommerce\Model\Lock::delete_lock($lock_id);
@@ -836,6 +835,46 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			if (!(substr( $return_url, 0, 4 ) === "http")) {
 				$return_url = get_site_url().$return_url;
 			}
+            if (isset($_POST['hftoken'])) {
+                $hf_token = $_POST['hftoken'];
+            }
+
+
+            $hosted_field_payment_data = [
+                'method' => 'payment',
+                'params' => [
+                    'IDENTIFIER' => 'Demo Shop',
+                    'OPERATIONTYPE' => 'payment',
+                    'ORDERID' => $order_id,
+                    'AMOUNT' => $amount ,
+                    'CLIENTIDENT' => 'Customer name',
+                    'CLIENTEMAIL' => 'John.doe@isp.com',
+                    'CLIENTREFERRER' => '',
+                    'CLIENTUSERAGENT' => 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0',
+                    'CLIENTIP' => '10.66.80.141',
+                    'CARDCVV' =>'123',
+                    'CARDCODE'=> '5131080132762421',
+                    'CARDFULLNAME' => '',
+                    'DESCRIPTION' => 'Order #',
+                    'HFTOKEN' => $hf_token,
+                    'HASH' => '17c16ccd6d6e315cf7a930d2e4fc8e3a8bf019ffd8298138ec2464c096014840',
+                    'VERSION' => '3.0',
+                    'DESCRIPTION' => 'Order #' . $order_id,
+                    'BILLINGADDRESS' => '42 av de Paris',
+                    'BILLINGCITY' => 'Paris',
+                    'BILLINGCOUNTRY' => 'FR',
+                    'BILLINGPOSTALCODE' => '75018',
+                    'SHIPTOCITY' => 'Levallois',
+                    'SHIPTOCOUNTRY' => 'FR',
+                    'SHIPTOADDRESS' => '42 av. des Champs E.',
+                    'SHIPTOPOSTALCODE' => '75009',
+                    'LANGUAGE' => 'FR',
+                    'TIMEZONE' => 'UTC',
+                    'SHIPTOADDRESSTYPE' => 'NEW',
+                ],
+            ];
+
+
 
 			$payment_data = [
                 'amount'           => $amount,
@@ -862,13 +901,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				$payment_data['metadata']['woocommerce_block'] = "CART";
 			}
 
-			//IP request required variables
-			if($this->payment_method === 'integrated'){
-				$payment_data['initiator'] = 'PAYER';
-				$payment_data['integration'] = 'INTEGRATED_PAYMENT';
-				unset($payment_data['hosted_payment']['cancel_url']);
-			}
-
 			//for subscriptions the card needs to be saved
 			$is_subscription = PayplugWoocommerceHelper::is_subscription();
 			if( !empty($is_subscription) && $is_subscription === true ){
@@ -886,8 +918,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
              * @param array $customer_details
              * @param PayplugAddressData $address_data
              */
-            $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
-            $payment      = $this->api->payment_create($payment_data);
+            $payment_data = apply_filters('payplug_gateway_payment_data', $this->payment_method==='integrated'?$hosted_field_payment_data :$payment_data, $order_id, [], $address_data);
+            $payment = $this->api->payment_create($payment_data);
 
             // Save transaction id for the order
             PayplugWoocommerceHelper::is_pre_30()
