@@ -97,46 +97,67 @@ var HostedFields = {
 			return true;
 		}
 	},
-	tokenizeHandler: function () {
-		return new Promise((resolve, reject) => {
-			HostedFields.hfields.createToken(function (result) {
-				if ( HostedFields.submitValidation(jQuery("[name=hosted-fields-cardHolder]"), jQuery(".IntegratedPayment_error.-cardHolder .invalidField")) && result.execCode == "0000") {
-					document.getElementById("hf-token").value = result.hfToken;
-					resolve(result);
-				}
-				reject({stt:"error"});
+	isPayplugChosen: function () {
+		return jQuery('#payment_method_payplug').is(':checked');
+	},
+	tokenizeHandler: async function (event) {
+
+		if (!HostedFields.isPayplugChosen()) {
+			return;
+		}
+
+		event.preventDefault();
+		event.stopImmediatePropagation();
+
+		try {
+
+			const isValid = HostedFields.submitValidation(
+				jQuery("[name=hosted-fields-cardHolder]"),
+				jQuery(".IntegratedPayment_error.-cardHolder .invalidField")
+			);
+
+			const result = await new Promise((resolve, reject) => {
+				HostedFields.hfields.createToken((response) => {
+					if (response.execCode === "0000") {
+						resolve(response);
+					} else {
+						reject(new Error("Tokenization failed"));
+					}
+				});
 			});
-		});
+
+
+			if (isValid) {
+				document.getElementById("hftoken").value = result.hfToken;
+
+				// Ensure no duplicate listeners
+				jQuery('form.woocommerce-checkout, form#order_review').off('submit', HostedFields.tokenizeHandler);
+				event.target.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+			}
+		} catch (error) {
+			console.error("Error during tokenization:", error);
+		}
+
+		// Prevents the submit of the form in case of failed tokenization request
+		return false;
 	}
 }
 
-
-
 jQuery( 'body' ).on( 'updated_checkout', function() {
 	HostedFields.hfields.load();
+
+	// Attach the event listener
 	jQuery("[name=hosted-fields-cardHolder]").on("input", function (event) {
 		HostedFields.validateInput(event.target, jQuery(".IntegratedPayment_error.-cardHolder .invalidField"));
 	});
+
 });
 
 
-jQuery(document).ready(function($) {
-	jQuery('form.woocommerce-checkout, form#order_review').on('checkout_place_order',  function (e) {
-		e.preventDefault();
-		e.stopPropagation();
-		HostedFields.tokenizeHandler().then((response) => {
-			e.target.submit();
+(function ($) {
+	// Attach the event listener
+	jQuery('form.woocommerce-checkout, form#order_review').on('submit', HostedFields.tokenizeHandler );
+})(jQuery);
 
-		}).catch((error => {
-            jQuery(".IntegratedPayment_error.-payment").removeClass("-hide");
-            jQuery(".IntegratedPayment_error.-payment").addClass("-show");
-            jQuery(".IntegratedPayment_error.-payment").html(payplug_integrated_payment_params.payplug_integrated_payment_error);
-            jQuery(".IntegratedPayment_error.-payment").fadeIn(300).delay(2000).fadeOut(300);
 
-        }));
-
-		return false;
-
-	});
-});
 

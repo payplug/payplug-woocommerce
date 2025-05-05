@@ -746,7 +746,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		if ( !is_wc_endpoint_url('order-pay') &&
 			PayplugWoocommerceHelper::is_checkout_block() &&
 			(
-				( $this->id === "payplug" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
+				( $this->id === "payplug" && $this->payment_method === 'popup' ) ||
 				( $this->id === "american_express" && $this->payment_method === 'popup')
 			) &&
 			$_GET["wc-ajax"] !== "payplug_order_review_url"
