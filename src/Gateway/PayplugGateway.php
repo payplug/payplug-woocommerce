@@ -1263,8 +1263,21 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 		$key = $this->get_option('payplug_' . $mode . '_key');
 		$jwt = $this->get_option('jwt');
+
 		if(!empty($jwt[$mode])) {
-			$key = $jwt[$mode]['access_token'];
+			$client_data = $this->get_option('client_data');
+			$this->api = new PayplugApi($this);
+			$validate_jwt = $this->api->validate_jwt($client_data[$mode], $jwt[$mode]);
+
+			if ($validate_jwt['token']) {
+				$key = $validate_jwt['token'];
+
+				if ($validate_jwt['need_update']) {
+					$options = get_option('woocommerce_payplug_settings', []);
+					$options['jwt'][$mode] = $validate_jwt['token'];
+					update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false );
+				}
+			}
 		}
 
         return $key;
