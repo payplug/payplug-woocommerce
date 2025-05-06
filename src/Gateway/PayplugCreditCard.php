@@ -53,6 +53,7 @@ class PayplugCreditCard extends PayplugGateway {
 
 		//add fields of IP to the description
 		if($this->payment_method === 'integrated'){
+			add_action( 'woocommerce_after_order_notes', [$this, 'add_hftoken_field'], 10, 2 );
 			$this->has_fields = true;
 		}
 
@@ -65,6 +66,16 @@ class PayplugCreditCard extends PayplugGateway {
 		}
 
 	}
+	/**
+	 * Add the field to the checkout
+	 */
+	function add_hftoken_field($checkout) {
+
+		echo '<div id="user_link_hidden_checkout_field">
+	            <input type="hidden" class="input-hidden" name="hftoken" id="hftoken" >
+	    	</div>';
+	}
+
 
 	/**
 	 * if the plugin is disabled the gateways should be disabled

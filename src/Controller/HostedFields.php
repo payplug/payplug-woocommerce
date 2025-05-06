@@ -76,7 +76,6 @@ class HostedFields {
 				<div class="payplug IntegratedPayment_container -privacy-policy">
 					<a href="$privacy_policy_url" target="_blank">{$f(__('payplug_integrated_payment_privacy_policy', 'payplug'))}</a>
 				</div>
-			    <input type="hidden" name="hf-token" id="hf-token" />
 			</form>
 
 HTML;
