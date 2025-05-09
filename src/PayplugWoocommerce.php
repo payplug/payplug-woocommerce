@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Payplug\PayplugWoocommerce\Admin\Ajax;
 use Payplug\PayplugWoocommerce\Admin\Metabox;
 use Payplug\PayplugWoocommerce\Admin\Notices;
+use Payplug\PayplugWoocommerce\Admin\SetupCallback;
 use Payplug\PayplugWoocommerce\Admin\WoocommerceActions;
 use Payplug\PayplugWoocommerce\Controller\ApplePay;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyAnimation;
@@ -122,6 +123,7 @@ class PayplugWoocommerce {
 		new Front\ApplePay();
 		$this->ajax     = new Ajax();
 
+		$setup_callback = new SetupCallback();
 
 		if( PayplugWoocommerceHelper::show_oney_popup() ) {
 			$this->animationHandlers();
