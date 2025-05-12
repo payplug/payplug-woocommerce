@@ -173,9 +173,17 @@ class SetupCallback {
 			$settings['auth']['test']['client_id'] = $auth_test['httpResponse']['client_id'];
 
 			$settings['payplug_test_key'] = $auth_test['httpResponse']['client_secret'];
+			$settings['payplug_live_key'] = $auth_live['httpResponse']['client_secret'];
+
+			// Setting to default in test mode
+			$settings['mode'] = "no";
+
+			update_option('woocommerce_payplug_settings', $settings);
+
+			dd(PayplugWoocommerceHelper::get_payplug_options());
 
 			// Save settings
-			update_option('woocommerce_payplug_settings', $settings);
+
 
 			// Clean up transients
 			delete_transient('payplug_code_verifier');
