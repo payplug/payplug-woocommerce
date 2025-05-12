@@ -7,6 +7,8 @@ if (!defined('ABSPATH')) {
 }
 
 use Payplug\Authentication;
+use Payplug\Payplug;
+use Payplug\PayplugWoocommerce\Gateway\PayplugApi;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Exception;
@@ -44,23 +46,24 @@ class SetupCallback {
 
 			try {
 				// Generate a code verifier
-				$code_verifier = bin2hex(openssl_random_pseudo_bytes(32));
+				$code_verifier = bin2hex(openssl_random_pseudo_bytes(50));
 
 				set_transient('payplug_code_verifier', $code_verifier, 3600); // Expires in 1 hour
 
-				$oauth_callback_uri = admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug&oauth_callback=1');
+				$oauth_callback_uri = admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug');
 
 				// Store the redirect URI in a transient for the callback
 				set_transient('payplug_oauth_callback_uri', $oauth_callback_uri, 3600);
 
 				// Initiate OAuth flow using the PayPlug library
 				Authentication::initiateOAuth($client_id, $oauth_callback_uri, $code_verifier);
+
 				// This function will perform the redirect and exit
 
 			} catch (Exception $e) {
 				PayplugGateway::log(sprintf('OAuth initiation error: %s', $e->getMessage()), 'error');
 				// Redirect back to settings page with error
-				wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug&setup_error=oauth_init'));
+				wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug'));
 				exit;
 			}
 		}
@@ -102,10 +105,9 @@ class SetupCallback {
 	 * Handle the OAuth callback
 	 */
 	public function handle_oauth_callback() {
-		if (!isset($_GET['oauth_callback']) || $_GET['oauth_callback'] != '1' || !isset($_GET['code'])) {
+		if (!isset($_GET['code'])) {
 			return;
 		}
-
 		$authorization_code = sanitize_text_field($_GET['code']);
 
 		$code_verifier = get_transient('payplug_code_verifier');
@@ -116,7 +118,7 @@ class SetupCallback {
 
 		if (empty($code_verifier) || empty($callback_uri) || empty($client_id)) {
 			PayplugGateway::log('Missing OAuth parameters for token exchange', 'error');
-			wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug&setup_error=missing_params'));
+			wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug'));
 			exit;
 		}
 
@@ -127,6 +129,7 @@ class SetupCallback {
 				$client_id,
 				$code_verifier
 			);
+
 
 			if (empty($jwt_response) || !isset($jwt_response['httpResponse']) || !isset($jwt_response['httpResponse']['access_token'])) {
 				PayplugGateway::log('Failed to obtain access token from authorization code', 'error');
@@ -149,6 +152,28 @@ class SetupCallback {
 
 			$settings['auth']['token_expires_at'] = time() + (int)$expires_in;
 
+			$id_token = $jwt_response['httpResponse']['id_token'];
+			$id_token_split = explode('.', $id_token);
+			$payload = base64_decode($id_token_split[1]);
+			$payload_decode = json_decode($payload, true);
+
+			$access_token = $jwt_response['httpResponse']['access_token'];
+
+			Payplug::init(['secretKey' => $access_token]);
+
+			$company_id = PayplugWooCommerceHelper::get_payplug_options()['auth']['company_id'];
+
+			$auth_live = Authentication::createClientIdAndSecret($company_id, "WooCommerce", "live");
+			$auth_test = Authentication::createClientIdAndSecret($company_id, "WooCommerce", "test");
+
+			$settings['auth']['live']['client_secret'] = $auth_live['httpResponse']['client_secret'];
+			$settings['auth']['live']['client_id'] = $auth_live['httpResponse']['client_id'];
+
+			$settings['auth']['test']['client_secret'] = $auth_test['httpResponse']['client_secret'];
+			$settings['auth']['test']['client_id'] = $auth_test['httpResponse']['client_id'];
+
+			$settings['payplug_test_key'] = $auth_test['httpResponse']['client_secret'];
+
 			// Save settings
 			update_option('woocommerce_payplug_settings', $settings);
 
@@ -159,12 +184,12 @@ class SetupCallback {
 			PayplugGateway::log('Successfully obtained and stored access token');
 
 			// Redirect to success page
-			wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug&setup_success=1'));
+			wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug'));
 			exit;
 
 		} catch (Exception $e) {
 			PayplugGateway::log(sprintf('Token exchange error: %s', $e->getMessage()), 'error');
-			wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug&setup_error=token_exchange'));
+			wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug'));
 			exit;
 		}
 	}
