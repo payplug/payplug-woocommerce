@@ -10,4 +10,4 @@
 /**
  *  CDN path to Hosted-Fields lib
  */
-define( 'HF_API', 'https://js.sandbox.dalenys.com/hosted-fields/v2.1.0/hosted-fields.min.js');
+define( 'HF_API', 'https://staging-internal-payment.gcp.dlns.io/ui/hosted-fields-lib/hosted-fields/v2.1.0/hosted-fields.min.js');

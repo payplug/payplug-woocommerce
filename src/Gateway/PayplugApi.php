@@ -79,7 +79,7 @@ class PayplugApi {
 	}
 
     public function hosted_field_payment_create($data) {
-        return $this->do_request( '\Payplug\Payment::createHostedFieldPayment', [ $data ] );
+        return $this->do_request( '\Payplug\Payment::create', [ $data ] );
     }
 
 	/**

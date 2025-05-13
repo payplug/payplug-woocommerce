@@ -835,31 +835,33 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			if (!(substr( $return_url, 0, 4 ) === "http")) {
 				$return_url = get_site_url().$return_url;
 			}
+
+			$apikey = "Gf=}k6]*E@EYBxau";
+			$apikeyid = "fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f";
+			$identifier = "TestPluginIdentif";
             if (isset($_POST['hftoken'])) {
                 $hf_token = $_POST['hftoken'];
             }
 
-
             $hosted_field_payment_data = [
                 'method' => 'payment',
                 'params' => [
-                    'IDENTIFIER' => 'Demo Shop',
+                    'IDENTIFIER' => $identifier,
                     'OPERATIONTYPE' => 'payment',
                     'ORDERID' => $order_id,
                     'AMOUNT' => $amount ,
-                    'CLIENTIDENT' => 'Customer name',
-                    'CLIENTEMAIL' => 'John.doe@isp.com',
-                    'CLIENTREFERRER' => '',
+                    'CLIENTIDENT' => 'John.doe42',
+                    'CLIENTEMAIL' => 'inecomessentials@test.com',
+                    'CLIENTREFERRER' => 'http://site.com/cart.php',
                     'CLIENTUSERAGENT' => 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0',
                     'CLIENTIP' => '10.66.80.141',
-                    'CARDCVV' =>'123',
-                    'CARDCODE'=> '5131080132762421',
-                    'CARDFULLNAME' => '',
+//                    'CARDCVV' =>'123',
+//                    'CARDCODE'=> '5131080132762421',
+					'CARDFULLNAME' => 'test',
                     'DESCRIPTION' => 'Order #',
                     'HFTOKEN' => $hf_token,
                     'HASH' => '17c16ccd6d6e315cf7a930d2e4fc8e3a8bf019ffd8298138ec2464c096014840',
                     'VERSION' => '3.0',
-                    'DESCRIPTION' => 'Order #' . $order_id,
                     'BILLINGADDRESS' => '42 av de Paris',
                     'BILLINGCITY' => 'Paris',
                     'BILLINGCOUNTRY' => 'FR',
@@ -871,11 +873,34 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                     'LANGUAGE' => 'FR',
                     'TIMEZONE' => 'UTC',
                     'SHIPTOADDRESSTYPE' => 'NEW',
+					'APIKEYID' => $apikeyid,
                 ],
             ];
-
-
-
+//
+//			$hosted_field_payment_data = [];
+//			$hosted_field_payment_data["method"]="payment";
+//			$hosted_field_payment_data["params"]["IDENTIFIER"]=$identifier;
+//			$hosted_field_payment_data["params"]["OPERATIONTYPE"]="payment";
+//			$hosted_field_payment_data["params"]["AMOUNT"]="1000";
+//			$hosted_field_payment_data["params"]["VERSION"]="3.0";
+//			$hosted_field_payment_data["params"]["CARDFULLNAME"]="squad BTTF functional tests Essential";
+//			$hosted_field_payment_data["params"]["CLIENTIDENT"]="John.doe42";
+//			$hosted_field_payment_data["params"]["CLIENTEMAIL"]="inecomessentials@test.com";
+//			$hosted_field_payment_data["params"]["CLIENTREFERRER"]="http://site.com/cart.php";
+//			$hosted_field_payment_data["params"]["CLIENTUSERAGENT"]="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36";
+//			$hosted_field_payment_data["params"]["CLIENTIP"]="10.66.80.141";
+//			$hosted_field_payment_data["params"]["ORDERID"]="order_59e8767c5cf52";
+//			$hosted_field_payment_data["params"]["DESCRIPTION"]="Achat de matériel informatique";
+//			$hosted_field_payment_data["params"]["CREATEALIAS"]="yes";
+//			$hosted_field_payment_data["params"]["APIKEYID"]=$apikeyid;
+//			$hosted_field_payment_data["params"]["HFTOKEN"]=$hf_token;
+//			$hosted_field_payment_data["params"]["SELECTEDBRAND"]="mastercard";
+//			$string = $this->buildHashContent($hosted_field_payment_data["params"], $apikey, $identifier);
+//			$hash = $apikey . $string;
+//			$hash256 = hash('sha256', $hash);
+//			$hosted_field_payment_data["params"]["HASH"] = $hash256;
+//			$a = $this->api->hosted_field_payment_create($hosted_field_payment_data);
+//			die(var_dump($a));
 			$payment_data = [
                 'amount'           => $amount,
                 'currency'         => get_woocommerce_currency(),
@@ -965,7 +990,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
         }
     }
+	public function buildHashContent($params, $secret, $prefix = ''){
+		ksort($params);
+		$string = '';
+		foreach($params as $k => $v){
+			$string .= $k  . "=" . $v . $secret;
+		}
 
+		return $string;
+
+	}
     /**
      * @param \WC_Order $order
      * @param int $amount
