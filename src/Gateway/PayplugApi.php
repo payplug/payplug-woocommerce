@@ -78,10 +78,6 @@ class PayplugApi {
 		return $this->do_request( '\Payplug\Payment::create', [ $data ] );
 	}
 
-    public function hosted_field_payment_create($data) {
-        return $this->do_request( '\Payplug\Payment::create', [ $data ] );
-    }
-
 	/**
 	 * Retrieve all refunds associated with a payment.
 	 *
