@@ -264,12 +264,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$order_id = (int) $id;
 		}
 
+
 		if (empty($order_id) && (isset($wp->query_vars['order-received']))) {
 			$order_id = apply_filters(
 				'woocommerce_thankyou_order_id',
 				absint($wp->query_vars['order-received'])
 			);
 		}
+
 
 		if (empty($order_id)) {
 
@@ -297,20 +299,36 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		if($payment_method === $this->id) {
 
-
 			$transaction_id = PayplugWoocommerceHelper::is_pre_30() ? get_post_meta($order_id, '_transaction_id', true) : $order->get_transaction_id();
 			if (empty($transaction_id)) {
 				PayplugGateway::log(sprintf('Order #%s : Missing transaction id.', $order_id), 'error');
 				return;
 			}
-
 			$lock_id = Lock::handle_insert($save_request, $transaction_id);
 			if(!$lock_id){
 				return;
 			}
 
 			try {
-				$payment = $this->api->payment_retrieve($transaction_id);
+				$apikey = "Gf=}k6]*E@EYBxau";
+				$apikeyid = "fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f";
+				$identifier = "TestPluginIdentif";
+				$payment_data = [
+					'method' => 'capture',
+					];
+				$payment_data['params'] = [
+					'IDENTIFIER' => $identifier,
+					"OPERATIONTYPE" => "capture",
+					"ORDERID" => $order_id,
+					"DESCRIPTION" => "Achat de matériel informatique",
+					"VERSION" => "3.0",
+					'TRANSACTIONID' => $transaction_id,
+				];
+				$string = $this->buildHashContent($payment_data["params"], $apikey, $identifier);
+				$hash = $apikey . $string;
+				$hash256 = hash('sha256', $hash);
+				$payment_data["params"]["HASH"] = $hash256;
+				$payment = $this->api->payment_retrieve($payment_data, true);
 
 			} catch (\Exception $e) {
 				PayplugGateway::log(
@@ -854,20 +872,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 ],
             ];
 			if ($this->payment_method === 'integrated') {
-				// get the credentials necessary to create the HF payment
-				$jsonFilePath = __DIR__ . '/../../hfields_config.json';
+				$apikey = "Gf=}k6]*E@EYBxau";
+				$apikeyid = "fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f";
+				$identifier = "TestPluginIdentif";
 
-				if (file_exists($jsonFilePath)) {
-					$config = json_decode(file_get_contents($jsonFilePath), true);
-					$apikey = $config['apikey'];
-					$apikeyid = $config['apikeyid'];
-					$identifier = $config['identifier'];
-
-				} else {
-					$apikey = $_POST['apikey'];
-					$apikeyid = $_POST['apikeyid'];
-					$identifier = $_POST['identifier'];
-				}
 				if (isset($_POST['hftoken'])) {
 					$hf_token = $_POST['hftoken'];
 				}
@@ -876,7 +884,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				$payment_data['params'] = [
 					"IDENTIFIER" => "TestPluginIdentif",
 					"OPERATIONTYPE" => "payment",
-					"AMOUNT" => $amount,
+					"AMOUNT" => '1000',
 					"VERSION" => "3.0",
 					"CARDFULLNAME" => "squad BTTF functional tests Essential",
 					"CLIENTIDENT" => $order->get_billing_first_name() . $order->get_billing_last_name(),
@@ -923,7 +931,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
              * @param PayplugAddressData $address_data
              */
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
-            $payment = $this->api->payment_create($payment_data);
+			$payment = $this->api->payment_create($payment_data);
 			$payment_id = isset($payment['TRANSACTIONID']) ? $payment['TRANSACTIONID'] : $payment->id;
 			// Save transaction id for the order
             PayplugWoocommerceHelper::is_pre_30()
@@ -953,7 +961,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			if(ob_get_length() > 0){
 				ob_clean();
 			}
-
 			return array(
 				'payment_id' => $payment_id,
 				'result'   => 'success',
@@ -985,7 +992,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		foreach($params as $k => $v){
 			$string .= $k  . "=" . $v . $secret;
 		}
-
 		return $string;
 
 	}

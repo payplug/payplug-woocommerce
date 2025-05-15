@@ -63,9 +63,17 @@ class PayplugApi {
 	 * @return null|\Payplug\Resource\Payment
 	 * @throws \Payplug\Exception\ConfigurationException
 	 */
-	public function payment_retrieve( $transaction_id ) {
-		return $this->do_request_with_fallback( '\Payplug\Payment::retrieve', $transaction_id );
+	public function payment_retrieve( $data, $is_hosted_field = false) {
+		if ($is_hosted_field) {
+			return $this->do_request_with_fallback('\Payplug\Payment::retrieve', [$data, null, $is_hosted_field] );
+		}
+
+		return $this->do_request_with_fallback('\Payplug\Payment::retrieve', $data);
+
 	}
+
+
+
 
 	/**
 	 * Create a payment.
