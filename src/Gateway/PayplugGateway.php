@@ -1261,18 +1261,24 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function get_api_key($mode = 'test')
     {
+		$key = $this->get_option('payplug_' . $mode . '_key');
+		$jwt = $this->get_option('jwt');
 
-        switch ($mode) {
-            case 'test':
-                $key = $this->get_option('payplug_test_key');
-                break;
-            case 'live':
-                $key = $this->get_option('payplug_live_key');
-                break;
-            default:
-                $key = '';
-                break;
-        }
+		if(!empty($jwt[$mode])) {
+			$client_data = $this->get_option('client_data');
+			$this->api = new PayplugApi($this);
+			$validate_jwt = $this->api->validate_jwt($client_data[$mode], $jwt[$mode]);
+
+			if ($validate_jwt['token']) {
+				$key = $validate_jwt['token'];
+
+				if ($validate_jwt['need_update']) {
+					$options = get_option('woocommerce_payplug_settings', []);
+					$options['jwt'][$mode] = $validate_jwt['token'];
+					update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false );
+				}
+			}
+		}
 
         return $key;
     }
@@ -1357,7 +1363,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			return false;
 		}
 
-		$client_data = $options['client_data'];
+		$client_data = $this->get_option('client_data');
 		$jwt = [];
 
 		$this->api = new PayplugApi($this);
@@ -1377,6 +1383,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$jwt[$key] = $generated_jwt['httpResponse'];
 		}
 
+		$options['jwt'] = $jwt;
 		return update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false );
 	}
 
