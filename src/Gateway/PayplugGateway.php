@@ -314,12 +314,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				$apikeyid = "fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f";
 				$identifier = "TestPluginIdentif";
 				$payment_data = [
-					'method' => 'capture',
+					'method' => 'getTransactions',
 					];
 				$payment_data['params'] = [
 					'IDENTIFIER' => $identifier,
-					"OPERATIONTYPE" => "capture",
-					"ORDERID" => $order_id,
+					"OPERATIONTYPE" => "getTransaction",
+					"ORDERID" =>  $order_id,
 					"DESCRIPTION" => "Achat de matériel informatique",
 					"VERSION" => "3.0",
 					'TRANSACTIONID' => $transaction_id,
@@ -721,7 +721,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function process_payment($order_id)
     {
-
         PayplugGateway::log(sprintf('Processing payment for order #%s', $order_id));
 
         $order       = wc_get_order($order_id);
@@ -747,7 +746,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
             return $this->process_payment_with_token($order, $amount, $customer_id, $payment_token_id);
         }
-
 		return $this->process_standard_payment($order, $amount, $customer_id);
     }
 
@@ -833,6 +831,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      * @param int $customer_id
      *
      * @return array
+     * @return array
      * @throws \Exception
      */
     public function process_standard_payment($order, $amount, $customer_id)
@@ -871,7 +870,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                     'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
                 ],
             ];
+
 			if ($this->payment_method === 'integrated') {
+				// get the credentials necessary to create the HF payment
 				$apikey = "Gf=}k6]*E@EYBxau";
 				$apikeyid = "fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f";
 				$identifier = "TestPluginIdentif";
