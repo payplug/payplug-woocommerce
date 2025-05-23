@@ -180,6 +180,11 @@ class PayplugApi {
         return $response;
     }
 
+	public function validate_jwt($client_data, $jwt)
+	{
+		return $this->do_request_with_fallback( '\Payplug\Authentication::validateJWT', [$client_data, $jwt] );
+	}
+
 	/**
 	 * Invoke PayPlug API. If it fail it switch to the other mode and retry the same request.
 	 *

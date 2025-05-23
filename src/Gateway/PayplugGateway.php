@@ -1261,24 +1261,24 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function get_api_key($mode = 'test')
     {
-		$options = PayplugWoocommerceHelper::get_payplug_options();
-        switch ($mode) {
-            case 'test':
-                $key = $options['payplug_test_key'];
-				if (empty($key)) {
-					$key = $options['client_data']['jwt']['test']['access_token'];
+		$key = $this->get_option('payplug_' . $mode . '_key');
+		$jwt = $this->get_option('jwt');
+
+		if(!empty($jwt[$mode])) {
+			$client_data = $this->get_option('client_data');
+			$this->api = new PayplugApi($this);
+			$validate_jwt = $this->api->validate_jwt($client_data[$mode], $jwt[$mode]);
+
+			if ($validate_jwt['token']) {
+				$key = $validate_jwt['token'];
+
+				if ($validate_jwt['need_update']) {
+					$options = get_option('woocommerce_payplug_settings', []);
+					$options['jwt'][$mode] = $validate_jwt['token'];
+					update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false );
 				}
-                break;
-            case 'live':
-                $key = $options['payplug_live_key'];
-				if (empty($key)) {
-					$key = $options['client_data']['jwt']['live']['access_token'];
-				}
-                break;
-            default:
-                $key = '';
-                break;
-        }
+			}
+		}
 
         return $key;
     }
