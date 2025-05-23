@@ -537,6 +537,13 @@ class PayplugWoocommerceHelper {
 		$payplug_test_key = !empty($options['payplug_test_key']) ? $options['payplug_test_key'] : '';
 		$payplug_live_key = !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : '';
 
+		if (empty($payplug_test_key) && isset( $options['client_data']['jwt']['test']['access_token'] ) ) {
+			$payplug_live_key = $options['client_data']['jwt']['test']['access_token'];
+		}
+		if (empty($payplug_live_key) && isset( $options['client_data']['jwt']['live']['access_token'] ) ) {
+			$payplug_live_key = $options['client_data']['jwt']['live']['access_token'];
+		}
+
 		if (empty($payplug_test_key) && empty($payplug_live_key)) {
 			return array();
 		}
@@ -730,12 +737,22 @@ class PayplugWoocommerceHelper {
 
 	public static function get_live_key()
 	{
-		return get_option('woocommerce_payplug_settings', [])['payplug_live_key'];
+		$options = self::get_payplug_options();
+		$live_key = $options['payplug_live_key'];
+		if (empty($live_key)) {
+			$live_key = $options['client_data']['jwt']['live']['access_token'];
+		}
+		return $live_key;
 	}
 
 	public static function get_test_key()
 	{
-		return get_option('woocommerce_payplug_settings', [])['payplug_test_key'];
+		$options = self::get_payplug_options();
+		$test_key = $options['payplug_test_key'];
+		if (empty($test_key)) {
+			$test_key = $options['client_data']['jwt']['test']['access_token'];
+		}
+		return $test_key;
 	}
 
 	/**
@@ -746,7 +763,13 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function user_logged_in()
 	{
-		return !empty(get_option( 'woocommerce_payplug_settings', [] )['payplug_test_key']);
+		$options = self::get_payplug_options();
+
+		if (isset($options['client_data']) && isset($options['client_data']['jwt']['test']['access_token'])) {
+			return true;
+		}
+
+		return !empty($options['payplug_test_key']);
 	}
 
 	public static function check_mode(){

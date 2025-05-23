@@ -139,18 +139,9 @@ class SetupCallback {
 
 			// Get the tokens from the response
 			$access_token = $jwt_response['httpResponse']['access_token'];
-			$refresh_token = isset($jwt_response['httpResponse']['refresh_token']) ? $jwt_response['httpResponse']['refresh_token'] : '';
-			$expires_in = isset($jwt_response['httpResponse']['expires_in']) ? $jwt_response['httpResponse']['expires_in'] : 3600;
 
 			// Update settings with tokens
 			$settings = PayplugWoocommerceHelper::get_payplug_options();
-			$settings['client_data']['access_token'] = $access_token;
-
-			if (!empty($refresh_token)) {
-				$settings['client_data']['refresh_token'] = $refresh_token;
-			}
-
-			$settings['client_data']['token_expires_at'] = time() + (int)$expires_in;
 
 			$id_token = $jwt_response['httpResponse']['id_token'];
 			$id_token_split = explode('.', $id_token);
@@ -159,8 +150,6 @@ class SetupCallback {
 
 			$email = isset($payload_decode['email']) ? $payload_decode['email'] : '';
 
-			$access_token = $jwt_response['httpResponse']['access_token'];
-
 			Payplug::init(['secretKey' => $access_token]);
 
 			$company_id = PayplugWooCommerceHelper::get_payplug_options()['client_data']['company_id'];
@@ -168,21 +157,27 @@ class SetupCallback {
 			$auth_live = Authentication::createClientIdAndSecret($company_id, "WooCommerce", "live");
 			$auth_test = Authentication::createClientIdAndSecret($company_id, "WooCommerce", "test");
 
-			$settings['client_data']['live']['client_secret'] = $auth_live['httpResponse']['client_secret'];
-			$settings['client_data']['live']['client_id'] = $auth_live['httpResponse']['client_id'];
+			if (!empty($auth_live['httpResponse']) ) {
+				$settings['client_data']['live']['client_secret'] = $auth_live['httpResponse']['client_secret'];
+				$settings['client_data']['live']['client_id'] = $auth_live['httpResponse']['client_id'];
+			}
 
-			$settings['client_data']['test']['client_secret'] = $auth_test['httpResponse']['client_secret'];
-			$settings['client_data']['test']['client_id'] = $auth_test['httpResponse']['client_id'];
+			if (!empty($auth_test['httpResponse']) ) {
+				$settings['client_data']['test']['client_secret'] = $auth_test['httpResponse']['client_secret'];
+				$settings['client_data']['test']['client_id'] = $auth_test['httpResponse']['client_id'];
+			}
+
 
 			$payplug = new PayplugGateway();
-			$payplug_api = new PayplugApi($payplug);
 
+			update_option(
+				$payplug->get_option_key(),
+				apply_filters('woocommerce_settings_api_sanitized_fields_' . $payplug->id, $settings)
+			);
 
-			$payplug_test_key = $payplug_api->generateJWT($auth_test['httpResponse']['client_id'], $auth_test['httpResponse']['client_secret'])['httpResponse']['access_token'];
-			$payplug_live_key = $payplug_api->generateJWT($auth_live['httpResponse']['client_id'], $auth_live['httpResponse']['client_secret'])['httpResponse']['access_token'];
+			$payplug->tmp_generate_jwt();
 
-
-			update_option('woocommerce_payplug_settings', $settings);
+			$settings = PayplugWoocommerceHelper::get_payplug_options();
 
 			// Save settings
 			$form_fields = $payplug->get_form_fields();
@@ -215,10 +210,6 @@ class SetupCallback {
 				$settings[$key] = $val;
 			}
 
-
-
-			$settings['payplug_test_key'] = $payplug_test_key;
-			$settings['payplug_live_key'] = $payplug_live_key;
 
 			$payplug->set_post_data($settings);
 			update_option(

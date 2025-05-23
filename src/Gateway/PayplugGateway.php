@@ -1261,13 +1261,19 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function get_api_key($mode = 'test')
     {
-
+		$options = PayplugWoocommerceHelper::get_payplug_options();
         switch ($mode) {
             case 'test':
-                $key = $this->get_option('payplug_test_key');
+                $key = $options['payplug_test_key'];
+				if (empty($key)) {
+					$key = $options['client_data']['jwt']['test']['access_token'];
+				}
                 break;
             case 'live':
-                $key = $this->get_option('payplug_live_key');
+                $key = $options['payplug_live_key'];
+				if (empty($key)) {
+					$key = $options['client_data']['jwt']['live']['access_token'];
+				}
                 break;
             default:
                 $key = '';
@@ -1294,7 +1300,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function user_logged_in()
     {
-        return !empty($this->get_option('payplug_test_key'));
+		$options = PayplugWoocommerceHelper::get_payplug_options();
+
+		if (isset($options['client_data']) && isset($options['client_data']['jwt']['test']['access_token'])) {
+			return true;
+		}
+
+        return !empty($options['payplug_test_key']);
     }
 
     /**
@@ -1353,7 +1365,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	{
 		$options = get_option( 'woocommerce_payplug_settings' );
 
-		if (isset($options['client_data']) || empty($options['client_data'])) {
+		if (!isset($options['client_data']) || empty($options['client_data'])) {
 			return false;
 		}
 
@@ -1368,15 +1380,29 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				continue;
 			}
 
-			$generated_jwt = $this->api->generateJWT($data['client_id'], $data['client_secret']);
+			if (($key == 'live') && isset($data['client_id']) && isset($data['client_secret'])) {
 
-			if (empty($generated_jwt['httpResponse'])) {
-				return false;
+				$generated_jwt = $this->api->generateJWT($data['client_id'], $data['client_secret']);
+
+				if (empty($generated_jwt['httpResponse'])) {
+					return false;
+				}
+				$jwt[$key] = $generated_jwt['httpResponse'];
+
 			}
 
-			$jwt[$key] = $generated_jwt['httpResponse'];
-		}
+			if (($key == 'test') && isset($data['client_id']) && isset($data['client_secret'])) {
 
+				$generated_jwt = $this->api->generateJWT($data['client_id'], $data['client_secret']);
+
+				if (empty($generated_jwt['httpResponse'])) {
+					return false;
+				}
+				$jwt[$key] = $generated_jwt['httpResponse'];
+
+			}
+		}
+		$options['client_data']['jwt'] = $jwt;
 		return update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false );
 	}
 

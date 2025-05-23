@@ -45,6 +45,7 @@ class Vue {
 			unset($this->options["payplug_test_key"]);
 			unset($this->options["payplug_password"]);
 			unset($this->options["payplug_merchant_id"]);
+			unset($this->options["client_data"]);
 
 			return [
 				"payplug_wooc_settings" => $this->options,
