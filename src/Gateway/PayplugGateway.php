@@ -313,22 +313,32 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				$apikey = "Gf=}k6]*E@EYBxau";
 				$apikeyid = "fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f";
 				$identifier = "TestPluginIdentif";
+//				$payment_data = [
+//					'method' => 'getTransactions',
+//					];
 				$payment_data = [
-					'method' => 'getTransactions',
+					'method' => 'capture',
 					];
 				$payment_data['params'] = [
 					'IDENTIFIER' => $identifier,
-					"OPERATIONTYPE" => "getTransaction",
+					"OPERATIONTYPE" => "capture",
 					"ORDERID" =>  $order_id,
 					"DESCRIPTION" => "Achat de matériel informatique",
 					"VERSION" => "3.0",
 					'TRANSACTIONID' => $transaction_id,
 				];
+
 				$string = $this->buildHashContent($payment_data["params"], $apikey, $identifier);
 				$hash = $apikey . $string;
 				$hash256 = hash('sha256', $hash);
 				$payment_data["params"]["HASH"] = $hash256;
-				$payment = $this->api->payment_retrieve($payment_data, true);
+				if (strpos($transaction_id, 'pay_') !== 0) {
+					//for hosted field, we have to call getTransactions
+					// $payment = $this->api->payment_retrieve($payment_data, true);
+					$payment = $this->api->payment_capture($payment_data, true);
+				} else {
+					$payment  = $this->api->payment_retrieve($transaction_id);
+				}
 
 			} catch (\Exception $e) {
 				PayplugGateway::log(
@@ -873,9 +883,15 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 			if ($this->payment_method === 'integrated') {
 				// get the credentials necessary to create the HF payment
+
+				// plugin test account
 				$apikey = "Gf=}k6]*E@EYBxau";
 				$apikeyid = "fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f";
 				$identifier = "TestPluginIdentif";
+
+//				$apikey = "ho;G0s&iL<YNg4B9";
+//				$apikeyid = "fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f";
+//				$identifier = "[NONREG] Galitt 3DSv1 CB2A";
 
 				if (isset($_POST['hftoken'])) {
 					$hf_token = $_POST['hftoken'];
@@ -883,10 +899,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				unset($payment_data['amount']);
 				$payment_data['method'] = "payment";
 				$payment_data['params'] = [
-					"IDENTIFIER" => "TestPluginIdentif",
+					"IDENTIFIER" => $identifier,
 					"OPERATIONTYPE" => "payment",
 					"AMOUNT" => '1000',
 					"VERSION" => "3.0",
+					"CARDCODE"=> "5131080132762421",
+					"CARDCVV" => "123",
+					"CARDVALIDITYDATE"=> "12-28",
 					"CARDFULLNAME" => "squad BTTF functional tests Essential",
 					"CLIENTIDENT" => $order->get_billing_first_name() . $order->get_billing_last_name(),
 					"CLIENTEMAIL" => $order->get_billing_email(),
@@ -934,6 +953,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
 			$payment = $this->api->payment_create($payment_data);
 			$payment_id = isset($payment['TRANSACTIONID']) ? $payment['TRANSACTIONID'] : $payment->id;
+//			die(var_dump($payment));
 			// Save transaction id for the order
             PayplugWoocommerceHelper::is_pre_30()
                 ? update_post_meta($order_id, '_transaction_id', $payment_id)

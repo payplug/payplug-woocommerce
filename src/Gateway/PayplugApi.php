@@ -71,7 +71,13 @@ class PayplugApi {
 		return $this->do_request_with_fallback('\Payplug\Payment::retrieve', $data);
 
 	}
+	public function payment_capture($data, $is_hosted_field = false) {
+		if ($is_hosted_field) {
+			return $this->do_request_with_fallback('\Payplug\Payment::capture', [$data, null, $is_hosted_field] );
+		}
 
+		return $this->do_request_with_fallback('\Payplug\Payment::capture', $data);
+	}
 
 
 
