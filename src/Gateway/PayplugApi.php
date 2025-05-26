@@ -79,6 +79,10 @@ class PayplugApi {
 		return $this->do_request_with_fallback('\Payplug\Payment::capture', $data);
 	}
 
+	public function payment_authorize($data, $is_hosted_field = false) {
+			return $this->do_request_with_fallback('\Payplug\Payment::authorize', [$data, null, $is_hosted_field] );
+	}
+
 
 
 	/**
