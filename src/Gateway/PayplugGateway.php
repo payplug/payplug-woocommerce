@@ -12,6 +12,7 @@ use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\HttpException;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Helper\Lock;
+use Payplug\PayplugWoocommerce\Model\HostedFields;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
@@ -112,6 +113,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	const MAX_AMOUNT = 20000;
 
 	/**
+	 * @var HostedFields $hosted_fields
+	 */
+	public $hosted_fields = null;
+
+	/**
 	 * @var string
 	 */
 	private $payplug_merchant_country = 'FR';
@@ -203,6 +209,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
 		add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
+
+		//FIXME:: get_options to get hosted_fields_data
+		$this->hosted_fields = new HostedFields(
+			"(z1Y+#{<u+P{&j@<",
+			"fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f",
+			"TestPluginIdentif",
+			"Gf=}k6]*E@EYBxau" );
 	}
 
 	/**
@@ -925,42 +938,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 ],
             ];
 
-			if ($this->payment_method === 'integrated') {
-//				$apikey = "ho;G0s&iL<YNg4B9";
-//				$apikeyid = "fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f";
-//				$identifier = "[NONREG] Galitt 3DSv1 CB2A";
-
-				if (isset($_POST['hftoken'])) {
-					$hf_token = $_POST['hftoken'];
-				}
-				unset($payment_data['amount']);
-				$payment_data['method'] = "payment";
-				$payment_data['params'] = [
-					"IDENTIFIER" => $this->identifier,
-					"OPERATIONTYPE" => "payment",
-					"AMOUNT" => '1000',
-					"VERSION" => "3.0",
-					"CARDCODE"=> "5131080132762421",
-					"CARDCVV" => "123",
-					"CARDVALIDITYDATE"=> "12-28",
-					"CARDFULLNAME" => "squad BTTF functional tests Essential",
-					"CLIENTIDENT" => $order->get_billing_first_name() . $order->get_billing_last_name(),
-					"CLIENTEMAIL" => $order->get_billing_email(),
-					"CLIENTREFERRER" => $this->limit_length(esc_url_raw(home_url()), 500),
-					"CLIENTUSERAGENT" => $order->get_customer_user_agent(),
-					"CLIENTIP" => $order->get_customer_ip_address(),
-					"ORDERID" => $order_id,
-					"DESCRIPTION" => "Achat de matériel informatique",
-					"CREATEALIAS" => "yes",
-					"APIKEYID" => $this->api_key_id,
-					"HFTOKEN" => $hf_token,
-					"SELECTEDBRAND" => "mastercard",
-				];
-
-				$string = $this->buildHashContent($payment_data["params"], $this->api_key, $this->identifier);
-				$hash = $this->api_key . $string;
-				$hash256 = hash('sha256', $hash);
-				$payment_data["params"]["HASH"] = $hash256;
+			if ($this->payment_method === 'integrated' && isset($_POST['hftoken'])) {
+				$hf_token = filter_var($_POST['hftoken'], FILTER_SANITIZE_STRING);
+				$payment_data = $this->hosted_fields->populateCreatePayment($payment_data, $order, $order_id, $hf_token, $amount);
+				$payment_data['metadata']['woocommerce_block'] = "HOSTED_FIELDS";
 			}
 
 			if (PayplugWoocommerceHelper::is_checkout_block() && is_checkout()) {
@@ -1080,25 +1061,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
         }
     }
-
-	/**
-	 * @description Builds a hash content string
-	 * by concatenating sorted parameters with a secret key.
-	 *
-	 * @param $params
-	 * @param $secret
-	 * @param $prefix
-	 * @return string
-	 */
-	public function buildHashContent($params, $secret, $prefix = ''){
-		ksort($params);
-		$string = '';
-		foreach($params as $k => $v){
-			$string .= $k  . "=" . $v . $secret;
-		}
-		return $string;
-
-	}
 
     /**
      * @param \WC_Order $order
