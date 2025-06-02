@@ -538,12 +538,11 @@ class PayplugWoocommerceHelper {
 		$payplug_live_key = !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : '';
 
 		if (empty($payplug_test_key) && isset( $options['client_data']['jwt']['test']['access_token'] ) ) {
-			$payplug_live_key = $options['client_data']['jwt']['test']['access_token'];
+			$payplug_test_key = $options['client_data']['jwt']['test']['access_token'];
 		}
 		if (empty($payplug_live_key) && isset( $options['client_data']['jwt']['live']['access_token'] ) ) {
 			$payplug_live_key = $options['client_data']['jwt']['live']['access_token'];
 		}
-
 		if (empty($payplug_test_key) && empty($payplug_live_key)) {
 			return array();
 		}
