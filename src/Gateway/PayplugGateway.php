@@ -676,7 +676,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 		/************ VUE Code *************/
 		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-1.7.10.js', [], PAYPLUG_GATEWAY_VERSION);
-		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.7.10.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.7.11.js', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('app.css', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/css/app.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_localize_script('app.js', 'payplug_admin_config',
 			array(
@@ -1261,11 +1261,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function get_api_key($mode = 'test')
     {
-		$key = $this->get_option('payplug_' . $mode . '_key');
-		$jwt = $this->get_option('jwt');
+
+		$options = PayplugWoocommerceHelper::get_payplug_options();
+
+		$key = $options['payplug_' . $mode . '_key'];
+		$jwt = $options['client_data']['jwt'];
 
 		if(!empty($jwt[$mode])) {
-			$client_data = $this->get_option('client_data');
+			$client_data = $options['client_data'];
 			$this->api = new PayplugApi($this);
 			$validate_jwt = $this->api->validate_jwt($client_data[$mode], $jwt[$mode]);
 
@@ -1273,14 +1276,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				$key = $validate_jwt['token'];
 
 				if ($validate_jwt['need_update']) {
-					$options = get_option('woocommerce_payplug_settings', []);
-					$options['jwt'][$mode] = $validate_jwt['token'];
+					$options['client_data']['jwt'][$mode] = $validate_jwt['token'];
 					update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false );
 				}
 			}
 		}
 
-        return $key;
+        return isset($key['access_token']) ? $key['access_token'] : $key;
     }
 
     /**
@@ -1300,7 +1302,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function user_logged_in()
     {
-        return !empty($this->get_option('payplug_test_key'));
+		$options = PayplugWoocommerceHelper::get_payplug_options();
+
+		if (isset($options['client_data']) && isset($options['client_data']['jwt']['test']['access_token'])) {
+			return true;
+		}
+
+        return !empty($options['payplug_test_key']);
     }
 
     /**
@@ -1359,11 +1367,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	{
 		$options = get_option( 'woocommerce_payplug_settings' );
 
-		if (isset($options['client_data']) || empty($options['client_data'])) {
+		if (!isset($options['client_data']) || empty($options['client_data'])) {
 			return false;
 		}
 
-		$client_data = $this->get_option('client_data');
+		$client_data = $options['client_data'];
 		$jwt = [];
 
 		$this->api = new PayplugApi($this);
@@ -1374,16 +1382,29 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				continue;
 			}
 
-			$generated_jwt = $this->api->generateJWT($data['client_id'], $data['client_secret']);
+			if (($key == 'live') && isset($data['client_id']) && isset($data['client_secret'])) {
 
-			if (empty($generated_jwt['httpResponse'])) {
-				return false;
+				$generated_jwt = $this->api->generateJWT($data['client_id'], $data['client_secret']);
+
+				if (empty($generated_jwt['httpResponse'])) {
+					return false;
+				}
+				$jwt[$key] = $generated_jwt['httpResponse'];
+
 			}
 
-			$jwt[$key] = $generated_jwt['httpResponse'];
-		}
+			if (($key == 'test') && isset($data['client_id']) && isset($data['client_secret'])) {
 
-		$options['jwt'] = $jwt;
+				$generated_jwt = $this->api->generateJWT($data['client_id'], $data['client_secret']);
+
+				if (empty($generated_jwt['httpResponse'])) {
+					return false;
+				}
+				$jwt[$key] = $generated_jwt['httpResponse'];
+
+			}
+		}
+		$options['client_data']['jwt'] = $jwt;
 		return update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false );
 	}
 
