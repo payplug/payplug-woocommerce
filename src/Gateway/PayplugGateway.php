@@ -676,7 +676,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 		/************ VUE Code *************/
 		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-1.7.10.js', [], PAYPLUG_GATEWAY_VERSION);
-		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.7.10.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.7.11.js', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('app.css', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/css/app.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_localize_script('app.js', 'payplug_admin_config',
 			array(
@@ -1282,7 +1282,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			}
 		}
 
-        return $key['access_token'] ?? $key;
+        return isset($key['access_token']) ? $key['access_token'] : $key;
     }
 
     /**
