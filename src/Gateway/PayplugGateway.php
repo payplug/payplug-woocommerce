@@ -28,19 +28,7 @@ use WC_Payment_Tokens;
 class PayplugGateway extends WC_Payment_Gateway_CC
 {
 	const OPTION_NAME = "payplug_config";
-	/**
-	 * @var string
-	 */
-	public $api_key;
-	/**
-	 * @var string
-	 */
-	public $api_key_id;
 
-	/**
-	 * @var string
-	 */
-	public $identifier;
 	/**
 	 * @var string
 	 */
@@ -159,10 +147,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 		//required plugin id
 		$this->id = 'payplug';
-		// required hosted fields identifiers
-		$this->api_key_id = 'fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f';
-		$this->identifier = 'TestPluginIdentif';
-		$this->api_key = 'Gf=}k6]*E@EYBxau';
 
 		$this->supports           = array(
 			'products',
@@ -217,6 +201,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			"TestPluginIdentif",
 			"Gf=}k6]*E@EYBxau" );
 	}
+
+
+
 
 	/**
 	 * @param $option
@@ -334,25 +321,17 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				PayplugGateway::log(sprintf('Order #%s : Missing transaction id.', $order_id), 'error');
 				return;
 			}
-			$lock_id = Lock::handle_insert($save_request, $transaction_id);
+			/*$lock_id = Lock::handle_insert($save_request, $transaction_id);
 			if(!$lock_id){
 				return;
-			}
+			}*/
 
 			try {
 				if (strpos($transaction_id, 'pay_') !== 0) {
 					//for hosted field, we have to call getTransactions
-//					$payment_data = $this->preparePaymentData(
-//						'getTransactions',
-//						'getTransaction',
-//						$order_id,
-//						$transaction_id,
-//						'Achat de matériel informatique',
-//						$identifier,
-//						'3.0',
-//						$apikey
-//					);
-					// $payment = $this->api->payment_retrieve($payment_data, true);
+					$response = $this->api->payment_retrieve( $this->hosted_fields->populateGetTransaction($transaction_id), true );
+					$payment = $this->hosted_fields->TransformToTransactionMetadata($response, $this->mode);
+
 
 				} else {
 					$payment  = $this->api->payment_retrieve($transaction_id);
@@ -381,6 +360,15 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		}
     }
 
+
+
+
+
+
+
+
+
+
 	/**
 	 * @param $operation_type
 	 * @param $method
@@ -392,6 +380,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 * @param $api_key
 	 * @return array
 	 */
+	/*
 	private function preparePaymentData($operation_type, $method, $order_id, $transaction_id, $description, $identifier, $version, $api_key, $amount = null, $additional_params = [])
 	{
 		$payment_data = [
@@ -412,13 +401,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		if (!empty($additional_params)) {
 			$payment_data['params'] = array_merge($payment_data['params'], $additional_params);
 		}
-		$string = $this->buildHashContent($payment_data['params'], $api_key, $identifier);
+		$string = $this->hosted_fields->buildHashContent($payment_data['params'], $api_key, $identifier);
 		$hash = $api_key . $string;
 		$hash256 = hash('sha256', $hash);
 		$payment_data['params']['HASH'] = $hash256;
 
 		return $payment_data;
 	}
+	*/
 
     /**
      * Check if this gateway is enabled
@@ -919,7 +909,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				$return_url = get_site_url().$return_url;
 			}
 
-
 			$payment_data = [
                 'amount'           => $amount,
                 'currency'         => get_woocommerce_currency(),
@@ -970,53 +959,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
              */
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
 			$payment = $this->api->payment_create($payment_data);
+			//HF VS NORMAL
 			$payment_id = isset($payment['TRANSACTIONID']) ? $payment['TRANSACTIONID'] : $payment->id;
+
 			if (strpos($payment_id, 'pay_') !== 0) {
-				$authorize_data = $this->preparePaymentData(
-					'authorization',
-					'authorization',
-					$order_id,
-					null,
-					'Achat de matériel informatique',
-					$this->identifier,
-					'3.0',
-					$this->api_key,
-					1000,
-					[
-						'CARDCODE' => '5131080132762421',
-						'CARDCVV' => '123',
-						'CARDVALIDITYDATE' => '12-28',
-						'CARDFULLNAME' => 'squad BTTF functional tests Essential',
-						'CLIENTIDENT' => $order->get_billing_first_name() . $order->get_billing_last_name(),
-						'CLIENTEMAIL' => $order->get_billing_email(),
-						'CLIENTREFERRER' => $this->limit_length(esc_url_raw(home_url()), 500),
-						'CLIENTUSERAGENT' => $order->get_customer_user_agent(),
-						'CLIENTIP' => $order->get_customer_ip_address(),
-						'BILLINGADDRESS' => $order->get_billing_address_1(),
-						'BILLINGCITY' => $order,
-						'BILLINGCOUNTRY' => 'FR',
-						'BILLINGPOSTALCODE' => '75018',
-						'SHIPTOCITY' => 'Levallois',
-						'SHIPTOCOUNTRY' => 'FR',
-						'SHIPTOADDRESS' => '42 av. des Champs E.',
-						'SHIPTOPOSTALCODE' => '75008',
-						'LANGUAGE' => 'FR',
-						'TIMEZONE' => 'UTC',
-						'SHIPTOADDRESSTYPE' => 'NEW',
-					]
-				);
-				$authorize_payment = $this->api->payment_authorize($authorize_data, true);
-				$capture_data = $this->preparePaymentData(
-					'capture',
-					'capture',
-					$order_id,
-					$payment_id,
-					'Achat de matériel informatique',
-					$this->identifier,
-					'3.0',
-					$this->api_key
-				);
-				$capture_payment = $this->api->payment_capture($capture_data, true);
+				$response = $this->api->payment_retrieve( $this->hosted_fields->populateGetTransaction($payment_id), true );
+				$payment = $this->hosted_fields->TransformToTransactionMetadata($response, $this->mode);
 			}
 			// Save transaction id for the order
             PayplugWoocommerceHelper::is_pre_30()

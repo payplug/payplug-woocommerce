@@ -63,6 +63,53 @@ class HostedFields {
 		return $payment_data;
 	}
 
+	public function populateGetTransaction($payment_id){
+
+		$data = Array(
+			"method" => 'getTransactions',
+			"params" => array(
+				'IDENTIFIER' => $this->get_identifier(),
+				'OPERATIONTYPE' => 'getTransaction',
+				'TRANSACTIONID' => $payment_id,
+				'VERSION' => $this->get_api_version(),
+			)
+		);
+		$data["params"]["HASH"] = $this->buildHashContent( $data['params'], true );
+
+		return $data;
+
+	}
+
+	public function TransformToTransactionMetadata($response, $mode) {
+
+		$data = $response['DATA'][0];
+		$obj = new \stdClass();
+		$obj->id = $data["TRANSACTIONID"];
+		$obj->is_paid = $data["EXECCODE"] == "0000";
+		$obj->paid = $data["EXECCODE"] == "0000";
+		$obj->is_refunded = null;
+		$obj->amount = $data["AMOUNT"] * 100;
+		$obj->amount_refunded = "NA";
+		$obj->is_3ds = $data["3DSECURE"];
+		$obj->is_live = $mode === "live";
+		$obj->hosted_payment->paid_at = $data["DATE"];
+		$obj->created_at = $data["DATE"];
+		$obj->card->last4 = null;
+		$obj->card->exp_month = "NA";
+		$obj->card->exp_year = "NA";
+		$obj->card->brand = $data["CARDTYPE"];
+		$obj->card->country = $data["CARDCOUNTRY"];
+
+		$obj->payment_method = Array("type" => "payplug");
+		$obj->metadata = Array("order_id" => $data["ORDERID"]);
+
+
+		//TODO:: Mapping about the error codes
+
+		return $obj;
+
+	}
+
 	/**
 	 * @description Builds a hash content string
 	 * by concatenating sorted parameters with a secret key.
@@ -72,7 +119,7 @@ class HostedFields {
 	 * @param $prefix
 	 * @return string
 	 */
-	public function buildHashContent($params){
+	public function buildHashContent($params, $getTransaction = false) {
 
 		// Validate inputs
 		if (empty($params) || !is_array($params)) {
@@ -81,14 +128,19 @@ class HostedFields {
 		if (empty($this->get_api_key_secret())) {
 			throw new \InvalidArgumentException('Secret key cannot be empty');
 		}
+		if($getTransaction && empty($this->get_api_secret()) ) {
+			throw new \InvalidArgumentException('API Secret cannot be empty');
+		}
+
+		$key = $getTransaction ? $this->get_api_secret() : $this->get_api_key_secret();
 
 		ksort($params);
 		$string = '';
 		foreach($params as $k => $v){
-			$string .= $k  . "=" . $v . $this->get_api_key_secret();
+			$string .= $k  . "=" . $v . $key;
 		}
 
-		return hash('sha256', $this->get_api_key_secret() . $string);
+		return hash('sha256', $key . $string);
 
 	}
 
