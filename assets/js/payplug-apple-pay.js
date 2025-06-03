@@ -64,8 +64,13 @@
 					"supports3DS"
 				],
 				"supportedNetworks": [
+					"cartesBancaires",
 					"visa",
 					"masterCard"
+				],
+            	"supportedTypes": [
+					"debit",
+					"credit"
 				],
 				"total": {
 					"label": "Apple Pay",
@@ -76,7 +81,7 @@
 					'apple_pay_domain': apple_pay_params.apple_pay_domain
 				}))
 			}
-			session = new ApplePaySession(3, request)
+			session = new ApplePaySession(4, request)
 		},
 		BeginSession: function (response) {
 			session.payment_id = response.payment_id
