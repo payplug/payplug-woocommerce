@@ -41,7 +41,7 @@ class HostedFields {
 		$payment_data['params'] = [
 			"IDENTIFIER" => $this->get_identifier(),
 			"OPERATIONTYPE" => "payment",
-			"AMOUNT" => (string) $amount,
+			"AMOUNT" => "$amount",
 			"VERSION" => $this->get_api_version(),
 			"CLIENTIDENT" => $order->get_billing_first_name() . $order->get_billing_last_name(),
 			"CLIENTEMAIL" => $order->get_billing_email(),
@@ -77,36 +77,6 @@ class HostedFields {
 		$data["params"]["HASH"] = $this->buildHashContent( $data['params'], true );
 
 		return $data;
-
-	}
-
-	public function TransformToTransactionMetadata($response, $mode) {
-
-		$data = $response['DATA'][0];
-		$obj = new \stdClass();
-		$obj->id = $data["TRANSACTIONID"];
-		$obj->is_paid = $data["EXECCODE"] == "0000";
-		$obj->paid = $data["EXECCODE"] == "0000";
-		$obj->is_refunded = null;
-		$obj->amount = $data["AMOUNT"] * 100;
-		$obj->amount_refunded = "NA";
-		$obj->is_3ds = $data["3DSECURE"];
-		$obj->is_live = $mode === "live";
-		$obj->hosted_payment->paid_at = $data["DATE"];
-		$obj->created_at = $data["DATE"];
-		$obj->card->last4 = null;
-		$obj->card->exp_month = "NA";
-		$obj->card->exp_year = "NA";
-		$obj->card->brand = $data["CARDTYPE"];
-		$obj->card->country = $data["CARDCOUNTRY"];
-
-		$obj->payment_method = Array("type" => "payplug");
-		$obj->metadata = Array("order_id" => $data["ORDERID"]);
-
-
-		//TODO:: Mapping about the error codes
-
-		return $obj;
 
 	}
 

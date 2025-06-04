@@ -196,10 +196,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		//FIXME:: get_options to get hosted_fields_data
 		$this->hosted_fields = new HostedFields(
-			"(z1Y+#{<u+P{&j@<",
-			"fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f",
-			"TestPluginIdentif",
-			"Gf=}k6]*E@EYBxau" );
+			'7zfUfFgxtqlp-$rq',
+			"1a8172b3-a060-4bce-b0ea-9abcdf288ff6",
+			"PluginTestClient",
+			')N-wwom4KmZ3aui$'
+		);
+
 	}
 
 
@@ -321,17 +323,19 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				PayplugGateway::log(sprintf('Order #%s : Missing transaction id.', $order_id), 'error');
 				return;
 			}
-			/*$lock_id = Lock::handle_insert($save_request, $transaction_id);
+
+			$lock_id = Lock::handle_insert($save_request, $transaction_id);
 			if(!$lock_id){
 				return;
-			}*/
+			}
 
 			try {
 				if (strpos($transaction_id, 'pay_') !== 0) {
-					//for hosted field, we have to call getTransactions
-					$response = $this->api->payment_retrieve( $this->hosted_fields->populateGetTransaction($transaction_id), true );
-					$payment = $this->hosted_fields->TransformToTransactionMetadata($response, $this->mode);
+					$payment = $this->api->payment_retrieve( $this->hosted_fields->populateGetTransaction($transaction_id), true );
+					$payment->is_live = $this->get_current_mode() === 'live';
 
+					//FIXME:: HF the amount unit is EURO not Cents
+					$payment->amount = $payment->amount * 100;
 
 				} else {
 					$payment  = $this->api->payment_retrieve($transaction_id);
@@ -359,15 +363,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			};
 		}
     }
-
-
-
-
-
-
-
-
-
 
 	/**
 	 * @param $operation_type
@@ -959,13 +954,18 @@ class PayplugGateway extends WC_Payment_Gateway_CC
              */
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
 			$payment = $this->api->payment_create($payment_data);
+
+			//TODO:: payment is not created we need to generate an error
 			//HF VS NORMAL
 			$payment_id = isset($payment['TRANSACTIONID']) ? $payment['TRANSACTIONID'] : $payment->id;
 
-			if (strpos($payment_id, 'pay_') !== 0) {
-				$response = $this->api->payment_retrieve( $this->hosted_fields->populateGetTransaction($payment_id), true );
-				$payment = $this->hosted_fields->TransformToTransactionMetadata($response, $this->mode);
+			if (!empty($payment_id) && strpos($payment_id, 'pay_') !== 0) {
+				$payment = $this->api->payment_retrieve( $this->hosted_fields->populateGetTransaction($payment_id), true );
+				$payment->is_live = $this->get_current_mode() === 'live';
 			}
+
+			//TODO if payment has 5xxxx error
+
 			// Save transaction id for the order
             PayplugWoocommerceHelper::is_pre_30()
                 ? update_post_meta($order_id, '_transaction_id', $payment_id)
