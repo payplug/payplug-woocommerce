@@ -1227,3 +1227,12 @@ msgstr "Non hai  un conto?"
 
 msgid "payplug_section_oauth_login_btn_connect"
 msgstr "Accedi al tuo conto"
+
+msgid "payplug_reconnect"
+msgstr "Riconnettimi"
+
+msgid "payplug_section_logged_modal_description_1_uauth"
+msgstr "Ci sei quasi!"
+
+msgid "payplug_section_logged_modal_description_2_uauth"
+msgstr "Per attivare la modalità LIVE e iniziare ad accettare pagamenti, riconnettiti al tuo account Payplug."

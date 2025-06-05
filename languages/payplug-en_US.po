@@ -616,3 +616,12 @@ msgstr "Don't have an account ?"
 
 msgid "payplug_section_oauth_login_btn_connect"
 msgstr "Connect account"
+
+msgid "payplug_reconnect"
+msgstr "Reconnect"
+
+msgid "payplug_section_logged_modal_description_1_uauth"
+msgstr "You’re almost there!"
+
+msgid "payplug_section_logged_modal_description_2_uauth"
+msgstr "To activate LIVE mode and start accepting payments, please reconnect to your Payplug account."

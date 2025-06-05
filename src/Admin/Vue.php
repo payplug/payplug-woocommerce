@@ -79,6 +79,9 @@ class Vue {
 		if( empty(PayplugWoocommerceHelper::get_live_key()) ){
 			$inactive = true;
 		}
+		$this->api = new PayplugApi($this);
+		$callback_uri = get_admin_url( null, '/admin.php?page=wc-settings&tab=checkout&section=payplug');
+		$register_url = $this->api->retrieve_register_url($callback_uri);
 
 		return [
 			"title"        => __( 'payplug_section_logged_title', 'payplug' ),
@@ -134,9 +137,13 @@ class Vue {
 				"inactive" => $inactive,
 				"title" => __( 'payplug_live_mode', 'payplug' ),
 				"description" => __( 'payplug_section_logged_modal_description', 'payplug' ),
+				"description_1" => __( 'payplug_section_logged_modal_description_1_uauth', 'payplug' ),
+				"description_2" => __( 'payplug_section_logged_modal_description_2_uauth', 'payplug' ),
 				"password_label" => __( 'payplug_section_login_password_label', 'payplug' ),
 				"cancel" => __( 'payplug_cancel', 'payplug' ),
 				"ok" => __( 'payplug_ok', 'payplug' ),
+				"oauth" => __( 'payplug_reconnect', 'payplug' ),
+				"oauth_url" => $register_url
 			],
 			"inactive_account" => [
 				"warning" => [
