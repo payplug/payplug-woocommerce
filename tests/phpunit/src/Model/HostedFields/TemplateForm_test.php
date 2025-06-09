@@ -5,7 +5,7 @@ namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Model\HostedFields;
 use Monolog\Test\TestCase;
 use Payplug\PayplugWoocommerce\Model\HostedFields;
 
-class templateFormtest extends TestCase {
+class TemplateForm_test extends TestCase {
 
 	public function testTemplateFormContainsFormTag()
 	{

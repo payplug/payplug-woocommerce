@@ -15,6 +15,8 @@ class HostedFields {
 
 	const API_Version = 3.0;
 
+	const OPERATION_TYPE_PAYMENT = 'payment';
+
 	private $api_secret;
 
 	private $api_key;
@@ -31,18 +33,30 @@ class HostedFields {
 	}
 
 
+	/**
+	 * @param $payment_data
+	 * @param $order
+	 * @param $order_id
+	 * @param $hf_token
+	 * @param $amount
+	 *
+	 * @return mixed
+	 * @throws \Exception
+	 *
+	 * Create a payment data array for the Hosted Fields integration.
+	 */
 	public function populateCreatePayment(&$payment_data, $order, $order_id, $hf_token, $amount) {
 
 		if (empty($hf_token)) {
 			throw new \Exception(__('Hosted fields token is empty.', 'payplug'));
 		}
 
-		$payment_data['method'] = "payment";
+		$payment_data['method'] = self::OPERATION_TYPE_PAYMENT;
 		$payment_data['params'] = [
 			"IDENTIFIER" => $this->get_identifier(),
-			"OPERATIONTYPE" => "payment",
+			"OPERATIONTYPE" => self::OPERATION_TYPE_PAYMENT,
 			"AMOUNT" => "$amount",
-			"VERSION" => $this->get_api_version(),
+			"VERSION" => self::API_Version,
 			"CLIENTIDENT" => $order->get_billing_first_name() . $order->get_billing_last_name(),
 			"CLIENTEMAIL" => $order->get_billing_email(),
 			"CLIENTREFERRER" => $this->limit_length(esc_url_raw(home_url()), 500),
@@ -55,6 +69,9 @@ class HostedFields {
 			"HFTOKEN" => $hf_token,
 		];
 
+		$this->handle_hostedfield_address($paymentData['params'], $order, 'billing');
+		$this->handle_hostedfield_address($paymentData['params'], $order, 'shipping');
+
 
 		//FIXME HF::updating the amount for: $amount response 5002 error
 		$payment_data['params']["AMOUNT"]="1000";
@@ -63,7 +80,37 @@ class HostedFields {
 		return $payment_data;
 	}
 
+	/**
+	 * @param $data
+	 * @param $order
+	 * @param $type
+	 *
+	 * @return void
+	 *
+	 * Handles the address data for hosted fields.
+	 */
+	public function handle_hostedfield_address(&$data, $order, $type)
+	{
+		$prefix = strtoupper($type);
+		$data["{$prefix}ADDRESS"] = $order->{"get_{$type}_address_1"}() . ' ' . $order->{"get_{$type}_address_2"}();
+		$data["{$prefix}COUNTRY"] = $order->{"get_{$type}_country"}();
+		$data["{$prefix}PHONE"] = $order->{"get_{$type}_phone"}() ?: $order->get_billing_phone();
+		$data["{$prefix}POSTALCODE"] = $order->{"get_{$type}_postcode"}();
+	}
+
+
+	/**
+	 * @param $payment_id
+	 *
+	 * @return array
+	 * @throws \InvalidArgumentException
+	 *  * Prepares the data for retrieving a transaction by its ID.
+	 */
 	public function populateGetTransaction($payment_id){
+
+		if(empty($payment_id)){
+			throw new \InvalidArgumentException('Parameters array cannot be empty');
+		}
 
 		$data = Array(
 			"method" => 'getTransactions',
@@ -71,7 +118,7 @@ class HostedFields {
 				'IDENTIFIER' => $this->get_identifier(),
 				'OPERATIONTYPE' => 'getTransaction',
 				'TRANSACTIONID' => $payment_id,
-				'VERSION' => $this->get_api_version(),
+				'VERSION' => self::API_Version,
 			)
 		);
 		$data["params"]["HASH"] = $this->buildHashContent( $data['params'], true );
@@ -112,10 +159,6 @@ class HostedFields {
 
 		return hash('sha256', $key . $string);
 
-	}
-
-	public function get_api_version() {
-		return self::API_Version;
 	}
 
 	/**

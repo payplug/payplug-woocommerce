@@ -196,10 +196,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		//FIXME:: get_options to get hosted_fields_data
 		$this->hosted_fields = new HostedFields(
-			'7zfUfFgxtqlp-$rq',
-			"1a8172b3-a060-4bce-b0ea-9abcdf288ff6",
-			"PluginTestClient",
-			')N-wwom4KmZ3aui$'
+			'ho;G0s&iL<YNg4B9',
+			"fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f",
+			"TestPluginIdentif",
+			'Gf=}k6]*E@EYBxau'
 		);
 
 	}

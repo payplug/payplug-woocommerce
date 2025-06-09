@@ -2,7 +2,7 @@
 
 namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Model\HostedFields;
 
-class buildHashContentTest extends BaseHostedFields {
+class BuildHashContent_test extends BaseHostedFields {
 
 
 	public function setUp(): void {
