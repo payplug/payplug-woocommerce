@@ -27,7 +27,7 @@ apple-pay-button.isDisabled {
 #apple-pay-button-wrapper apple-pay-button,
 .cart_totals apple-pay-button {
 	--apple-pay-button-width: 100%;
-	--apple-pay-button-height: auto;
+	--apple-pay-button-height: 60px;
 	--apple-pay-button-padding: 1em;
 	-webkit-appearance: -apple-pay-button;
 
