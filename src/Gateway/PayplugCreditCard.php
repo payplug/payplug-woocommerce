@@ -2,7 +2,7 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway;
 
-use Payplug\PayplugWoocommerce\Controller\HostedFields;
+use Payplug\PayplugWoocommerce\Model\HostedFields;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 

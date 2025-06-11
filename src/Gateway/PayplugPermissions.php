@@ -113,7 +113,7 @@ class PayplugPermissions {
 		} catch ( PayplugException $e ) {
 
 			//logout
-			PayplugGateway::log(sprintf('Account request error from PayPlug API : %s', wc_print_r($e->getErrorObject(), true)), 'error');
+			PayplugGateway::log(sprintf('Account request error from PayPlug API : %s', wc_print_r($e->getMessage(), true)), 'error');
 			PayplugWoocommerceHelper::payplug_logout();
 			$this->permissions = [];
 		}
