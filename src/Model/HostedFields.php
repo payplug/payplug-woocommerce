@@ -69,8 +69,8 @@ class HostedFields {
 			"HFTOKEN" => $hf_token,
 		];
 
-		$this->handle_hostedfield_address($paymentData['params'], $order, 'billing');
-		$this->handle_hostedfield_address($paymentData['params'], $order, 'shipping');
+		$this->handle_hostedfield_address($payment_data['params'], $order, 'billing');
+		$this->handle_hostedfield_address($payment_data['params'], $order, 'shipping');
 
 
 		//FIXME HF::updating the amount for: $amount response 5002 error
@@ -96,6 +96,7 @@ class HostedFields {
 		$data["{$prefix}COUNTRY"] = $order->{"get_{$type}_country"}();
 		$data["{$prefix}PHONE"] = $order->{"get_{$type}_phone"}() ?: $order->get_billing_phone();
 		$data["{$prefix}POSTALCODE"] = $order->{"get_{$type}_postcode"}();
+		return $data;
 	}
 
 

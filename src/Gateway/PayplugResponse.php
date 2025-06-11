@@ -41,6 +41,11 @@ class PayplugResponse {
 	{
 		$order_id = wc_clean($resource->metadata['order_id']);
 
+		if(empty($order_id)){
+			PayplugGateway::log('Parameters array cannot be empty');
+			return;
+		}
+
 		$order = wc_get_order($order_id);
 		$gateway_id = $order->get_payment_method();
 		$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($resource);
