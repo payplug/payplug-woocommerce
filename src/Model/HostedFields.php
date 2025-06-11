@@ -80,6 +80,32 @@ class HostedFields {
 		return $payment_data;
 	}
 
+
+	/**
+	 * @description Prepares the data for a refund transaction.
+	 * @param $payment_id
+	 * @param $amount
+	 * @param $order_id
+	 * @param $order
+	 * @return array
+	 */
+	public function populateRefundTransaction($payment_id, $amount, $order_id, $order) {
+		$data = Array(
+			"method" => 'refund',
+			"params" => array(
+				'IDENTIFIER' => $this->get_identifier(),
+				'OPERATIONTYPE' => 'refund',
+				'AMOUNT' => (string) $amount,
+				'ORDERID' =>$order_id,
+				'DESCRIPTION' =>!empty($order->get_customer_order_notes()) ? $order->get_customer_order_notes() : "N.a.",
+				'TRANSACTIONID' => $payment_id,
+				'VERSION' => self::API_Version,
+			)
+		);
+		$data["params"]["HASH"] = $this->buildHashContent( $data['params'], true );
+		return $data;
+	}
+
 	/**
 	 * @param $data
 	 * @param $order
