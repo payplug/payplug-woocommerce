@@ -22,8 +22,8 @@ var HostedFields = {
 	hfields: dalenys.hostedFields({
 		// API Keys
 		key: {
-			id: "970c4f7c-c62e-40d2-8084-b61781326c81",
-			value: "lr3*{F/4?nLnTq.t"
+			id: "fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f",
+			value: "Gf=}k6]*E@EYBxau"
 		},
 		// Manages each hosted-field container
 		fields: {
