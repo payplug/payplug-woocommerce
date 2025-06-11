@@ -364,47 +364,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		}
     }
 
-	/**
-	 * @param $operation_type
-	 * @param $method
-	 * @param $order_id
-	 * @param $transaction_id
-	 * @param $description
-	 * @param $identifier
-	 * @param $version
-	 * @param $api_key
-	 * @return array
-	 */
-	/*
-	private function preparePaymentData($operation_type, $method, $order_id, $transaction_id, $description, $identifier, $version, $api_key, $amount = null, $additional_params = [])
-	{
-		$payment_data = [
-			'method' => $method,
-			'params' => [
-				'IDENTIFIER' => $identifier,
-				'OPERATIONTYPE' => $operation_type,
-				'ORDERID' => $order_id,
-				'DESCRIPTION' => $description,
-				'VERSION' => $version,
-				'TRANSACTIONID' => $transaction_id,
-			],
-		];
-		if ($operation_type === 'authorization') {
-			$payment_data['params']['AMOUNT'] = $amount;
-		}
-
-		if (!empty($additional_params)) {
-			$payment_data['params'] = array_merge($payment_data['params'], $additional_params);
-		}
-		$string = $this->hosted_fields->buildHashContent($payment_data['params'], $api_key, $identifier);
-		$hash = $api_key . $string;
-		$hash256 = hash('sha256', $hash);
-		$payment_data['params']['HASH'] = $hash256;
-
-		return $payment_data;
-	}
-	*/
-
     /**
      * Check if this gateway is enabled
      */
@@ -882,7 +841,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      * @param int $amount
      * @param int $customer_id
      *
-     * @return array
      * @return array
      * @throws \Exception
      */

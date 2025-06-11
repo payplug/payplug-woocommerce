@@ -131,10 +131,10 @@ class HostedFields {
 	 * @description Builds a hash content string
 	 * by concatenating sorted parameters with a secret key.
 	 *
-	 * @param $params
-	 * @param $secret
-	 * @param $prefix
+	 * @param array $params
+	 * @param bool $getTransaction
 	 * @return string
+	 * @throws \InvalidArgumentException
 	 */
 	public function buildHashContent($params, $getTransaction = false) {
 

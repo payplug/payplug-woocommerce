@@ -58,7 +58,8 @@ class PayplugApi {
 	/**
 	 * Retrieve payment data from PayPlug API.
 	 *
-	 * @param string $transaction_id
+	 * @param string|array $data
+	 * @param bool $is_hosted_field
 	 *
 	 * @return null|\Payplug\Resource\Payment
 	 * @throws \Payplug\Exception\ConfigurationException
@@ -71,6 +72,14 @@ class PayplugApi {
 		return $this->do_request_with_fallback('\Payplug\Payment::retrieve', $data);
 
 	}
+
+	/**
+	 * @param $data
+	 * @param $is_hosted_field
+	 *
+	 * @return object
+	 * @throws \Payplug\Exception\ConfigurationException
+	 */
 	public function payment_capture($data, $is_hosted_field = false) {
 		if ($is_hosted_field) {
 			return $this->do_request_with_fallback('\Payplug\Payment::capture', [$data, null, $is_hosted_field] );
@@ -79,6 +88,13 @@ class PayplugApi {
 		return $this->do_request_with_fallback('\Payplug\Payment::capture', $data);
 	}
 
+	/**
+	 * @param $data
+	 * @param $is_hosted_field
+	 *
+	 * @return object
+	 * @throws \Payplug\Exception\ConfigurationException
+	 */
 	public function payment_authorize($data, $is_hosted_field = false) {
 			return $this->do_request_with_fallback('\Payplug\Payment::authorize', [$data, null, $is_hosted_field] );
 	}
