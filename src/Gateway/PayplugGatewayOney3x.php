@@ -380,10 +380,17 @@ HTML;
      */
     public function check_gateway($gateways)
     {
-        $ordered_gateways = [];
         if (isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id) {
+
+	        //remove gateway if thresholds/country criteria are not met
+	        if( $this->check_oney_is_available() === false){
+		        unset($gateways[$this->id]);
+	        }
+
+			//remove gateway if account doesn't have permission
             if (!PayplugWoocommerceHelper::is_oney_available()) {
                 unset($gateways[$this->id]);
+
             } else {
 				$gateways = parent::check_gateway($gateways);
             }
