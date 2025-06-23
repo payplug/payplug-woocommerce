@@ -12,6 +12,7 @@ use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\HttpException;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Helper\Lock;
+use Payplug\PayplugWoocommerce\Model\HostedFields;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
@@ -100,6 +101,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	const MAX_AMOUNT = 20000;
 
 	/**
+	 * @var HostedFields $hosted_fields
+	 */
+	public $hosted_fields = null;
+
+	/**
 	 * @var string
 	 */
 	private $payplug_merchant_country = 'FR';
@@ -141,6 +147,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 		//required plugin id
 		$this->id = 'payplug';
+
 		$this->supports           = array(
 			'products',
 			'refunds',
@@ -186,7 +193,19 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
 		add_action('the_post', [$this, 'validate_payment']);
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
+
+		//FIXME:: get_options to get hosted_fields_data
+		$this->hosted_fields = new HostedFields(
+			'ho;G0s&iL<YNg4B9',
+			"fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f",
+			"TestPluginIdentif",
+			'Gf=}k6]*E@EYBxau'
+		);
+
 	}
+
+
+
 
 	/**
 	 * @param $option
@@ -264,12 +283,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$order_id = (int) $id;
 		}
 
+
 		if (empty($order_id) && (isset($wp->query_vars['order-received']))) {
 			$order_id = apply_filters(
 				'woocommerce_thankyou_order_id',
 				absint($wp->query_vars['order-received'])
 			);
 		}
+
 
 		if (empty($order_id)) {
 
@@ -297,7 +318,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		if($payment_method === $this->id) {
 
-
 			$transaction_id = PayplugWoocommerceHelper::is_pre_30() ? get_post_meta($order_id, '_transaction_id', true) : $order->get_transaction_id();
 			if (empty($transaction_id)) {
 				PayplugGateway::log(sprintf('Order #%s : Missing transaction id.', $order_id), 'error');
@@ -310,7 +330,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			}
 
 			try {
-				$payment = $this->api->payment_retrieve($transaction_id);
+				if (strpos($transaction_id, 'pay_') !== 0) {
+					$payment = $this->api->payment_retrieve( $this->hosted_fields->populateGetTransaction($transaction_id), true );
+					$payment->is_live = $this->get_current_mode() === 'live';
+
+					//FIXME:: HF the amount unit is EURO not Cents
+					$payment->amount = $payment->amount * 100;
+
+				} else {
+					$payment  = $this->api->payment_retrieve($transaction_id);
+				}
 
 			} catch (\Exception $e) {
 				PayplugGateway::log(
@@ -323,7 +352,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 				return;
 			}
-
 			$this->response->process_payment($payment);
 
 			\Payplug\PayplugWoocommerce\Model\Lock::delete_lock($lock_id);
@@ -704,7 +732,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function process_payment($order_id)
     {
-
         PayplugGateway::log(sprintf('Processing payment for order #%s', $order_id));
 
         $order       = wc_get_order($order_id);
@@ -730,7 +757,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
             return $this->process_payment_with_token($order, $amount, $customer_id, $payment_token_id);
         }
-
 		return $this->process_standard_payment($order, $amount, $customer_id);
     }
 
@@ -820,7 +846,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function process_standard_payment($order, $amount, $customer_id)
 	{
-
 		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 
 		$intent = $this->process_standard_intent_payment($order);
@@ -855,18 +880,17 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 ],
             ];
 
+			if ($this->payment_method === 'integrated' && isset($_POST['hftoken'])) {
+				$hf_token = filter_var($_POST['hftoken'], FILTER_SANITIZE_STRING);
+				$payment_data = $this->hosted_fields->populateCreatePayment($payment_data, $order, $order_id, $hf_token, $amount);
+				$payment_data['metadata']['woocommerce_block'] = "HOSTED_FIELDS";
+			}
+
 			if (PayplugWoocommerceHelper::is_checkout_block() && is_checkout()) {
 				$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
 
 			} elseif (PayplugWoocommerceHelper::is_cart_block() && is_cart()) {
 				$payment_data['metadata']['woocommerce_block'] = "CART";
-			}
-
-			//IP request required variables
-			if($this->payment_method === 'integrated'){
-				$payment_data['initiator'] = 'PAYER';
-				$payment_data['integration'] = 'INTEGRATED_PAYMENT';
-				unset($payment_data['hosted_payment']['cancel_url']);
 			}
 
 			//for subscriptions the card needs to be saved
@@ -887,12 +911,23 @@ class PayplugGateway extends WC_Payment_Gateway_CC
              * @param PayplugAddressData $address_data
              */
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
-            $payment      = $this->api->payment_create($payment_data);
+			$payment = $this->api->payment_create($payment_data);
 
-            // Save transaction id for the order
+			//TODO:: payment is not created we need to generate an error
+			//HF VS NORMAL
+			$payment_id = isset($payment['TRANSACTIONID']) ? $payment['TRANSACTIONID'] : $payment->id;
+
+			if (!empty($payment_id) && strpos($payment_id, 'pay_') !== 0) {
+				$payment = $this->api->payment_retrieve( $this->hosted_fields->populateGetTransaction($payment_id), true );
+				$payment->is_live = $this->get_current_mode() === 'live';
+			}
+
+			//TODO if payment has 5xxxx error
+
+			// Save transaction id for the order
             PayplugWoocommerceHelper::is_pre_30()
-                ? update_post_meta($order_id, '_transaction_id', $payment->id)
-                : $order->set_transaction_id($payment->id);
+                ? update_post_meta($order_id, '_transaction_id', $payment_id)
+                : $order->set_transaction_id($payment_id);
 
 			$order->set_payment_method( $this->id );
 			$order->set_payment_method_title($this->method_title);
@@ -917,9 +952,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			if(ob_get_length() > 0){
 				ob_clean();
 			}
-
 			return array(
-				'payment_id' => $payment->id,
+				'payment_id' => $payment_id,
 				'result'   => 'success',
 				'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
 				'cancel'   => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null
