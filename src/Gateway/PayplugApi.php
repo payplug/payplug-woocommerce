@@ -139,16 +139,14 @@ class PayplugApi {
 
 	/**
 	 * Create a refund.
-	 *
-	 * @param string $transaction_id
-	 * @param array $data
-	 *
-	 * @return null|\Payplug\Resource\Refund
+	 * @param $data
+	 * @param $is_hosted_field
+	 * @return object
 	 * @throws \Payplug\Exception\ConfigurationException
-	 * @author Clément Boirie
 	 */
-	public function refund_create( $transaction_id, $data ) {
-		return $this->do_request_with_fallback( '\Payplug\Refund::create', [ $transaction_id, $data ] );
+
+	public function refund_create($data, $is_hosted_field = false) {
+		return $this->do_request_with_fallback('\Payplug\Refund::create', [$data, null, null, $is_hosted_field] );
 	}
 
 	/**
