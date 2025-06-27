@@ -113,7 +113,6 @@ const Content = (props) => {
 					"supports3DS"
 				],
 				"supportedNetworks": [
-					"cartesBancaires",
 					"visa",
 					"masterCard"
 				],
