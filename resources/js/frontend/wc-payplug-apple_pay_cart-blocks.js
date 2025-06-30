@@ -25,7 +25,6 @@ const ApplePayCart = ( props ) =>{
 					"supports3DS"
 				],
 				"supportedNetworks": [
-					"cartesBancaires",
 					"visa",
 					"masterCard"
 				],
