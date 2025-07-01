@@ -196,10 +196,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		//FIXME:: get_options to get hosted_fields_data
 		$this->hosted_fields = new HostedFields(
-			'ho;G0s&iL<YNg4B9',
-			"fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f",
-			"TestPluginIdentif",
-			'Gf=}k6]*E@EYBxau'
+			'7zfUfFgxtqlp-$rq',
+			"1a8172b3-a060-4bce-b0ea-9abcdf288ff6",
+			"PluginTestClient",
+			')N-wwom4KmZ3aui$'
 		);
 
 	}
@@ -1134,7 +1134,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $data = apply_filters('payplug_gateway_refund_data', $data, $order_id, $transaction_id);
 
         try {
-            $refund = $this->api->refund_create($transaction_id, $data);
+			if (strpos($transaction_id, 'pay_') === 0) {
+				$refund = $this->api->refund_create($transaction_id, $data, false);
+			} else {
+				$amount = $amount*100;
+				$refund = $this->api->refund_create($this->hosted_fields->populateRefundTransaction($transaction_id,$amount, $order_id, $order), true);
+			}
+//
 
             /**
              * Fires once a refund has been created.
@@ -1145,7 +1151,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
              */
             \do_action('payplug_gateway_refund_created', $order_id, $refund, $transaction_id);
 
-            $refund_meta_key = sprintf('_pr_%s', wc_clean($refund->id));
+			$refund_meta_key = sprintf('_pr_%s', wc_clean($refund->id));
             if (PayplugWoocommerceHelper::is_pre_30()) {
                 update_post_meta($order_id, $refund_meta_key, $refund->id);
             } else {
@@ -1158,7 +1164,17 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 $note .= sprintf(' (%s)', esc_html($refund->metadata['reason']));
             }
             $order->add_order_note($note);
+			if(isset($refund->failure) && !empty($refund->failure)) {
+				$note = sprintf(__('Refund %s : ', 'payplug'), wc_clean($refund->id));
+				PayplugGateway::log(
+					sprintf('Refund request error for the order %s from PayPlug API : %s', $order_id, wc_print_r($refund, true)),
+					'error'
+				);
+				$note .= sprintf(' (%s)', esc_html($refund->description));
 
+				$order->add_order_note($note);
+				return new \WP_Error('process_refund_error', __('The transaction could not be refunded. Please try again.', 'payplug'));
+			}
             try {
                 $payment  = $this->api->payment_retrieve($transaction_id);
                 $metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
