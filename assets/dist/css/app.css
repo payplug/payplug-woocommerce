@@ -68,11 +68,6 @@
 .payplugConfiguration .color {
   color: #00AB7A !important;
 }
-.payplugConfiguration ._forgotPassword_wrapper {
-  display: inline-block !important;
-  min-width: 171px;
-  text-align: center;
-}
 .payplugConfiguration ._paylaterAdvancedOption.-product {
   position: relative;
 }
@@ -1522,20 +1517,9 @@
 .generalBlock.-hide {
   display: none;
 }
-.generalBlock.-subscribe ._content {
-  padding: 0 0 60px;
-}
-.generalBlock.-subscribe ._content p {
-  text-align: center;
-  font-size: 14px;
-  margin: 39px 0;
-}
-.generalBlock.-subscribe ._content ._buttons {
-  flex-direction: column;
-}
-.generalBlock.-subscribe ._content .payplugUIButton {
-  margin: 10px 0 0;
-  padding: 0px 15px;
+.generalBlock.-login {
+  border-radius: 4px 4px 0 0;
+  margin-bottom: -1px;
 }
 .generalBlock.-login ._loginForm {
   display: flex;
@@ -1564,7 +1548,8 @@
 }
 .generalBlock.-login ._subscribe,
 .generalBlock.-login ._connexion {
-  margin: 16px 0 12px 8px;
+  width: auto;
+  margin: 16px 0 -16px 8px;
 }
 @media (max-width: 767px) {
   .generalBlock.-login ._subscribe,
@@ -1573,18 +1558,21 @@
   }
 }
 .generalBlock.-login ._forgotPassword {
-  font-size: 13px;
-  color: #909192;
-  margin: 0 0 -2px;
+  color: #212225;
 }
-.generalBlock.-login ._loginPortal {
-  border-top: 1px solid #C8D7E4;
-  padding: 32px 0 0 0;
-  margin: 32px 0 0 0;
+.generalBlock.-login ._forgotPassword:hover {
+  color: #0555EB;
+}
+.generalBlock.-oauth {
+  border-radius: 0 0 4px 4px;
+}
+.generalBlock.-oauth .payplugUIParagraph + div {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  flex-direction: row-reverse;
+  width: 100%;
+}
+.generalBlock.-oauth ._connexion {
+  width: auto;
 }
 .generalBlock.-logged ._user {
   width: 100%;
