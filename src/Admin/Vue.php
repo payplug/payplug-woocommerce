@@ -160,6 +160,51 @@ class Vue {
 		];
 	}
 
+
+
+	/**
+	 * @return array[]
+	 */
+	public function payplug_section_login() {
+
+		$login = [
+			"name"         => "generalLogin",
+			"title"        => __( 'payplug_section_logged_title', 'payplug' ),
+			"descriptions" => [
+				"live"    => [
+					"description"          => __( 'payplug_section_login_description', 'payplug' ),
+					"not_registered"       => __( 'payplug_section_login_not_registered', 'payplug' ),
+					"connect"              => __( 'payplug_section_login_connect', 'payplug' ),
+					"email_label"          => __( 'payplug_section_login_email_label', 'payplug' ),
+					"email_placeholder"    => __( 'payplug_section_login_email_label', 'payplug' ),
+					"password_label"       => __( 'payplug_section_login_password_label', 'payplug' ),
+					"password_placeholder" => __( 'payplug_section_login_password_label', 'payplug' ),
+					"link_forgot_password" => [
+						"text"   => __( 'payplug_section_login_forgot_password', 'payplug' ),
+						"url"    => "https://portal.payplug.com/forgot_password",
+						"target" => "_blank"
+					],
+				],
+				"sandbox" => [
+					"description"          => __( 'payplug_section_login_description', 'payplug' ),
+					"not_registered"       => __( 'payplug_section_login_not_registered', 'payplug' ),
+					"connect"              => __( 'payplug_section_login_connect', 'payplug' ),
+					"email_label"          => __( 'payplug_section_login_email_label', 'payplug' ),
+					"email_placeholder"    => __( 'payplug_section_login_email_label', 'payplug' ),
+					"password_label"       => __( 'payplug_section_login_password_label', 'payplug' ),
+					"password_placeholder" => __( 'payplug_section_login_password_label', 'payplug' ),
+					"link_forgot_password" => [
+						"text"   => __( 'payplug_section_login_forgot_password', 'payplug' ),
+						"url"    => "https://portal.payplug.com/forgot_password",
+						"target" => "_blank"
+					],
+				]
+			]
+		];
+
+		return $login;
+	}
+
 	/**
 	 * @return array[]
 	 */
@@ -167,22 +212,63 @@ class Vue {
 		$this->api = new PayplugApi($this);
 		$callback_uri = get_admin_url( null, '/admin.php?page=wc-settings&tab=checkout&section=payplug');
 		$register_url = $this->api->retrieve_register_url($callback_uri);
-		$content = [
-			'description' => __( 'payplug_section_oauth_login_description', 'payplug' ),
-			'content_description' => __( 'payplug_section_oauth_login_content', 'payplug' ),
-			'already_have_account' => __( 'payplug_section_oauth_login_create_account', 'payplug' ),
-			'link_portal' => [
-				'text' => __( 'payplug_section_oauth_login_btn_connect', 'payplug' ),
-				'url' => $register_url,
-			],
-		];
 
 		$oauth_login = [
-			"name"         => "generalLogin",
+			"name"         => "oauthLogin",
 			"title"        => __( 'payplug_section_logged_title', 'payplug' ),
 			"descriptions" => [
-				"live"    => $content,
-				"sandbox" => $content,
+				"live"    => [
+					"description" => __( 'payplug_section_oauth_login_description', 'payplug' ),
+					"form" => [
+						"email" => [
+							"label" => __( 'payplug_section_login_email_label', 'payplug' ),
+							"placeholder" => __( 'payplug_section_login_email_label', 'payplug' )
+						],
+						"password" => [
+							"label" => __( 'payplug_section_login_password_label', 'payplug' ),
+							"placeholder" => __( 'payplug_section_login_password_label', 'payplug' )
+						],
+						"connexion" => __( 'payplug_section_login_connect', 'payplug' ),
+						"create_account" => __( 'payplug_section_login_not_registered', 'payplug' ),
+						"forgot_password" => __( 'payplug_section_login_forgot_password', 'payplug' ),
+						"error" => __( 'payplug_section_login_error', 'payplug' ),
+						"create_account_url" => "https://portal.payplug.com/auth/signup",
+						"forgot_password_url" => "https://portal.payplug.com/forgot_password"
+					],
+					"sso" => [
+						"title" => __( 'payplug_section_oauth_login_title', 'payplug' ),
+						"description" => __( 'payplug_section_oauth_login_description', 'payplug' ),
+						"information" => __( 'payplug_section_oauth_info', 'payplug' ),
+						"button" => __( 'payplug_section_oauth_login_btn_connect', 'payplug' ),
+						"button_url" => $register_url
+					]
+				],
+				"sandbox" => [
+					"description" => __( 'payplug_section_oauth_login_description', 'payplug' ),
+					"form" => [
+						"email" => [
+							"label" => __( 'payplug_section_login_email_label', 'payplug' ),
+							"placeholder" => __( 'payplug_section_login_email_label', 'payplug' )
+						],
+						"password" => [
+							"label" => __( 'payplug_section_login_password_label', 'payplug' ),
+							"placeholder" => __( 'payplug_section_login_password_label', 'payplug' )
+						],
+						"connexion" => __( 'payplug_section_login_connect', 'payplug' ),
+						"create_account" => __( 'payplug_section_login_not_registered', 'payplug' ),
+						"forgot_password" => __( 'payplug_section_login_forgot_password', 'payplug' ),
+						"error" => __( 'payplug_section_login_error', 'payplug' ),
+						"create_account_url" => "https://portal.payplug.com/auth/signup",
+						"forgot_password_url" => "https://portal.payplug.com/forgot_password"
+					],
+					"sso" => [
+						"title" => __( 'payplug_section_oauth_login_title', 'payplug' ),
+						"description" => __( 'payplug_section_oauth_login_description', 'payplug' ),
+						"information" => __( 'payplug_section_oauth_info', 'payplug' ),
+						"button" => __( 'payplug_section_oauth_login_btn_connect', 'payplug' ),
+						"button_url" => $register_url
+					]
+				]
 			],
 		];
 

@@ -675,8 +675,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function admin_options()
     {
 		/************ VUE Code *************/
-		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-1.7.11.js', [], PAYPLUG_GATEWAY_VERSION);
-		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.7.11.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-1.7.12.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.7.12.js', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('app.css', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/css/app.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_localize_script('app.js', 'payplug_admin_config',
 			array(
@@ -1265,17 +1265,26 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$options = PayplugWoocommerceHelper::get_payplug_options();
 
 		$key = $options['payplug_' . $mode . '_key'];
-		$jwt = $options['client_data']['jwt'];
+		$jwt = isset($options['client_data']) && isset($options['client_data']['jwt']) ? $options['client_data']['jwt'] : [];
 
-		if(!empty($jwt[$mode])) {
-			$client_data = $options['client_data'];
+		if(!empty($jwt) && !empty($jwt[$mode])) {
+			$client_data = isset($options['client_data']) ? $options['client_data'] : [];
 			$this->api = new PayplugApi($this);
-			$validate_jwt = $this->api->validate_jwt($client_data[$mode], $jwt[$mode]);
+			$validate_jwt = $this->api->validate_jwt(
+				array_key_exists($mode, $client_data) ? $client_data[$mode] : [], 
+				$jwt[$mode]
+			);
 
 			if ($validate_jwt['token']) {
 				$key = $validate_jwt['token'];
 
 				if ($validate_jwt['need_update']) {
+					if (!isset($options['client_data'])) {
+						$options['client_data'] = [];
+					}
+					if (!isset($options['client_data']['jwt'])) {
+						$options['client_data']['jwt'] = [];
+					}
 					$options['client_data']['jwt'][$mode] = $validate_jwt['token'];
 					update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false );
 				}

@@ -1217,7 +1217,7 @@ msgstr ""
 " Per maggiori informazioni, consulta il nostro centro assistenza."
 
 msgid "payplug_section_oauth_login_description"
-msgstr "Accedi al tuo conto"
+msgstr "Hai già attivato la nuova autenticazione sicura? Accedi qui"
 
 msgid "payplug_section_oauth_login_content"
 msgstr "Accedi tramite il mio portale PayPlug"
@@ -1236,3 +1236,9 @@ msgstr "Ci sei quasi!"
 
 msgid "payplug_section_logged_modal_description_2_uauth"
 msgstr "Per attivare la modalità LIVE e iniziare ad accettare pagamenti, riconnettiti al tuo account Payplug."
+
+msgid "payplug_section_oauth_info"
+msgstr "Nuova modalità di accesso in fase di rilascio progressivo L’accesso tramite OAuth2 è riservato ai commercianti che hanno già attivato questa opzione. Se non è ancora il tuo caso, continua a utilizzare l’accesso classico."
+
+msgid "payplug_section_oauth_login_title"
+msgstr "Accesso via OAuth2 (nuovo)"

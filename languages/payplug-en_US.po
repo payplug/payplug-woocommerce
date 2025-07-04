@@ -606,7 +606,7 @@ msgstr ""
 " For more information, please visit our help center."
 
 msgid "payplug_section_oauth_login_description"
-msgstr "Connect account"
+msgstr "Already activated the new secure authentication? Log in here."
 
 msgid "payplug_section_oauth_login_content"
 msgstr "Log in via my PayPlug portal"
@@ -625,3 +625,9 @@ msgstr "You’re almost there!"
 
 msgid "payplug_section_logged_modal_description_2_uauth"
 msgstr "To activate LIVE mode and start accepting payments, please reconnect to your Payplug account."
+
+msgid "payplug_section_oauth_info"
+msgstr "New login method being rolled out gradually OAuth2 login is only available for merchants who have already enabled this option. If that's not your case yet, please continue using the classic login."
+
+msgid "payplug_section_oauth_login_title"
+msgstr "OAuth2 Login (new)"
