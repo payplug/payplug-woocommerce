@@ -155,8 +155,8 @@ HTML;
     /**
      * Check if Oney is available
      *
-     * @return void
-     */
+     * @return false
+	 */
     public function check_oney_is_available()
     {
         $cart = WC()->cart;
@@ -176,6 +176,14 @@ HTML;
 			$country_code_billing = $order->get_billing_country();
 
 			$this->order_items_to_cart($cart, $items);
+		}
+
+		if(empty($cart->total)){
+			return false;
+		}
+
+		if(empty($cart->cart_contents_count)){
+			return false;
 		}
 
         $total_price = floatval($cart->total);
