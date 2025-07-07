@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.5\n"
+"X-Generator: Poedit 3.6\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1215,3 +1215,30 @@ msgid "payplug_ppro_flag_error"
 msgstr ""
 "Remboursement enregistré. Il sera traité manuellement par nos équipes. \n"
 " Pour plus d’informations, consultez notre centre d'assistance."
+
+msgid "payplug_section_oauth_login_description"
+msgstr "Vous avez déjà activé la nouvelle authentification sécurisée ? Connectez-vous ici"
+
+msgid "payplug_section_oauth_login_content"
+msgstr "Me connecter via mon portail Payplug"
+
+msgid "payplug_section_oauth_login_create_account"
+msgstr "Pas encore de compte Payplug ?"
+
+msgid "payplug_section_oauth_login_btn_connect"
+msgstr "Connexion"
+
+msgid "payplug_reconnect"
+msgstr "Me reconnecter"
+
+msgid "payplug_section_logged_modal_description_1_uauth"
+msgstr "Vous êtes presque prêt !"
+
+msgid "payplug_section_logged_modal_description_2_uauth"
+msgstr "Pour activer le mode LIVE et commencer à encaisser des paiements, veuillez vous reconnecter à votre compte Payplug."
+
+msgid "payplug_section_oauth_info"
+msgstr "Nouveau mode de connexion disponible progressivement La connexion via OAuth2 est réservée aux marchands ayant déjà activé cette option. Si ce n’est pas votre cas, continuez à utiliser la connexion classique."
+
+msgid "payplug_section_oauth_login_title"
+msgstr "Connexion via OAuth2 (nouveau) "

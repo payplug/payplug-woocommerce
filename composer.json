@@ -17,7 +17,7 @@
   "require": {
     "php": ">=5.6.0",
     "composer/installers": "^1.9",
-    "payplug/payplug-php": "^3.5"
+    "payplug/payplug-php": "^3.7.1"
   },
   "require-dev": {
     "phpdocumentor/phpdocumentor": "3.*",
