@@ -25,8 +25,13 @@ const ApplePayCart = ( props ) =>{
 					"supports3DS"
 				],
 				"supportedNetworks": [
+					"cartesBancaires",
 					"visa",
 					"masterCard"
+				],
+            	"supportedTypes": [
+					"debit",
+					"credit"
 				],
 				"total": {
 					"label": "Apple Pay",
@@ -53,7 +58,7 @@ const ApplePayCart = ( props ) =>{
 				request.shippingMethods = settings.payplug_carriers;
 
 			}
-			session = new ApplePaySession(3, request);
+			session = new ApplePaySession(4, request);
 
 		},
 		CancelOrder: function () {

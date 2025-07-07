@@ -15,8 +15,10 @@ class PayplugApplePay extends PayplugGenericBlock
 	protected $name = "apple_pay";
 
 	/**
-	 * Returns an associative array of data to be exposed for the payment method's client side.
-	 */
+ 	* Returns an associative array of data to be exposed for the payment method's client side.
+ 	*
+ 	* @return array
+ 	*/
 	public function get_payment_method_data() {
 		$data = parent::get_payment_method_data();
 		$data['icon'] =  [
@@ -69,6 +71,11 @@ class PayplugApplePay extends PayplugGenericBlock
 		return parent::get_payment_method_script_handles();
 	}
 
+	/**
+ 	* Checks if the Apple Pay payment method is active.
+ 	*
+ 	* @return bool
+ 	*/
 	public function is_active()
 	{
 		if (class_exists('WC_Blocks_Utils')) {
@@ -77,7 +84,7 @@ class PayplugApplePay extends PayplugGenericBlock
 			if ( \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' ) ||
 			     \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' ) ) {
 
-				if( !empty($this->gateway) && $this->gateway->checkApplePay() && $this->gateway->checkDeviceComptability() && $this->gateway->isSSL() ){
+				if( !empty($this->gateway) && $this->gateway->checkApplePay() && $this->gateway->isSSL() ){
 					return true;
 				}
 
@@ -88,6 +95,11 @@ class PayplugApplePay extends PayplugGenericBlock
 		}
 	}
 
+	/**
+ 	* Retrieves available shipping carriers for Apple Pay.
+ 	*
+ 	* @return array
+ 	*/
 	public function get_carriers() {
 
 		$shippings = [];
@@ -98,7 +110,7 @@ class PayplugApplePay extends PayplugGenericBlock
 		}
 
 		if ( empty( WC()->cart ) || empty( WC()->cart->get_shipping_packages() ) ) {
-			return false;
+			return $shippings;
 		}
 
 		$packages = WC()->cart !== null ? WC()->cart->get_shipping_packages() : null;
@@ -131,9 +143,11 @@ class PayplugApplePay extends PayplugGenericBlock
 	}
 
 	/**
-	 * @param $shipping
-	 * @return bool
-	 */
+ 	* Checks if the shipping method is compatible with Apple Pay.
+ 	*
+ 	* @param array $shipping
+ 	* @return bool
+ 	*/
 	public function checkApplePayShipping($shipping = []){
 		if(empty($shipping)){
 			return false;
@@ -152,7 +166,12 @@ class PayplugApplePay extends PayplugGenericBlock
 		return $exists;
 	}
 
-
+	/**
+ 	* Retrieves shipping methods from a package.
+ 	*
+ 	* @param array $package
+ 	* @return array
+ 	*/
 	public function get_shipping_methods_from_package($package){
 		$shipping_zone = \WC_Shipping_Zones::get_zone_matching_package( $package );
 		return $shipping_zone->get_shipping_methods( true );

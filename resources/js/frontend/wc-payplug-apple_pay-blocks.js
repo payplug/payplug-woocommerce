@@ -113,8 +113,13 @@ const Content = (props) => {
 					"supports3DS"
 				],
 				"supportedNetworks": [
+					"cartesBancaires",
 					"visa",
 					"masterCard"
+				],
+            	"supportedTypes": [
+					"debit",
+					"credit"
 				],
 				"total": {
 					"label": "Apple Pay",
@@ -126,7 +131,7 @@ const Content = (props) => {
 				}))
 			}
 
-			session = new ApplePaySession(3, request)
+			session = new ApplePaySession(4, request)
 		},
 		CancelOrder: function () {
 			session.oncancel = event => {
