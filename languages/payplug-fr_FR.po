@@ -1238,7 +1238,7 @@ msgid "payplug_section_logged_modal_description_2_uauth"
 msgstr "Pour activer le mode LIVE et commencer à encaisser des paiements, veuillez vous reconnecter à votre compte Payplug."
 
 msgid "payplug_section_oauth_info"
-msgstr "Nouveau mode de connexion disponible progressivement La connexion via OAuth2 est réservée aux marchands ayant déjà activé cette option. Si ce n’est pas votre cas, continuez à utiliser la connexion classique."
+msgstr "Nouveau mode de connexion disponible progressivement. La connexion via OAuth2 est réservée aux marchands ayant déjà activé cette option. Si ce n’est pas votre cas, continuez à utiliser la connexion classique."
 
 msgid "payplug_section_oauth_login_title"
 msgstr "Connexion via OAuth2 (nouveau) "
