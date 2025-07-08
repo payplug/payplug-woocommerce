@@ -178,6 +178,7 @@ class SetupCallback {
 			$payplug->tmp_generate_jwt();
 
 			$settings = PayplugWoocommerceHelper::get_payplug_options();
+			$merchant_id = $payplug->retrieve_merchant_id($settings['client_data']['jwt']['test']['access_token']);
 
 			// Save settings
 			$form_fields = $payplug->get_form_fields();
@@ -202,6 +203,9 @@ class SetupCallback {
 						break;
 					case 'email':
 						$val = esc_html($email);
+						break;
+					case 'payplug_merchant_id':
+						$val = esc_attr($merchant_id);
 						break;
 					default:
 						$val = $payplug->get_option($key);
