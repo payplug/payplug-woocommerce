@@ -330,6 +330,7 @@ class Ajax {
 		$this->accountIsNotValid();
 
 		$live_key = PayplugWoocommerceHelper::get_live_key();
+
 		if(empty($live_key)){
 			return false;
 		}
@@ -540,7 +541,7 @@ class Ajax {
 
 		$payplug = new PayplugGateway();
 		$options = $payplug->settings;
-		if ($payplug->user_logged_in()) {
+		if (PayplugWoocommerceHelper::user_logged_in()) {
 
 			$data = json_decode(file_get_contents('php://input'), true);
 

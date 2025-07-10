@@ -38,6 +38,19 @@ class PayplugApi {
 	}
 
 	/**
+	 * Get register url
+	 *
+	 * @param string $callback_uri
+	 *
+	 * @return object
+	 * @throws \Payplug\Exception\ConfigurationException
+	 */
+	public function retrieve_register_url($callback_uri)
+	{
+		return $this->do_request_with_fallback( '\Payplug\Authentication::getRegisterUrl', [$callback_uri, $callback_uri] );
+	}
+
+	/**
 	 * Configure PayPlug client.
 	 */
 	public function init() {
@@ -53,6 +66,20 @@ class PayplugApi {
 			PAYPLUG_GATEWAY_VERSION,
 			sprintf( 'WooCommerce/%s', WC()->version )
 		);
+	}
+
+	/**
+	 * Generate the JWT from API
+	 *
+	 * @param string $client_id
+	 * @param string $client_secret
+	 *
+	 * @return array
+	 * @throws \Payplug\Exception\ConfigurationException
+	 */
+	public function generateJWT($client_id = '', $client_secret = '')
+	{
+		return $this->do_request_with_fallback( '\Payplug\Authentication::generateJWT', [$client_id, $client_secret]);
 	}
 
 	/**
@@ -152,6 +179,11 @@ class PayplugApi {
 
         return $response;
     }
+
+	public function validate_jwt($client_data, $jwt)
+	{
+		return $this->do_request_with_fallback( '\Payplug\Authentication::validateJWT', [$client_data, $jwt] );
+	}
 
 	/**
 	 * Invoke PayPlug API. If it fail it switch to the other mode and retry the same request.

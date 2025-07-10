@@ -155,8 +155,8 @@ HTML;
     /**
      * Check if Oney is available
      *
-     * @return void
-     */
+     * @return false
+	 */
     public function check_oney_is_available()
     {
         $cart = WC()->cart;
@@ -176,6 +176,14 @@ HTML;
 			$country_code_billing = $order->get_billing_country();
 
 			$this->order_items_to_cart($cart, $items);
+		}
+
+		if(empty($cart->total)){
+			return false;
+		}
+
+		if(empty($cart->cart_contents_count)){
+			return false;
 		}
 
         $total_price = floatval($cart->total);
@@ -380,10 +388,17 @@ HTML;
      */
     public function check_gateway($gateways)
     {
-        $ordered_gateways = [];
         if (isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id) {
+
+	        //remove gateway if thresholds/country criteria are not met
+	        if( $this->check_oney_is_available() === false){
+		        unset($gateways[$this->id]);
+	        }
+
+			//remove gateway if account doesn't have permission
             if (!PayplugWoocommerceHelper::is_oney_available()) {
                 unset($gateways[$this->id]);
+
             } else {
 				$gateways = parent::check_gateway($gateways);
             }

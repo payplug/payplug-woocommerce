@@ -185,13 +185,11 @@ class PayplugWoocommerceRequest {
 	 */
 	public function applepay_update_payment() {
 
-		$options = get_option('woocommerce_payplug_settings', []);
-		$order_id = $_POST['order_id'];
 		$payment_id = $_POST['payment_id'];
 
 		try{
 			\Payplug\Payplug::init(array(
-				'secretKey' => @$options['payplug_live_key'],
+				'secretKey' => PayplugWoocommerceHelper::get_live_key(),
 				'apiVersion' => "2019-08-06",
 			));
 

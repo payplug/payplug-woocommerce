@@ -116,6 +116,7 @@
 					"supports3DS"
 				],
 				"supportedNetworks": [
+					"cartesBancaires",
 					"visa",
 					"masterCard"
 				],
