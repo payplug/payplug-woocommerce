@@ -74,7 +74,20 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
 	 * @return string[]
 	 */
 	public function get_supported_features() {
-		return $this->gateway->supports;
+		$features = $this->gateway->supports;
+		
+		// Only include tokenization in supported features when order amount is between min and max allowed values
+		$cart_total = WC()->cart ? WC()->cart->get_total('') : 0;
+		$cart_total_cents = (int) PayplugWoocommerceHelper::get_payplug_amount($cart_total);
+		$min_amount = PayplugWoocommerceHelper::get_minimum_amount();
+		$max_amount = PayplugWoocommerceHelper::get_maximum_amount();
+		
+		if (!($cart_total_cents >= $min_amount && $cart_total_cents <= $max_amount)) {
+			// Remove tokenization from supported features if outside allowed amount range
+			$features = array_diff($features, ['tokenization']);
+		}
+		
+		return $features;
 	}
 
 
@@ -84,7 +97,14 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
 	public function get_payment_method_data() {
 		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options( $this->name );
 		$this->allowed_country_codes = !empty($account["payment_methods"][ $this->name ]['allowed_countries']) ? $account["payment_methods"][ $this->name ]['allowed_countries'] : null;
-		if ($this->gateway->settings['oneclick'] === 'yes') {
+		
+		// Only show saved cards when order amount is between min and max allowed values
+		$cart_total = WC()->cart ? WC()->cart->get_total('') : 0;
+		$cart_total_cents = (int) PayplugWoocommerceHelper::get_payplug_amount($cart_total);
+		$min_amount = PayplugWoocommerceHelper::get_minimum_amount();
+		$max_amount = PayplugWoocommerceHelper::get_maximum_amount();
+		
+		if ($this->gateway->settings['oneclick'] === 'yes' && $cart_total_cents >= $min_amount && $cart_total_cents <= $max_amount) {
 			$oneclick = true;
 		} else {
 			$oneclick = false;
