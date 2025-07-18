@@ -71,15 +71,19 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
 	public function checkGateway()
 	{
-
 		//check if module is enabled
 		if(!empty($this->settings['enabled']) && 'no' === $this->settings['enabled']){
 			return false;
 		}
 
 		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options( $this->id );
+		$options = PayplugWoocommerceHelper::get_payplug_options();
 
 		if( !$this->check_api_gateway_enable($account)){
+			return false;
+		}
+
+		if ($options[$this->id] === 'no') {
 			return false;
 		}
 
@@ -122,13 +126,6 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			isset( $account["payment_methods"] )  &&
 			empty( $account["payment_methods"][ $this->id ] )  &&
 			!$account["payment_methods"][ $this->id ]['enabled']
-		) {
-			return false;
-		}
-
-
-		if (! isset( $account['permissions'][ $this->id ] ) ||
-			( isset( $account['permissions'][ $this->id ] ) && !$account['permissions'][ $this->id ] )
 		) {
 			return false;
 		}
