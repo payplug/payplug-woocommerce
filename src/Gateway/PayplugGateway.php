@@ -880,7 +880,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 ],
             ];
 
-			if ($this->payment_method === 'integrated' && isset($_POST['hftoken'])) {
+			if ($this->payment_method === 'integrated' && (defined('USE_HOSTED_FIELDS') && USE_HOSTED_FIELDS) && isset($_POST['hftoken'])) {
 				$hf_token = filter_var($_POST['hftoken'], FILTER_SANITIZE_STRING);
 				$payment_data = $this->hosted_fields->populateCreatePayment($payment_data, $order, $order_id, $hf_token, $amount);
 				$payment_data['metadata']['woocommerce_block'] = "HOSTED_FIELDS";
