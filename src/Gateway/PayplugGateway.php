@@ -1271,7 +1271,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$client_data = isset($options['client_data']) ? $options['client_data'] : [];
 			$this->api = new PayplugApi($this);
 			$validate_jwt = $this->api->validate_jwt(
-				array_key_exists($mode, $client_data) ? $client_data[$mode] : [], 
+				array_key_exists($mode, $client_data) ? $client_data[$mode] : [],
 				$jwt[$mode]
 			);
 

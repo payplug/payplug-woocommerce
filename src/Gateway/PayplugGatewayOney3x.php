@@ -2,6 +2,7 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway;
 
+use Payplug\PayplugWoocommerce\Controller\PayplugGenericGateway;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Authentication;
 use libphonenumber\PhoneNumberType;
@@ -17,7 +18,7 @@ if (!defined('ABSPATH')) {
  *
  * @package Payplug\PayplugWoocommerce\Gateway
  */
-class PayplugGatewayOney3x extends PayplugGateway
+class PayplugGatewayOney3x extends PayplugGenericGateway
 {
     const ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED = 2;
     const ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH = 3;
@@ -482,5 +483,16 @@ HTML;
 		}
 	}
 
+	public function checkGateway() {
+
+		$options = PayplugWoocommerceHelper::get_payplug_options();
+
+		if ($options['oney'] === 'no') {
+			return false;
+		}
+
+		return true;
+
+	}
 
 }
