@@ -18,7 +18,7 @@ const label = decodeEntities( settings?.title ) || defaultLabel;
  */
 const Content = (props) => {
 
-	if(settings?.IP === true){
+	if(settings?.IP === true && IntegratedPayment){
 		return (
 			<IntegratedPayment settings={settings} props={props} />
 		)

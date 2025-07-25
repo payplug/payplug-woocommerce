@@ -6,24 +6,26 @@ use Payplug\PayplugWoocommerce\Model\HostedFields;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
-class PayplugCreditCard extends PayplugGateway {
+class PayplugCreditCard extends PayplugGateway
+{
 
 	public $oneclick = false;
 
-	public function __construct() {
+	public function __construct()
+	{
 		parent::__construct();
 
-		$this->id                 = 'payplug';
-		$this->icon               = '';
-		$this->has_fields         = false;
-		$this->method_title       = _x('PayPlug', 'Gateway method title', 'payplug');
+		$this->id = 'payplug';
+		$this->icon = '';
+		$this->has_fields = false;
+		$this->method_title = _x('PayPlug', 'Gateway method title', 'payplug');
 		$this->method_description = __('Enable PayPlug for your customers.', 'payplug');
-		$this->new_method_label   = __('Pay with another credit card', 'payplug');
-		$this->title              = $this->get_option('title');
-		$this->description        = $this->get_option('description');
-		$this->oneclick       = (('yes' === $this->get_option('oneclick', 'no')) && (is_user_logged_in()));
+		$this->new_method_label = __('Pay with another credit card', 'payplug');
+		$this->title = $this->get_option('title');
+		$this->description = $this->get_option('description');
+		$this->oneclick = (('yes' === $this->get_option('oneclick', 'no')) && (is_user_logged_in()));
 		$this->payment_method = $this->get_option('payment_method');
-		$this->supports           = array(
+		$this->supports = array(
 			'products',
 			'refunds',
 			'tokenization',
@@ -52,8 +54,8 @@ class PayplugCreditCard extends PayplugGateway {
 		}
 
 		//add fields of IP to the description
-		if($this->payment_method === 'integrated'){
-			add_action( 'woocommerce_after_order_notes', [$this, 'add_hftoken_field'], 10, 2 );
+		if ($this->payment_method === 'integrated') {
+			add_action('woocommerce_after_order_notes', [$this, 'add_hftoken_field'], 10, 2);
 			$this->has_fields = true;
 		}
 
@@ -64,24 +66,25 @@ class PayplugCreditCard extends PayplugGateway {
 			add_action('woocommerce_scheduled_subscription_payment_' . $this->id,
 				array($this, 'scheduled_subscription_payment'), 10, 2);
 		}
-
 	}
+
 	/**
 	 * Add the field to the checkout
 	 */
-	function add_hftoken_field($checkout) {
+	function add_hftoken_field($checkout)
+	{
 
 		echo '<div id="user_link_hidden_checkout_field">
 	            <input type="hidden" class="input-hidden" name="hftoken" id="hftoken" >
 	    	</div>';
 	}
 
-
 	/**
 	 * if the plugin is disabled the gateways should be disabled
 	 * @return mixed|string
 	 */
-	private function handle_cc_enabled(){
+	private function handle_cc_enabled()
+	{
 
 		if (!empty($this->settings["enabled"]) && $this->settings["enabled"] === "yes") {
 			$this->enabled = !empty($this->settings[$this->id]) ? $this->settings[$this->id] : $this->settings["enabled"];
@@ -116,7 +119,6 @@ class PayplugCreditCard extends PayplugGateway {
 		return $icons_str;
 	}
 
-
 	/**
 	 * Embedded payment form scripts.
 	 *
@@ -145,19 +147,18 @@ class PayplugCreditCard extends PayplugGateway {
 		wp_enqueue_style('payplug-checkout');
 
 		if (
-			( $this->payment_method == "integrated" && !PayplugWoocommerceHelper::is_checkout_block() ) ||
-			($this->payment_method == "integrated" && is_wc_endpoint_url('order-pay') )
+			($this->payment_method == "integrated" && !PayplugWoocommerceHelper::is_checkout_block()) ||
+			($this->payment_method == "integrated" && is_wc_endpoint_url('order-pay'))
 		) {
 			$this->integrated_payments_scripts();
 		}
 
-		if (($this->payment_method == "popup" ) && ($this->id === "payplug" || $this->id === "american_express") && !PayplugWoocommerceHelper::is_checkout_block() ) {
+		if (($this->payment_method == "popup") && ($this->id === "payplug" || $this->id === "american_express") && !PayplugWoocommerceHelper::is_checkout_block()) {
 			$this->popup_payments_scripts();
 
 		}
 
 	}
-
 
 	/**
 	 * Integrated payment form scripts.
@@ -165,14 +166,14 @@ class PayplugCreditCard extends PayplugGateway {
 	 * Register scripts and additionnal data needed for the
 	 * embedded payment form.
 	 */
-	public function integrated_payments_scripts(){
-
+	public function integrated_payments_scripts()
+	{
 		$translations = array(
-			"cardholder" =>  __('payplug_integrated_payment_cardholder', 'payplug'),
-			"your_card" =>  __('payplug_integrated_payment_your_card', 'payplug'),
-			"card_number" =>  __('payplug_integrated_payment_card_number', 'payplug'),
-			"expiration_date" =>  __('payplug_integrated_payment_expiration_date', 'payplug'),
-			"cvv" =>  __('payplug_integrated_payment_cvv', 'payplug'),
+			"cardholder" => __('payplug_integrated_payment_cardholder', 'payplug'),
+			"your_card" => __('payplug_integrated_payment_your_card', 'payplug'),
+			"card_number" => __('payplug_integrated_payment_card_number', 'payplug'),
+			"expiration_date" => __('payplug_integrated_payment_expiration_date', 'payplug'),
+			"cvv" => __('payplug_integrated_payment_cvv', 'payplug'),
 		);
 
 		/**x
@@ -185,9 +186,8 @@ class PayplugCreditCard extends PayplugGateway {
 		wp_register_script('payplug-hosted-fields-payments', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-hostedfields.js', ['jquery', 'jquery-bind-first', 'payplug-hosted-fields-payments-api'], 'v1.0', true);
 		wp_enqueue_script('payplug-hosted-fields-payments');
 		wp_localize_script('payplug-hosted-fields-payments', 'payplug_integrated_payment_params', $translations);
-		wp_register_script( 'jquery-bind-first', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/jquery.bind-first-0.2.3.min.js', array( 'jquery' ), '1.0.0', true );
+		wp_register_script('jquery-bind-first', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/jquery.bind-first-0.2.3.min.js', array('jquery'), '1.0.0', true);
 		wp_enqueue_script('jquery-bind-first');
-
 	}
 
 	/**
@@ -196,14 +196,15 @@ class PayplugCreditCard extends PayplugGateway {
 	 * Register scripts and additionnal data needed for the
 	 * embedded payment form.
 	 */
-	public function popup_payments_scripts(){
+	public function popup_payments_scripts()
+	{
 		//load popup features
 		wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
-		wp_register_script('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', [ 'jquery', 'payplug' ], PAYPLUG_GATEWAY_VERSION, true);
+		wp_register_script('payplug-checkout', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-checkout.js', ['jquery', 'payplug'], PAYPLUG_GATEWAY_VERSION, true);
 		wp_localize_script('payplug-checkout', 'payplug_checkout_params', [
 			'ajax_url' => \WC_AJAX::get_endpoint('payplug_create_order'),
 			'order_review_url' => \WC_AJAX::get_endpoint('payplug_order_review_url'),
-			'nonce'    => [
+			'nonce' => [
 				'checkout' => wp_create_nonce('woocommerce-process_checkout'),
 			],
 			'is_embedded' => 'redirect' !== $this->payment_method
@@ -223,7 +224,7 @@ class PayplugCreditCard extends PayplugGateway {
 			echo wpautop(wptexturize($description));
 		}
 
-		if(($this->payment_method === 'integrated') ){
+		if (($this->payment_method === 'integrated')) {
 			echo HostedFields::template_form();
 		}
 
@@ -236,13 +237,14 @@ class PayplugCreditCard extends PayplugGateway {
 	/**
 	 * Process the subscription scheduled payment
 	 */
-	public function scheduled_subscription_payment($amount, $order) {
+	public function scheduled_subscription_payment($amount, $order)
+	{
 
-		$order_id      = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
+		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 		$subscription = wcs_get_subscription($order->get_meta('_subscription_renewal'));
 		$payplug_parent_meta = $subscription->get_parent()->get_meta("_payplug_metadata");
 
-		if (!$payplug_parent_meta ) {
+		if (!$payplug_parent_meta) {
 			PayplugGateway::log('Could not find the intial payment data belong to the current user and the current subscription.', 'error');
 			throw new \Exception(__('Invalid payment method.', 'payplug'));
 		}
@@ -261,34 +263,34 @@ class PayplugCreditCard extends PayplugGateway {
 			throw new \Exception(__('Invalid payment method.', 'payplug'));
 		}
 
-		$amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($amount);
+		$amount = (int)PayplugWoocommerceHelper::get_payplug_amount($amount);
 
 		try {
 			$address_data = PayplugAddressData::from_order($order);
 			$return_url = esc_url_raw($order->get_checkout_order_received_url());
 
-			if (!(substr( $return_url, 0, 4 ) === "http")) {
-				$return_url = get_site_url().$return_url;
+			if (!(substr($return_url, 0, 4) === "http")) {
+				$return_url = get_site_url() . $return_url;
 			}
 
 			$payment_data = [
-				'amount'           => $amount,
-				'currency'         => get_woocommerce_currency(),
-				'payment_method'   => $token,
-				'allow_save_card'  => false,
-				'billing'          => $address_data->get_billing(),
-				'shipping'         => $address_data->get_shipping(),
-				'initiator'        => 'MERCHANT',
-				'hosted_payment'   => [
+				'amount' => $amount,
+				'currency' => get_woocommerce_currency(),
+				'payment_method' => $token,
+				'allow_save_card' => false,
+				'billing' => $address_data->get_billing(),
+				'shipping' => $address_data->get_shipping(),
+				'initiator' => 'MERCHANT',
+				'hosted_payment' => [
 					'return_url' => $return_url,
 					'cancel_url' => esc_url_raw($order->get_cancel_order_url_raw()),
 				],
 				'notification_url' => esc_url_raw(WC()->api_request_url('PayplugGateway')),
-				'metadata'         => [
-					'order_id'    => $order->get_id(),
-					'customer_id' => ((int) get_current_user_id() > 0) ? get_current_user_id() : 'guest',
-					'domain'      => $this->limit_length(esc_url_raw(home_url()), 500),
-					'woocommerce_block' => \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' ),
+				'metadata' => [
+					'order_id' => $order->get_id(),
+					'customer_id' => ((int)get_current_user_id() > 0) ? get_current_user_id() : 'guest',
+					'domain' => $this->limit_length(esc_url_raw(home_url()), 500),
+					'woocommerce_block' => \WC_Blocks_Utils::has_block_in_page(wc_get_page_id('checkout'), 'woocommerce/checkout'),
 					'subscription' => 'renewal'
 				],
 			];
@@ -298,7 +300,7 @@ class PayplugCreditCard extends PayplugGateway {
 
 			/** This filter is documented in src/Gateway/PayplugGateway */
 			$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
-			$payment      = $this->api->payment_create($payment_data);
+			$payment = $this->api->payment_create($payment_data);
 
 			// Save transaction id for the order
 			PayplugWoocommerceHelper::is_pre_30()
@@ -318,18 +320,18 @@ class PayplugCreditCard extends PayplugGateway {
 
 			$this->response->process_payment($payment, true);
 
-			if(($payment->__get('is_paid'))){
-				$redirect =  $order->get_checkout_order_received_url();
-			}else if(isset($payment->__get('hosted_payment')->payment_url)){
+			if (($payment->__get('is_paid'))) {
+				$redirect = $order->get_checkout_order_received_url();
+			} else if (isset($payment->__get('hosted_payment')->payment_url)) {
 				$redirect = $payment->__get('hosted_payment')->payment_url;
-			}else{
+			} else {
 				$redirect = $return_url;
 			}
 
 			return [
 				'payment_id' => $payment->id,
-				'result'   => 'success',
-				'is_paid'  => $payment->__get('is_paid'), // Use for path redirect before DSP2
+				'result' => 'success',
+				'is_paid' => $payment->__get('is_paid'), // Use for path redirect before DSP2
 				'redirect' => $redirect
 			];
 		} catch (HttpException $e) {

@@ -17,21 +17,20 @@ class HostedFields {
 
 	const OPERATION_TYPE_PAYMENT = 'payment';
 
-	private $api_secret;
+	private $account_key;
 
-	private $api_key;
+	private $api_key_id;
 
 	private $identifier;
 
-	private $api_key_secret;
+	private $api_key;
 
-	public function __construct($api_secret, $api_key, $identifier, $api_key_secret) {
+	public function __construct($account_key, $api_key_id, $identifier, $api_key) {
+		$this->set_api_key_id($api_key_id);
 		$this->set_api_key($api_key);
-		$this->set_api_key_secret($api_key_secret);
-		$this->set_api_secret($api_secret);
 		$this->set_identifier($identifier);
+		$this->set_account_key($account_key);
 	}
-
 
 	/**
 	 * @param $payment_data
@@ -65,18 +64,17 @@ class HostedFields {
 			"ORDERID" => $order_id,
 			"DESCRIPTION" => !empty($order->get_customer_order_notes()) ? $order->get_customer_order_notes() : "N.a.",
 			"CREATEALIAS" => "yes",
-			"APIKEYID" => $this->get_api_key(),
+			"APIKEYID" => $this->get_api_key_id(),
 			"HFTOKEN" => $hf_token,
 		];
 
 		$this->handle_hostedfield_address($payment_data['params'], $order, 'billing');
-		$this->handle_hostedfield_address($payment_data['params'], $order, 'shipping');
-
+		$this->handle_hostedfield_address($payment_data['params'], $order, 'shipto');
 
 		//FIXME HF::updating the amount for: $amount response 5002 error
 		$payment_data['params']["AMOUNT"]="1000";
-		$payment_data["params"]["HASH"] = $this->buildHashContent( $payment_data['params'] );
 
+		$payment_data["params"]["HASH"] = $this->buildHashContent( $payment_data['params']);
 		return $payment_data;
 	}
 
@@ -118,9 +116,9 @@ class HostedFields {
 	public function handle_hostedfield_address(&$data, $order, $type)
 	{
 		$prefix = strtoupper($type);
+        $type = $type == 'shipto' ? 'shipping' : $type;
 		$data["{$prefix}ADDRESS"] = $order->{"get_{$type}_address_1"}() . ' ' . $order->{"get_{$type}_address_2"}();
 		$data["{$prefix}COUNTRY"] = $order->{"get_{$type}_country"}();
-		$data["{$prefix}PHONE"] = $order->{"get_{$type}_phone"}() ?: $order->get_billing_phone();
 		$data["{$prefix}POSTALCODE"] = $order->{"get_{$type}_postcode"}();
 		return $data;
 	}
@@ -169,14 +167,13 @@ class HostedFields {
 		if (empty($params) || !is_array($params)) {
 			throw new \InvalidArgumentException('Parameters array cannot be empty');
 		}
-		if (empty($this->get_api_key_secret())) {
+		if (empty($this->get_api_key())) {
 			throw new \InvalidArgumentException('Secret key cannot be empty');
 		}
-		if($getTransaction && empty($this->get_api_secret()) ) {
+		if($getTransaction && empty($this->get_account_key()) ) {
 			throw new \InvalidArgumentException('API Secret cannot be empty');
 		}
-
-		$key = $getTransaction ? $this->get_api_secret() : $this->get_api_key_secret();
+		$key = $getTransaction ? $this->get_account_key() : $this->get_api_key();
 
 		ksort($params);
 		$string = '';
@@ -191,22 +188,22 @@ class HostedFields {
 	/**
 	 * @return mixed
 	 */
-	public function get_api_key() {
-		return $this->api_key;
+	public function get_api_key_id() {
+		return $this->api_key_id;
 	}
 
 	/**
 	 * @return mixed
 	 */
-	public function get_api_key_secret() {
-		return $this->api_key_secret;
+	public function get_api_key() {
+		return $this->api_key;
 	}
 
 	/**
 	 * @return self
 	 */
-	public function get_api_secret() {
-		return $this->api_secret;
+	public function get_account_key() {
+		return $this->account_key;
 	}
 
 	/**
@@ -217,6 +214,13 @@ class HostedFields {
 	}
 
 	/**
+	 * @param mixed $api_key_id
+	 */
+	private function set_api_key_id( $api_key_id ) {
+		$this->api_key_id = $api_key_id;
+	}
+
+	/**
 	 * @param mixed $api_key
 	 */
 	private function set_api_key( $api_key ) {
@@ -224,17 +228,10 @@ class HostedFields {
 	}
 
 	/**
-	 * @param mixed $api_key_secret
+	 * @param mixed $account_key
 	 */
-	private function set_api_key_secret( $api_key_secret ) {
-		$this->api_key_secret = $api_key_secret;
-	}
-
-	/**
-	 * @param mixed $api_secret
-	 */
-	private function set_api_secret( $api_secret ) {
-		$this->api_secret = $api_secret;
+	private function set_account_key( $account_key ) {
+		$this->account_key = $account_key;
 	}
 
 	/**

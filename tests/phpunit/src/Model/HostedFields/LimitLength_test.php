@@ -11,7 +11,7 @@ class LimitLength_test extends TestCase {
 
 	public function setUp(): void
 	{
-		$this->hostedFields = new HostedFields('secret', 'api_key', 'identifier', 'api_key_secret');
+		$this->hostedFields = new HostedFields('secret', 'api_key', 'identifier', 'account_key');
 	}
 
 	public function testLimitLengthWithShortString()

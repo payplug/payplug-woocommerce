@@ -15,8 +15,8 @@ class BaseHostedFields extends TestCase {
 	public function setUp(): void {
 
 		$this->hostedFields = $this->getMockBuilder(HostedFields::class)
-			->setConstructorArgs(['secret', 'api_key', 'identifier', 'api_key_secret'])
-            ->onlyMethods(['get_api_key_secret', 'get_api_version', 'get_api_key', 'buildHashContent', 'limit_length'])
+			->setConstructorArgs(['secret', 'api_key', 'identifier', 'account_key'])
+            ->onlyMethods(['get_account_key', 'get_api_version', 'get_api_key', 'buildHashContent', 'limit_length'])
             ->getMock();
 		$this->mockedOrder = $this->populateMockedOrder();
 

@@ -195,17 +195,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
 
 		//FIXME:: get_options to get hosted_fields_data
-		$this->hosted_fields = new HostedFields(
-			'7zfUfFgxtqlp-$rq',
-			"1a8172b3-a060-4bce-b0ea-9abcdf288ff6",
-			"PluginTestClient",
-			')N-wwom4KmZ3aui$'
-		);
-
+		$hosted_field_mid = defined('HOSTED_FIELD_MID') && !empty(HOSTED_FIELD_MID) ? HOSTED_FIELD_MID : [];
+		if(!empty($hosted_field_mid)) {
+			$this->hosted_fields = new HostedFields(
+				$hosted_field_mid['account_key'],
+				$hosted_field_mid['api_key_id'],
+				$hosted_field_mid['identifier'],
+				$hosted_field_mid['api_key']
+			);
+		}
 	}
-
-
-
 
 	/**
 	 * @param $option
@@ -336,11 +335,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 					//FIXME:: HF the amount unit is EURO not Cents
 					$payment->amount = $payment->amount * 100;
-
 				} else {
 					$payment  = $this->api->payment_retrieve($transaction_id);
 				}
-
 			} catch (\Exception $e) {
 				PayplugGateway::log(
 					sprintf(

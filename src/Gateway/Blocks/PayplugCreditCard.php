@@ -68,6 +68,23 @@ class PayplugCreditCard extends PayplugGenericBlock
 
 		}
 
+		wp_register_script(
+			'wc-payplug-blocks',
+			get_template_directory_uri() . '/resources/js/frontend/wc-payplug-blocks.js',
+			array('wp-blocks', 'wp-element', 'wp-i18n'),
+			null,
+			true
+		);
+		wp_localize_script(
+			'wc-payplug-blocks',
+			'hosted_fields_params',
+			array(
+				'USE_HOSTED_FIELDS' => defined('USE_HOSTED_FIELDS') && USE_HOSTED_FIELDS,
+				'HOSTED_FIELD_MID' => defined('HOSTED_FIELD_MID') ? HOSTED_FIELD_MID : null,
+			)
+		);
+		wp_enqueue_script('wc-payplug-blocks');
+
 		return $data;
 	}
 
@@ -91,33 +108,17 @@ class PayplugCreditCard extends PayplugGenericBlock
 	}
 
 	private function ip_scripts(){
-        if (defined('USE_INTEGRATED_PAYMENT') && USE_INTEGRATED_PAYMENT) {
-            wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
-            wp_register_script(
-                'payplug-integrated-payments-api',
-                IP_API,
-                array(),
-                'v1.1',
-                true
-            );
+		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+		if (defined('USE_HOSTED_FIELDS') && USE_HOSTED_FIELDS) {
+			wp_enqueue_style('payplug-hosted-fields-style', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-hosted-fields-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+			wp_register_script('payplug-hosted-fields-payments-api', HF_API, [], 'v2.1.0', true);
+			wp_enqueue_script('payplug-hosted-fields-payments-api');
+		} else {
+            wp_register_script('payplug-integrated-payments-api', IP_API, array(), 'v1.1', true);
             wp_register_script('payplug-domain', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-domain.js', [], 'v1.0');
             wp_enqueue_script('payplug-domain');
             wp_enqueue_script('payplug-integrated-payments-api');
-        } else if (defined('USE_HOSTED_FIELDS') && USE_HOSTED_FIELDS) {
-
-			wp_enqueue_style('payplug-hosted-fields-style', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-hosted-fields-payments.css', [], PAYPLUG_GATEWAY_VERSION);
-			wp_register_script('payplug-hosted-fields-payments-api', HF_API, [], 'v2.1.0', true);
-			wp_localize_script(
-				'wc-payplug-blocks',
-				'hosted_fields_params',
-				[
-					'USE_HOSTED_FIELDS' => (defined('USE_HOSTED_FIELDS') && USE_HOSTED_FIELDS)
-				]
-			);
-			wp_enqueue_script('payplug-hosted-fields-payments-api');
-		}
-		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
-
+        }
 	}
 
 	private function popup_scripts(){
