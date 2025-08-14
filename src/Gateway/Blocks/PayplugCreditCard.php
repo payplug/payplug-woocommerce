@@ -18,7 +18,6 @@ class PayplugCreditCard extends PayplugGenericBlock
 	 * Returns an associative array of data to be exposed for the payment method's client side.
 	 */
 	public function get_payment_method_data() {
-
 		$data = parent::get_payment_method_data();
 		$data['icon'] =  [
 			"src" => ('it_IT' === get_locale()) ?
@@ -37,6 +36,7 @@ class PayplugCreditCard extends PayplugGenericBlock
             //translations
             $data["payplug_integrated_payment_cardHolder_error"] = __('payplug_integrated_payment_cardHolder_error', 'payplug');
             $data["payplug_integrated_payment_empty"] = __('payplug_integrated_payment_empty', 'payplug');
+            $data["payplug_integrated_payment_amex"] = __('payplug_integrated_payment_amex', 'payplug');
             $data["payplug_integrated_payment_your_card"] = __('payplug_integrated_payment_your_card', 'payplug');
             $data["payplug_integrated_payment_pan_error"] = __('payplug_integrated_payment_pan_error', 'payplug');
             $data["payplug_integrated_payment_exp_error"] = __('payplug_integrated_payment_exp_error', 'payplug');

@@ -76,27 +76,29 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const settings = (0,_woocommerce_settings__WEBPACK_IMPORTED_MODULE_0__.getSetting)('payplug_data', {});
+const $ = jQuery;
 var style = {
-  "input": {
-    "font-size": "1em",
-    "background-color": "transparent"
+  'input': {
+    'font-size': '1em',
+    'background-color': 'transparent'
   },
-  "::placeholder": {
-    "font-size": "1em",
-    "color": "#777",
-    "font-style": "italic"
+  '::placeholder': {
+    'font-size': '1em',
+    'color': '#777',
+    'font-style': 'italic'
   },
-  ":invalid": {
-    "color": "#FF0000",
-    "font-size": "1em"
+  ':invalid': {
+    'color': '#FF0000',
+    'font-size': '1em'
   }
 };
-const hosted_fields_mid = typeof hosted_fields_params.HOSTED_FIELD_MID !== "undefined" ? hosted_fields_params.HOSTED_FIELD_MID : {
+const hosted_fields_mid = typeof hosted_fields_params.HOSTED_FIELD_MID !== 'undefined' ? hosted_fields_params.HOSTED_FIELD_MID : {
   'api_key_id': null,
   'api_key': null
 };
+let cardType = '';
 var HostedFields = {
-  hfields: typeof dalenys !== "undefined" ? dalenys.hostedFields({
+  hfields: typeof dalenys !== 'undefined' ? dalenys.hostedFields({
     // API Keys
     key: {
       id: hosted_fields_mid.api_key_id,
@@ -110,10 +112,18 @@ var HostedFields = {
         enableAutospacing: true,
         style: style,
         onInput: function (event) {
-          if (typeof event['cardType'] !== "undefined") {
-            jQuery("input[type='radio'][name='schemeOptions'][value='" + event['cardType'] + "']").attr("checked", true);
+          if (typeof event['cardType'] !== 'undefined') {
+            cardType = event['cardType'];
+            $('input[type="radio"][name="schemeOptions"][value="' + event['cardType'] + '"]').attr('checked', true);
           }
-          HostedFields.handleInvalidFieldErrors(event, jQuery(".IntegratedPayment_error.-pan .invalidField"));
+
+          // reset american express error
+          $('.IntegratedPayment_error.-pan .americanExpress').addClass('-hide');
+          HostedFields.handleInvalidFieldErrors(event, $('.IntegratedPayment_error.-pan .invalidField'));
+          if ('american_express' == cardType) {
+            event['type'] = 'invalid';
+            HostedFields.handleInvalidFieldErrors(event, $('.IntegratedPayment_error.-pan .americanExpress'));
+          }
         }
       },
       'expiry': {
@@ -121,7 +131,7 @@ var HostedFields = {
         placeholder: settings?.payplug_integrated_payment_expiration_date,
         style: style,
         onInput: function (event) {
-          HostedFields.handleInvalidFieldErrors(event, jQuery(".IntegratedPayment_error.-exp .invalidField"));
+          HostedFields.handleInvalidFieldErrors(event, $('.IntegratedPayment_error.-exp .invalidField'));
         }
       },
       'cryptogram': {
@@ -129,34 +139,34 @@ var HostedFields = {
         placeholder: settings?.payplug_integrated_payment_cvv,
         style: style,
         onInput: function (event) {
-          HostedFields.handleInvalidFieldErrors(event, jQuery(".IntegratedPayment_error.-cvv .invalidField"));
+          HostedFields.handleInvalidFieldErrors(event, $('.IntegratedPayment_error.-cvv .invalidField'));
         }
       }
     }
   }) : null,
   handleInvalidFieldErrors: function (event, $element) {
-    if (event["type"] === "invalid") {
-      $element.removeClass("-hide");
-      $element.parent().removeClass("-hide");
+    if (event['type'] === 'invalid') {
+      $element.removeClass('-hide');
+      $element.parent().removeClass('-hide');
     }
-    if (event["type"] === "valid" || event["type"] === "empty") {
-      $element.addClass("-hide");
-      $element.parent().addClass("-hide");
+    if (event['type'] === 'valid' || event['type'] === 'empty') {
+      $element.addClass('-hide');
+      $element.parent().addClass('-hide');
     }
   },
   showInputErrorBorder: function (input, error_targer) {
-    jQuery(input).addClass("hosted-fields-invalid-state");
-    jQuery(error_targer).removeClass("-hide");
-    jQuery(error_targer).parent().removeClass("-hide");
+    $(input).addClass('hosted-fields-invalid-state');
+    $(error_targer).removeClass('-hide');
+    $(error_targer).parent().removeClass('-hide');
   },
   hideInputErrorBorder: function (input, error_targer) {
-    jQuery(input).removeClass("hosted-fields-invalid-state");
-    jQuery(error_targer).addClass("-hide");
-    jQuery(error_targer).parent().addClass("-hide");
+    $(input).removeClass('hosted-fields-invalid-state');
+    $(error_targer).addClass('-hide');
+    $(error_targer).parent().addClass('-hide');
   },
   validateInput: function (input, error_targer) {
     // Check if the input value has more than 4 letters
-    if (jQuery(input).val().length < 5 && jQuery(input).val().length > 0) {
+    if ($(input).val().length < 5 && $(input).val().length > 0) {
       HostedFields.showInputErrorBorder(input, error_targer);
       return false;
     } else {
@@ -165,8 +175,12 @@ var HostedFields = {
     }
   },
   submitValidation: function (input, error_targer) {
+    if ('american_express' == cardType) {
+      return false;
+    }
+
     // Check if the input value has more than 4 letters
-    if (jQuery(input).val().length < 1) {
+    if ($(input).val().length < 1) {
       HostedFields.showInputErrorBorder(input, error_targer);
       return false;
     } else {
@@ -175,7 +189,7 @@ var HostedFields = {
     }
   }
 };
-const IntegratedPayment = typeof dalenys !== "undefined" ? ({
+const IntegratedPayment = typeof dalenys !== 'undefined' ? ({
   props: props
 }) => {
   const {
@@ -190,13 +204,13 @@ const IntegratedPayment = typeof dalenys !== "undefined" ? ({
   //on init
   (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
     HostedFields.hfields.load();
-    jQuery("[name=hosted-fields-cardHolder]").on("input", function (event) {
-      HostedFields.validateInput(event.target, jQuery(".IntegratedPayment_error.-cardHolder .invalidField"));
+    $('[name=hosted-fields-cardHolder]').on('input', function (event) {
+      HostedFields.validateInput(event.target, $('.IntegratedPayment_error.-cardHolder .invalidField'));
     });
   }, []);
   (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
     const handlePaymentProcessing = () => {
-      const hftoken = document.getElementById("hf-token").value;
+      const hftoken = document.getElementById('hf-token').value;
       return {
         type: emitResponse.responseTypes.SUCCESS,
         meta: {
@@ -219,7 +233,7 @@ const IntegratedPayment = typeof dalenys !== "undefined" ? ({
     const onValidation = async () => {
       try {
         const response = await tokenizeHandler();
-        if (response.execCode === "0000") {
+        if (response.execCode === '0000') {
           return true; // Validation successful
         } else {
           return {
@@ -235,11 +249,11 @@ const IntegratedPayment = typeof dalenys !== "undefined" ? ({
     async function tokenizeHandler() {
       return new Promise((resolve, reject) => {
         HostedFields.hfields.createToken(function (result) {
-          if (HostedFields.submitValidation(jQuery("[name=hosted-fields-cardHolder]"), jQuery(".IntegratedPayment_error.-cardHolder .invalidField")) && result.execCode == "0000") {
-            document.getElementById("hf-token").value = result.hfToken;
+          if (HostedFields.submitValidation($('[name=hosted-fields-cardHolder]'), $('.IntegratedPayment_error.-cardHolder .invalidField')) && result.execCode == '0000') {
+            document.getElementById('hf-token').value = result.hfToken;
             resolve(result);
           } else {
-            reject(new Error("Tokenization failed"));
+            reject(new Error('Tokenization failed'));
           }
         });
       });
@@ -324,6 +338,10 @@ const IntegratedPayment = typeof dalenys !== "undefined" ? ({
         className: "-hide emptyField",
         "data-e2e-error": "paymentError",
         children: settings?.payplug_integrated_payment_empty
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+        className: "-hide americanExpress",
+        "data-e2e-error": "americanExpress",
+        children: settings?.payplug_integrated_payment_amex
       })]
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
       className: "payplug IntegratedPayment_container -exp exp-input-container",
