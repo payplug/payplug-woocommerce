@@ -18,12 +18,19 @@ var style = {
 	}
 };
 
+const hosted_fields_mid = typeof hosted_fields_params.HOSTED_FIELD_MID !== "undefined"
+	? hosted_fields_params.HOSTED_FIELD_MID
+	: {
+		'api_key_id': null,
+		'api_key': null
+	};
+
 var HostedFields = {
-	hfields: dalenys.hostedFields({
+	hfields: typeof dalenys !== "undefined" ? dalenys.hostedFields({
 		// API Keys
 		key: {
-			id: "fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f",
-			value: "Gf=}k6]*E@EYBxau"
+			id: hosted_fields_mid.api_key_id,
+			value: hosted_fields_mid.api_key
 		},
 		// Manages each hosted-field container
 		fields: {
@@ -57,7 +64,7 @@ var HostedFields = {
 				}
 			}
 		}
-	}),
+	}) : null,
 	handleInvalidFieldErrors: function (event, $element) {
 		if (event["type"] === "invalid") {
 			$element.removeClass("-hide");
@@ -104,7 +111,7 @@ var HostedFields = {
 	}
 };
 
-const IntegratedPayment = ({props: props,}) => {
+const IntegratedPayment = typeof dalenys !== "undefined" ? ({props: props,}) => {
 
 	const { eventRegistration, emitResponse } = props;
 	const { onCheckoutValidation, onPaymentProcessing } = eventRegistration;
@@ -252,6 +259,6 @@ const IntegratedPayment = ({props: props,}) => {
 			<input type="hidden" name="hf-token" id="hf-token"/>
 		</>
 	)
-}
+} : null;
 
 export default IntegratedPayment;

@@ -30,7 +30,7 @@ class BuildHashContent_test extends BaseHostedFields {
 			'param2' => 'value2',
 		];
 
-		$this->hostedFields->method('get_api_key_secret')->willReturn('secret_key');
+		$this->hostedFields->method('get_account_key')->willReturn('secret_key');
 
 		$result = $this->hostedFields->buildHashContent($params);
 
@@ -56,7 +56,7 @@ class BuildHashContent_test extends BaseHostedFields {
 
 	public function testBuildHashContentThrowsExceptionForEmptySecretKey()
 	{
-		$this->hostedFields->method('get_api_key_secret')->willReturn('');
+		$this->hostedFields->method('get_account_key')->willReturn('');
 		$this->expectException(\InvalidArgumentException::class);
 		$this->expectExceptionMessage('Secret key cannot be empty');
 		$this->hostedFields->buildHashContent(['param1' => 'value1']);

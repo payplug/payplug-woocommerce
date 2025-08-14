@@ -1,9 +1,13 @@
-
 import { __ } from '@wordpress/i18n';
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
-import IntegratedPayment from "./wc-payplug-hosted-fields-blocks";
+let IntegratedPayment;
+if (hosted_fields_params.USE_HOSTED_FIELDS) {
+    IntegratedPayment = require('./wc-payplug-hosted-fields-blocks').default;
+} else {
+    IntegratedPayment = require('./wc-payplug-integratedPayment-blocks').default;
+}
 import Popup from "./wc-payplug-popup-blocks";
 const settings = getSetting( 'payplug_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
@@ -14,7 +18,7 @@ const label = decodeEntities( settings?.title ) || defaultLabel;
  */
 const Content = (props) => {
 
-	if(settings?.IP === true){
+	if(settings?.IP === true && IntegratedPayment){
 		return (
 			<IntegratedPayment settings={settings} props={props} />
 		)
