@@ -13,13 +13,20 @@ var inputStyle = {
 		"font-size": "1em"
 	}
 };
+const $ = jQuery;
+const hosted_fields_mid = typeof hosted_fields_params.HOSTED_FIELD_MID !== 'undefined'
+	? hosted_fields_params.HOSTED_FIELD_MID
+	: {
+		'api_key_id': null,
+		'api_key': null
+	};
 
 var HostedFields = {
-	hfields: dalenys.hostedFields({
+	hfields: typeof dalenys !== 'undefined' ? dalenys.hostedFields({
 		// API Keys
 		key: {
-			id: "fadc44f6-b98b-4ea1-a8a0-50ab1d2e216f",
-			value: 'Gf=}k6]*E@EYBxau'
+			id: hosted_fields_mid.api_key_id,
+			value: hosted_fields_mid.api_key
 		},
 		// Manages each hosted-field container
 		fields: {
@@ -30,10 +37,10 @@ var HostedFields = {
 				style: inputStyle,
 				onInput: function (event) {
 					if( typeof event['cardType'] !== "undefined" ) {
-						jQuery("input[type='radio'][name='schemeOptions'][value='"+event['cardType']+"']").attr("checked", true);
+						$("input[type='radio'][name='schemeOptions'][value='"+event['cardType']+"']").attr("checked", true);
 					}
 
-					HostedFields.handleInvalidFieldErrors(event, jQuery(".IntegratedPayment_error.-pan .invalidField"))
+					HostedFields.handleInvalidFieldErrors(event, $(".IntegratedPayment_error.-pan .invalidField"))
 				}
 			},
 			'expiry': {
@@ -41,7 +48,7 @@ var HostedFields = {
 				placeholder: payplug_integrated_payment_params.expiration_date,
 				style: inputStyle,
 				onInput: function (event) {
-					HostedFields.handleInvalidFieldErrors(event, jQuery(".IntegratedPayment_error.-exp .invalidField"))
+					HostedFields.handleInvalidFieldErrors(event, $(".IntegratedPayment_error.-exp .invalidField"))
 				}
 			},
 			'cryptogram': {
@@ -49,11 +56,11 @@ var HostedFields = {
 				placeholder: payplug_integrated_payment_params.cvv,
 				style: inputStyle,
 				onInput: function (event) {
-					HostedFields.handleInvalidFieldErrors(event, jQuery(".IntegratedPayment_error.-cvv .invalidField"))
+					HostedFields.handleInvalidFieldErrors(event, $(".IntegratedPayment_error.-cvv .invalidField"))
 				}
 			}
 		}
-	}),
+	}) : null,
 	handleInvalidFieldErrors: function(event, $element){
 		if(event["type"] === "invalid"){
 			$element.removeClass("-hide");
@@ -66,18 +73,18 @@ var HostedFields = {
 		}
 	},
 	showInputErrorBorder: function(input, error_targer){
-		jQuery(input).addClass("hosted-fields-invalid-state");
-		jQuery(error_targer).removeClass("-hide");
-		jQuery(error_targer).parent().removeClass("-hide");
+		$(input).addClass("hosted-fields-invalid-state");
+		$(error_targer).removeClass("-hide");
+		$(error_targer).parent().removeClass("-hide");
 	},
 	hideInputErrorBorder: function(input, error_targer) {
-		jQuery(input).removeClass("hosted-fields-invalid-state");
-		jQuery(error_targer).addClass("-hide");
-		jQuery(error_targer).parent().addClass("-hide");
+		$(input).removeClass("hosted-fields-invalid-state");
+		$(error_targer).addClass("-hide");
+		$(error_targer).parent().addClass("-hide");
 	},
 	validateInput : function(input, error_targer){
 		// Check if the input value has more than 4 letters
-		if (jQuery(input).val().length < 5 && jQuery(input).val().length > 0) {
+		if ($(input).val().length < 5 && $(input).val().length > 0) {
 			HostedFields.showInputErrorBorder(input, error_targer);
 			return false;
 
@@ -88,7 +95,7 @@ var HostedFields = {
 	},
 	submitValidation: function (input, error_targer) {
 		// Check if the input value has more than 4 letters
-		if (jQuery(input).val().length < 1) {
+		if ($(input).val().length < 1) {
 			HostedFields.showInputErrorBorder(input, error_targer);
 			return false;
 
@@ -98,7 +105,7 @@ var HostedFields = {
 		}
 	},
 	isPayplugChosen: function () {
-		return jQuery('#payment_method_payplug').is(':checked');
+		return $('#payment_method_payplug').is(':checked');
 	},
 	tokenizeHandler: async function (event) {
 
@@ -112,8 +119,8 @@ var HostedFields = {
 		try {
 
 			const isValid = HostedFields.submitValidation(
-				jQuery("[name=hosted-fields-cardHolder]"),
-				jQuery(".IntegratedPayment_error.-cardHolder .invalidField")
+				$("[name=hosted-fields-cardHolder]"),
+				$(".IntegratedPayment_error.-cardHolder .invalidField")
 			);
 
 			const result = await new Promise((resolve, reject) => {
@@ -133,7 +140,7 @@ var HostedFields = {
 				document.getElementById("card-expiry").value = document.getElementById("card-expiry").value = result.cardValidityDate ? result.cardValidityDate.replace("-", "/") : "";
 
 				// Ensure no duplicate listeners
-				jQuery('form.woocommerce-checkout, form#order_review').off('submit', HostedFields.tokenizeHandler);
+				$('form.woocommerce-checkout, form#order_review').off('submit', HostedFields.tokenizeHandler);
 				event.target.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
 			}
 		} catch (error) {
@@ -145,12 +152,12 @@ var HostedFields = {
 	}
 }
 
-jQuery( 'body' ).on( 'updated_checkout', function() {
+$( 'body' ).on( 'updated_checkout', function() {
 	HostedFields.hfields.load();
 
 	// Attach the event listener
-	jQuery("[name=hosted-fields-cardHolder]").on("input", function (event) {
-		HostedFields.validateInput(event.target, jQuery(".IntegratedPayment_error.-cardHolder .invalidField"));
+	$("[name=hosted-fields-cardHolder]").on("input", function (event) {
+		HostedFields.validateInput(event.target, $(".IntegratedPayment_error.-cardHolder .invalidField"));
 	});
 
 });
@@ -158,8 +165,8 @@ jQuery( 'body' ).on( 'updated_checkout', function() {
 
 (function ($) {
 	// Attach the event listener
-	jQuery('form.woocommerce-checkout, form#order_review').on('submit', HostedFields.tokenizeHandler );
-})(jQuery);
+	$('form.woocommerce-checkout, form#order_review').on('submit', HostedFields.tokenizeHandler );
+})($);
 
 
 
