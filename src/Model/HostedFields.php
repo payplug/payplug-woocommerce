@@ -279,6 +279,7 @@ class HostedFields {
 				<div class="payplug IntegratedPayment_error -pan -hide">
 					<span class="-hide invalidField" data-e2e-error="invalidField">{$f(__('payplug_integrated_payment_pan_error', 'payplug'))}</span>
 					<span class="-hide emptyField" data-e2e-error="paymentError">{$f(__('payplug_integrated_payment_empty', 'payplug'))}</span>
+					<span class="-hide americanExpress" data-e2e-error="americanExpress">{$f(__('payplug_integrated_payment_amex', 'payplug'))}</span>
 				</div>
 
 				<div class="payplug IntegratedPayment_container -exp exp-input-container" data-e2e-name="expiration">

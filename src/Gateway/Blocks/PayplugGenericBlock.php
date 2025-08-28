@@ -49,9 +49,6 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
 		}
 	}
 
-
-
-
 	/**
 	 * Returns an array of scripts/handles to be registered for this payment method.
 	 *
