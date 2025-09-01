@@ -439,17 +439,26 @@ class PayplugResponse {
 	 * @return bool
 	 */
 	protected function maybe_save_card( $resource ) {
-
-		if ( ! isset( $resource->card ) || empty( $resource->card->id ) ) {
+		// FIXME: Check if card saving is enabled in settings?
+		if ( ! isset( $resource->card ) || empty( $resource->card->id ) && !isset($resource->alias) || empty( $resource->alias ) ) {
 			return false;
 		}
 
 		if ( ! isset( $resource->metadata['customer_id'] ) ) {
 			return false;
 		}
-
-		$customer = get_user_by( 'id', $resource->metadata['customer_id'] );
-		if ( ! $customer || 0 === (int) $customer->ID ) {
+		if(!empty($resource->alias)){
+			$users = get_users([
+				   'meta_key'   => 'payplug_customer_id',
+				   'meta_value' => $resource->metadata['customer_id'],
+				   'number'     => 1,
+				   'fields'     => 'all',
+		   ]);
+			$customer = !empty($users) ? $users[0] : null;
+		} else {
+			$customer = get_user_by( 'id', $resource->metadata['customer_id'] );
+		}
+		if( ( ! $customer || 0 === (int) $customer->ID ) ) {
 			return false;
 		}
 
@@ -462,13 +471,24 @@ class PayplugResponse {
 
         $token = new WC_Payment_Token_CC();
         $existing_tokens = WC_Payment_Tokens::get_customer_tokens( $customer->ID , $this->gateway->id );
-        $set_token = wc_clean( $resource->card->id );
-        $set_last4 = wc_clean( $resource->card->last4 );
-        $set_expiry_year =  wc_clean( $resource->card->exp_year ) ;
-        $set_expiry_month = zeroise( (int) wc_clean( $resource->card->exp_month ), 2 ) ;
-        $set_card_type =  \strtolower( wc_clean( $resource->card->brand ) ) ;
+
+		if (!empty( $resource->alias )) {
+			$set_token       = wc_clean($resource->alias);
+			$set_last4       = wc_clean(get_user_meta( $customer->ID, 'payplug_card_last4', true));
+			$set_expiry_year = wc_clean(get_user_meta( $customer->ID, 'payplug_card_expiry_year', true));
+			$set_expiry_month = get_user_meta( $customer->ID, 'payplug_card_expiry_month', true);
+			$set_card_type   = \strtolower(wc_clean( $resource->card->brand));
+
+		} else {
+			$set_token = wc_clean($resource->card->id);
+			$set_last4 = wc_clean($resource->card->last4);
+			$set_expiry_year = wc_clean($resource->card->exp_year);
+			$set_expiry_month = zeroise((int)wc_clean($resource->card->exp_month), 2);
+			$set_card_type = \strtolower(wc_clean($resource->card->brand));
+		}
         if(!empty($existing_tokens)) {
             foreach($existing_tokens as $token_id => $existing_token) {
+
                 $current_data = $existing_token->get_data();
                 if( $current_data['token'] === $set_token &&
                     $current_data['last4'] === $set_last4 &&
@@ -479,14 +499,13 @@ class PayplugResponse {
                 }
             }
         }
-
 		$token->set_token( $set_token );
 		$token->set_gateway_id( 'payplug' );
 		$token->set_last4( $set_last4 );
 		$token->set_expiry_year( $set_expiry_year );
 		$token->set_expiry_month( $set_expiry_month );
 		$token->set_card_type( $set_card_type );
-		$token->set_user_id( $customer->ID );
+		$token->set_user_id( $customer->ID);
 		$token->add_meta_data( 'mode', $resource->is_live ? 'live' : 'test', true );
 		$token->add_meta_data( 'payplug_account', \wc_clean( $merchant_id ), true );
 		$token->save();

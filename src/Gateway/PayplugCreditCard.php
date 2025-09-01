@@ -318,7 +318,7 @@ class PayplugCreditCard extends PayplugGateway
 			$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
 			PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
 
-			$this->response->process_payment($payment, true);
+			$this->response->process_payment($payment,true);
 
 			if (($payment->__get('is_paid'))) {
 				$redirect = $order->get_checkout_order_received_url();

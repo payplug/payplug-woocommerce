@@ -332,6 +332,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				if (strpos($transaction_id, 'pay_') !== 0) {
 					$payment = $this->api->payment_retrieve( $this->hosted_fields->populateGetTransaction($transaction_id), true );
 					$payment->is_live = $this->get_current_mode() === 'live';
+					$payment->alias =  get_post_meta($order_id, '_transaction_alias', true);
 
 					//FIXME:: HF the amount unit is EURO not Cents
 					$payment->amount = $payment->amount * 100;
@@ -668,7 +669,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             }
 
             if ($current_year === (int) $token->get_expiry_year() && $current_month > (int) $token->get_expiry_month()) {
-                unset($tokens[$k]);
+				unset($tokens[$k]);
                 continue;
             }
         }
@@ -878,8 +879,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             ];
 
 			if ($this->payment_method === 'integrated' && (defined('USE_HOSTED_FIELDS') && USE_HOSTED_FIELDS) && isset($_POST['hftoken'])) {
+				$saved_card = isset($_POST['savedcard']) && $_POST['savedcard'] === '1';
 				$hf_token = filter_var($_POST['hftoken'], FILTER_SANITIZE_STRING);
-				$payment_data = $this->hosted_fields->populateCreatePayment($payment_data, $order, $order_id, $hf_token, $amount);
+				$payment_data = $this->hosted_fields->populateCreatePayment($payment_data, $order, $order_id, $hf_token, $amount, $saved_card);
 				$payment_data['metadata']['woocommerce_block'] = "HOSTED_FIELDS";
 			}
 
@@ -910,13 +912,34 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
 			$payment = $this->api->payment_create($payment_data);
 
+
+
+			$alias = isset($payment['ALIAS']) ? $payment['ALIAS'] : null;
 			//TODO:: payment is not created we need to generate an error
 			//HF VS NORMAL
 			$payment_id = isset($payment['TRANSACTIONID']) ? $payment['TRANSACTIONID'] : $payment->id;
 
 			if (!empty($payment_id) && strpos($payment_id, 'pay_') !== 0) {
-				$payment = $this->api->payment_retrieve( $this->hosted_fields->populateGetTransaction($payment_id), true );
+				$payment = $this->api->payment_retrieve( $this->hosted_fields->populateGetTransaction($payment_id),true );
 				$payment->is_live = $this->get_current_mode() === 'live';
+				if (isset($alias)){
+					$user_id = $payment->metadata['customer_id'];
+					// Get and sanitize POST values
+					$card_last4 = isset($_POST['cardlast4']) ? filter_var($_POST['cardlast4'], FILTER_SANITIZE_STRING) :'';
+					$expiry_date = isset($_POST['cardexpiry']) ? filter_var($_POST['cardexpiry'], FILTER_SANITIZE_STRING):'';
+					if (preg_match('/^(\d{2})\/(\d{2})$/', $expiry_date, $matches)) {
+						$set_expiry_year =  $matches[2];
+						$set_expiry_month = $matches[1];
+					} else {
+						$set_expiry_year = '';
+						$set_expiry_month = '';
+					}
+					update_user_meta($order->get_customer_id(), 'payplug_customer_id', $user_id);
+					update_user_meta($order->get_customer_id(), 'payplug_card_last4', $card_last4);
+					update_user_meta($order->get_customer_id(), 'payplug_card_expiry_year', $set_expiry_year);
+					update_user_meta($order->get_customer_id(), 'payplug_card_expiry_month', $set_expiry_month);
+
+				}
 			}
 
 			//TODO if payment has 5xxxx error
@@ -925,6 +948,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             PayplugWoocommerceHelper::is_pre_30()
                 ? update_post_meta($order_id, '_transaction_id', $payment_id)
                 : $order->set_transaction_id($payment_id);
+
+			if ($alias) {
+				update_post_meta($order_id, '_transaction_alias', $alias);
+			}
+
+			$order_alias = get_post_meta($order_id, '_transaction_alias', true);
 
 			$order->set_payment_method( $this->id );
 			$order->set_payment_method_title($this->method_title);
@@ -976,7 +1005,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function process_payment_with_token($order, $amount, $customer_id, $token_id)
     {
-
         $order_id      = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
         $payment_token = WC_Payment_Tokens::get($token_id);
         if (!$payment_token || (int) $customer_id !== (int) $payment_token->get_user_id()) {
@@ -1014,6 +1042,18 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				],
             ];
 
+			if ( (defined('USE_HOSTED_FIELDS') && USE_HOSTED_FIELDS)) {
+
+				if ( $payment_token->get_gateway_id() =='payplug' && strpos($payment_token->get_token(), 'card') !== 0) {
+					$payment_data = $this->hosted_fields->populateCreateWithAliasPayment($payment_data, $order, $order_id, $amount, $payment_token->get_token());
+
+//					die(var_dump($payment_data));
+					$payment_data['metadata']['woocommerce_block'] = "HOSTED_FIELDS";
+				}
+
+			}
+
+
 			$is_subscription = PayplugWoocommerceHelper::is_subscription();
 			if( !empty($is_subscription) && $is_subscription === true ){
 				$payment_data['metadata']['subscription'] = 'subscription';
@@ -1024,10 +1064,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
             $payment      = $this->api->payment_create($payment_data);
 
+			$payment_id = isset($payment['TRANSACTIONID']) ? $payment['TRANSACTIONID'] : $payment->id;
+
 			// Save transaction id for the order
 			PayplugWoocommerceHelper::is_pre_30()
-				? update_post_meta($order_id, '_transaction_id', $payment->id)
-				: $order->set_transaction_id($payment->id);
+				? update_post_meta($order_id, '_transaction_id', $payment_id)
+				: $order->set_transaction_id($payment_id);
 
 			if (is_callable([$order, 'save'])) {
 				$order->save();
@@ -1042,18 +1084,34 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
             $this->response->process_payment($payment, true);
 
-			if(($payment->__get('is_paid'))){
+			if (isset($payment['EXECCODE'] )&&( $payment['EXECCODE'] == 0000))
+			{
 				$redirect =  $order->get_checkout_order_received_url();
-			}else if(isset($payment->__get('hosted_payment')->payment_url)){
-				$redirect = $payment->__get('hosted_payment')->payment_url;
-			}else{
+			} else if(($payment->__get('is_paid'))){
+				$redirect =  $order->get_checkout_order_received_url();
+			} else {
 				$redirect = $return_url;
+			}
+//			if(($payment->__get('is_paid'))){
+//				$redirect =  $order->get_checkout_order_received_url();
+//			}else if(isset($payment->__get('hosted_payment')->payment_url)){
+//				$redirect = $payment->__get('hosted_payment')->payment_url;
+//			}else{
+//				$redirect = $return_url;
+//			}
+
+
+			if (isset($payment['EXECCODE']) )
+			{
+				$is_paid = $payment['EXECCODE'] == 00000 ? true : false;
+			} else  {
+				$is_paid = $payment->__get('is_paid');
 			}
 
             return [
-				'payment_id' => $payment->id,
+				'payment_id' => $payment_id,
                 'result'   => 'success',
-                'is_paid'  => $payment->__get('is_paid'), // Use for path redirect before DSP2
+                'is_paid'  => $is_paid, // Use for path redirect before DSP2
                 'redirect' => $redirect
             ];
         } catch (HttpException $e) {

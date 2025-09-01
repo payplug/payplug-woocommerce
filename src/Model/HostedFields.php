@@ -44,7 +44,7 @@ class HostedFields {
 	 *
 	 * Create a payment data array for the Hosted Fields integration.
 	 */
-	public function populateCreatePayment(&$payment_data, $order, $order_id, $hf_token, $amount) {
+	public function populateCreatePayment(&$payment_data, $order, $order_id, $hf_token, $amount, $save_card) {
 
 		if (empty($hf_token)) {
 			throw new \Exception(__('Hosted fields token is empty.', 'payplug'));
@@ -63,10 +63,13 @@ class HostedFields {
 			"CLIENTIP" => $order->get_customer_ip_address(),
 			"ORDERID" => $order_id,
 			"DESCRIPTION" => !empty($order->get_customer_order_notes()) ? $order->get_customer_order_notes() : "N.a.",
-			"CREATEALIAS" => "yes",
+			"CREATEALIAS" => $save_card ? "yes" : "no",
 			"APIKEYID" => $this->get_api_key_id(),
 			"HFTOKEN" => $hf_token,
 		];
+		if ($save_card) {
+			$payment_data['params']["ALIASMODE"] = "oneclick";
+		}
 
 		$this->handle_hostedfield_address($payment_data['params'], $order, 'billing');
 		$this->handle_hostedfield_address($payment_data['params'], $order, 'shipto');
@@ -75,6 +78,48 @@ class HostedFields {
 		$payment_data['params']["AMOUNT"]="1000";
 
 		$payment_data["params"]["HASH"] = $this->buildHashContent( $payment_data['params']);
+		return $payment_data;
+	}
+
+	/**
+	 * @description Prepares the data for a payment transaction using a saved alias.
+	 * @param $payment_data
+	 * @param $order
+	 * @param $order_id
+	 * @param $amount
+	 * @param $payment_token
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	public function populateCreateWithAliasPayment(&$payment_data, $order, $order_id, $amount, $payment_token) {
+		if (empty($payment_token)) {
+			throw new \Exception(__('Payment token is empty.', 'payplug'));
+		}
+
+		$payment_data['method'] = self::OPERATION_TYPE_PAYMENT;
+		$payment_data['params'] = [
+			"IDENTIFIER"      => $this->get_identifier(),
+			"OPERATIONTYPE"   => self::OPERATION_TYPE_PAYMENT,
+			"AMOUNT"          => "$amount",
+			"VERSION"         => self::API_Version,
+			"CLIENTIDENT"     => $order->get_billing_first_name() . $order->get_billing_last_name(),
+			"CLIENTEMAIL"     => $order->get_billing_email(),
+			"CLIENTREFERRER"  => $this->limit_length(esc_url_raw(home_url()), 500),
+			"CLIENTUSERAGENT" => $order->get_customer_user_agent(),
+			"CLIENTIP"        => $order->get_customer_ip_address(),
+			"ORDERID"         => $order_id,
+			"DESCRIPTION"     => !empty($order->get_customer_order_notes()) ? $order->get_customer_order_notes() : "N.a.",
+			"APIKEYID"        => $this->get_api_key_id(),
+			"ALIAS"    => $payment_token,
+			"ALIASMODE" => "oneclick",
+		];
+
+		$this->handle_hostedfield_address($payment_data['params'], $order, 'billing');
+		$this->handle_hostedfield_address($payment_data['params'], $order, 'shipto');
+
+		//FIXME HF::updating the amount for: $amount response 5002 error
+		$payment_data['params']["AMOUNT"]="1000";
+		$payment_data["params"]["HASH"] = $this->buildHashContent($payment_data['params']);
 		return $payment_data;
 	}
 
