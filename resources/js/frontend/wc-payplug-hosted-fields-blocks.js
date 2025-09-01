@@ -1,22 +1,21 @@
-import {getSetting} from '@woocommerce/settings';
-import React, {useEffect} from 'react';
-
-const settings = getSetting('payplug_data', {});
+import { getSetting } from '@woocommerce/settings';
+import React, { useEffect, useState } from 'react';
+const settings = getSetting( 'payplug_data', {} );
 const $ = jQuery;
 
 var style = {
-	'input': {
-		'font-size': '1em',
-		'background-color': 'transparent',
+	"input": {
+		"font-size": "1em",
+		"background-color": "transparent",
 	},
-	'::placeholder': {
-		'font-size': '1em',
-		'color': '#777',
-		'font-style': 'italic'
+	"::placeholder": {
+		"font-size": "1em",
+		"color": "#777",
+		"font-style": "italic"
 	},
-	':invalid': {
-		'color': '#FF0000',
-		'font-size': '1em'
+	":invalid": {
+		"color": "#FF0000",
+		"font-size": "1em"
 	}
 };
 
@@ -125,10 +124,13 @@ var HostedFields = {
 		}
 	}
 };
+let saved_card = false;
 
 const IntegratedPayment = typeof dalenys !== 'undefined' ? ({props: props,}) => {
-	const {eventRegistration, emitResponse} = props;
-	const {onCheckoutValidation, onPaymentProcessing} = eventRegistration;
+
+	const { eventRegistration, emitResponse } = props;
+	saved_card = props.shouldSavePayment;
+	const { onCheckoutValidation, onPaymentProcessing } = eventRegistration;
 
 	//on init
 	useEffect(() => {
@@ -141,12 +143,18 @@ const IntegratedPayment = typeof dalenys !== 'undefined' ? ({props: props,}) => 
 	useEffect(() => {
 		const handlePaymentProcessing = () => {
 			const hftoken = document.getElementById('hf-token').value;
+			const savedCard = document.getElementById('saved_card').value;
+			const cardLast4 = document.getElementById('card-last4').value;
+			const cardExpiry = document.getElementById('card-expiry').value;
 
 			return {
 				type: emitResponse.responseTypes.SUCCESS,
 				meta: {
 					paymentMethodData: {
 						hftoken,
+						savedCard,
+						cardLast4,
+						cardExpiry
 					},
 				},
 			};
@@ -185,6 +193,9 @@ const IntegratedPayment = typeof dalenys !== 'undefined' ? ({props: props,}) => 
 				HostedFields.hfields.createToken(function (result) {
 					if (HostedFields.submitValidation($('[name=hosted-fields-cardHolder]'), $('.IntegratedPayment_error.-cardHolder .invalidField')) && result.execCode == '0000') {
 						document.getElementById('hf-token').value = result.hfToken;
+						// Save last 4 and expiry to hidden fields
+						document.getElementById('card-last4').value = result.cardCode ? result.cardCode.slice(-4) : "";
+						document.getElementById('card-expiry').value = result.cardValidityDate ? result.cardValidityDate.replace("-", "/") : "";
 						resolve(result);
 					} else {
 						reject(new Error('Tokenization failed'));
@@ -272,6 +283,10 @@ const IntegratedPayment = typeof dalenys !== 'undefined' ? ({props: props,}) => 
 				   target='_blank'>{settings?.payplug_integrated_payment_privacy_policy}</a>
 			</div>
 			<input type='hidden' name='hf-token' id='hf-token'/>
+			<input type='hidden' name='saved_card' id='saved_card' value={saved_card ? '1' : '0'} />
+			<input type='hidden' name='card-last4' id='card-last4'/>
+			<input type='hidden' name='card-expiry' id='card-expiry'/>
+
 		</>
 	)
 } : null;
