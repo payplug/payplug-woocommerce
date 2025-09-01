@@ -1046,8 +1046,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 				if ( $payment_token->get_gateway_id() =='payplug' && strpos($payment_token->get_token(), 'card') !== 0) {
 					$payment_data = $this->hosted_fields->populateCreateWithAliasPayment($payment_data, $order, $order_id, $amount, $payment_token->get_token());
-
-//					die(var_dump($payment_data));
 					$payment_data['metadata']['woocommerce_block'] = "HOSTED_FIELDS";
 				}
 
@@ -1092,14 +1090,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			} else {
 				$redirect = $return_url;
 			}
-//			if(($payment->__get('is_paid'))){
-//				$redirect =  $order->get_checkout_order_received_url();
-//			}else if(isset($payment->__get('hosted_payment')->payment_url)){
-//				$redirect = $payment->__get('hosted_payment')->payment_url;
-//			}else{
-//				$redirect = $return_url;
-//			}
-
 
 			if (isset($payment['EXECCODE']) )
 			{

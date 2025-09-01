@@ -505,7 +505,7 @@ class PayplugResponse {
 		$token->set_expiry_year( $set_expiry_year );
 		$token->set_expiry_month( $set_expiry_month );
 		$token->set_card_type( $set_card_type );
-		$token->set_user_id( $customer->ID);
+		$token->set_user_id( $customer->ID );
 		$token->add_meta_data( 'mode', $resource->is_live ? 'live' : 'test', true );
 		$token->add_meta_data( 'payplug_account', \wc_clean( $merchant_id ), true );
 		$token->save();
