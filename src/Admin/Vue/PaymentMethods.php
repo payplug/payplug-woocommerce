@@ -232,7 +232,7 @@ class PaymentMethods {
 	 */
 	public static function payment_method_applepay( $active, $options, $carriers = [] ) {
 
-		$checkout = $cart = false;
+		$checkout = $cart = $product = false;
 
 		if( !empty($options['applepay_checkout']) && ($options['applepay_checkout'] == "yes" ) ){
 			$checkout = true;
@@ -240,6 +240,10 @@ class PaymentMethods {
 
 		if( !empty($options['applepay_cart']) && ($options['applepay_cart'] == "yes" ) ){
 			$cart = true;
+		}
+
+		if( !empty($options['applepay_product']) && ($options['applepay_product'] == "yes" ) ){
+			$product = true;
 		}
 
 		if( $active === true  && !$checkout && !$cart ){
@@ -289,6 +293,15 @@ class PaymentMethods {
 									"value" => "cart",
 									"switch" => true,
 									"checked" => $cart
+								],
+								[
+									"name" => "applepay_product",
+									"title" => __( 'applepay_display_product', 'payplug' ),
+									"image_url" => esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/cart/applepay_cart.svg' ),
+									"label" => __( 'applepay_display_product', 'payplug' ),
+									"value" => "product",
+									"switch" => true,
+									"checked" => $product
 								]
 							],
 						"carriers" =>

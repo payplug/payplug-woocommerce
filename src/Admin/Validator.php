@@ -88,16 +88,17 @@ class Validator {
 	 * prevent saving when neither cart and checkout is enabled
 	 *
 	 * @param $cart
+	 * @param $product
 	 * @param $checkout
 	 * @return true
 	 */
-	public static function applePayPaymentGatewayOptions($apple_pay, $cart, $checkout, $carriers){
+	public static function applePayPaymentGatewayOptions($apple_pay, $cart, $product, $checkout, $carriers){
 
 		if($apple_pay === "no"){
 			return true;
 		}
 
-		if( $cart === "no" && $checkout === "no" ){
+		if( $cart === "no" && $product === "no" && $checkout === "no" ){
 			http_response_code(200);
 
 			$arr = [
@@ -110,7 +111,7 @@ class Validator {
 			wp_send_json_error($arr);
 		}
 
-		if( $cart === "yes" && empty($carriers)){
+		if( ($cart === "yes" || $product === "yes") && empty($carriers)){
 			http_response_code(200);
 
 			$arr = [

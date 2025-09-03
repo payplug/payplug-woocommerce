@@ -565,9 +565,10 @@ class Ajax {
 			$options['applepay_carriers'] = (!empty($data['applepay_carriers'])) ? $data['applepay_carriers'] : [];
 			$options['applepay_checkout'] = Validator::genericPaymentGateway($data['enable_applepay_checkout'], "Apple Pay Checkout", $test_mode);
 			$options['applepay_cart'] = Validator::genericPaymentGateway($data['enable_applepay_cart'], "Apple Pay Cart", $test_mode);
+			$options['applepay_product'] = Validator::genericPaymentGateway($data['enable_applepay_product'], "Apple Pay Product", $test_mode);
 
-			Validator::applePayPaymentGatewayOptions($options['apple_pay'], $options['applepay_cart'], $options['applepay_checkout'], $options['applepay_carriers']);
-			if (($options['apple_pay'] === 'yes') && ($options['applepay_checkout'] === 'no') && ($options['applepay_cart'] === 'no')) {
+			Validator::applePayPaymentGatewayOptions($options['apple_pay'], $options['applepay_cart'], $options['applepay_product'], $options['applepay_checkout'], $options['applepay_carriers']);
+			if (($options['apple_pay'] === 'yes') && ($options['applepay_checkout'] === 'no') && ($options['applepay_cart'] === 'no') && ($options['applepay_product'] === 'no')) {
 				$options['applepay_checkout'] = 'yes';
 			}
 
