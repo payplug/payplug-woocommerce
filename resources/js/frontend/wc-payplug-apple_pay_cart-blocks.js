@@ -138,7 +138,7 @@ const ApplePayCart = ( props ) =>{
 						'payment_id': session.payment_id,
 						'payment_token': event.payment.token,
 						'order_id': session.order_id,
-						'amount': session.amount
+						'amount': session.amount/100
 					}
 
 					apple_pay_Payment(data).then((result_payment) => {
