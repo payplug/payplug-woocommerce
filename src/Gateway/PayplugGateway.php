@@ -911,14 +911,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
              */
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
 			$payment = $this->api->payment_create($payment_data);
-
-
-
 			$alias = isset($payment['ALIAS']) ? $payment['ALIAS'] : null;
+
 			//TODO:: payment is not created we need to generate an error
 			//HF VS NORMAL
 			$payment_id = isset($payment['TRANSACTIONID']) ? $payment['TRANSACTIONID'] : $payment->id;
-
 			if (!empty($payment_id) && strpos($payment_id, 'pay_') !== 0) {
 				$payment = $this->api->payment_retrieve( $this->hosted_fields->populateGetTransaction($payment_id),true );
 				$payment->is_live = $this->get_current_mode() === 'live';
@@ -928,7 +925,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 					$card_last4 = isset($_POST['cardlast4']) ? filter_var($_POST['cardlast4'], FILTER_SANITIZE_STRING) :'';
 					$expiry_date = isset($_POST['cardexpiry']) ? filter_var($_POST['cardexpiry'], FILTER_SANITIZE_STRING):'';
 					if (preg_match('/^(\d{2})\/(\d{2})$/', $expiry_date, $matches)) {
-						$set_expiry_year =  $matches[2];
+						$set_expiry_year =  '20' . $matches[2];
 						$set_expiry_month = $matches[1];
 					} else {
 						$set_expiry_year = '';

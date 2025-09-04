@@ -439,7 +439,6 @@ class PayplugResponse {
 	 * @return bool
 	 */
 	protected function maybe_save_card( $resource ) {
-		// FIXME: Check if card saving is enabled in settings?
 		if ( ! isset( $resource->card ) || empty( $resource->card->id ) && !isset($resource->alias) || empty( $resource->alias ) ) {
 			return false;
 		}
@@ -485,6 +484,7 @@ class PayplugResponse {
 			$set_expiry_year = wc_clean($resource->card->exp_year);
 			$set_expiry_month = zeroise((int)wc_clean($resource->card->exp_month), 2);
 			$set_card_type = \strtolower(wc_clean($resource->card->brand));
+
 		}
         if(!empty($existing_tokens)) {
             foreach($existing_tokens as $token_id => $existing_token) {
