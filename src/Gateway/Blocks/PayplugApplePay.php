@@ -126,13 +126,20 @@ class PayplugApplePay extends PayplugGenericBlock
 
 					$rates = $shipping_method->get_rates_for_package( $package );
 					if ( $this->checkApplePayShipping( $shipping_method ) ) {
+
+						if(empty($rates[ $shipping_method->get_rate_id() ])){
+							continue;
+						}
 						$shipping_rate = $rates[ $shipping_method->get_rate_id() ];
+
+						!empty($shipping_rate) && method_exists($shipping_rate, 'get_cost') ? $shipping_costs = $shipping_rate->get_cost() : $shipping_costs = 0;
+						!empty($shipping_rate) && method_exists($shipping_rate, 'get_shipping_tax') ? $shipping_tax = $shipping_rate->get_shipping_tax() : $shipping_tax = "Na";
 
 						array_push( $shippings, [
 							'identifier' => $shipping_method->id,
 							'label'      => $shipping_method->method_title,
 							'detail'     => strip_tags( $shipping_method->method_description ),
-							'amount'     => $shipping_rate->get_cost() + $shipping_rate->get_shipping_tax()
+							'amount'     => $shipping_costs + $shipping_tax
 						] );
 					}
 				}
