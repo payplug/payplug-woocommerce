@@ -78,18 +78,18 @@ __webpack_require__.r(__webpack_exports__);
 const settings = (0,_woocommerce_settings__WEBPACK_IMPORTED_MODULE_0__.getSetting)('payplug_data', {});
 const $ = jQuery;
 var style = {
-  'input': {
-    'font-size': '1em',
-    'background-color': 'transparent'
+  "input": {
+    "font-size": "1em",
+    "background-color": "transparent"
   },
-  '::placeholder': {
-    'font-size': '1em',
-    'color': '#777',
-    'font-style': 'italic'
+  "::placeholder": {
+    "font-size": "1em",
+    "color": "#777",
+    "font-style": "italic"
   },
-  ':invalid': {
-    'color': '#FF0000',
-    'font-size': '1em'
+  ":invalid": {
+    "color": "#FF0000",
+    "font-size": "1em"
   }
 };
 const hosted_fields_mid = typeof hosted_fields_params.HOSTED_FIELD_MID !== 'undefined' ? hosted_fields_params.HOSTED_FIELD_MID : {
@@ -189,6 +189,7 @@ var HostedFields = {
     }
   }
 };
+let saved_card = false;
 const IntegratedPayment = typeof dalenys !== 'undefined' ? ({
   props: props
 }) => {
@@ -196,6 +197,7 @@ const IntegratedPayment = typeof dalenys !== 'undefined' ? ({
     eventRegistration,
     emitResponse
   } = props;
+  saved_card = props.shouldSavePayment;
   const {
     onCheckoutValidation,
     onPaymentProcessing
@@ -211,11 +213,17 @@ const IntegratedPayment = typeof dalenys !== 'undefined' ? ({
   (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
     const handlePaymentProcessing = () => {
       const hftoken = document.getElementById('hf-token').value;
+      const savedCard = document.getElementById('saved_card').value;
+      const cardLast4 = document.getElementById('card-last4').value;
+      const cardExpiry = document.getElementById('card-expiry').value;
       return {
         type: emitResponse.responseTypes.SUCCESS,
         meta: {
           paymentMethodData: {
-            hftoken
+            hftoken,
+            savedCard,
+            cardLast4,
+            cardExpiry
           }
         }
       };
@@ -251,6 +259,9 @@ const IntegratedPayment = typeof dalenys !== 'undefined' ? ({
         HostedFields.hfields.createToken(function (result) {
           if (HostedFields.submitValidation($('[name=hosted-fields-cardHolder]'), $('.IntegratedPayment_error.-cardHolder .invalidField')) && result.execCode == '0000') {
             document.getElementById('hf-token').value = result.hfToken;
+            // Save last 4 and expiry to hidden fields
+            document.getElementById('card-last4').value = result.cardCode ? result.cardCode.slice(-4) : "";
+            document.getElementById('card-expiry').value = result.cardValidityDate ? result.cardValidityDate.replace("-", "/") : "";
             resolve(result);
           } else {
             reject(new Error('Tokenization failed'));
@@ -407,6 +418,19 @@ const IntegratedPayment = typeof dalenys !== 'undefined' ? ({
       type: "hidden",
       name: "hf-token",
       id: "hf-token"
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
+      type: "hidden",
+      name: "saved_card",
+      id: "saved_card",
+      value: saved_card ? '1' : '0'
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
+      type: "hidden",
+      name: "card-last4",
+      id: "card-last4"
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
+      type: "hidden",
+      name: "card-expiry",
+      id: "card-expiry"
     })]
   });
 } : null;

@@ -129,6 +129,8 @@ var HostedFields = {
 
 			if (isValid) {
 				document.getElementById("hftoken").value = result.hfToken;
+				document.getElementById("card-last4").value = result.cardCode ? result.cardCode.slice(-4) : "";
+				document.getElementById("card-expiry").value = document.getElementById("card-expiry").value = result.cardValidityDate ? result.cardValidityDate.replace("-", "/") : "";
 
 				// Ensure no duplicate listeners
 				jQuery('form.woocommerce-checkout, form#order_review').off('submit', HostedFields.tokenizeHandler);
