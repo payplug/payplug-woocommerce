@@ -15,4 +15,5 @@ define( 'HF_API', 'https://staging-internal-payment.gcp.dlns.io/ui/hosted-fields
  *  CDN path to integrated-payment lib
  */
 define( 'IP_API', 'https://cdn-qa.payplug.com/js/integrated-payment/v1@1/index.js' );
+define('USE_HOSTED_FIELDS', true);
 

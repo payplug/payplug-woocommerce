@@ -553,7 +553,11 @@ class Ajax {
 
 			$options['title'] = trim(wp_strip_all_tags($data['standard_payment_title']));
 			$options['description'] = trim(wp_strip_all_tags($data['standard_payment_description']));
-			$options['payment_method'] = (Validator::payment_method($data['payplug_embeded'])) ? $data['payplug_embeded'] : $options['payplug_embeded'];
+			if (empty($data['payplug_embeded'])) {
+				$options['payment_method'] = 'integrated';
+			} else {
+				$options['payment_method'] = (Validator::payment_method($data['payplug_embeded'])) ? $data['payplug_embeded'] : $options['payplug_embeded'];
+			}
 			$options['oneclick'] = Validator::oneclick($data['enable_one_click']);
 
 			$options['oney'] = Validator::oney($data['enable_oney']);
@@ -581,7 +585,7 @@ class Ajax {
 			$options['oney_thresholds_max'] = $thresholds['max'];
 			$options['oney_product_animation'] = Validator::oney_product_animation($data['enable_oney_product_animation']);
 			$options['debug'] = Validator::debug($data['enable_debug']);
-
+			//hosted field credentials section
 			$options['account_key'] = isset($data['payplug_payplug_account_key']) && $data['payplug_payplug_account_key']
 				? trim($data['payplug_payplug_account_key'])
 				: '';
