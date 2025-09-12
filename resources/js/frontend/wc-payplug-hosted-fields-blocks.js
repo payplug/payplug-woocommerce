@@ -286,7 +286,6 @@ const IntegratedPayment = typeof dalenys !== 'undefined' ? ({props: props,}) => 
 			<input type='hidden' name='saved_card' id='saved_card' value={saved_card ? '1' : '0'} />
 			<input type='hidden' name='card-last4' id='card-last4'/>
 			<input type='hidden' name='card-expiry' id='card-expiry'/>
-
 		</>
 	)
 } : null;

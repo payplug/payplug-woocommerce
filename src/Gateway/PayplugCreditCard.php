@@ -184,6 +184,11 @@ class PayplugCreditCard extends PayplugGateway
 		wp_register_script('payplug-hosted-fields-payments-api', HF_API, [], 'v2.1.0', true);
 		wp_enqueue_script('payplug-hosted-fields-payments-api');
 		wp_register_script('payplug-hosted-fields-payments', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-hostedfields.js', ['jquery', 'jquery-bind-first', 'payplug-hosted-fields-payments-api'], 'v1.0', true);
+		$hosted_fields_params = array(
+			'USE_HOSTED_FIELDS' => defined('USE_HOSTED_FIELDS') && USE_HOSTED_FIELDS,
+			'HOSTED_FIELD_MID' => defined('HOSTED_FIELD_MID') ? HOSTED_FIELD_MID : null,
+		);
+		wp_localize_script('payplug-hosted-fields-payments', 'hosted_fields_params', $hosted_fields_params);
 		wp_enqueue_script('payplug-hosted-fields-payments');
 		wp_localize_script('payplug-hosted-fields-payments', 'payplug_integrated_payment_params', $translations);
 		wp_register_script('jquery-bind-first', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/jquery.bind-first-0.2.3.min.js', array('jquery'), '1.0.0', true);

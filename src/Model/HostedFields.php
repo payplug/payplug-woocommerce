@@ -2,6 +2,8 @@
 
 namespace Payplug\PayplugWoocommerce\Model;
 
+use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
+
 /**
  * Class HostedFields
  *
@@ -44,7 +46,7 @@ class HostedFields {
 	 *
 	 * Create a payment data array for the Hosted Fields integration.
 	 */
-	public function populateCreatePayment(&$payment_data, $order, $order_id, $hf_token, $amount, $save_card) {
+	public function populateCreatePayment(&$payment_data, $order, $order_id, $hf_token, $amount, $return_url, $save_card) {
 
 		if (empty($hf_token)) {
 			throw new \Exception(__('Hosted fields token is empty.', 'payplug'));
@@ -52,21 +54,28 @@ class HostedFields {
 
 		$payment_data['method'] = self::OPERATION_TYPE_PAYMENT;
 		$payment_data['params'] = [
-			"IDENTIFIER" => $this->get_identifier(),
-			"OPERATIONTYPE" => self::OPERATION_TYPE_PAYMENT,
-			"AMOUNT" => "$amount",
-			"VERSION" => self::API_Version,
-			"CLIENTIDENT" => $order->get_billing_first_name() . $order->get_billing_last_name(),
-			"CLIENTEMAIL" => $order->get_billing_email(),
-			"CLIENTREFERRER" => $this->limit_length(esc_url_raw(home_url()), 500),
-			"CLIENTUSERAGENT" => $order->get_customer_user_agent(),
-			"CLIENTIP" => $order->get_customer_ip_address(),
-			"ORDERID" => $order_id,
-			"DESCRIPTION" => !empty($order->get_customer_order_notes()) ? $order->get_customer_order_notes() : "N.a.",
-			"CREATEALIAS" => $save_card ? "yes" : "no",
-			"APIKEYID" => $this->get_api_key_id(),
-			"HFTOKEN" => $hf_token,
+			'IDENTIFIER' => $this->get_identifier(),
+			'OPERATIONTYPE' => self::OPERATION_TYPE_PAYMENT,
+			'AMOUNT' => (string) $amount,
+			'VERSION' => self::API_Version,
+			'CLIENTIDENT' => $order->get_billing_first_name() . $order->get_billing_last_name(),
+			'CLIENTEMAIL' => $order->get_billing_email(),
+			'CLIENTREFERRER' => $this->limit_length(esc_url_raw(home_url()), 500),
+			'CLIENTUSERAGENT' => $order->get_customer_user_agent(),
+			'CLIENTIP' => $order->get_customer_ip_address(),
+			'ORDERID' => $order_id,
+			'DESCRIPTION' => !empty($order->get_customer_order_notes()) ? $order->get_customer_order_notes() : 'N.a.',
+			'CREATEALIAS' => $save_card ? 'yes' : 'no',
+			'APIKEYID' => $this->get_api_key_id(),
+			'HFTOKEN' => $hf_token,
+
+			// 3DS SECURE DATA
+			'3DSECUREDISPLAYMODE' => 'raw',
+			'3DSECUREPREFERENCE' => 'nopref',
+			'REDIRECTURLCANCEL' => $return_url,
+			'REDIRECTURLSUCCESS' => $return_url,
 		];
+
 		if ($save_card) {
 			$payment_data['params']["ALIASMODE"] = "oneclick";
 		}
@@ -118,8 +127,8 @@ class HostedFields {
 		$this->handle_hostedfield_address($payment_data['params'], $order, 'shipto');
 
 		//FIXME HF::updating the amount for: $amount response 5002 error
-		$payment_data['params']["AMOUNT"]="1000";
-		$payment_data["params"]["HASH"] = $this->buildHashContent($payment_data['params']);
+		$payment_data['params']['AMOUNT'] = '1000';
+		$payment_data['params']['HASH'] = $this->buildHashContent( $payment_data['params']);
 		return $payment_data;
 	}
 
@@ -134,18 +143,18 @@ class HostedFields {
 	 */
 	public function populateRefundTransaction($payment_id, $amount, $order_id, $order) {
 		$data = Array(
-			"method" => 'refund',
-			"params" => array(
+			'method' => 'refund',
+			'params' => array(
 				'IDENTIFIER' => $this->get_identifier(),
 				'OPERATIONTYPE' => 'refund',
 				'AMOUNT' => (string) $amount,
 				'ORDERID' =>$order_id,
-				'DESCRIPTION' =>!empty($order->get_customer_order_notes()) ? $order->get_customer_order_notes() : "N.a.",
+				'DESCRIPTION' =>!empty($order->get_customer_order_notes()) ? $order->get_customer_order_notes() : 'N.a.',
 				'TRANSACTIONID' => $payment_id,
 				'VERSION' => self::API_Version,
 			)
 		);
-		$data["params"]["HASH"] = $this->buildHashContent( $data['params'], true );
+		$data['params']['HASH'] = $this->buildHashContent( $data['params'], true );
 		return $data;
 	}
 
@@ -162,9 +171,22 @@ class HostedFields {
 	{
 		$prefix = strtoupper($type);
         $type = $type == 'shipto' ? 'shipping' : $type;
+		if ($type == 'shipto') {
+			$type = 'shipping';
+		}
+
 		$data["{$prefix}ADDRESS"] = $order->{"get_{$type}_address_1"}() . ' ' . $order->{"get_{$type}_address_2"}();
-		$data["{$prefix}COUNTRY"] = $order->{"get_{$type}_country"}();
+		$country = $order->{"get_{$type}_country"}();
+		$data["{$prefix}COUNTRY"] = $country;
 		$data["{$prefix}POSTALCODE"] = $order->{"get_{$type}_postcode"}();
+
+		if ($type == 'billing') {
+			$phone = $order->get_billing_phone();
+			$formated_phone = PayplugAddressData::prepare_phone_number($phone, $country);
+			if(isset($formated_phone['phone']) && $formated_phone['phone']) {
+				$data['MOBILEPHONE'] = $formated_phone['phone'];
+			}
+		}
 		return $data;
 	}
 
@@ -183,15 +205,15 @@ class HostedFields {
 		}
 
 		$data = Array(
-			"method" => 'getTransactions',
-			"params" => array(
+			'method' => 'getTransactions',
+			'params' => array(
 				'IDENTIFIER' => $this->get_identifier(),
 				'OPERATIONTYPE' => 'getTransaction',
 				'TRANSACTIONID' => $payment_id,
 				'VERSION' => self::API_Version,
 			)
 		);
-		$data["params"]["HASH"] = $this->buildHashContent( $data['params'], true );
+		$data['params']['HASH'] = $this->buildHashContent( $data['params'], true );
 
 		return $data;
 
@@ -223,7 +245,7 @@ class HostedFields {
 		ksort($params);
 		$string = '';
 		foreach($params as $k => $v){
-			$string .= $k  . "=" . $v . $key;
+			$string .= $k  . '=' . $v . $key;
 		}
 
 		return hash('sha256', $key . $string);
@@ -290,7 +312,7 @@ class HostedFields {
 
 		$logo = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/logo-payplug.png';
 		$lock = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
-		$privacy_policy_url = __("payplug_integrated_payment_privacy_policy_url", "payplug");
+		$privacy_policy_url = __('payplug_integrated_payment_privacy_policy_url', 'payplug');
 		$f = function ($fn) {
 			return $fn;
 		};
