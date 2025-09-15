@@ -582,6 +582,21 @@ class Ajax {
 			$options['oney_product_animation'] = Validator::oney_product_animation($data['enable_oney_product_animation']);
 			$options['debug'] = Validator::debug($data['enable_debug']);
 
+			$options['account_key'] = isset($data['payplug_payplug_account_key']) && $data['payplug_payplug_account_key']
+				? trim($data['payplug_payplug_account_key'])
+				: '';
+			$options['api_key'] = isset($data['payplug_payplug_api_key']) && $data['payplug_payplug_api_key']
+				? trim($data['payplug_payplug_api_key'])
+				: '';
+			$options['api_key_id'] = isset($data['payplug_payplug_api_key_id']) && $data['payplug_payplug_api_key_id']
+				? trim($data['payplug_payplug_api_key_id'])
+				: '';
+			$options['identifier'] = isset($data['payplug_payplug_identifier']) && $data['payplug_payplug_identifier']
+				? trim($data['payplug_payplug_identifier'])
+				: '';
+
+			$options['debug'] = Validator::debug($data['enable_debug']);
+
 			//force save
 			if( update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false ) ){
 
