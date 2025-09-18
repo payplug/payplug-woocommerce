@@ -75,13 +75,17 @@ class PayplugCreditCard extends PayplugGenericBlock
 			null,
 			true
 		);
+
+		$hosted_fields_mid = $this->gateway->get_hosted_fields_mid();
+
+		$hosted_fields_params = array(
+			'USE_HOSTED_FIELDS' => is_array($hosted_fields_mid) && !empty($hosted_fields_mid),
+			'HOSTED_FIELD_MID' => $hosted_fields_mid,
+		);
 		wp_localize_script(
 			'wc-payplug-blocks',
 			'hosted_fields_params',
-			array(
-				'USE_HOSTED_FIELDS' => defined('USE_HOSTED_FIELDS') && USE_HOSTED_FIELDS,
-				'HOSTED_FIELD_MID' => defined('HOSTED_FIELD_MID') ? HOSTED_FIELD_MID : null,
-			)
+			$hosted_fields_params
 		);
 		wp_enqueue_script('wc-payplug-blocks');
 
@@ -109,7 +113,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 
 	private function ip_scripts(){
 		wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
-		if (defined('USE_HOSTED_FIELDS') && USE_HOSTED_FIELDS) {
+		if (!empty($this->gateway->get_hosted_fields_mid())) {
 			wp_enqueue_style('payplug-hosted-fields-style', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-hosted-fields-payments.css', [], PAYPLUG_GATEWAY_VERSION);
 			wp_register_script('payplug-hosted-fields-payments-api', HF_API, [], 'v2.1.0', true);
 			wp_enqueue_script('payplug-hosted-fields-payments-api');

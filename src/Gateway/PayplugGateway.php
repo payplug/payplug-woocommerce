@@ -195,7 +195,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
 
 		//FIXME:: get_options to get hosted_fields_data
-		$hosted_field_mid = defined('HOSTED_FIELD_MID') && !empty(HOSTED_FIELD_MID) ? HOSTED_FIELD_MID : [];
+
+		$hosted_field_mid = $this->get_hosted_fields_mid();
 		if (!empty($hosted_field_mid)) {
 			$this->hosted_fields = new HostedFields(
 				$hosted_field_mid['account_key'],
@@ -730,8 +731,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	public function admin_options()
 	{
 		/************ VUE Code *************/
-		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-1.7.2.js', [], PAYPLUG_GATEWAY_VERSION);
-		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.7.2.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-1.7.13.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.7.13.js', [], PAYPLUG_GATEWAY_VERSION);
 		wp_enqueue_style('app.css', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/css/app.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_localize_script('app.js', 'payplug_admin_config',
 			array(
@@ -909,7 +910,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				],
 			];
 
-			if ($this->payment_method === 'integrated' && (defined('USE_HOSTED_FIELDS') && USE_HOSTED_FIELDS) && isset($_POST['hftoken'])) {
+			if ($this->payment_method === 'integrated' && !empty($this->get_hosted_fields_mid()) && isset($_POST['hftoken'])) {
 				$saved_card = isset($_POST['savedcard']) && $_POST['savedcard'] === '1';
 				$hf_token = filter_var($_POST['hftoken'], FILTER_SANITIZE_STRING);
 				$payment_data = $this->hosted_fields->populateCreatePayment($payment_data, $order, $order_id, $hf_token, $amount, $return_url, $saved_card);
@@ -1085,13 +1086,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				],
 			];
 
-			if ( (defined('USE_HOSTED_FIELDS') && USE_HOSTED_FIELDS)) {
-
+			if (!empty($this->get_hosted_fields_mid())) {
 				if ( $payment_token->get_gateway_id() =='payplug' && strpos($payment_token->get_token(), 'card') !== 0) {
 					$payment_data = $this->hosted_fields->populateCreateWithAliasPayment($payment_data, $order, $order_id, $amount, $payment_token->get_token());
 					$payment_data['metadata']['woocommerce_block'] = "HOSTED_FIELDS";
 				}
-
 			}
 
 
@@ -1485,4 +1484,27 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		return $order && $this->supports('refunds') && $status !== "cancelled" && $status !== "failed";
 	}
 
+	/**
+	 * @description get hosted field mid from plugin options
+	 * @return array
+	 */
+	public function get_hosted_fields_mid() {
+		// check if api && api key && identifier given, or return empty array
+		if (!isset($this->settings['api_key']) && !$this->settings['api_key']) {
+			return [];
+		}
+		if (!isset($this->settings['api_key_id']) && !$this->settings['api_key_id']) {
+			return [];
+		}
+		if (!isset($this->settings['identifier']) && !$this->settings['identifier']) {
+			return [];
+		}
+
+		return [
+			'api_key' => $this->settings['api_key'],
+			'api_key_id' => $this->settings['api_key_id'],
+			'identifier' => $this->settings['identifier'],
+			'account_key' => $this->settings['account_key'],
+		];
+	}
 }

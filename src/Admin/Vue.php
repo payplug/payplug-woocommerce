@@ -50,6 +50,7 @@ class Vue {
 				"header"           		=> $header,
 				"login"     			=> $this->payplug_section_login(),
 				"logged"           		=> $logged,
+				"multi_account"         => $this->payplug_section_multi_account($this->options),
 				"payment_methods"  		=> $this->payplug_section_payment_methods($this->options),
 				"payment_paylater"  	=> $this->payplug_section_paylater(),
 				"status" 				=> $this->payplug_section_status($this->options),
@@ -268,6 +269,62 @@ class Vue {
 	}
 
 	/**
+	 * @description get data to rend for multi account data
+	 * @param $options
+	 * @return array
+	 */
+	public function payplug_section_multi_account($options = array()) {
+		$description = __( 'payplug_section_multi_account_description', 'payplug' );
+		$inputs = [
+			[
+				'name' => 'payplug_identifier',
+				'label' => __( 'payplug_section_multi_account_identifier_label', 'payplug' ),
+				'placeholder' => __( 'payplug_section_multi_account_identifier_placeholder', 'payplug' ),
+				'value' => isset($options['identifier']) && $options['identifier']
+					? $options['identifier']
+					: '',
+			],
+			[
+				'name' => 'payplug_api_key_id',
+				'label' => __( 'payplug_section_multi_account_api_key_id_label', 'payplug' ),
+				'placeholder' => __( 'payplug_section_multi_account_api_key_id_placeholder', 'payplug' ),
+				'value' => isset($options['api_key_id']) && $options['api_key_id']
+					? $options['api_key_id']
+					: '',
+			],
+			[
+				'name' => 'payplug_api_key',
+				'label' => __( 'payplug_section_multi_account_api_key_label', 'payplug' ),
+				'placeholder' => __( 'payplug_section_multi_account_api_key_placeholder', 'payplug' ),
+				'value' => isset($options['api_key']) && $options['api_key']
+					? $options['api_key']
+					: '',
+			],
+			[
+				'name' => 'payplug_account_key',
+				'label' => __( 'payplug_section_multi_account_account_key_label', 'payplug' ),
+				'placeholder' => __( 'payplug_section_multi_account_account_key_placeholder', 'payplug' ),
+				'value' => isset($options['account_key']) && $options['account_key']
+					? $options['account_key']
+					: '',
+			],
+		];
+
+		return [
+			"name"         => "multiAccountBlock",
+			"title"        => __( 'payplug_section_multi_account_title', 'payplug' ),
+			'descriptions' => [
+				'live' => $description,
+				'sandbox' => $description,
+			],
+			'inputs' => [
+				'live' => $inputs,
+				'sandbox' => $inputs,
+			],
+		];
+	}
+
+	/**
 	 * @return array
 	 */
 	public function payplug_section_payment_methods($options = array()) {
@@ -422,7 +479,6 @@ class Vue {
 			"checked" => $active
 		];
 	}
-
 
 	/**
 	 * @return array
