@@ -487,7 +487,7 @@ HTML;
 
 		$options = PayplugWoocommerceHelper::get_payplug_options();
 
-		if (empty($options) || $options['oney'] === 'no') {
+		if (empty($options) || !isset($options['oney'] ) || $options['oney'] === 'no') {
 			return false;
 		}
 
