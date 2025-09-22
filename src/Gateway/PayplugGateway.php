@@ -1490,13 +1490,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 */
 	public function get_hosted_fields_mid() {
 		// check if api && api key && identifier given, or return empty array
-		if (!isset($this->settings['api_key']) && !$this->settings['api_key']) {
+		if (empty($this->settings['api_key'])) {
 			return [];
 		}
-		if (!isset($this->settings['api_key_id']) && !$this->settings['api_key_id']) {
+		if (empty($this->settings['api_key_id'])) {
 			return [];
 		}
-		if (!isset($this->settings['identifier']) && !$this->settings['identifier']) {
+		if (empty($this->settings['identifier'])) {
 			return [];
 		}
 

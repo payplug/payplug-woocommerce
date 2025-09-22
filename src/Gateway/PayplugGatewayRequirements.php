@@ -147,7 +147,11 @@ class PayplugGatewayRequirements {
 	 * @return bool
 	 */
 	public function valid_currency() {
-		return 'EUR' === get_woocommerce_currency();
+		$Multicurrency_compliant = true; // TODO check if multicurrency merchant is compliant in PRE-2961
+		if ( !$Multicurrency_compliant && 'EUR' !== get_woocommerce_currency() ) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
