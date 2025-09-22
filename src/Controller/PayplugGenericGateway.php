@@ -83,7 +83,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			return false;
 		}
 
-		if (empty($options) || $options[$this->id] === 'no') {
+		if (empty($options) || empty($options[$this->id]) || $options[$this->id] === 'no') {
 			return false;
 		}
 
