@@ -34,6 +34,8 @@ vendor
 # unit tests
 tests
 
+# raw block files
+/src/Gateway/Blocks/
 /resources
 
 # Temporary files
