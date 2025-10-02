@@ -94,7 +94,7 @@ class Ajax {
 				'permission_callback' => function () use ($permission)  {return $permission ;},
 				'show_in_index' => false
 			) );
-			register_rest_route( 'payplug_api', '/one_click_permission/', array(
+			register_rest_route( 'payplug_api', '/one_click_permissions/', array(
 				'methods' => 'POST',
 				'callback' => [ $this, 'api_check_one_click_permission' ],
 				'permission_callback' => function () use ($permission)  {return $permission ;},
