@@ -33,6 +33,7 @@ class PayplugApplePay extends PayplugGenericBlock
 		$data['ajax_url_applepay_update_payment'] = \WC_AJAX::get_endpoint('applepay_update_payment');
 		$data['payplug_create_intent_payment'] = \WC_AJAX::get_endpoint('payplug_create_intent');
 		$data['is_cart'] = is_cart() && $this->gateway->get_button_cart() && !PayplugWoocommerceHelper::is_subscription();
+		$data['is_product'] = is_product() && $this->gateway->get_button_product() && !PayplugWoocommerceHelper::is_subscription();
 
 		$data['ajax_url_applepay_get_shippings'] = \WC_AJAX::get_endpoint('applepay_get_shippings');
 		$data['ajax_url_place_order_with_dummy_data'] = \WC_AJAX::get_endpoint('place_order_with_dummy_data');
@@ -40,6 +41,8 @@ class PayplugApplePay extends PayplugGenericBlock
 		$data['ajax_url_update_applepay_payment'] = \WC_AJAX::get_endpoint('update_applepay_payment');
 		$data['ajax_url_applepay_get_order_totals'] = \WC_AJAX::get_endpoint('applepay_get_order_totals');
 		$data['ajax_url_applepay_cancel_order'] = \WC_AJAX::get_endpoint('applepay_cancel_order');
+		$data['ajax_url_applepay_empty_cart'] = \WC_AJAX::get_endpoint('applepay_empty_cart');
+		$data['ajax_url_applepay_add_to_cart'] = \WC_AJAX::get_endpoint('applepay_add_to_cart');
 
 		$data['countryCode'] = WC()->customer !== null ? WC()->customer->get_billing_country() : "FR";
 		$data['currencyCode'] = get_woocommerce_currency();
@@ -82,7 +85,8 @@ class PayplugApplePay extends PayplugGenericBlock
 
 			//replace for the helper function when merged
 			if ( \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' ) ||
-			     \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' ) ) {
+			     \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' ) ||
+			     \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('product'), 'woocommerce/product' ) ) {
 
 				if( !empty($this->gateway) && $this->gateway->checkApplePay() && $this->gateway->isSSL() ){
 					return true;

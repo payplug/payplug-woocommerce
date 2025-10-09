@@ -11,12 +11,14 @@ class ApplePay {
 
 	public function __construct() {
 
-		//routes for apple_pay on cart
+		//routes for apple_pay on cart and product page
 		add_action( 'wc_ajax_applepay_get_shippings', [ $this, 'applepay_get_shippings' ] );
 		add_action( 'wc_ajax_place_order_with_dummy_data', [ $this, 'place_order_with_dummy_data' ] );
 		add_action( 'wc_ajax_update_applepay_order', [ $this, 'update_applepay_order' ] );
 		add_action( 'wc_ajax_update_applepay_payment', [ $this, 'update_applepay_payment' ] );
 		add_action( 'wc_ajax_applepay_cancel_order', [ $this, 'applepay_cancel_order' ] );
+		add_action( 'wc_ajax_applepay_empty_cart', [ $this, 'applepay_empty_cart' ] );
+		add_action( 'wc_ajax_applepay_add_to_cart', [ $this, 'applepay_add_to_cart' ] );
 	}
 
 	public function applepay_get_shippings() {
@@ -42,7 +44,7 @@ class ApplePay {
 					$shipping_rate = $rates[$shipping_method->get_rate_id()];
 
 					array_push($shippings, [
-						'identifier' => $shipping_method->id,
+						'identifier' => $shipping_method->id.'_'.$shipping_method->instance_id,
 						'label' => $shipping_method->method_title,
 						'detail' => strip_tags($shipping_method->method_description),
 						'amount' =>$shipping_rate->get_cost()+$shipping_rate->get_shipping_tax()
@@ -88,7 +90,6 @@ class ApplePay {
 		}
 
 		$cart = WC()->cart;
-
 
 		if ( ! $cart->is_empty() ) {
 			try{
@@ -191,7 +192,7 @@ class ApplePay {
 		wp_send_json([
 			'total' => $amount,
 			'order_id' => $order_id,
-			'payment_data' => $gateway->process_standard_payment($order, $amount, $customer_id, 'cart')
+			'payment_data' => $gateway->process_standard_payment($order, $amount, $customer_id, 'product')
 		]);
 
 	}
@@ -284,18 +285,19 @@ class ApplePay {
 			$order->remove_item($item_id);
 		}
 
-
 		$shipping_zone = \WC_Shipping_Zones::get_zone_matching_package( $package );
 		if ( $shipping_zone && !empty( $selected_shipping_method ) ) {
 
 			$shipping_methods = $shipping_zone->get_shipping_methods( true );
+			$use_taxes = false;
 
 			foreach ( $shipping_methods as $shipping_method ) {
 				if ( ! $shipping_method->supports( 'shipping-zones' ) || ! $shipping_method->is_enabled() ) {
 					continue;
 				}
 
-				if ($shipping_method->id === $selected_shipping_method) {
+				$id_shipping_method = $shipping_method->id.'_'.$shipping_method->instance_id;
+				if ($id_shipping_method === $selected_shipping_method) {
 
 					$shipping_method->calculate_shipping( $package );
 					$rates = $shipping_method->get_rates_for_package($package);
@@ -303,15 +305,20 @@ class ApplePay {
 					if ( ! empty( $rates ) ) {
 
 						$rate = reset( $rates );
+
 						$item = new \WC_Order_Item_Shipping();
 						$item->set_method_title( $rate->get_label() );
 						$item->set_method_id( $rate->get_id() );
 						$item->set_total( $rate->get_cost() );
 
+						if (!empty($rate->taxes)) {
+							$use_taxes = true;
+						}
 						$shipping_taxes = \WC_Tax::calc_shipping_tax(
-							$rate->cost,
-							\WC_Tax::get_shipping_tax_rates()
+							$rate->get_cost(),
+							$rate->get_taxes()
 						);
+
 						$item->set_taxes( [
 							'total' => $shipping_taxes,
 						] );
@@ -327,8 +334,7 @@ class ApplePay {
 			}
 		}
 
-		$order->calculate_taxes();
-		$order->calculate_totals();
+		$order->calculate_totals($use_taxes);
 		$order->save();
 
 		wp_send_json($order);
@@ -347,8 +353,7 @@ class ApplePay {
 		$payment_id = $_POST['payment_id'];
 		$order_id = $_POST['order_id'];
 		$payment_token = $_POST['payment_token'];
-		$amount = $_POST['amount']/100;
-
+		$amount = $_POST['amount'];
 
 		$payment = \Payplug\Payment::retrieve($payment_id);
 
@@ -433,6 +438,38 @@ class ApplePay {
 		}
 
 
+	}
+
+	public function applepay_empty_cart() {
+		try {
+			WC()->cart->empty_cart();
+			wp_send_json_success();
+		} catch (\Exception $e) {
+			wp_send_json_error([
+				'message' => __('Your order was cancelled.', 'woocommerce')
+			]);
+		}
+	}
+
+	public function applepay_add_to_cart() {
+		try {
+			if (!empty($_POST['product_id'])) {
+				$product_id = $_POST['product_id'];
+			} else {
+				$product_id = $_POST['product_variation_id'];
+			}
+
+			$product_quantity = !empty($_POST['product_quantity']) ? $_POST['product_quantity'] : 1;
+
+			WC()->cart->add_to_cart($product_id, $product_quantity);
+			wp_send_json_success([
+				'total' => WC()->cart->total
+			]);
+		} catch (\Exception $e) {
+			wp_send_json_error([
+				'message' => __('Your order was cancelled.', 'woocommerce')
+			]);
+		}
 	}
 
 }
