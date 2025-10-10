@@ -375,7 +375,6 @@ class PayplugWoocommerceRequest {
 	}
 
 	public function create_payment_intent(){
-
 		$order_id = $_POST["order_id"];
 		$this->gateway = $this->get_payplug_gateway($_POST['gateway']);
 		$order       = wc_get_order($order_id);
@@ -430,8 +429,7 @@ class PayplugWoocommerceRequest {
 			$payment_data['integration'] = 'INTEGRATED_PAYMENT';
 			unset($payment_data['hosted_payment']['cancel_url']);
 		}
-
-		if($this->gateway->payment_method === 'popup' && $this->gateway->id === "american_express") {
+		if($this->gateway->get_option('payment_method') === 'popup' && $this->gateway->id === "american_express") {
 			$payment_data['payment_method'] = $this->gateway->id;
 		}
 
