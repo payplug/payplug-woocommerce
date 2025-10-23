@@ -27,6 +27,22 @@ export const getPayment = (props, order_id) => {
 	}
 };
 
+export const apple_pay_get_shippings = (data) => {
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			type: 'POST',
+			data: data,
+			url: settings.ajax_url_applepay_get_shippings
+		}).success(function (response) {
+			resolve(response);
+
+		}).error(function (xhr, status, error) {
+			reject(error); // NOT WORKING!!
+
+		});
+	});
+}
+
 export const apple_pay_update_payment = (data) => {
 	return new Promise((resolve, reject) => {
 		$.ajax({
