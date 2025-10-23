@@ -206,6 +206,7 @@ const ExpressContent = (props) => {
 		<>
 			<div id="apple-pay-button-wrapper">
 				<apple-pay-button
+					id="apple-pay-button"
 					buttonstyle="black"
 					type="pay"
 					locale={settings?.payplug_locale}

@@ -126,43 +126,6 @@ class ApplePay {
 
 				WC()->shipping()->reset_shipping();
 
-				foreach ( $packages as $package_key => $package ) {
-
-					$shipping_methods = $this->get_shipping_methods_from_package($package);
-
-					foreach ( $shipping_methods as $shipping_method ) {
-
-						if ( ! $shipping_method->supports( 'shipping-zones' ) || ! $shipping_method->is_enabled() ) {
-							continue;
-						}
-
-						if($this->checkApplePayShipping($shipping_method)) {
-							$shipping_method->calculate_shipping($package);
-							$rates = $shipping_method->get_rates_for_package($package);
-							if (!empty($rates)) {
-								$rate = reset($rates);
-								$shipping = new \WC_Order_Item_Shipping();
-								$shipping->set_method_title($rate->get_label());
-								$shipping->set_method_id($rate->get_id());
-								$shipping->set_total($rate->get_cost());
-
-								$shipping_taxes = \WC_Tax::calc_shipping_tax(
-									$rate->cost,
-									\WC_Tax::get_shipping_tax_rates()
-								);
-
-								$shipping->set_taxes([
-									'total' => $shipping_taxes
-								]);
-
-								$shipping->save();
-								$order->add_item($shipping);
-								break;
-							}
-						}
-					}
-				}
-
 				$order->calculate_taxes();
 
 				$order->calculate_totals();
@@ -463,7 +426,7 @@ class ApplePay {
 
 			WC()->cart->add_to_cart($product_id, $product_quantity);
 			wp_send_json_success([
-				'total' => WC()->cart->total
+				'total' => WC()->cart->total - WC()->cart->shipping_total
 			]);
 		} catch (\Exception $e) {
 			wp_send_json_error([

@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { getSetting } from '@woocommerce/settings';
-import { apple_pay_CancelOrder, apple_pay_Payment, apple_pay_PlaceOrderWithDummyData, apple_pay_UpdateOrder} from "./helper/wc-payplug-apple_pay-requests";
+import { apple_pay_CancelOrder, apple_pay_Payment, apple_pay_PlaceOrderWithDummyData, apple_pay_UpdateOrder, apple_pay_get_shippings} from "./helper/wc-payplug-apple_pay-requests";
 const settings = getSetting( 'apple_pay_data', {} );
 
 const ApplePayCart = ( props ) =>{
 
 	let session = null;
 	let apple_pay_Session_status = null;
+	let apple_pay_carriers = [];
 	const apple_pay_wrapper = jQuery("#apple-pay-button-wrapper");
 	const apple_pay = {
 		load_order_total: false,
@@ -31,7 +32,7 @@ const ApplePayCart = ( props ) =>{
 				"total": {
 					"label": "Apple Pay",
 					"type": "final",
-					"amount": settings.total_amount/100
+					"amount": parseFloat(settings.total_amount/100)
 				},
 				'applicationData': btoa(JSON.stringify({
 					'apple_pay_domain': settings.apple_pay_domain
@@ -49,12 +50,10 @@ const ApplePayCart = ( props ) =>{
 			];
 
 			if (settings.payplug_apple_pay_shipping_required) {
-
-				request.shippingMethods = settings.payplug_carriers;
-
+				request.shippingMethods = apple_pay_carriers;
 			}
-			session = new ApplePaySession(3, request);
 
+			session = new ApplePaySession(4, request);
 		},
 		CancelOrder: function () {
 			session.oncancel = event => {
@@ -84,7 +83,7 @@ const ApplePayCart = ( props ) =>{
 
 				const update = {
 					newTotal: {
-						label: 'Total',
+						label: 'Apple Pay',
 						amount: newTotalAmount
 					},
 					newLineItems: [
@@ -159,29 +158,9 @@ const ApplePayCart = ( props ) =>{
 		})
 	}
 
-	jQuery(function ($) {
-		jQuery('apple-pay-button').on("click", (e) => {
-			e.preventDefault();
-			e.stopImmediatePropagation();
-			disabled_button();
-
-			apple_pay.CreateSession();
-			apple_pay.CancelOrder();
-			apple_pay_PlaceOrderWithDummyData().then(async (response) => {
-				if (response.success === false) {
-					apple_pay.AddErrorMessage(response.data.message)
-					apple_pay.DeleteErrorMessage();
-					enabled_button();
-					return;
-				}
-				settings.total = response.total
-				apple_pay.OrderPaymentCreated(response);
-
-				await CheckPaymentOnPaymentAuthorized().then((res) => {
-					window.location = session.return_url
-				});
-
-			});
+	jQuery( document ).ready(function ($) {
+		apple_pay_get_shippings().then((result_shippings) => {
+			apple_pay_carriers = result_shippings.data;
 		});
 	});
 
@@ -192,6 +171,40 @@ const ApplePayCart = ( props ) =>{
 	function enabled_button(){
 		jQuery('apple-pay-button').removeClass("isDisabled");
 	}
+
+	useEffect(() => {
+		const btn = document.getElementById('apple-pay-button');
+		if (btn) {
+		  	btn.addEventListener('click', (e) => {
+				e.preventDefault();
+				e.stopImmediatePropagation();
+				disabled_button();
+
+				apple_pay.CreateSession();
+				apple_pay.CancelOrder();
+				apple_pay_PlaceOrderWithDummyData().then(async (response) => {
+					if (response.success === false) {
+						apple_pay.AddErrorMessage(response.data.message)
+						apple_pay.DeleteErrorMessage();
+						enabled_button();
+						return;
+					}
+					settings.total = response.total
+					apple_pay.OrderPaymentCreated(response);
+
+					await CheckPaymentOnPaymentAuthorized().then((res) => {
+						window.location = session.return_url
+					});
+
+				});
+		  	});
+		}
+		return () => {
+		  	if (btn) {
+				btn.removeEventListener('click', () => {});
+		  	}
+		};
+	}, []);
 
 	return (<> </>);
 }

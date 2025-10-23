@@ -247,7 +247,7 @@ class PayplugWoocommerceRequest {
 
 			WC()->cart->add_to_cart($product_id, $product_quantity);
 			wp_send_json_success([
-				'total' => WC()->cart->total
+				'total' => WC()->cart->total - WC()->cart->shipping_total
 			]);
 		} catch (\Exception $e) {
 			wp_send_json_error([
@@ -375,6 +375,7 @@ class PayplugWoocommerceRequest {
 	}
 
 	public function create_payment_intent(){
+
 		$order_id = $_POST["order_id"];
 		$this->gateway = $this->get_payplug_gateway($_POST['gateway']);
 		$order       = wc_get_order($order_id);
@@ -424,11 +425,12 @@ class PayplugWoocommerceRequest {
 			$payment_data["metadata"]["applepay_workflow"] = "checkout";
 		}
 
-		if($this->gateway->payment_method === 'integrated' && $this->gateway->id === "payplug") {
+		if($this->gateway->get_option('payment_method') === 'integrated' && $this->gateway->id === "payplug") {
 			$payment_data['initiator'] = 'PAYER';
 			$payment_data['integration'] = 'INTEGRATED_PAYMENT';
 			unset($payment_data['hosted_payment']['cancel_url']);
 		}
+
 		if($this->gateway->get_option('payment_method') === 'popup' && $this->gateway->id === "american_express") {
 			$payment_data['payment_method'] = $this->gateway->id;
 		}

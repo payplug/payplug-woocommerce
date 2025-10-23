@@ -131,7 +131,7 @@
 				"total": {
 					"label": "Apple Pay",
 					"type": "final",
-					"amount": apple_pay_params.total
+					"amount": parseFloat(apple_pay_params.total) + parseFloat(apple_pay_params.cart_shipping)
 				},
 				'shippingMethods': apple_pay_params.carriers,
 				'applicationData': btoa(JSON.stringify({
@@ -174,7 +174,7 @@
 
 				const update = {
 					newTotal: {
-						label: 'Total',
+						label: 'Apple Pay',
 						amount: parseFloat(newTotalAmount)
 					},
 					newLineItems: [
