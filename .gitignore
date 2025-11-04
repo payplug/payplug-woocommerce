@@ -34,6 +34,8 @@ vendor
 # unit tests
 tests
 
+/resources
+
 # Temporary files
 *~
 /cypress/
