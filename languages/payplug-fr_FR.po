@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.6\n"
+"X-Generator: Poedit 3.7\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1200,13 +1200,13 @@ msgid "applepay_active_carriers_instructions"
 msgstr "Veuillez sélectionner les méthodes de livraison qui ne sont pas des points de collecte."
 
 msgid "applepay_cart_checkout_option_validation"
-msgstr "Impossible d'enregistrer la configuration. Merci de sélectionner au moins une page sur laquelle proposer Apple Pay : Page Checkout ou Page Panier."
+msgstr "Impossible d'enregistrer la configuration. Merci de sélectionner au moins une page sur laquelle proposer Apple Pay : Page Checkout, Page Panier ou Page Produit."
 
 msgid "applepay_cart_checkout_option_validation_title"
 msgstr "Impossible d'enregistrer la configuration."
 
 msgid "applepay_cart_carrier_enabled"
-msgstr "Merci de sélectionner au moins une méthode de livraison compatible pour Apple Pay Panier ou désactivez la fonctionnalité."
+msgstr "Merci de sélectionner au moins une méthode de livraison compatible pour Apple Pay Panier et Apple Pay Produit ou désactivez la fonctionnalité."
 
 msgid "payplug_required_fields_error"
 msgstr "Veuillez remplir tous les champs requis."

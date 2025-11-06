@@ -10,31 +10,26 @@
  * Do not modify this file directly!
  */
 
-
-return array (
-  'id' => '',
-  'countryCode' => 95,
-  'internationalPrefix' => '',
-  'sameMobileAndFixedLinePattern' => false,
-  'numberFormat' => 
-  array (
-    0 => 
-    array (
-      'pattern' => '(\\d)(\\d{4})(\\d{5})',
-      'format' => '$1 $2 $3',
-      'leadingDigitsPatterns' => 
-      array (
-        0 => '92',
-      ),
-      'nationalPrefixFormattingRule' => '',
-      'domesticCarrierCodeFormattingRule' => '',
-      'nationalPrefixOptionalWhenFormatting' => false,
-    ),
-  ),
-  'intlNumberFormat' => 
-  array (
-  ),
-  'mainCountryForCode' => false,
-  'leadingZeroPossible' => false,
-  'mobileNumberPortableRegion' => false,
-);
+return [
+    'id' => '',
+    'countryCode' => 95,
+    'internationalPrefix' => '',
+    'sameMobileAndFixedLinePattern' => false,
+    'numberFormat' => [
+        0 => [
+            'pattern' => '(\\d)(\\d{4})(\\d{5})',
+            'format' => '$1 $2 $3',
+            'leadingDigitsPatterns' => [
+                0 => '92',
+            ],
+            'nationalPrefixFormattingRule' => '',
+            'domesticCarrierCodeFormattingRule' => '',
+            'nationalPrefixOptionalWhenFormatting' => false,
+        ],
+    ],
+    'intlNumberFormat' => [
+    ],
+    'mainCountryForCode' => false,
+    'leadingZeroPossible' => false,
+    'mobileNumberPortableRegion' => false,
+];

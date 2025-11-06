@@ -42,32 +42,10 @@
 			).done(function(results){
 
 				if(results.data.length === 0){
-					//$apple_pay_button.remove();
 					apple_pay_params.carriers = [];
 					return;
 				}
 
-				selected_shipping = jQuery('[name^="shipping_method"]:checked').val();
-
-				//if there's only 1 shipping method available there is no radio
-				if(typeof selected_shipping === "undefined" ){
-					if( jQuery("ul#shipping_method li").length === 1 ){
-						selected_shipping = jQuery('[name^="shipping_method"]').val();
-					}
-				}
-
-				if(typeof selected_shipping === "undefined" ){
-					apple_pay_params.carriers = [];
-					return;
-				}
-
-				selected_shipping = selected_shipping.split(":");
-
-				results.data.map(function(v){
-					if(v.identifier === selected_shipping[0]){
-						v.selected = true;
-					}
-				});
 				apple_pay_params.carriers = results.data;
 			}).fail( function() {
 				$apple_pay_button.remove();
@@ -94,8 +72,6 @@
 					apple_pay.handle_process_error(results.data.order_id);
 					return;
 				}
-
-				apple_pay_params.total = results.total
 				apple_pay.OrderPaymentCreated(results);
 			});
 
@@ -127,7 +103,7 @@
 				"total": {
 					"label": "Apple Pay",
 					"type": "final",
-					"amount": apple_pay_params.total
+					"amount": parseFloat(apple_pay_params.total) + parseFloat(apple_pay_params.cart_shipping)
 				},
 				'shippingMethods': apple_pay_params.carriers,
 				'applicationData': btoa(JSON.stringify({
@@ -162,7 +138,7 @@
 				const shippingMethod = event.shippingMethod;
 				session.shippingMethod = shippingMethod.identifier;
 
-				const baseTotal = apple_pay_params.total/100 ;
+				const baseTotal = apple_pay_params.total ;
 				let currentShippingCost = shippingMethod.amount;
 
 				const newTotalAmount = parseFloat(baseTotal) + parseFloat(currentShippingCost);
@@ -170,8 +146,8 @@
 
 				const update = {
 					newTotal: {
-						label: 'Total',
-						amount: newTotalAmount
+						label: 'Apple Pay',
+						amount: parseFloat(newTotalAmount)
 					},
 					newLineItems: [
 						{
@@ -209,7 +185,6 @@
 						'shipping_method' : session.shippingMethod
 					}
 				}).done(function (response) {
-
 					jQuery.ajax({
 						url: apple_pay_params.ajax_url_update_applepay_payment,
 						type: 'post',
@@ -219,7 +194,7 @@
 							'payment_id': session.payment_id,
 							'payment_token': event.payment.token,
 							'order_id': session.order_id,
-							'amount': session.amount
+							'amount': session.amount/100
 						},
 						dataType: 'json',
 						success:function(res) {
@@ -295,7 +270,3 @@
 	})
 
 })(jQuery)
-
-
-
-

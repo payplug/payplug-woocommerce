@@ -4,6 +4,7 @@ namespace libphonenumber;
 
 /**
  * Generic exception class for errors encountered when parsing phone numbers.
+ *
  * @author Lara Rennie
  */
 class NumberParseException extends \Exception
@@ -32,16 +33,16 @@ class NumberParseException extends \Exception
         $this->errorType = $errorType;
     }
 
+    public function __toString()
+    {
+        return 'Error type: ' . $this->errorType . '. ' . $this->message;
+    }
+
     /**
      * Returns the error type of the exception that has been thrown.
      */
     public function getErrorType()
     {
         return $this->errorType;
-    }
-
-    public function __toString()
-    {
-        return 'Error type: ' . $this->errorType . '. ' . $this->message;
     }
 }

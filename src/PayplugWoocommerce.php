@@ -3,8 +3,8 @@
 namespace Payplug\PayplugWoocommerce;
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+if (!defined('ABSPATH')) {
+    exit;
 }
 
 use Payplug\PayplugWoocommerce\Admin\Ajax;
@@ -12,226 +12,230 @@ use Payplug\PayplugWoocommerce\Admin\Metabox;
 use Payplug\PayplugWoocommerce\Admin\Notices;
 use Payplug\PayplugWoocommerce\Admin\SetupCallback;
 use Payplug\PayplugWoocommerce\Admin\WoocommerceActions;
-use Payplug\PayplugWoocommerce\Controller\ApplePay;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyAnimation;
-use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithFees;
-use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithoutFees;
-
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugAmex;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugApplePay;
-use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugCreditCard;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugBancontact;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugCreditCard;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugIdeal;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugMybank;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney3x;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney3xWithoutFees;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney4x;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney4xWithoutFees;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugSatispay;
-use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugIdeal;
 
-class PayplugWoocommerce {
+class PayplugWoocommerce
+{
+    /**
+     * PayPlug admin notices.
+     *
+     * @var Notices
+     */
+    public $notices;
 
-	/**
-	 * @var PayplugWoocommerce
-	 */
-	private static $instance;
+    /**
+     * PayPlug metabox.
+     *
+     * @var Metabox
+     */
+    public $metabox;
 
-	/**
-	 * PayPlug admin notices
-	 *
-	 * @var Notices
-	 */
-	public $notices;
+    /**
+     * Custom woocommerce actions.
+     *
+     * @var WoocommerceActions
+     */
+    public $actions;
 
-	/**
-	 * PayPlug metabox
-	 *
-	 * @var Metabox
-	 */
-	public $metabox;
+    /**
+     * @var PayplugWoocommerceRequest
+     */
+    public $requests;
 
-	/**
-	 * Custom woocommerce actions
-	 *
-	 * @var WoocommerceActions
-	 */
-	public $actions;
+    /**
+     * Ajax actions handler.
+     *
+     * @var Ajax
+     */
+    public $ajax;
 
-	/**
-	 * @var PayplugWoocommerceRequest
-	 */
-	public $requests;
+    /**
+     * PayPlug Setup authentifications.
+     *
+     * @var SetupCallback
+     */
+    public $setup_callback;
 
-	/**
-	 * Ajax actions handler
-	 *
-	 * @var Ajax
-	 */
-	public $ajax;
+    /**
+     * @var PayplugWoocommerce
+     */
+    private static $instance;
 
-	/**
-	 * PayPlug Setup authentifications.
-	 *
-	 * @var SetupCallback
-	 */
-	public $setup_callback;
-
-	/**
-	 * Get the singleton instance.
-	 *
-	 * @return PayplugWoocommerce
-	 */
-	public static function get_instance() {
-		if ( is_null( self::$instance ) ) {
-			self::$instance = new static();
-		}
-
-		return self::$instance;
-	}
-
-	/**
-	 * Singleton instance can't be cloned.
-	 */
-	private function __clone() {
-	}
-
-	/**
-	 * Singleton instance can't be serialized.
-	 */
-	public function __wakeup() {
-	}
-
-	/**
-	 * PayplugWoocommerce constructor.
-	 */
-	private function __construct() {
-
-		// Bail early if WooCommerce is not activated
-		if ( ! defined( 'WC_VERSION' ) ) {
-			add_action( 'admin_notices', function () {
-				?>
+    /**
+     * PayplugWoocommerce constructor.
+     */
+    private function __construct()
+    {
+        // Bail early if WooCommerce is not activated
+        if (!defined('WC_VERSION')) {
+            add_action('admin_notices', function () {
+                ?>
 				<div id="message" class="notice notice-error">
-					<p><?php _e( 'PayPlug requires an active version of WooCommerce', 'payplug' ); ?></p>
+					<p><?php _e('PayPlug requires an active version of WooCommerce', 'payplug'); ?></p>
 				</div>
 				<?php
-			} );
+            });
 
-			return;
-		}
+            return;
+        }
 
-		if ( PayplugWoocommerceHelper::is_pre_30() ) {
-			require_once PAYPLUG_GATEWAY_PLUGIN_DIR . '/woocommerce-compat.php';
-		}
+        if (PayplugWoocommerceHelper::is_pre_30()) {
+            require_once PAYPLUG_GATEWAY_PLUGIN_DIR . '/woocommerce-compat.php';
+        }
 
-		$this->notices  = new Notices();
-		$this->metabox  = new Metabox();
-		$this->actions  = new WoocommerceActions();
-		$this->requests = new PayplugWoocommerceRequest();
-		new Front\ApplePay();
-		$this->ajax     = new Ajax();
+        $this->notices = new Notices();
+        $this->metabox = new Metabox();
+        $this->actions = new WoocommerceActions();
+        $this->requests = new PayplugWoocommerceRequest();
+        new Front\ApplePay();
+        $this->ajax = new Ajax();
 
-		$this->setup_callback = new SetupCallback();
+        $this->setup_callback = new SetupCallback();
 
-		if( PayplugWoocommerceHelper::show_oney_popup() ) {
-			$this->animationHandlers();
-		}
+        if (PayplugWoocommerceHelper::show_oney_popup()) {
+            $this->animationHandlers();
+        }
 
-		add_action( 'woocommerce_payment_gateways', [ $this, 'register_payplug_gateway' ] );
+        add_action('woocommerce_payment_gateways', [$this, 'register_payplug_gateway']);
 
-		// Registers WooCommerce Blocks integration.
-		add_action( 'woocommerce_blocks_loaded', [$this, 'woocommerce_gateways_block_support'] );
+        // Registers WooCommerce Blocks integration.
+        add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_gateways_block_support']);
 
-		add_filter( 'plugin_action_links_' . PAYPLUG_GATEWAY_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
-	}
+        add_filter('plugin_action_links_' . PAYPLUG_GATEWAY_PLUGIN_BASENAME, [$this, 'plugin_action_links']);
+    }
 
-	/**
-	 * Register PayPlug gateway.
-	 *
-	 * @param $methods
-	 *
-	 * @return array
-	 */
-	public function register_payplug_gateway( $methods ) {
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugCreditCard';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3x';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4x';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3xWithoutFees';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4xWithoutFees';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\Bancontact';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\AmericanExpress';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Mybank';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Ideal';
-		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Satispay';
+    /**
+     * Singleton instance can't be cloned.
+     */
+    private function __clone()
+    {
+    }
 
-		$methods[] = __NAMESPACE__ . '\\Controller\\ApplePay';
+    /**
+     * Singleton instance can't be serialized.
+     */
+    public function __wakeup()
+    {
+    }
 
-		return $methods;
-	}
+    /**
+     * Get the singleton instance.
+     *
+     * @return PayplugWoocommerce
+     */
+    public static function get_instance()
+    {
+        if (is_null(self::$instance)) {
+            self::$instance = new static();
+        }
 
-	/**
-	 * Add additional action links.
-	 *
-	 * @param array $links
-	 *
-	 * @return array
-	 */
-	public function plugin_action_links( $links = [] ) {
-		$plugin_links = [
-			'<a href="' . esc_url( PayplugWoocommerceHelper::get_setting_link() ) . '">' . esc_html__( 'Settings', 'payplug' ) . '</a>',
-		];
+        return self::$instance;
+    }
 
-		return array_merge( $plugin_links, $links );
-	}
+    /**
+     * Register PayPlug gateway.
+     *
+     * @param $methods
+     *
+     * @return array
+     */
+    public function register_payplug_gateway($methods)
+    {
+        $methods[] = __NAMESPACE__ . '\\Gateway\\PayplugCreditCard';
+        $methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3x';
+        $methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4x';
+        $methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney3xWithoutFees';
+        $methods[] = __NAMESPACE__ . '\\Gateway\\PayplugGatewayOney4xWithoutFees';
+        $methods[] = __NAMESPACE__ . '\\Gateway\\Bancontact';
+        $methods[] = __NAMESPACE__ . '\\Gateway\\AmericanExpress';
+        $methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Mybank';
+        $methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Ideal';
+        $methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Satispay';
 
-	public function animationHandlers()
-	{
-		$options = get_option('woocommerce_payplug_settings', []);
+        $methods[] = __NAMESPACE__ . '\\Controller\\ApplePay';
 
-		//if live and don't have country setted on the option
-		if ( !isset($options['payplug_merchant_country']) ) {
-			$options['payplug_merchant_country'] = PayplugWoocommerceHelper::UpdateCountryOption($options);
-		}
+        return $methods;
+    }
 
-		//failsafe
-		if( empty($options['payplug_merchant_country']) || empty($options['oney_type']) ){
-			return ;
-		}
+    /**
+     * Add additional action links.
+     *
+     * @param array $links
+     *
+     * @return array
+     */
+    public function plugin_action_links($links = [])
+    {
+        $plugin_links = [
+            '<a href="' . esc_url(PayplugWoocommerceHelper::get_setting_link()) . '">' . esc_html__('Settings', 'payplug') . '</a>',
+        ];
 
-		if( !class_exists( "\\Payplug\\PayplugWoocommerce\\Front\\PayplugOney\\Country\\Oney" .$options['payplug_merchant_country'] )){
-			return ;
-		}
+        return array_merge($plugin_links, $links);
+    }
 
-		Switch($options['oney_type']){
-			case "without_fees" : $class = "PayplugGatewayOney3xWithoutFees";break;
-			default: $class = "PayplugGatewayOney3x"; break;
-		}
-		new OneyAnimation( $options['oney_type'], $class );
-	}
+    public function animationHandlers()
+    {
+        $options = get_option('woocommerce_payplug_settings', []);
 
-	/**
-	 * Registers WooCommerce Blocks integration.
-	 *
-	 */
-	public function woocommerce_gateways_block_support(){
-		if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+        //if live and don't have country setted on the option
+        if (!isset($options['payplug_merchant_country'])) {
+            $options['payplug_merchant_country'] = PayplugWoocommerceHelper::UpdateCountryOption($options);
+        }
 
-			add_action(
-				'woocommerce_blocks_payment_method_type_registration',
-				function( \Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
-					$payment_method_registry->register( new PayplugCreditCard() );
-					$payment_method_registry->register( new PayplugBancontact() );
-					$payment_method_registry->register( new PayplugSatispay() );
-					$payment_method_registry->register( new PayplugAmex() );
-					$payment_method_registry->register( new PayplugIdeal() );
-					$payment_method_registry->register( new PayplugMybank() );
-					$payment_method_registry->register( new PayplugApplePay() );
-					$payment_method_registry->register( new PayplugOney3x() );
-					$payment_method_registry->register( new PayplugOney4x() );
-					$payment_method_registry->register( new PayplugOney3xWithoutFees() );
-					$payment_method_registry->register( new PayplugOney4xWithoutFees() );
-				}
-			);
-		}
-	}
+        //failsafe
+        if (empty($options['payplug_merchant_country']) || empty($options['oney_type'])) {
+            return;
+        }
 
+        if (!class_exists('\\Payplug\\PayplugWoocommerce\\Front\\PayplugOney\\Country\\Oney' . $options['payplug_merchant_country'])) {
+            return;
+        }
+
+        switch ($options['oney_type']) {
+            case 'without_fees' : $class = 'PayplugGatewayOney3xWithoutFees';
+
+break;
+
+            default: $class = 'PayplugGatewayOney3x';
+
+break;
+        }
+        new OneyAnimation($options['oney_type'], $class);
+    }
+
+    /**
+     * Registers WooCommerce Blocks integration.
+     */
+    public function woocommerce_gateways_block_support()
+    {
+        if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
+            add_action(
+                'woocommerce_blocks_payment_method_type_registration',
+                function (\Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
+                    $payment_method_registry->register(new PayplugCreditCard());
+                    $payment_method_registry->register(new PayplugBancontact());
+                    $payment_method_registry->register(new PayplugSatispay());
+                    $payment_method_registry->register(new PayplugAmex());
+                    $payment_method_registry->register(new PayplugIdeal());
+                    $payment_method_registry->register(new PayplugMybank());
+                    $payment_method_registry->register(new PayplugApplePay());
+                    $payment_method_registry->register(new PayplugOney3x());
+                    $payment_method_registry->register(new PayplugOney4x());
+                    $payment_method_registry->register(new PayplugOney3xWithoutFees());
+                    $payment_method_registry->register(new PayplugOney4xWithoutFees());
+                }
+            );
+        }
+    }
 }

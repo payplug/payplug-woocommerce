@@ -3,7 +3,7 @@
 namespace libphonenumber;
 
 /**
- * Phone Number Description
+ * Phone Number Description.
  */
 class PhoneNumberDesc
 {
@@ -63,7 +63,7 @@ class PhoneNumberDesc
 
     public function clearPossibleLength()
     {
-        $this->possibleLength = array();
+        $this->possibleLength = [];
     }
 
     /**
@@ -91,11 +91,11 @@ class PhoneNumberDesc
 
     public function clearPossibleLengthLocalOnly()
     {
-        $this->possibleLengthLocalOnly = array();
+        $this->possibleLengthLocalOnly = [];
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function hasNationalNumberPattern()
     {
@@ -112,6 +112,7 @@ class PhoneNumberDesc
 
     /**
      * @param string $value
+     *
      * @return PhoneNumberDesc
      */
     public function setNationalNumberPattern($value)
@@ -129,6 +130,7 @@ class PhoneNumberDesc
     {
         $this->hasNationalNumberPattern = false;
         $this->nationalNumberPattern = '';
+
         return $this;
     }
 
@@ -150,6 +152,7 @@ class PhoneNumberDesc
 
     /**
      * @param string $value
+     *
      * @return PhoneNumberDesc
      */
     public function setExampleNumber($value)
@@ -172,7 +175,6 @@ class PhoneNumberDesc
     }
 
     /**
-     * @param PhoneNumberDesc $other
      * @return PhoneNumberDesc
      */
     public function mergeFrom(PhoneNumberDesc $other)
@@ -190,13 +192,12 @@ class PhoneNumberDesc
     }
 
     /**
-     * @param PhoneNumberDesc $other
-     * @return boolean
+     * @return bool
      */
     public function exactlySameAs(PhoneNumberDesc $other)
     {
-        return $this->nationalNumberPattern === $other->nationalNumberPattern &&
-        $this->exampleNumber === $other->exampleNumber;
+        return $this->nationalNumberPattern === $other->nationalNumberPattern
+        && $this->exampleNumber === $other->exampleNumber;
     }
 
     /**
@@ -204,7 +205,7 @@ class PhoneNumberDesc
      */
     public function toArray()
     {
-        $data = array();
+        $data = [];
         if ($this->hasNationalNumberPattern()) {
             $data['NationalNumberPattern'] = $this->getNationalNumberPattern();
         }
@@ -219,15 +220,14 @@ class PhoneNumberDesc
     }
 
     /**
-     * @param array $input
      * @return PhoneNumberDesc
      */
     public function fromArray(array $input)
     {
-        if (isset($input['NationalNumberPattern']) && $input['NationalNumberPattern'] != '') {
+        if (isset($input['NationalNumberPattern']) && '' != $input['NationalNumberPattern']) {
             $this->setNationalNumberPattern($input['NationalNumberPattern']);
         }
-        if (isset($input['ExampleNumber']) && $input['NationalNumberPattern'] != '') {
+        if (isset($input['ExampleNumber']) && '' != $input['NationalNumberPattern']) {
             $this->setExampleNumber($input['ExampleNumber']);
         }
         $this->setPossibleLength($input['PossibleLength']);

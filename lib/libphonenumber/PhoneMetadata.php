@@ -3,8 +3,8 @@
 namespace libphonenumber;
 
 /**
- * Class PhoneMetadata
- * @package libphonenumber
+ * Class PhoneMetadata.
+ *
  * @internal Used internally, and can change at any time
  */
 class PhoneMetadata
@@ -35,7 +35,7 @@ class PhoneMetadata
     protected $premiumRate;
     protected $fixedLine;
     protected $sameMobileAndFixedLinePattern = false;
-    protected $numberFormat = array();
+    protected $numberFormat = [];
     protected $tollFree;
     protected $sharedCost;
     protected $personalNumber;
@@ -65,35 +65,34 @@ class PhoneMetadata
      */
     protected $noInternationalDialling;
     /**
-     *
      * @var NumberFormat[]
      */
-    protected $intlNumberFormat = array();
+    protected $intlNumberFormat = [];
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function hasId()
     {
-        return $this->id !== null;
+        return null !== $this->id;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function hasCountryCode()
     {
-        return $this->countryCode !== null;
+        return null !== $this->countryCode;
     }
 
     public function hasInternationalPrefix()
     {
-        return $this->internationalPrefix !== null;
+        return null !== $this->internationalPrefix;
     }
 
     public function hasMainCountryForCode()
     {
-        return $this->mainCountryForCode !== null;
+        return null !== $this->mainCountryForCode;
     }
 
     public function isMainCountryForCode()
@@ -109,28 +108,30 @@ class PhoneMetadata
     public function setMainCountryForCode($value)
     {
         $this->mainCountryForCode = $value;
+
         return $this;
     }
 
     public function clearMainCountryForCode()
     {
         $this->mainCountryForCode = false;
+
         return $this;
     }
 
     public function hasLeadingZeroPossible()
     {
-        return $this->leadingZeroPossible !== null;
+        return null !== $this->leadingZeroPossible;
     }
 
     public function hasMobileNumberPortableRegion()
     {
-        return $this->mobileNumberPortableRegion !== null;
+        return null !== $this->mobileNumberPortableRegion;
     }
 
     public function hasSameMobileAndFixedLinePattern()
     {
-        return $this->sameMobileAndFixedLinePattern !== null;
+        return null !== $this->sameMobileAndFixedLinePattern;
     }
 
     public function numberFormatSize()
@@ -140,6 +141,7 @@ class PhoneMetadata
 
     /**
      * @param int $index
+     *
      * @return NumberFormat
      */
     public function getNumberFormat($index)
@@ -159,13 +161,14 @@ class PhoneMetadata
 
     public function clearIntlNumberFormat()
     {
-        $this->intlNumberFormat = array();
+        $this->intlNumberFormat = [];
+
         return $this;
     }
 
     public function toArray()
     {
-        $output = array();
+        $output = [];
 
         if ($this->hasGeneralDesc()) {
             $output['generalDesc'] = $this->getGeneralDesc()->toArray();
@@ -272,12 +275,12 @@ class PhoneMetadata
             $output['sameMobileAndFixedLinePattern'] = $this->getSameMobileAndFixedLinePattern();
         }
 
-        $output['numberFormat'] = array();
+        $output['numberFormat'] = [];
         foreach ($this->numberFormats() as $numberFormat) {
             $output['numberFormat'][] = $numberFormat->toArray();
         }
 
-        $output['intlNumberFormat'] = array();
+        $output['intlNumberFormat'] = [];
         foreach ($this->intlNumberFormats() as $intlNumberFormat) {
             $output['intlNumberFormat'][] = $intlNumberFormat->toArray();
         }
@@ -301,7 +304,7 @@ class PhoneMetadata
 
     public function hasGeneralDesc()
     {
-        return $this->generalDesc !== null;
+        return null !== $this->generalDesc;
     }
 
     /**
@@ -315,12 +318,13 @@ class PhoneMetadata
     public function setGeneralDesc(PhoneNumberDesc $value)
     {
         $this->generalDesc = $value;
+
         return $this;
     }
 
     public function hasFixedLine()
     {
-        return $this->fixedLine !== null;
+        return null !== $this->fixedLine;
     }
 
     /**
@@ -334,12 +338,13 @@ class PhoneMetadata
     public function setFixedLine(PhoneNumberDesc $value)
     {
         $this->fixedLine = $value;
+
         return $this;
     }
 
     public function hasMobile()
     {
-        return $this->mobile !== null;
+        return null !== $this->mobile;
     }
 
     /**
@@ -353,12 +358,13 @@ class PhoneMetadata
     public function setMobile(PhoneNumberDesc $value)
     {
         $this->mobile = $value;
+
         return $this;
     }
 
     public function hasTollFree()
     {
-        return $this->tollFree !== null;
+        return null !== $this->tollFree;
     }
 
     /**
@@ -372,12 +378,13 @@ class PhoneMetadata
     public function setTollFree(PhoneNumberDesc $value)
     {
         $this->tollFree = $value;
+
         return $this;
     }
 
     public function hasPremiumRate()
     {
-        return $this->premiumRate !== null;
+        return null !== $this->premiumRate;
     }
 
     /**
@@ -391,12 +398,13 @@ class PhoneMetadata
     public function setPremiumRate(PhoneNumberDesc $value)
     {
         $this->premiumRate = $value;
+
         return $this;
     }
 
     public function hasSharedCost()
     {
-        return $this->sharedCost !== null;
+        return null !== $this->sharedCost;
     }
 
     /**
@@ -410,12 +418,13 @@ class PhoneMetadata
     public function setSharedCost(PhoneNumberDesc $value)
     {
         $this->sharedCost = $value;
+
         return $this;
     }
 
     public function hasPersonalNumber()
     {
-        return $this->personalNumber !== null;
+        return null !== $this->personalNumber;
     }
 
     /**
@@ -429,12 +438,13 @@ class PhoneMetadata
     public function setPersonalNumber(PhoneNumberDesc $value)
     {
         $this->personalNumber = $value;
+
         return $this;
     }
 
     public function hasVoip()
     {
-        return $this->voip !== null;
+        return null !== $this->voip;
     }
 
     /**
@@ -448,12 +458,13 @@ class PhoneMetadata
     public function setVoip(PhoneNumberDesc $value)
     {
         $this->voip = $value;
+
         return $this;
     }
 
     public function hasPager()
     {
-        return $this->pager !== null;
+        return null !== $this->pager;
     }
 
     /**
@@ -467,12 +478,13 @@ class PhoneMetadata
     public function setPager(PhoneNumberDesc $value)
     {
         $this->pager = $value;
+
         return $this;
     }
 
     public function hasUan()
     {
-        return $this->uan !== null;
+        return null !== $this->uan;
     }
 
     /**
@@ -486,12 +498,13 @@ class PhoneMetadata
     public function setUan(PhoneNumberDesc $value)
     {
         $this->uan = $value;
+
         return $this;
     }
 
     public function hasEmergency()
     {
-        return $this->emergency !== null;
+        return null !== $this->emergency;
     }
 
     /**
@@ -505,12 +518,13 @@ class PhoneMetadata
     public function setEmergency(PhoneNumberDesc $value)
     {
         $this->emergency = $value;
+
         return $this;
     }
 
     public function hasVoicemail()
     {
-        return $this->voicemail !== null;
+        return null !== $this->voicemail;
     }
 
     /**
@@ -524,12 +538,13 @@ class PhoneMetadata
     public function setVoicemail(PhoneNumberDesc $value)
     {
         $this->voicemail = $value;
+
         return $this;
     }
 
     public function hasShortCode()
     {
-        return $this->short_code !== null;
+        return null !== $this->short_code;
     }
 
     public function getShortCode()
@@ -540,12 +555,13 @@ class PhoneMetadata
     public function setShortCode(PhoneNumberDesc $value)
     {
         $this->short_code = $value;
+
         return $this;
     }
 
     public function hasStandardRate()
     {
-        return $this->standard_rate !== null;
+        return null !== $this->standard_rate;
     }
 
     public function getStandardRate()
@@ -556,12 +572,13 @@ class PhoneMetadata
     public function setStandardRate(PhoneNumberDesc $value)
     {
         $this->standard_rate = $value;
+
         return $this;
     }
 
     public function hasCarrierSpecific()
     {
-        return $this->carrierSpecific !== null;
+        return null !== $this->carrierSpecific;
     }
 
     public function getCarrierSpecific()
@@ -572,12 +589,13 @@ class PhoneMetadata
     public function setCarrierSpecific(PhoneNumberDesc $value)
     {
         $this->carrierSpecific = $value;
+
         return $this;
     }
 
     public function hasSmsServices()
     {
-        return $this->smsServices !== null;
+        return null !== $this->smsServices;
     }
 
     public function getSmsServices()
@@ -588,12 +606,13 @@ class PhoneMetadata
     public function setSmsServices(PhoneNumberDesc $value)
     {
         $this->smsServices = $value;
+
         return $this;
     }
 
     public function hasNoInternationalDialling()
     {
-        return $this->noInternationalDialling !== null;
+        return null !== $this->noInternationalDialling;
     }
 
     public function getNoInternationalDialling()
@@ -604,6 +623,7 @@ class PhoneMetadata
     public function setNoInternationalDialling(PhoneNumberDesc $value)
     {
         $this->noInternationalDialling = $value;
+
         return $this;
     }
 
@@ -617,11 +637,13 @@ class PhoneMetadata
 
     /**
      * @param string $value
+     *
      * @return PhoneMetadata
      */
     public function setId($value)
     {
         $this->id = $value;
+
         return $this;
     }
 
@@ -635,11 +657,13 @@ class PhoneMetadata
 
     /**
      * @param int $value
+     *
      * @return PhoneMetadata
      */
     public function setCountryCode($value)
     {
         $this->countryCode = $value;
+
         return $this;
     }
 
@@ -651,12 +675,13 @@ class PhoneMetadata
     public function setInternationalPrefix($value)
     {
         $this->internationalPrefix = $value;
+
         return $this;
     }
 
     public function hasPreferredInternationalPrefix()
     {
-        return ($this->preferredInternationalPrefix !== null);
+        return (null !== $this->preferredInternationalPrefix);
     }
 
     public function getPreferredInternationalPrefix()
@@ -667,18 +692,20 @@ class PhoneMetadata
     public function setPreferredInternationalPrefix($value)
     {
         $this->preferredInternationalPrefix = $value;
+
         return $this;
     }
 
     public function clearPreferredInternationalPrefix()
     {
         $this->preferredInternationalPrefix = null;
+
         return $this;
     }
 
     public function hasNationalPrefix()
     {
-        return $this->nationalPrefix !== null;
+        return null !== $this->nationalPrefix;
     }
 
     public function getNationalPrefix()
@@ -689,18 +716,20 @@ class PhoneMetadata
     public function setNationalPrefix($value)
     {
         $this->nationalPrefix = $value;
+
         return $this;
     }
 
     public function clearNationalPrefix()
     {
         $this->nationalPrefix = '';
+
         return $this;
     }
 
     public function hasPreferredExtnPrefix()
     {
-        return $this->preferredExtnPrefix !== null;
+        return null !== $this->preferredExtnPrefix;
     }
 
     public function getPreferredExtnPrefix()
@@ -711,18 +740,20 @@ class PhoneMetadata
     public function setPreferredExtnPrefix($value)
     {
         $this->preferredExtnPrefix = $value;
+
         return $this;
     }
 
     public function clearPreferredExtnPrefix()
     {
         $this->preferredExtnPrefix = '';
+
         return $this;
     }
 
     public function hasNationalPrefixForParsing()
     {
-        return $this->nationalPrefixForParsing !== null;
+        return null !== $this->nationalPrefixForParsing;
     }
 
     public function getNationalPrefixForParsing()
@@ -733,12 +764,13 @@ class PhoneMetadata
     public function setNationalPrefixForParsing($value)
     {
         $this->nationalPrefixForParsing = $value;
+
         return $this;
     }
 
     public function hasNationalPrefixTransformRule()
     {
-        return $this->nationalPrefixTransformRule !== null;
+        return null !== $this->nationalPrefixTransformRule;
     }
 
     public function getNationalPrefixTransformRule()
@@ -749,12 +781,14 @@ class PhoneMetadata
     public function setNationalPrefixTransformRule($value)
     {
         $this->nationalPrefixTransformRule = $value;
+
         return $this;
     }
 
     public function clearNationalPrefixTransformRule()
     {
         $this->nationalPrefixTransformRule = '';
+
         return $this;
     }
 
@@ -766,12 +800,14 @@ class PhoneMetadata
     public function setSameMobileAndFixedLinePattern($value)
     {
         $this->sameMobileAndFixedLinePattern = $value;
+
         return $this;
     }
 
     public function clearSameMobileAndFixedLinePattern()
     {
         $this->sameMobileAndFixedLinePattern = false;
+
         return $this;
     }
 
@@ -793,7 +829,7 @@ class PhoneMetadata
      */
     public function hasLeadingDigits()
     {
-        return $this->leadingDigits !== null;
+        return null !== $this->leadingDigits;
     }
 
     public function getLeadingDigits()
@@ -804,6 +840,7 @@ class PhoneMetadata
     public function setLeadingDigits($value)
     {
         $this->leadingDigits = $value;
+
         return $this;
     }
 
@@ -815,12 +852,14 @@ class PhoneMetadata
     public function setLeadingZeroPossible($value)
     {
         $this->leadingZeroPossible = $value;
+
         return $this;
     }
 
     public function clearLeadingZeroPossible()
     {
         $this->leadingZeroPossible = false;
+
         return $this;
     }
 
@@ -832,17 +871,18 @@ class PhoneMetadata
     public function setMobileNumberPortableRegion($value)
     {
         $this->mobileNumberPortableRegion = $value;
+
         return $this;
     }
 
     public function clearMobileNumberPortableRegion()
     {
         $this->mobileNumberPortableRegion = false;
+
         return $this;
     }
 
     /**
-     * @param array $input
      * @return PhoneMetadata
      */
     public function fromArray(array $input)
@@ -990,12 +1030,14 @@ class PhoneMetadata
     public function addNumberFormat(NumberFormat $value)
     {
         $this->numberFormat[] = $value;
+
         return $this;
     }
 
     public function addIntlNumberFormat(NumberFormat $value)
     {
         $this->intlNumberFormat[] = $value;
+
         return $this;
     }
 }

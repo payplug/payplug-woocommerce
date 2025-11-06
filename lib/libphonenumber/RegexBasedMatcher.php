@@ -3,8 +3,8 @@
 namespace libphonenumber;
 
 /**
- * Class RegexBasedMatcher
- * @package libphonenumber
+ * Class RegexBasedMatcher.
+ *
  * @internal
  */
 class RegexBasedMatcher implements MatcherAPIInterface
@@ -19,9 +19,9 @@ class RegexBasedMatcher implements MatcherAPIInterface
      * the national number pattern defined in the given {@code PhoneNumberDesc} message.
      *
      * @param string $number
-     * @param PhoneNumberDesc $numberDesc
-     * @param boolean $allowPrefixMatch
-     * @return boolean
+     * @param bool $allowPrefixMatch
+     *
+     * @return bool
      */
     public function matchNationalNumber($number, PhoneNumberDesc $numberDesc, $allowPrefixMatch)
     {
@@ -30,7 +30,7 @@ class RegexBasedMatcher implements MatcherAPIInterface
         // We don't want to consider it a prefix match when matching non-empty input against an empty
         // pattern
 
-        if (strlen($nationalNumberPattern) === 0) {
+        if (0 === strlen($nationalNumberPattern)) {
             return false;
         }
 
@@ -41,6 +41,7 @@ class RegexBasedMatcher implements MatcherAPIInterface
      * @param string $number
      * @param string $pattern
      * @param $allowPrefixMatch
+     *
      * @return bool
      */
     private function match($number, $pattern, $allowPrefixMatch)

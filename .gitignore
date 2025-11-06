@@ -41,3 +41,7 @@ tests
 # Temporary files
 *~
 /cypress/
+
+
+# Environment files
+.php-cs-fixer.cache
