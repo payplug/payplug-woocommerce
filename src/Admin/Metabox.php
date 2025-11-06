@@ -34,7 +34,7 @@ class Metabox {
 		global $post;
 
 		$screen = class_exists( '\Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController' ) && wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled()
-			? function_exists("wc_get_page_screen_id") ? wc_get_page_screen_id( 'shop-order' ) : "shop_order"
+			? function_exists('wc_get_page_screen_id') ? wc_get_page_screen_id( 'shop-order' ) : 'shop_order'
 			: 'shop_order';
 
 		add_meta_box(
@@ -59,7 +59,7 @@ class Metabox {
 			return;
 		}
 
-		if( !in_array($order->get_payment_method(), ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express', 'satispay', 'sofort', 'ideal', 'mybank'])){
+		if( !in_array($order->get_payment_method(), ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'applepay', 'american_express', 'satispay', 'sofort', 'ideal', 'mybank', 'wero', 'bizum'])){
 			return;
 		}
 
@@ -82,7 +82,7 @@ class Metabox {
 				</li>
 				<!-- PPRO methods don't have card brand info-->
 				<?php if( empty( $metadata['card_brand'] ) && $order->get_payment_method() != 'payplug' ){ ?>
-					<li><span><?php _e( 'payment_method', 'payplug' ); ?>:</span> <?php echo str_replace("_", " ",ucfirst($order->get_payment_method())); ?></li>
+					<li><span><?php _e( 'payment_method', 'payplug' ); ?>:</span> <?php echo str_replace('_', ' ',ucfirst($order->get_payment_method())); ?></li>
 				<?php } ?>
 				<li><span><?php _e( 'Amount', 'payplug' ); ?>
 						:</span> <?php echo wc_price( (int) $metadata['amount'] / 100 ); ?></li>

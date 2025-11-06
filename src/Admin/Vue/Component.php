@@ -13,9 +13,9 @@ class Component {
 	 */
 	public static function link( $text, $url, $target ) {
 		return [
-			"text"   => $text,
-			"url"    => $url,
-			"target" => $target
+			'text'   => $text,
+			'url'    => $url,
+			'target' => $target
 		];
 	}
 
