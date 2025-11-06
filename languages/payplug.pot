@@ -857,6 +857,36 @@ msgstr "iDEAL payments"
 msgid "payplug_ideal_more_url"
 msgstr "https://support.payplug.com/hc/en-gb/articles/8089119071132"
 
+msgid "payplug_wero_activate"
+msgstr "Wero payments"
+
+msgid "payplug_wero_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089119071132"
+
+msgid "payplug_section_wero_payment_description"
+msgstr "Allow your customers to pay via Wero."
+
+msgid "payplug_wero_unavailable_testmode_description"
+msgstr "Wero is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_wero_access_error"
+msgstr "You don't have access to this feature yet. To activate Wero, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248663314844' target='_blank'>the following form</a>"
+
+msgid "payplug_bizum_activate"
+msgstr "Bizum payments"
+
+msgid "payplug_bizum_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089119071132"
+
+msgid "payplug_section_bizum_payment_description"
+msgstr "Allow your customers to pay via Bizum."
+
+msgid "payplug_bizum_unavailable_testmode_description"
+msgstr "Bizum is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_bizum_access_error"
+msgstr "You don't have access to this feature yet. To activate Bizum, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248663314844' target='_blank'>the following form</a>"
+
 msgid "applepay_cart_checkout_option_validation"
 msgstr "Unable to save the configuration. Please select at least one page to offer Apple Pay: Checkout Page or Cart Page."
 

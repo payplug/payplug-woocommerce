@@ -11,10 +11,10 @@ class Lock
 	static function create_lock_table(){
 		global $wpdb;
 
-		$sql = "CREATE TABLE  IF NOT EXISTS `{$wpdb->base_prefix}woocommerce_payplug_lock` (";
-		$sql .= " `payment_id` VARCHAR(50) NOT NULL,";
-		$sql .= " `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,";
-		$sql .= " PRIMARY KEY (`payment_id`));";
+		$sql = 'CREATE TABLE  IF NOT EXISTS `{$wpdb->base_prefix}woocommerce_payplug_lock` (';
+		$sql .= ' `payment_id` VARCHAR(50) NOT NULL,';
+		$sql .= ' `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,';
+		$sql .= ' PRIMARY KEY (`payment_id`));';
 
 		$table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';

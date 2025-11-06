@@ -6,6 +6,7 @@ namespace Payplug\PayplugWoocommerce;
 use Payplug\PayplugWoocommerce\Controller\WC_Payplug_Intent_Controller as PayplugIntent;
 use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
+use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 use WC_Payment_Tokens;
 use WP_REST_Request;
 use Automattic\WooCommerce\Utilities\OrderUtil;
@@ -20,6 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class PayplugWoocommerceRequest {
 
+	use ServiceGetter;
+
 	/**
 	 * Gateway settings.
 	 *
@@ -32,12 +35,16 @@ class PayplugWoocommerceRequest {
 	 */
 	protected $gateway;
 
+	protected $configuration;
+
 	/**
 	 * PayplugWoocommerceRequest constructor.
 	 */
 	public function __construct() {
-		$this->settings = get_option( 'woocommerce_payplug_settings', [] );
-		if ( empty( $this->settings ) || ! isset( $this->settings['enabled'] ) || 'yes' !== $this->settings['enabled'] ) {
+		$this->configuration = $this->get_service('configuration');
+		$this->settings = $this->configuration->get_options();
+
+		if ( empty( $this->settings ) || ! isset( $this->settings['enabled'] ) || !(bool) $this->settings['enabled'] ) {
 			return;
 		}
 
@@ -53,7 +60,6 @@ class PayplugWoocommerceRequest {
 		add_action( 'wc_ajax_payplug_order_review_url', [ $this, 'ajax_create_payment' ] );
 		add_action( 'wc_ajax_payplug_check_payment', [$this, 'check_payment']);
 		add_action( 'wc_ajax_payplug_create_intent', [$this, 'create_payment_intent']);
-
 	}
 
 	/**
@@ -88,6 +94,7 @@ class PayplugWoocommerceRequest {
 			define( 'WOOCOMMERCE_CHECKOUT', true );
 		}
 
+
 		WC()->checkout()->process_checkout();
 
 		die( 0 );
@@ -112,13 +119,10 @@ class PayplugWoocommerceRequest {
 		$payment_method = $_POST['payment_method'];
 
 		if($payment_method === 'payplug' || $payment_method === 'american_express'){
-			$settings = get_option('woocommerce_payplug_settings', []);
-			$method = $settings['payment_method'];
-
-			if($method !== "integrated" && $method !== "popup" ){
+			$method = $this->configuration->get_option('payment_methods.configuration.payplug.embedded_mode');
+			if('integrated' != $method && 'popup' != $method){
 				$this->ajax_create_order();
 			}
-
 		}else{
 			$this->ajax_create_order();
 		}
@@ -130,7 +134,7 @@ class PayplugWoocommerceRequest {
 		if (isset($output['order-pay'])) {
 			$order_id = $output['order-pay'];
 		} else {
-			preg_match("/(?<=order-pay\/)\d*/", $path['path'], $matches);
+			preg_match('/(?<=order-pay\/)\d*/', $path['path'], $matches);
 			$order_id = $matches[0];
 		}
 
@@ -190,7 +194,7 @@ class PayplugWoocommerceRequest {
 		try{
 			\Payplug\Payplug::init(array(
 				'secretKey' => PayplugWoocommerceHelper::get_live_key(),
-				'apiVersion' => "2019-08-06",
+				'apiVersion' => '2019-08-06',
 			));
 
 			$apple_pay = array();
@@ -200,7 +204,7 @@ class PayplugWoocommerceRequest {
 			$data = array( 'apple_pay' => $apple_pay );
 			$update = $payment->update($data);
 
-			wp_send_json_success([ "result" => $update->is_paid ]);
+			wp_send_json_success([ 'result' => $update->is_paid ]);
 
 		}catch (\Exception $e){
 			wp_send_json_error($e->getMessage());
@@ -276,7 +280,7 @@ class PayplugWoocommerceRequest {
 		$payment_id = $_POST['payment_id'];
 
 		if(empty($payment_id)){
-			wp_send_json_error( __("Invalid request.", "payplug") );
+			wp_send_json_error( __('Invalid request.', 'payplug') );
 		}
 
 
@@ -289,7 +293,7 @@ class PayplugWoocommerceRequest {
 		try {
 			\Payplug\Payplug::init(array(
 				'secretKey' => $key,
-				'apiVersion' => "2019-08-06",
+				'apiVersion' => '2019-08-06',
 			));
 
 			$payment =\Payplug\Payment::retrieve($payment_id);
@@ -321,7 +325,7 @@ class PayplugWoocommerceRequest {
 			wp_send_json_error(
 				[
 					'code' => isset($payment->failure->code) ? $payment->failure->code : 500,
-					'message' => !empty($payment->failure->message) ? $payment->failure->message :__("payplug_integrated_payment_error", "payplug"),
+					'message' => !empty($payment->failure->message) ? $payment->failure->message :__('payplug_integrated_payment_error', 'payplug'),
 					'cancel_url' => esc_url_raw($order->get_cancel_order_url_raw())
 				]
 			);
@@ -360,9 +364,9 @@ class PayplugWoocommerceRequest {
 
 		}else{
 
-			$sql = "SELECT post_id
-							FROM $wpdb->postmeta
-								WHERE meta_key = '_transaction_id' AND meta_value = %s";
+			$sql = 'SELECT post_id
+					FROM $wpdb->postmeta
+					WHERE meta_key = "_transaction_id" AND meta_value = %s';
 			$order_id = $wpdb->get_var(
 				$wpdb->prepare(
 					$sql,
@@ -375,8 +379,7 @@ class PayplugWoocommerceRequest {
 	}
 
 	public function create_payment_intent(){
-
-		$order_id = $_POST["order_id"];
+		$order_id = $_POST['order_id'];
 		$this->gateway = $this->get_payplug_gateway($_POST['gateway']);
 		$order       = wc_get_order($order_id);
 		$customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
@@ -403,17 +406,17 @@ class PayplugWoocommerceRequest {
 		];
 
 		if (PayplugWoocommerceHelper::is_checkout_block() && is_checkout()) {
-			$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
+			$payment_data['metadata']['woocommerce_block'] = 'CHECKOUT';
 
 		} elseif (PayplugWoocommerceHelper::is_cart_block() && is_cart()) {
-			$payment_data['metadata']['woocommerce_block'] = "CART";
+			$payment_data['metadata']['woocommerce_block'] = 'CART';
 		}
 
-		if($this->gateway->id === "apple_pay"){
-			unset($payment_data["allow_save_card"]);
+		if($this->gateway->id === 'apple_pay'){
+			unset($payment_data['allow_save_card']);
 
-			$payment_data["payment_method"] = $this->gateway->id;
-			$payment_data["payment_context"] = array(
+			$payment_data['payment_method'] = $this->gateway->id;
+			$payment_data['payment_context'] = array(
 				'apple_pay' => array(
 					'domain_name' => $this->gateway->domain_name,
 					'application_data' => base64_encode(json_encode(array(
@@ -421,17 +424,19 @@ class PayplugWoocommerceRequest {
 					)))
 				)
 			);
-			$payment_data["hosted_payment"]["cancel_url"] = esc_url_raw($order->get_cancel_order_url_raw());
-			$payment_data["metadata"]["applepay_workflow"] = "checkout";
+			$payment_data['hosted_payment']['cancel_url'] = esc_url_raw($order->get_cancel_order_url_raw());
+			$payment_data['metadata']['applepay_workflow'] = 'checkout';
 		}
 
-		if($this->gateway->get_option('payment_method') === 'integrated' && $this->gateway->id === "payplug") {
+		$method = $this->configuration->get_option('payment_methods.configuration.payplug.embedded_mode');
+
+		if('integrated' == $method && $this->gateway->id === 'payplug') {
 			$payment_data['initiator'] = 'PAYER';
 			$payment_data['integration'] = 'INTEGRATED_PAYMENT';
 			unset($payment_data['hosted_payment']['cancel_url']);
 		}
 
-		if($this->gateway->get_option('payment_method') === 'popup' && $this->gateway->id === "american_express") {
+		if('popup' == $method && $this->gateway->id === 'american_express') {
 			$payment_data['payment_method'] = $this->gateway->id;
 		}
 
@@ -462,7 +467,7 @@ class PayplugWoocommerceRequest {
 
 		wp_send_json_success(array(
 			'payment_id' => $payment->id,
-			'merchant_session' => isset($payment->payment_method["merchant_session"]) ? $payment->payment_method["merchant_session"]: null,
+			'merchant_session' => isset($payment->payment_method['merchant_session']) ? $payment->payment_method['merchant_session']: null,
 			'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
 			'cancel'   => esc_url_raw($order->get_cancel_order_url_raw())
 		));

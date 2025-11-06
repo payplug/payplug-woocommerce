@@ -12,6 +12,7 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugApi;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Exception;
+use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
 /**
  * PayPlug Setup Callback Handler
@@ -19,10 +20,15 @@ use Exception;
  */
 class SetupCallback {
 
+	use ServiceGetter;
+	public $configuration;
+
 	/**
 	 * Initialize the handler
 	 */
 	public function __construct() {
+		$this->configuration = $this->get_service('configuration');
+
 		add_action('admin_init', array($this, 'handle_setup_callback'), 5);
 		add_action('admin_init', array($this, 'handle_oauth_callback'), 5);
 	}
@@ -113,8 +119,8 @@ class SetupCallback {
 		$code_verifier = get_transient('payplug_code_verifier');
 		$callback_uri = get_transient('payplug_oauth_callback_uri');
 
-		$settings = PayplugWoocommerceHelper::get_payplug_options();
-		$client_id = isset($settings['client_data']['client_id']) ? $settings['client_data']['client_id'] : '';
+		$options = PayplugWoocommerceHelper::get_payplug_options();
+		$client_id = isset($options['oauth_client_id']) ? $options['oauth_client_id'] : '';
 
 		if (empty($code_verifier) || empty($callback_uri) || empty($client_id)) {
 			PayplugGateway::log('Missing OAuth parameters for token exchange', 'error');
@@ -141,7 +147,7 @@ class SetupCallback {
 			$access_token = $jwt_response['httpResponse']['access_token'];
 
 			// Update settings with tokens
-			$settings = PayplugWoocommerceHelper::get_payplug_options();
+			$options = PayplugWoocommerceHelper::get_payplug_options();
 
 			$id_token = $jwt_response['httpResponse']['id_token'];
 			$id_token_split = explode('.', $id_token);
@@ -152,33 +158,35 @@ class SetupCallback {
 
 			Payplug::init(['secretKey' => $access_token]);
 
-			$company_id = PayplugWooCommerceHelper::get_payplug_options()['client_data']['company_id'];
+			$company_id = PayplugWooCommerceHelper::get_payplug_options()['oauth_company_id'];
 
-			$auth_live = Authentication::createClientIdAndSecret($company_id, "WooCommerce", "live");
-			$auth_test = Authentication::createClientIdAndSecret($company_id, "WooCommerce", "test");
+			$auth_live = Authentication::createClientIdAndSecret($company_id, 'WooCommerce', 'live');
+			$auth_test = Authentication::createClientIdAndSecret($company_id, 'WooCommerce', 'test');
 
+			$oauth_client_data = [];
 			if (!empty($auth_live['httpResponse']) ) {
-				$settings['client_data']['live']['client_secret'] = $auth_live['httpResponse']['client_secret'];
-				$settings['client_data']['live']['client_id'] = $auth_live['httpResponse']['client_id'];
+				$oauth_client_data['live'] = [
+					'client_secret' => $auth_live['httpResponse']['client_secret'],
+					'client_id' => $auth_live['httpResponse']['client_id'],
+				];
 			}
 
 			if (!empty($auth_test['httpResponse']) ) {
-				$settings['client_data']['test']['client_secret'] = $auth_test['httpResponse']['client_secret'];
-				$settings['client_data']['test']['client_id'] = $auth_test['httpResponse']['client_id'];
+				$oauth_client_data['test'] = [
+					'client_secret' => $auth_test['httpResponse']['client_secret'],
+					'client_id' => $auth_test['httpResponse']['client_id'],
+				];
 			}
+			$this->configuration->update_option('oauth_client_data', $oauth_client_data);
 
 
 			$payplug = new PayplugGateway();
 
-			update_option(
-				$payplug->get_option_key(),
-				apply_filters('woocommerce_settings_api_sanitized_fields_' . $payplug->id, $settings)
-			);
-
 			$payplug->tmp_generate_jwt();
 
-			$settings = PayplugWoocommerceHelper::get_payplug_options();
-			$merchant_id = $payplug->retrieve_merchant_id($settings['client_data']['jwt']['test']['access_token']);
+			$options = PayplugWoocommerceHelper::get_payplug_options();
+			$jwt = json_decode($options['jwt'], true);
+			$merchant_id = $payplug->retrieve_merchant_id($jwt['test']['access_token']);
 
 			// Save settings
 			$form_fields = $payplug->get_form_fields();
@@ -190,36 +198,33 @@ class SetupCallback {
 
 				switch ($key) {
 					case 'enabled':
-						$val = 'yes';
+						$val = true;
 						break;
 					case 'mode':
-						$val = 'no';
+						$val = false;
 						break;
-					case 'payplug_test_key':
-						$val = !empty($api_keys['test']) ? esc_attr($api_keys['test']) : null;
-						break;
-					case 'payplug_live_key':
-						$val = !empty($api_keys['live']) ? esc_attr($api_keys['live']) : null;
-						break;
+//					case 'payplug_test_key':
+//						$val = !empty($api_keys['test']) ? esc_attr($api_keys['test']) : null;
+//						break;
+//					case 'payplug_live_key':
+//						$val = !empty($api_keys['live']) ? esc_attr($api_keys['live']) : null;
+//						break;
 					case 'email':
 						$val = esc_html($email);
 						break;
-					case 'payplug_merchant_id':
-						$val = esc_attr($merchant_id);
-						break;
+//					case 'payplug_merchant_id':
+//						$val = esc_attr($merchant_id);
+//						break;
 					default:
 						$val = $payplug->get_option($key);
 				}
 
-				$settings[$key] = $val;
+				$options[$key] = $val;
 			}
 
 
-			$payplug->set_post_data($settings);
-			update_option(
-				$payplug->get_option_key(),
-				apply_filters('woocommerce_settings_api_sanitized_fields_' . $payplug->id, $settings)
-			);
+			$payplug->set_post_data($options);
+			$payplug->get_service('configuration')->update_options($options);
 
 			// Clean up transients
 			delete_transient('payplug_code_verifier');
@@ -253,19 +258,14 @@ class SetupCallback {
 	 */
 	private function process_setup_credentials($client_id, $company_id) {
 		// Get the current PayPlug settings
-		$settings = PayplugWoocommerceHelper::get_payplug_options();
-
-		// Initialize auth array if it doesn't exist
-		if (!isset($settings['client_data'])) {
-			$settings['client_data'] = array();
-		}
+		$options = PayplugWoocommerceHelper::get_payplug_options();
 
 		// Update the settings with the new credentials
-		$settings['client_data']['client_id'] = $client_id;
-		$settings['client_data']['company_id'] = $company_id;
+		$options['oauth_client_id'] = $client_id;
+		$options['oauth_company_id'] = $company_id;
 
 		// Save the updated settings
-		update_option('woocommerce_payplug_settings', $settings);
+		update_option('woocommerce_payplug_settings', $options);
 
 		// Log the successful connection
 		PayplugGateway::log(sprintf('PayPlug Setup: Received client_id %s and company_id %s',

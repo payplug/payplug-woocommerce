@@ -75,8 +75,14 @@ Abstract Class OneyBase implements InterfaceOney
 	public function __construct()
 	{
 		$this->payplugOptions = PayplugWoocommerceHelper::get_payplug_options();
-		$max = ( !empty($this->payplugOptions['oney_thresholds_max']) && (int) $this->payplugOptions['oney_thresholds_max'] <= $this->max_default_amount ) ? $this->payplugOptions['oney_thresholds_max'] : $this->max_default_amount;
-		$min = ( !empty($this->payplugOptions['oney_thresholds_min']) && (int) $this->payplugOptions['oney_thresholds_min'] >= $this->min_default_amount) ? $this->payplugOptions['oney_thresholds_min'] : $this->min_default_amount;
+		$oney_cfg = $this->payplugOptions['payment_methods']['configuration']['oney'];
+		$oney_amount = json_decode($oney_cfg['custom_amounts'], true);
+
+		$oney_amount['min'] = (float) $oney_amount['min'] / 100;
+		$oney_amount['max'] = (float) $oney_amount['max'] / 100;
+
+		$max = ( !empty($oney_amount['max']) && (int) $oney_amount['max'] <= $this->max_default_amount ) ? $oney_amount['max'] : $this->max_default_amount;
+		$min = ( !empty($oney_amount['min']) && (int) $oney_amount['min'] >= $this->min_default_amount) ? $oney_amount['min'] : $this->min_default_amount;
 
 		$this->set_max_amount( $max );
 		$this->set_min_amount( $min );
@@ -266,7 +272,7 @@ Abstract Class OneyBase implements InterfaceOney
 	 * @return array
 	 */
 	public function setVariations($variations){
-		$this->variations[$variations['variation_id']] = (float) $variations["display_price"];
+		$this->variations[$variations['variation_id']] = (float) $variations['display_price'];
 	}
 
 

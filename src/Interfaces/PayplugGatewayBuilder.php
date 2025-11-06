@@ -14,5 +14,4 @@ interface PayplugGatewayBuilder
 	public function process_standard_payment($order, $amount, $customer_id);
 
 	public function process_admin_options();
-
 }
