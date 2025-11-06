@@ -7,6 +7,7 @@ use Payplug\Exception\HttpException;
 use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Controller\ApplePay;
+use Payplug\PayplugWoocommerce\Gateway\AccountGateway;
 use Payplug\PayplugWoocommerce\Gateway\AmericanExpress;
 use Payplug\PayplugWoocommerce\Gateway\Bancontact;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
@@ -27,10 +28,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package Payplug\PayplugWoocommerce\Admin
  */
-class Ajax {
-
-	public function __construct() {
-		$permission = ( current_user_can('editor') || current_user_can('administrator') );
+class Ajax
+{
+	public function __construct()
+	{
+		$permission = (current_user_can('editor') || current_user_can('administrator'));
 
 		add_action( 'rest_api_init', function () use ($permission) {
 			//Path to REST route and the callback function
@@ -383,9 +385,12 @@ class Ajax {
 	 *
 	 * @return void
 	 */
-	public function payplug_login() {
+	public function payplug_login()
+	{
+		return $this->login_action();
 
 		$data = json_decode(file_get_contents('php://input'), true);
+
 		$email = sanitize_email($data['payplug_email']);
 		$password = base64_decode(wp_unslash($data['payplug_password']));
 		$wp_nonce = !empty($data['_wpnonce']) ? $data['_wpnonce'] : null;
@@ -394,7 +399,6 @@ class Ajax {
 		delete_site_option( 'woocommerce_payplug_settings' );
 
 		try {
-
 			$payplug = new PayplugGateway();
 			$api_keys = $payplug->retrieve_user_api_keys($email, $password);
 			if ( is_wp_error( $api_keys ) ) {
@@ -435,6 +439,9 @@ class Ajax {
 				$data[$key] = $val;
 			}
 
+			var_dump($data);
+			die(var_dump(get_option('woocommerce_payplug_settings', [])));
+
 			$payplug->set_post_data($data);
 			update_option(
 				$payplug->get_option_key(),
@@ -455,7 +462,6 @@ class Ajax {
 			wp_send_json_success( ["settings" => $user + $wp] + ( new Vue )->init() );
 		} catch (HttpException $e) {
 			$this->login_wrong_credentials_error();
-
 		}
 	}
 
@@ -473,8 +479,8 @@ class Ajax {
 	 *
 	 * @return JSON
 	 */
-	public function payplug_init() {
-
+	public function payplug_init()
+	{
 		$wp_nonce = wp_create_nonce();
 
 		$wp = [
@@ -486,9 +492,8 @@ class Ajax {
 		];
 
 		return wp_send_json_success([
-			"settings" => $wp
-		] + ( new Vue )->init() );
-
+				"settings" => $wp
+			] + (new Vue)->init());
 	}
 
 	/**
@@ -565,9 +570,10 @@ class Ajax {
 			$options['applepay_carriers'] = (!empty($data['applepay_carriers'])) ? $data['applepay_carriers'] : [];
 			$options['applepay_checkout'] = Validator::genericPaymentGateway($data['enable_applepay_checkout'], "Apple Pay Checkout", $test_mode);
 			$options['applepay_cart'] = Validator::genericPaymentGateway($data['enable_applepay_cart'], "Apple Pay Cart", $test_mode);
+			$options['applepay_product'] = Validator::genericPaymentGateway($data['enable_applepay_product'], "Apple Pay Product", $test_mode);
 
-			Validator::applePayPaymentGatewayOptions($options['apple_pay'], $options['applepay_cart'], $options['applepay_checkout'], $options['applepay_carriers']);
-			if (($options['apple_pay'] === 'yes') && ($options['applepay_checkout'] === 'no') && ($options['applepay_cart'] === 'no')) {
+			Validator::applePayPaymentGatewayOptions($options['apple_pay'], $options['applepay_cart'], $options['applepay_product'], $options['applepay_checkout'], $options['applepay_carriers']);
+			if (($options['apple_pay'] === 'yes') && ($options['applepay_checkout'] === 'no') && ($options['applepay_cart'] === 'no') && ($options['applepay_product'] === 'no')) {
 				$options['applepay_checkout'] = 'yes';
 			}
 
@@ -635,5 +641,22 @@ class Ajax {
 		wp_send_json_success(true);
 		return true;
 
+	}
+
+	protected function login_action()
+	{
+		$data = json_decode(file_get_contents('php://input'), true);
+		$email = sanitize_email($data['payplug_email']);
+		$password = base64_decode(wp_unslash($data['payplug_password']));
+		$wp_nonce = !empty($data['_wpnonce']) ? $data['_wpnonce'] : null;
+
+		delete_option('woocommerce_payplug_settings');
+		delete_site_option('woocommerce_payplug_settings');
+
+		// use AccountGateway
+		echo '<pre>';
+		$account_gateway = new AccountGateway();
+		$register = $account_gateway->register((string) $email, (string) $password);
+		die(var_dump($register));
 	}
 }

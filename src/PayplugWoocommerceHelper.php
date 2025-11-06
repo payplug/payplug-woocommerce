@@ -831,6 +831,10 @@ class PayplugWoocommerceHelper {
 		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' );
 	}
 
+	public static function is_product_block() {
+		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('product'), 'woocommerce/product' );
+	}
+
 	/**
 	 * Checks if subscriptions are enabled on the site.
 	 *
