@@ -25,8 +25,9 @@ class AmericanExpress extends PayplugGenericGateway
 		$this->has_fields = false;
 		$this->image = 'Amex_logo_color.svg';
 
-		if(!$this->checkGateway())
-			$this->enabled = 'no';
+		if(!$this->checkGateway()){
+			$this->enabled = false;
+		}
 
 	}
 

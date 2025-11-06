@@ -3,12 +3,13 @@
 namespace Payplug\PayplugWoocommerce;
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
 	exit;
 }
 
 use Payplug\Exception\ForbiddenException;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
+use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 use Payplug\Resource\APIResource;
 use Payplug\Payplug;
 use Payplug\Authentication;
@@ -22,17 +23,21 @@ use WC_Subscriptions;
  *
  * @package Payplug\PayplugWoocommerce
  */
-class PayplugWoocommerceHelper {
+class PayplugWoocommerceHelper
+{
+
+	use ServiceGetter;
 
 	/**
 	 * Check if current WooCommerce version is below 3.0.0
 	 *
 	 * @return bool
 	 */
-	public static function is_pre_30() {
-		$wc = function_exists( 'WC' ) ? WC() : $GLOBALS['woocommerce'];
+	public static function is_pre_30()
+	{
+		$wc = function_exists('WC') ? WC() : $GLOBALS['woocommerce'];
 
-		return version_compare( $wc->version, '3.0.0', '<' );
+		return version_compare($wc->version, '3.0.0', '<');
 	}
 
 	/**
@@ -40,11 +45,12 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return string
 	 */
-	public static function get_setting_link() {
-		$use_id_as_section = function_exists( 'WC' ) ? version_compare( WC()->version, '2.6', '>=' ) : false;
-		$section_slug      = $use_id_as_section ? 'payplug' : strtolower( 'PayplugGateway' );
+	public static function get_setting_link()
+	{
+		$use_id_as_section = function_exists('WC') ? version_compare(WC()->version, '2.6', '>=') : false;
+		$section_slug = $use_id_as_section ? 'payplug' : strtolower('PayplugGateway');
 
-		return admin_url( 'admin.php?page=wc-settings&tab=checkout&section=' . $section_slug );
+		return admin_url('admin.php?page=wc-settings&tab=checkout&section=' . $section_slug);
 	}
 
 	/**
@@ -54,7 +60,8 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return array
 	 */
-	public static function get_supported_countries() {
+	public static function get_supported_countries()
+	{
 		return [
 			'AD',
 			'AO',
@@ -318,13 +325,14 @@ class PayplugWoocommerceHelper {
 	 * @return bool
 	 * @author Clément Boirie
 	 */
-	public static function is_country_supported( $country ) {
-		$country = trim( $country );
-		if ( empty( $country ) ) {
+	public static function is_country_supported($country)
+	{
+		$country = trim($country);
+		if (empty($country)) {
 			return false;
 		}
 
-		return in_array( strtoupper( $country ), self::get_supported_countries() );
+		return in_array(strtoupper($country), self::get_supported_countries());
 	}
 
 	/**
@@ -332,10 +340,11 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return string
 	 */
-	public static function get_default_country() {
+	public static function get_default_country()
+	{
 		$country = \WC()->countries->get_base_country();
 
-		return ( self::is_country_supported( $country ) ) ? strtoupper( $country ) : 'FR';
+		return (self::is_country_supported($country)) ? strtoupper($country) : 'FR';
 	}
 
 	/**
@@ -345,7 +354,8 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return int
 	 */
-	public static function get_minimum_amount() {
+	public static function get_minimum_amount()
+	{
 		return 99;
 	}
 
@@ -356,7 +366,8 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return int
 	 */
-	public static function get_maximum_amount() {
+	public static function get_maximum_amount()
+	{
 		return 2000000;
 	}
 
@@ -367,12 +378,13 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return int
 	 */
-	public static function get_payplug_amount( $amount ) {
-		if ( is_null( $amount ) ) {
+	public static function get_payplug_amount($amount)
+	{
+		if (is_null($amount)) {
 			return $amount;
 		}
 
-		return absint( wc_format_decimal( ( (float) $amount * 100 ), wc_get_price_decimals() ) );
+		return absint(wc_format_decimal(((float)$amount * 100), wc_get_price_decimals()));
 	}
 
 	/**
@@ -382,21 +394,22 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return array
 	 */
-	public static function extract_transaction_metadata( $resource ) {
+	public static function extract_transaction_metadata($resource)
+	{
 		return [
-			'transaction_id'  => sanitize_text_field( $resource->id ),
-			'paid'            => (bool) $resource->is_paid,
-			'refunded'        => (bool) $resource->is_refunded,
-			'amount'          => sanitize_text_field( $resource->amount ),
-			'amount_refunded' => sanitize_text_field( $resource->amount_refunded ),
-			'3ds'             => (bool) $resource->is_3ds,
-			'live'            => (bool) $resource->is_live,
-			'paid_at'         => isset( $resource->hosted_payment->paid_at ) ? sanitize_text_field( $resource->hosted_payment->paid_at ) : sanitize_text_field( $resource->created_at ),
-			'card_last4'      => sanitize_text_field( $resource->card->last4 ),
-			'card_exp_month'  => sanitize_text_field( $resource->card->exp_month ),
-			'card_exp_year'   => sanitize_text_field( $resource->card->exp_year ),
-			'card_brand'      => sanitize_text_field( $resource->card->brand ),
-			'card_country'    => sanitize_text_field( $resource->card->country ),
+			'transaction_id' => sanitize_text_field($resource->id),
+			'paid' => (bool)$resource->is_paid,
+			'refunded' => (bool)$resource->is_refunded,
+			'amount' => sanitize_text_field($resource->amount),
+			'amount_refunded' => sanitize_text_field($resource->amount_refunded),
+			'3ds' => (bool)$resource->is_3ds,
+			'live' => (bool)$resource->is_live,
+			'paid_at' => isset($resource->hosted_payment->paid_at) ? sanitize_text_field($resource->hosted_payment->paid_at) : sanitize_text_field($resource->created_at),
+			'card_last4' => sanitize_text_field($resource->card->last4),
+			'card_exp_month' => sanitize_text_field($resource->card->exp_month),
+			'card_exp_year' => sanitize_text_field($resource->card->exp_year),
+			'card_brand' => sanitize_text_field($resource->card->brand),
+			'card_country' => sanitize_text_field($resource->card->country),
 		];
 	}
 
@@ -406,12 +419,13 @@ class PayplugWoocommerceHelper {
 	 * @return array|bool
 	 * @author Clément Boirie
 	 */
-	public static function get_transaction_metadata( $order ) {
+	public static function get_transaction_metadata($order)
+	{
 
-		if ( PayplugWoocommerceHelper::is_pre_30() ) {
-			return get_post_meta( $order->id, '_payplug_metadata', true );
+		if (PayplugWoocommerceHelper::is_pre_30()) {
+			return get_post_meta($order->id, '_payplug_metadata', true);
 		} else {
-			return $order->get_meta( '_payplug_metadata', true );
+			return $order->get_meta('_payplug_metadata', true);
 		}
 	}
 
@@ -423,14 +437,13 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return void
 	 */
-	public static function save_transaction_metadata( $order, $metadata ) {
-
-		if ( PayplugWoocommerceHelper::is_pre_30() ) {
-			update_post_meta( $order->id, '_payplug_metadata', $metadata );
+	public static function save_transaction_metadata($order, $metadata)
+	{
+		if (PayplugWoocommerceHelper::is_pre_30()) {
+			update_post_meta($order->id, '_payplug_metadata', $metadata);
 		} else {
-			$order->add_meta_data( '_payplug_metadata', $metadata, true );
+			$order->add_meta_data('_payplug_metadata', $metadata, true);
 			$order->save_meta_data();
-
 		}
 	}
 
@@ -443,7 +456,8 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return void
 	 */
-	public static function set_flag_ipn_order ( $order, $metadata, $flag) {
+	public static function set_flag_ipn_order($order, $metadata, $flag)
+	{
 		$metadata['transaction_in_progress'] = $flag;
 		PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
 	}
@@ -455,10 +469,9 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function get_transient_key($options)
 	{
-		$transient_key = PayplugGateway::OPTION_NAME . (array_key_exists('mode', $options) && $options['mode'] === 'yes' ? "_live" : "_test");
+		$transient_key = PayplugGateway::OPTION_NAME . (array_key_exists('mode', $options) && (bool)$options['mode'] ? '_live' : '_test');
 		return $transient_key;
 	}
-
 
 	/**
 	 * Get transient live key from payplug option
@@ -467,7 +480,7 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function get_live_transient_key()
 	{
-		return PayplugGateway::OPTION_NAME .  "_live";
+		return PayplugGateway::OPTION_NAME . '_live';
 	}
 
 	/**
@@ -477,7 +490,7 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function set_transient_data($data, $options = null)
 	{
-		$options = $options ? $options : get_option('woocommerce_payplug_settings', []);
+		$options = $options ? $options : self::get_payplug_options();
 		$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
 		set_transient($transient_key, isset($data['httpResponse']) ? $data['httpResponse'] : []);
 	}
@@ -489,11 +502,11 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function get_account_data_from_options()
 	{
-		$options = get_option('woocommerce_payplug_settings', []);
+		$options = self::get_payplug_options();
 		$transient_key = self::get_transient_key($options);
 		$account = get_transient($transient_key);
 
-		if(empty($account) || !is_array($account) ){
+		if (empty($account) || !is_array($account)) {
 			self::set_account_data_from_options();
 			$account = get_transient($transient_key);
 		}
@@ -507,23 +520,23 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return array
 	 */
-	public static function generic_get_account_data_from_options($gateway_id){
-		$options = get_option('woocommerce_payplug_settings', []);
+	public static function generic_get_account_data_from_options($gateway_id)
+	{
+		$options = self::get_payplug_options();
 		$transient_key = self::get_transient_key($options);
 		$account = get_transient($transient_key);
 
 		//if transient is empty, it goes and get the permissions for the customer to populate it
-		if(empty($account) || !is_array($account) ){
+		if (empty($account) || !is_array($account)) {
 			self::set_account_data_from_options();
 			$account = get_transient($transient_key);
 		}
 
-		if( isset($options[$gateway_id]) && $options[$gateway_id] == "yes"){
-			$account['permissions'][$gateway_id] = true;
-		}
+		$helper = new self();
+		$configuration = $helper->get_service('configuration');
+		$account['permissions']['payplug'] = $configuration->get_option('payment_methods.configuration.payplug.active');
 
 		return $account;
-
 	}
 
 	/**
@@ -533,37 +546,49 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function set_account_data_from_options()
 	{
-		$options          = get_option('woocommerce_payplug_settings', []);
-		$payplug_test_key = !empty($options['payplug_test_key']) ? $options['payplug_test_key'] : '';
-		$payplug_live_key = !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : '';
+		$helper = new self();
+		$configuration = $helper->get_service('configuration');
+		$options = $configuration->get_options();
 
-		if (empty($payplug_test_key) && isset( $options['client_data']['jwt']['test']['access_token'] ) ) {
-			$payplug_test_key = $options['client_data']['jwt']['test']['access_token'];
-		}
-		if (empty($payplug_live_key) && isset( $options['client_data']['jwt']['live']['access_token'] ) ) {
-			$payplug_live_key = $options['client_data']['jwt']['live']['access_token'];
-		}
-		if (empty($payplug_test_key) && empty($payplug_live_key)) {
-			return array();
+		if (empty($options)) {
+			return [];
 		}
 
-		if( $options['mode'] === 'yes' && empty($payplug_live_key) ){
-			return array();
+		$api_key = json_decode($options['api_key'], true);
+		$jwt = json_decode($options['jwt'], true);
+
+		$test_key = !empty($api_key['test']) ? $api_key['test'] : '';
+		$live_key = !empty($api_key['live']) ? $api_key['live'] : '';
+
+		if (empty($test_key) && isset($jwt['test']['access_token'])) {
+			$test_key = $jwt['test']['access_token'];
+		}
+		if (empty($live_key) && isset($jwt['live']['access_token'])) {
+			$live_key = $jwt['live']['access_token'];
+		}
+		if (empty($test_key) && empty($live_key)) {
+			return [];
 		}
 
-		if( $options['mode'] != 'yes' && empty($payplug_test_key)){
-			return array();
+		if ((bool)$options['mode'] && empty($live_key)) {
+			return [];
+		}
+
+		if (!(bool)$options['mode'] && empty($test_key)) {
+			return [];
 		}
 
 		try {
-			$parameters_account = Authentication::getAccount(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
+			$parameters_account = Authentication::getAccount(new Payplug((bool)$options['mode'] ? $live_key : $test_key));
 			self::set_transient_data($parameters_account, $options);
 		} catch (\Payplug\Exception\UnauthorizedException $e) {
-			self::exception_handler_400_logout($e->getCode(), __( 'payplug_enable_feature', 'payplug' ), sprintf('Account request error from PayPlug API : %s <br><b> ' . __('Successfully logged out.', 'payplug') . '</b>', wc_print_r($e->getMessage(), true)));
+			self::exception_handler_400_logout($e->getCode(), __('payplug_enable_feature', 'payplug'), sprintf('Account request error from PayPlug API : %s <br><b> ' . __('Successfully logged out.', 'payplug') . '</b>', wc_print_r($e->getMessage(), true)));
 
 		} catch (\Payplug\Exception\ConfigurationNotSetException $e) {
-		} catch( \Payplug\Exception\ForbiddenException $e){
-		} catch (\Payplug\Exception\ForbiddenException $e){return array();}
+		} catch (\Payplug\Exception\ForbiddenException $e) {
+		} catch (\Payplug\Exception\ForbiddenException $e) {
+			return [];
+		}
 
 	}
 
@@ -572,14 +597,15 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return array
 	 */
-	public static function get_min_max_oney() {
+	public static function get_min_max_oney()
+	{
 		$account = self::get_account_data_from_options();
 		if (!$account) {
-			return array();
+			return [];
 		}
 		return [
-			'min' => floatval($account['configuration']['oney']['min_amounts']['EUR'])/100,
-			'max' => floatval($account['configuration']['oney']['max_amounts']['EUR'])/100
+			'min' => floatval($account['configuration']['oney']['min_amounts']['EUR']) / 100,
+			'max' => floatval($account['configuration']['oney']['max_amounts']['EUR']) / 100
 		];
 	}
 
@@ -588,16 +614,17 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return boolean
 	 */
-	public static function is_oney_available() {
+	public static function is_oney_available()
+	{
 		$account = self::get_account_data_from_options();
 		if (!$account) {
 			return false;
 		}
 
 		$options = self::get_payplug_options();
-		$oney_active = (isset($options['oney']) && !empty($options['oney'])) ? $options['oney'] : '';
+		$oney_active = (bool)$options['payment_methods']['configuration']['oney']['active'];
 
-		return ($account && $account['permissions'][PayplugPermissions::USE_ONEY] == "1" && $oney_active === "yes");
+		return ($account && $account['permissions'][PayplugPermissions::USE_ONEY] == '1' && $oney_active);
 	}
 
 	/**
@@ -609,7 +636,7 @@ class PayplugWoocommerceHelper {
 	public static function show_oney_popup()
 	{
 		$account = self::get_account_data_from_options();
-		if(  $account && $account['permissions'][PayplugPermissions::USE_ONEY] == true && $account["country"] == self::getISOCountryCode() ){
+		if ($account && $account['permissions'][PayplugPermissions::USE_ONEY] == true && $account['country'] == self::getISOCountryCode()) {
 			return true;
 		}
 		return false;
@@ -618,31 +645,33 @@ class PayplugWoocommerceHelper {
 	/**
 	 * @return bool
 	 */
-	public static function check_order_max_amount($order_total){
+	public static function check_order_max_amount($order_total)
+	{
 		if ($order_total < PayplugGatewayOney3x::MIN_AMOUNT || $order_total > PayplugGatewayOney3x::MAX_AMOUNT) {
 			return false;
 		}
 		return true;
 	}
 
-  	/**
+	/**
 	 * Load translations from plugin languages folder.
 	 *
 	 * @param string $plugin_rel_path
 	 *
 	 * @return bool
 	 */
-	public static function load_plugin_textdomain( $plugin_rel_path ) {
+	public static function load_plugin_textdomain($plugin_rel_path)
+	{
 
 		$domain = 'payplug';
 
-		$locale = apply_filters( 'plugin_locale', is_admin() ? get_user_locale() : get_locale(), $domain );
+		$locale = apply_filters('plugin_locale', is_admin() ? get_user_locale() : get_locale(), $domain);
 
 		$mofile = $domain . '-' . $locale . '.mo';
 
-		$path = WP_PLUGIN_DIR . '/' . trim( $plugin_rel_path, '/' );
+		$path = WP_PLUGIN_DIR . '/' . trim($plugin_rel_path, '/');
 
-		return load_textdomain( $domain, $path . '/' . $mofile );
+		return load_textdomain($domain, $path . '/' . $mofile);
 	}
 
 	/**
@@ -650,8 +679,9 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return void
 	 */
-	public static function oney_simulation_values ($keys_array, &$array) {
-		foreach($keys_array as $key) {
+	public static function oney_simulation_values($keys_array, &$array)
+	{
+		foreach ($keys_array as $key) {
 			if (array_key_exists($key, $array)) {
 				$array[$key]['down_payment_amount'] = floatval($array[$key]['down_payment_amount']) / 100;
 				foreach ($array[$key]['installments'] as $k => $value) {
@@ -663,7 +693,7 @@ class PayplugWoocommerceHelper {
 
 	public static function getISOCountryCode()
 	{
-		preg_match( '([a-z-]+)', get_locale(), $country );
+		preg_match('([a-z-]+)', get_locale(), $country);
 		return strtoupper($country[0]);
 	}
 
@@ -674,7 +704,7 @@ class PayplugWoocommerceHelper {
 	 */
 	public static function get_payplug_merchant_country()
 	{
-		$data = get_option('woocommerce_payplug_settings');
+		$data = self::get_payplug_options();
 
 		//in order to reduce the getAccount calls
 		if (isset($data['payplug_live_key'])) {
@@ -698,98 +728,83 @@ class PayplugWoocommerceHelper {
 	 * @return string
 	 * @throws \Payplug\Exception\ConfigurationException
 	 */
-	public static function UpdateCountryOption($options){
+	public static function UpdateCountryOption($options)
+	{
 
 		try {
+			$api_key = json_decode($options['api_key'], true);
 
 			//fail safe for non activated account
-			if ((isset($options['mode'])) && $options['payplug_test_key']){
-				$key = $options['mode'] === "yes" && !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : $options['payplug_test_key'];
+			if ((isset($options['mode'])) && $api_key['test']) {
+				$key = $options['mode'] && !empty($api_key['live']) ? $api_key['live'] : $api_key['test'];
 			}
 
-			if( empty($options['payplug_live_key'] )){
-				$options['mode'] = "no";
+			if (empty($api_key['live'])) {
+				$options['mode'] = false;
 			}
 
-			if (isset($key) && !empty($key)){
+			if (isset($key) && !empty($key)) {
 				$response = self::get_account_data_from_options();
 			}
 
 			if (isset($response['httpResponse']['country'])) {
-				$options['payplug_merchant_country'] = $response['httpResponse']['country'];
-				update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options) );
-			}else{
+				$options['company_iso'] = $response['httpResponse']['country'];
+				update_option('woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options));
+			} else {
 
 				//default value for merchant country
-				$options['payplug_merchant_country'] = 'FR';
+				$options['company_iso'] = 'FR';
 			}
 
 		} catch (ForbiddenException $e) {
 			PayplugGateway::log('Error while getting account : ' . $e->getMessage(), 'error');
 			\WC_Admin_Settings::add_error($e->getMessage());
-			$options['payplug_merchant_country'] = 'FR';
+			$options['company_iso'] = 'FR';
 		}
 
-		return $options['payplug_merchant_country'];
+		return $options['company_iso'];
 
 	}
 
 	public static function get_live_key()
 	{
 		$options = self::get_payplug_options();
-		$live_key = $options['payplug_live_key'];
-		if (empty($live_key)) {
-			$live_key = $options['client_data']['jwt']['live']['access_token'];
-		}
-		return $live_key;
+		$jwt = json_decode($options['jwt'], true);
+		$api_key = json_decode($options['api_key'], true);
+
+		return isset($jwt['live']) && isset($jwt['live']['access_token'])
+			? $jwt['live']['access_token']
+			: $api_key['live'];
 	}
 
 	public static function get_test_key()
 	{
 		$options = self::get_payplug_options();
-		$test_key = $options['payplug_test_key'];
-		if (empty($test_key)) {
-			$test_key = $options['client_data']['jwt']['test']['access_token'];
-		}
-		return $test_key;
+		$jwt = json_decode($options['jwt'], true);
+		$api_key = json_decode($options['api_key'], true);
+
+		return isset($jwt['test']) && isset($jwt['test']['access_token'])
+			? $jwt['test']['access_token']
+			: $api_key['test'];
 	}
 
-	/**
-	 *
-	 * Checks fi the user is logged in
-	 *
-	 * @return bool
-	 */
-	public static function user_logged_in()
+	public static function check_mode()
 	{
-		$options = self::get_payplug_options();
-
-		if (isset($options['client_data']) && isset($options['client_data']['jwt']['test']['access_token'])) {
-			return true;
-		}
-
-		return !empty($options['payplug_test_key']);
+		return self::get_payplug_options()['mode'];
 	}
 
-	public static function check_mode(){
-
-		if(empty(get_option( 'woocommerce_payplug_settings', [] ))){
-			return false;
-		}
-
-		return get_option( 'woocommerce_payplug_settings', [] )['mode'] === "yes" ? true : false;
-	}
-
-	public static function payplug_logout() {
+	public static function payplug_logout()
+	{
 		delete_option('woocommerce_payplug_settings');
-		set_transient( PayplugWoocommerceHelper::get_transient_key(get_option('woocommerce_payplug_settings', [])), null );
+		set_transient(PayplugWoocommerceHelper::get_transient_key(self::get_payplug_options()), null);
 	}
 
-	public static function plugin_deactivation(){
+	public static function plugin_deactivation()
+	{
 		$option_name = 'woocommerce_payplug_settings';
-		delete_option( $option_name );
+		delete_option($option_name);
 		// for site options in Multisite
-		delete_site_option( $option_name );
+		delete_site_option($option_name);
 		\Payplug\PayplugWoocommerce\Model\Lock::delete_lock_table();
 	}
 
@@ -836,71 +851,80 @@ class PayplugWoocommerceHelper {
 		return $shippings_methods;
 	}
 
-	public static function get_payplug_options() {
-		return get_option('woocommerce_payplug_settings', []);
+	public static function get_payplug_options()
+	{
+		$helper = new self();
+		return $helper->get_service('configuration')->get_options();
 	}
 
-	public static function get_applepay_options() {
+	public static function get_applepay_options()
+	{
 		$options = self::get_payplug_options();
+		$applepay_configuration = $options['payment_methods']['configuration']['applepay'];
+		$applepay_display = json_decode($applepay_configuration['display'], true);
 		$applepay = [
-			"enabled" => (!empty($options['apple_pay'])) ? $options['apple_pay'] : false,
-			"checkout" => (!empty($options['applepay_checkout'])) ? $options['applepay_checkout'] : false,
-			"cart" => (!empty($options['applepay_cart'])) ? $options['applepay_cart'] : false,
-			"carriers" => (!empty($options['applepay_carriers'])) ? $options['applepay_carriers'] : [],
-
+			'enabled' => (bool)$applepay_configuration['active'],
+			'checkout' => (bool)$applepay_display['checkout'],
+			'cart' => (bool)$applepay_display['cart'],
+			'carriers' => json_decode($applepay_configuration['carriers'], true),
 		];
 
 		return $applepay;
 	}
 
-	public static function is_checkout_block() {
-		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' );
+	public static function is_checkout_block()
+	{
+		return WC_Blocks_Utils::has_block_in_page(wc_get_page_id('checkout'), 'woocommerce/checkout');
 	}
 
-	public static function is_cart_block() {
-		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('cart'), 'woocommerce/cart' );
+	public static function is_cart_block()
+	{
+		return WC_Blocks_Utils::has_block_in_page(wc_get_page_id('cart'), 'woocommerce/cart');
 	}
 
-	public static function is_product_block() {
-		return WC_Blocks_Utils::has_block_in_page( wc_get_page_id('product'), 'woocommerce/product' );
+	public static function is_product_block()
+	{
+		return WC_Blocks_Utils::has_block_in_page(wc_get_page_id('product'), 'woocommerce/product');
 	}
 
 	/**
 	 * Checks if subscriptions are enabled on the site.
 	 *
+	 * @return bool Whether subscriptions is enabled or not.
 	 * @since 5.6.0
 	 *
-	 * @return bool Whether subscriptions is enabled or not.
 	 */
-	public static function is_subscriptions_enabled() {
-		return class_exists( 'WC_Subscriptions' ) && class_exists( 'WC_Subscription' ) && version_compare( WC_Subscriptions::$version, '2.2.0', '>=' );
+	public static function is_subscriptions_enabled()
+	{
+		return class_exists('WC_Subscriptions') && class_exists('WC_Subscription') && version_compare(WC_Subscriptions::$version, '2.2.0', '>=');
 	}
 
 	/**
 	 * Cart has any subscriptions
 	 * @return bool
 	 */
-	public static function is_subscription() {
+	public static function is_subscription()
+	{
 
-		if ( is_null( WC()->cart ) ) {
+		if (is_null(WC()->cart)) {
 			wc_load_cart();
 			WC()->cart->get_cart_from_session();
 
 		}
 
-		if ( empty( WC()->cart ) || empty( WC()->cart->get_cart() ) ) {
+		if (empty(WC()->cart) || empty(WC()->cart->get_cart())) {
 			return false;
 		}
 
-		foreach ( WC()->cart->get_cart() as $prod ) {
-			if ( empty( $prod["product_id"] ) ) {
+		foreach (WC()->cart->get_cart() as $prod) {
+			if (empty($prod['product_id'])) {
 				return false;
 			}
 
-			$pid     = $prod["product_id"];
-			$product = wc_get_product( $pid );
+			$pid = $prod['product_id'];
+			$product = wc_get_product($pid);
 
-			if ( $product->is_type( 'subscription' ) ) {
+			if ($product->is_type('subscription')) {
 				return true;
 			}
 		}
@@ -916,19 +940,20 @@ class PayplugWoocommerceHelper {
 	 *
 	 * @return false
 	 */
-	public static function exception_handler_400_logout($error_code, $title, $msg){
+	public static function exception_handler_400_logout($error_code, $title, $msg)
+	{
 
-		if( !empty($error_code) && ($error_code === 401 || $error_code === 403) ){
+		if (!empty($error_code) && ($error_code === 401 || $error_code === 403)) {
 
 			PayplugWoocommerceHelper::payplug_logout();
-			wp_send_json_error( array(
-				"title" => $title,
+			wp_send_json_error(array(
+				'title' => $title,
 				'msg' => $msg,
-				"close" => __( 'payplug_ok', 'payplug' )
+				'close' => __('payplug_ok', 'payplug')
 			));
 		}
 
-		return  false;
+		return false;
 	}
 
 }

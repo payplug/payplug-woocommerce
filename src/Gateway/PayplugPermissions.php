@@ -46,12 +46,14 @@ class PayplugPermissions {
 	 * @param PayplugGateway $gateway
 	 */
 	public function __construct( PayplugGateway $gateway) {
-		$this->gateway_mode = $gateway->get_current_mode();
-		if (!isset($gateway->settings['payplug_live_key']) || !isset($gateway->settings['payplug_test_key'])) {
+		$this->gateway_mode = $gateway->configuration->get_option('mode');
+		$api_key = json_decode($gateway->configuration->get_option('api_key'), true);
+
+		// todo: check if we should get the jwt instead api key
+		if (!isset($api_key['live']) || !isset($api_key['test'])) {
 			$this->current_key = '';
 		} else {
-			$this->current_key = "live" === $this->gateway_mode ?
-				$gateway->settings['payplug_live_key'] : $gateway->settings['payplug_test_key'];
+			$this->current_key = "live" === $this->gateway_mode ? $api_key['live'] : $api_key['test'];
 		}
 		$this->load_permissions();
 	}

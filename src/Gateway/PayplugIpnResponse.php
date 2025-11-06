@@ -77,7 +77,6 @@ class PayplugIpnResponse {
 		if(!$lock_id){
 			return;
 		}
-
 		$this->gateway->response->process_payment( $resource, false, "ipn" );
 
 		Lock::delete_lock($lock_id);

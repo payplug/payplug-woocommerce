@@ -102,16 +102,16 @@ class PayplugResponse {
 				$gateway_id = $resource->payment_method['type'];
 
 				switch ($gateway_id) {
-					case substr( $gateway_id, 0, 5 ) === "oney_" :
+					case 'oney_' === substr( $gateway_id, 0, 5 ):
 						$this->oney_ipn($resource);
 						break;
-					case "bancontact" :
+					case 'bancontact' :
 						$this->bancontact_ipn($resource, $source);
 						break;
-					case "apple_pay" :
+					case 'apple_pay' :
 						$this->apple_pay_ipn($resource, $source);
 						break;
-					case "american_express" :
+					case 'american_express' :
 						$this->amex_ipn($resource, $source);
 						break;
 				}
@@ -231,7 +231,7 @@ class PayplugResponse {
 	 * @param $gateway_id
 	 */
 	private function gateway_name($gateway_id){
-		return ucwords(str_replace("_", " ", $gateway_id));
+		return ucwords(str_replace('_', ' ', $gateway_id));
 	}
 
 	/**

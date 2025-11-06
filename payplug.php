@@ -7,7 +7,7 @@
  * Author URI:      https://www.payplug.com/
  * Text Domain:     payplug
  * Domain Path:     /languages
- * Version:         2.15.1
+ * Version:         2.16.0
  * WC tested up to: 10.4.3
  * Requires plugins: woocommerce
  * License:         GPLv3 or later
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-define( 'PAYPLUG_GATEWAY_VERSION', '2.15.1' );
+define( 'PAYPLUG_GATEWAY_VERSION', '2.16.0' );
 define( 'PAYPLUG_GATEWAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'PAYPLUG_GATEWAY_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -54,7 +54,7 @@ function init() {
 
 	// parse the English translation file
 	$path = WP_PLUGIN_DIR . '/' . plugin_basename( dirname( __FILE__ ) ) . '/languages/payplug-en_US.mo';
-	$GLOBALS["mo"]->import_from_file($path);
+	$GLOBALS['mo']->import_from_file($path);
 }
 
 function create_lock_table(){
@@ -88,8 +88,8 @@ function wpdocs_translate_text($msgstr, $msgid, $domain)
 	$pattern = '/^payplug_.+/';
 
 	if (preg_match($pattern, $msgstr) === 1) {
-		if(isset($GLOBALS["mo"]->entries[$msgstr]))
-			return $GLOBALS["mo"]->entries[$msgstr]->translations[0];
+		if(isset($GLOBALS['mo']->entries[$msgstr]))
+			return $GLOBALS['mo']->entries[$msgstr]->translations[0];
 	}
 
 	return $msgstr;

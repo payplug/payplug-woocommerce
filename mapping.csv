@@ -1,0 +1,8 @@
+
+"payment_method" => "redirect"
+payment_methods.configuration.embedded_mode
+
+
+/// Go from this
+
+['payment_methods']['configuration']['applepay']['display']

@@ -1,27 +1,36 @@
 <?php
+
 namespace Payplug\PayplugWoocommerce\Front;
 
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Controller\ApplePay as ApplePayGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 use function is_cart;
 
-class ApplePay {
+class ApplePay
+{
+	use ServiceGetter;
 
-	public function __construct() {
+	private $options;
+
+	public function __construct()
+	{
+		$this->options = $this->get_service('configuration')->get_options();
 
 		//routes for apple_pay on cart and product page
-		add_action( 'wc_ajax_applepay_get_shippings', [ $this, 'applepay_get_shippings' ] );
-		add_action( 'wc_ajax_place_order_with_dummy_data', [ $this, 'place_order_with_dummy_data' ] );
-		add_action( 'wc_ajax_update_applepay_order', [ $this, 'update_applepay_order' ] );
-		add_action( 'wc_ajax_update_applepay_payment', [ $this, 'update_applepay_payment' ] );
-		add_action( 'wc_ajax_applepay_cancel_order', [ $this, 'applepay_cancel_order' ] );
-		add_action( 'wc_ajax_applepay_empty_cart', [ $this, 'applepay_empty_cart' ] );
-		add_action( 'wc_ajax_applepay_add_to_cart', [ $this, 'applepay_add_to_cart' ] );
+		add_action('wc_ajax_applepay_get_shippings', [$this, 'applepay_get_shippings']);
+		add_action('wc_ajax_place_order_with_dummy_data', [$this, 'place_order_with_dummy_data']);
+		add_action('wc_ajax_update_applepay_order', [$this, 'update_applepay_order']);
+		add_action('wc_ajax_update_applepay_payment', [$this, 'update_applepay_payment']);
+		add_action('wc_ajax_applepay_cancel_order', [$this, 'applepay_cancel_order']);
+		add_action('wc_ajax_applepay_empty_cart', [$this, 'applepay_empty_cart']);
+		add_action('wc_ajax_applepay_add_to_cart', [$this, 'applepay_add_to_cart']);
 	}
 
-	public function applepay_get_shippings() {
+	public function applepay_get_shippings()
+	{
 		WC()->customer->set_shipping_country('FR');
 		WC()->customer->set_shipping_city('Paris');
 		WC()->customer->set_shipping_postcode('12345');
@@ -30,24 +39,24 @@ class ApplePay {
 		$packages = WC()->cart->get_shipping_packages();
 		$shippings = [];
 
-		foreach ( $packages as $package_key => $package ) {
+		foreach ($packages as $package_key => $package) {
 			$shipping_methods = $this->get_shipping_methods_from_package($package);
 
-			foreach ( $shipping_methods as $shipping_method ) {
+			foreach ($shipping_methods as $shipping_method) {
 
 				if (!$shipping_method->supports('shipping-zones') || !$shipping_method->is_enabled()) {
 					continue;
 				}
 
 				$rates = $shipping_method->get_rates_for_package($package);
-				if($this->checkApplePayShipping($shipping_method)){
+				if ($this->checkApplePayShipping($shipping_method)) {
 					$shipping_rate = $rates[$shipping_method->get_rate_id()];
 
 					array_push($shippings, [
-						'identifier' => $shipping_method->id.'_'.$shipping_method->instance_id,
+						'identifier' => $shipping_method->id . '_' . $shipping_method->instance_id,
 						'label' => $shipping_method->method_title,
 						'detail' => strip_tags($shipping_method->method_description),
-						'amount' =>$shipping_rate->get_cost()+$shipping_rate->get_shipping_tax()
+						'amount' => $shipping_rate->get_cost() + $shipping_rate->get_shipping_tax()
 					]);
 				}
 			}
@@ -59,8 +68,9 @@ class ApplePay {
 	 * @param $shipping
 	 * @return bool
 	 */
-	private function checkApplePayShipping($shipping = []){
-		if(empty($shipping)){
+	private function checkApplePayShipping($shipping = [])
+	{
+		if (empty($shipping)) {
 			return false;
 		}
 
@@ -68,8 +78,8 @@ class ApplePay {
 		$apple_pay_carriers = $apple_pay_options['carriers'];
 
 		$exists = false;
-		foreach($apple_pay_carriers as $carrier => $carrier_id){
-			if($carrier_id === $shipping->id){
+		foreach ($apple_pay_carriers as $carrier => $carrier_id) {
+			if ($carrier_id === $shipping->id) {
 				return true;
 			}
 		}
@@ -77,48 +87,49 @@ class ApplePay {
 		return $exists;
 	}
 
-
-	private function get_shipping_methods_from_package($package){
-		$shipping_zone = \WC_Shipping_Zones::get_zone_matching_package( $package );
-		return $shipping_zone->get_shipping_methods( true );
+	private function get_shipping_methods_from_package($package)
+	{
+		$shipping_zone = \WC_Shipping_Zones::get_zone_matching_package($package);
+		return $shipping_zone->get_shipping_methods(true);
 	}
 
-	public function place_order_with_dummy_data() {
+	public function place_order_with_dummy_data()
+	{
 		$apple_pay = new ApplePayGateway();
-		if ( is_admin() ) {
+		if (is_admin()) {
 			return;
 		}
 
 		$cart = WC()->cart;
 
-		if ( ! $cart->is_empty() ) {
-			try{
+		if (!$cart->is_empty()) {
+			try {
 				$checkout = WC()->checkout();
 
 				$order_id = $checkout->create_order(array('payment_method' => $apple_pay->id));
 				$order = wc_get_order($order_id);
 
 
-				$order->set_address( [
+				$order->set_address([
 					'first_name' => 'payplug_applepay_first_name',
-					'last_name'  => 'payplug_applepay_last_name',
-					'address_1'  => 'payplug_applepay_address',
-					'address_2'  => '',
-					'city'       => 'payplug_applepay_city',
-					'postcode'   => 'payplug_applepay_psotcode',
-					'country'    => WC()->countries->get_base_country(),
-					'email'      => 'payplug_applepay_email@payplug.com'
-				], 'billing' );
-				$order->set_address( [
+					'last_name' => 'payplug_applepay_last_name',
+					'address_1' => 'payplug_applepay_address',
+					'address_2' => '',
+					'city' => 'payplug_applepay_city',
+					'postcode' => 'payplug_applepay_psotcode',
+					'country' => WC()->countries->get_base_country(),
+					'email' => 'payplug_applepay_email@payplug.com'
+				], 'billing');
+				$order->set_address([
 					'first_name' => 'payplug_applepay_first_name',
-					'last_name'  => 'payplug_applepay_last_name',
-					'address_1'  => 'payplug_applepay_address',
-					'address_2'  => '',
-					'city'       => 'payplug_applepay_city',
-					'postcode'   => 'payplug_applepay_psotcode',
-					'country'    => WC()->countries->get_base_country(),
-					'email'      => 'payplug_applepay_email@payplug.com'
-				], 'shipping' );
+					'last_name' => 'payplug_applepay_last_name',
+					'address_1' => 'payplug_applepay_address',
+					'address_2' => '',
+					'city' => 'payplug_applepay_city',
+					'postcode' => 'payplug_applepay_psotcode',
+					'country' => WC()->countries->get_base_country(),
+					'email' => 'payplug_applepay_email@payplug.com'
+				], 'shipping');
 
 				$order->set_payment_method($apple_pay);
 
@@ -136,7 +147,7 @@ class ApplePay {
 
 				$this->process_cart_payment($order, $apple_pay);
 
-			}catch (\Exception $exception){
+			} catch (\Exception $exception) {
 				wp_send_json_error([
 					'message' => __('Your order was cancelled.', 'woocommerce')
 				]);
@@ -147,11 +158,12 @@ class ApplePay {
 		}
 	}
 
-	public function process_cart_payment($order ,$gateway) {
+	public function process_cart_payment($order, $gateway)
+	{
 		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 		$customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
-		$amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total() - ($order->get_shipping_tax() + $order->get_shipping_total()));
-		$amount      = $gateway->validate_order_amount($amount);
+		$amount = (int)PayplugWoocommerceHelper::get_payplug_amount($order->get_total() - ($order->get_shipping_tax() + $order->get_shipping_total()));
+		$amount = $gateway->validate_order_amount($amount);
 		wp_send_json([
 			'total' => $amount,
 			'order_id' => $order_id,
@@ -160,9 +172,10 @@ class ApplePay {
 
 	}
 
-	public function update_applepay_order() {
+	public function update_applepay_order()
+	{
 		$order_id = $_POST['order_id'];
-		$order = wc_get_order( $order_id );
+		$order = wc_get_order($order_id);
 
 		$selected_shipping_method = !empty($_POST['shipping_method']) ? $_POST['shipping_method'] : null;
 		if (!empty($_POST['shipping'])) {
@@ -199,7 +212,7 @@ class ApplePay {
 			}
 		}
 		if (!empty($_POST['billing'])) {
-			foreach ( $_POST['billing'] as $key => $data ) {
+			foreach ($_POST['billing'] as $key => $data) {
 				switch ($key) {
 					case 'familyName':
 						$order->set_billing_last_name($data);
@@ -231,15 +244,15 @@ class ApplePay {
 		$order->set_shipping_country($address_data->get_shipping()['country']);
 		$order->set_billing_country($address_data->get_billing()['country']);
 
-		$shipping_address= $address_data->get_shipping();
+		$shipping_address = $address_data->get_shipping();
 		$shipping_address['state'] = '';
 
 		$package = array(
-			'contents'        => array(),
-			'contents_cost'   => 0,
-			'destination'     => $shipping_address,
+			'contents' => array(),
+			'contents_cost' => 0,
+			'destination' => $shipping_address,
 			'applied_coupons' => $order->get_used_coupons(),
-			'user'            => array(
+			'user' => array(
 				'ID' => $order->get_customer_id()
 			)
 		);
@@ -254,25 +267,25 @@ class ApplePay {
 
 			$shipping_methods = $shipping_zone->get_shipping_methods( true );
 
-			foreach ( $shipping_methods as $shipping_method ) {
-				if ( ! $shipping_method->supports( 'shipping-zones' ) || ! $shipping_method->is_enabled() ) {
+			foreach ($shipping_methods as $shipping_method) {
+				if (!$shipping_method->supports('shipping-zones') || !$shipping_method->is_enabled()) {
 					continue;
 				}
 
-				$id_shipping_method = $shipping_method->id.'_'.$shipping_method->instance_id;
+				$id_shipping_method = $shipping_method->id . '_' . $shipping_method->instance_id;
 				if ($id_shipping_method === $selected_shipping_method) {
 
-					$shipping_method->calculate_shipping( $package );
+					$shipping_method->calculate_shipping($package);
 					$rates = $shipping_method->get_rates_for_package($package);
 
-					if ( ! empty( $rates ) ) {
+					if (!empty($rates)) {
 
-						$rate = reset( $rates );
+						$rate = reset($rates);
 
 						$item = new \WC_Order_Item_Shipping();
-						$item->set_method_title( $rate->get_label() );
-						$item->set_method_id( $rate->get_id() );
-						$item->set_total( $rate->get_cost() );
+						$item->set_method_title($rate->get_label());
+						$item->set_method_id($rate->get_id());
+						$item->set_total($rate->get_cost());
 
 						if (!empty($rate->taxes)) {
 							$use_taxes = true;
@@ -282,15 +295,15 @@ class ApplePay {
 							$rate->get_taxes()
 						);
 
-						$item->set_taxes( [
+						$item->set_taxes([
 							'total' => $shipping_taxes,
-						] );
+						]);
 
 						$item->calculate_taxes();
 
 						$item->save();
 
-						$order->add_item( $item );
+						$order->add_item($item);
 						break;
 					}
 				}
@@ -309,7 +322,8 @@ class ApplePay {
 	 * @return void
 	 * @throws \Payplug\Exception\ConfigurationNotSetException
 	 */
-	public function update_applepay_payment() {
+	public function update_applepay_payment()
+	{
 
 		$applepay = new ApplePayGateway();
 
@@ -320,9 +334,9 @@ class ApplePay {
 
 		$payment = \Payplug\Payment::retrieve($payment_id);
 
-		$order = wc_get_order( $order_id );
-		$amount      = (int) PayplugWoocommerceHelper::get_payplug_amount($amount);
-		$amount      = $applepay->validate_order_amount($amount);
+		$order = wc_get_order($order_id);
+		$amount = (int)PayplugWoocommerceHelper::get_payplug_amount($amount);
+		$amount = $applepay->validate_order_amount($amount);
 
 		$address_data = PayplugAddressData::from_order($order);
 
@@ -333,10 +347,10 @@ class ApplePay {
 		unset($shipping['delivery_type']);
 
 		$data = ['apple_pay' => array(
-			"amount" => $amount,
-			"payment_token" => $payment_token,
-			"billing"          => $billing,
-			"shipping"       => $shipping,
+			'amount' => $amount,
+			'payment_token' => $payment_token,
+			'billing' => $billing,
+			'shipping' => $shipping,
 		)];
 
 		$update = $payment->update($data);
@@ -352,7 +366,7 @@ class ApplePay {
 		$payment_id = !empty($_POST['payment_id']) ? $_POST['payment_id'] : null;
 		$order_id = $_POST['order_id'];
 
-		if(empty($_POST['order_id'])){
+		if (empty($_POST['order_id'])) {
 			wp_send_json_error([
 				'message' => __('Your order was cancelled.', 'woocommerce')
 			]);
@@ -375,19 +389,19 @@ class ApplePay {
 		}
 
 		//if there's no payment created
-		if (!empty($payment_id)){
-			$options = PayplugWoocommerceHelper::get_payplug_options();
-			$payplug_test_key = !empty($options['payplug_test_key']) ? $options['payplug_test_key'] : '';
-			$payplug_live_key = !empty($options['payplug_live_key']) ? $options['payplug_live_key'] : '';
+		if (!empty($payment_id)) {
+			$api_key = json_decode($this->options['api_key'], true);
+			$test_key = !empty($api_key['test']) ? $api_key['test'] : '';
+			$live_key = !empty($api_key['live']) ? $api_key['live'] : '';
 
-			if (empty($payplug_test_key) && empty($payplug_live_key)) {
+			if (empty($test_key) && empty($live_key)) {
 				wp_send_json_error([
 					'message' => __('Your order was cancelled.', 'woocommerce')
 				]);
 			}
 
-			$payment = \Payplug\Payment::retrieve($payment_id, new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
-			$payment->abort(new Payplug($options['mode'] === 'yes' ? $payplug_live_key : $payplug_test_key));
+			$payment = \Payplug\Payment::retrieve($payment_id, new Payplug((bool)$this->options ? $live_key : $test_key));
+			$payment->abort(new Payplug((bool)$this->options ? $live_key : $test_key));
 		}
 
 		if ($order->delete(true)) {
@@ -399,11 +413,10 @@ class ApplePay {
 				'message' => __('Your order was cancelled.', 'woocommerce')
 			]);
 		}
-
-
 	}
 
-	public function applepay_empty_cart() {
+	public function applepay_empty_cart()
+	{
 		try {
 			WC()->cart->empty_cart();
 			wp_send_json_success();
@@ -414,7 +427,8 @@ class ApplePay {
 		}
 	}
 
-	public function applepay_add_to_cart() {
+	public function applepay_add_to_cart()
+	{
 		try {
 			if (!empty($_POST['product_id'])) {
 				$product_id = $_POST['product_id'];
