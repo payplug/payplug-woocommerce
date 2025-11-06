@@ -1,14 +1,12 @@
 /* global window, apple_pay_params */
 (function($){
-
 	var $apple_pay_button = $('apple-pay-button')
 	var session = null;
-	var is_cart = apple_pay_params.is_cart;
+	var is_product = apple_pay_params.is_product;
 	var apple_pay = {
 		load_order_total: false,
 		init: function () {
-
-			if(!is_cart){
+			if(!is_product){
 				return;
 			}
 
@@ -22,7 +20,6 @@
 			).done(function(results){
 				if(results.success){
 					apple_pay_params.total = results.data;
-
 				} else {
 					$apple_pay_button.remove();
 				}
@@ -40,8 +37,8 @@
 				apple_pay_params.ajax_url_applepay_get_shippings
 
 			).done(function(results){
-
 				if(results.data.length === 0){
+					//$apple_pay_button.remove();
 					apple_pay_params.carriers = [];
 					return;
 				}
@@ -56,8 +53,39 @@
 			e.preventDefault();
 			e.stopImmediatePropagation();
 
+			jQuery.post({
+				'url' : apple_pay_params.ajax_url_applepay_empty_cart,
+                'async' : false,
+			}).done(function(results){
+			    product_informations = {
+					'product_id': jQuery("button[name=add-to-cart]").val(),
+					'product_quantity': jQuery("input[name=quantity]").val()
+				}
+			    // We manage variations
+				if (jQuery("table.variations").length != 0) {
+				    product_informations['product_variation_id'] = jQuery("input[name=variation_id]").val();
+				}
+
+				jQuery.post({
+					'url' : apple_pay_params.ajax_url_applepay_add_to_cart,
+                    'async' : false,
+				    'data' : product_informations
+				}).done(function(results) {
+					if (results.success === false) {
+						apple_pay.showError(results.data.msg, "error");
+						$apple_pay_button.remove();
+						return;
+					}
+					apple_pay_params.total = results.data.total;
+				}).fail( function() {
+					$apple_pay_button.remove();
+				});
+			}).fail( function() {
+				$apple_pay_button.remove();
+			});
+
 			apple_pay.CreateSession();
-			apple_pay.CancelOrder()
+			apple_pay.CancelOrder();
 			apple_pay.PaymentCompleted();
 
 			//loading layer
@@ -78,7 +106,7 @@
 		},
 		OrderPaymentCreated: function (response) {
 			if ('success' !== response.payment_data.result) {
-				var error_messages = response.messages || ''
+				var error_messages = response.messages || '';
 				apple_pay.CancelOrder(error_messages);
 			}
 
@@ -205,7 +233,7 @@
 								apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
 								apple_pay.CancelOrder('Unfortunately your order cannot be processed as the originating bank/merchant has declined your transaction. Please attempt your purchase again.')
 							}
-							session.completePayment({"status": apple_pay_Session_status})
+							session.completePayment({"status": apple_pay_Session_status});
 							window.location = session.return_url
 						},
 						error: function(err){
@@ -222,13 +250,13 @@
 		},
 		CancelOrder: function (message) {
 			session.oncancel = event => {
-				$('apple-pay-button').removeClass("isDisabled")
+				$('apple-pay-button').removeClass("isDisabled");
 				apple_pay.cancel_order_request(session.order_id, session.payment_id);
 
 			}
 		},
 		handle_process_error: function (order_id = null) {
-			$('apple-pay-button').removeClass("isDisabled")
+			$('apple-pay-button').removeClass("isDisabled");
 			apple_pay.cancel_order_request(order_id, null);
 		},
 		cancel_order_request: function(order_id, payment_id = null){

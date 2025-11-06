@@ -217,6 +217,45 @@ class PayplugWoocommerceRequest {
 			wp_send_json_error($e->getMessage());
 		}
 	}
+
+	/**
+	 * Empty cart for Apple Pay on product page
+	 */
+	public function applepay_empty_cart() {
+		try {
+			WC()->cart->empty_cart();
+			wp_send_json_success();
+		} catch (\Exception $e) {
+			wp_send_json_error([
+				'message' => __('Your order was cancelled.', 'woocommerce')
+			]);
+		}
+	}
+
+	/**
+	 * Add the product on the current page to the cart for Apple Pay on product page
+	 */
+	public function applepay_add_to_cart() {
+		try {
+			if (!empty($_POST['product_id'])) {
+				$product_id = $_POST['product_id'];
+			} else {
+				$product_id = $_POST['product_variation_id'];
+			}
+
+			$product_quantity = !empty($_POST['product_quantity']) ? $_POST['product_quantity'] : 1;
+
+			WC()->cart->add_to_cart($product_id, $product_quantity);
+			wp_send_json_success([
+				'total' => WC()->cart->total - WC()->cart->shipping_total
+			]);
+		} catch (\Exception $e) {
+			wp_send_json_error([
+				'message' => __('Your order was cancelled.', 'woocommerce')
+			]);
+		}
+	}
+
 	/**
 	 * Limit string length.
 	 *
@@ -386,13 +425,13 @@ class PayplugWoocommerceRequest {
 			$payment_data["metadata"]["applepay_workflow"] = "checkout";
 		}
 
-		if($this->gateway->payment_method === 'integrated' && $this->gateway->id === "payplug") {
+		if($this->gateway->get_option('payment_method') === 'integrated' && $this->gateway->id === "payplug") {
 			$payment_data['initiator'] = 'PAYER';
 			$payment_data['integration'] = 'INTEGRATED_PAYMENT';
 			unset($payment_data['hosted_payment']['cancel_url']);
 		}
 
-		if($this->gateway->payment_method === 'popup' && $this->gateway->id === "american_express") {
+		if($this->gateway->get_option('payment_method') === 'popup' && $this->gateway->id === "american_express") {
 			$payment_data['payment_method'] = $this->gateway->id;
 		}
 
