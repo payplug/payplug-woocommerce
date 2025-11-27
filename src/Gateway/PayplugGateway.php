@@ -675,13 +675,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function admin_options()
     {
 		/************ VUE Code *************/
-		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-1.7.12.js', [], PAYPLUG_GATEWAY_VERSION);
-		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-1.7.12.js', [], PAYPLUG_GATEWAY_VERSION);
-		wp_enqueue_style('app.css', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/css/app.css', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-' . PAYPLUG_GATEWAY_VERSION . '.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_script('app.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/app-' . PAYPLUG_GATEWAY_VERSION . '.js', [], PAYPLUG_GATEWAY_VERSION);
+		wp_enqueue_style('app.css', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/css/app-' . PAYPLUG_GATEWAY_VERSION . '.css', [], PAYPLUG_GATEWAY_VERSION);
 		wp_localize_script('app.js', 'payplug_admin_config',
 			array(
 				"img_path"		=> esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/'),
-				'ajax_url'      => get_home_url()
+				'ajax_url'      => get_home_url(),
+				'rest_url'      => get_home_url() . '/?rest_route=/payplug_api/',
 			));
 
 		?>

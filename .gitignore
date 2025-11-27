@@ -37,3 +37,6 @@ tests
 # Temporary files
 *~
 /cypress/
+
+# Assets
+assets/dist
