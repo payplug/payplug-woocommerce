@@ -135,6 +135,19 @@ jobs:
       - name: Test php version 8.1
         run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 8.1
 
+  Run-PHPUnit-Tests:
+    name: 10) Run PHPUnit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code ${{ github.workflow }}
+        uses: actions/checkout@v3
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          composer-options: "--ignore-platform-reqs"
+      - name: Run PHPUnit
+        run: ./vendor/phpunit/phpunit/phpunit tests/phpunit/src/ --coverage-text --colors=never -d memory_limit=-1
+
   sonarcloud:
       runs-on: ubuntu-latest
       continue-on-error: true
