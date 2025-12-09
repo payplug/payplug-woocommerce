@@ -1,16 +1,16 @@
-<?xml version="1.0"?>
-<phpunit
-	bootstrap="tests/bootstrap.php"
-	backupGlobals="false"
-	colors="true"
-	convertErrorsToExceptions="true"
-	convertNoticesToExceptions="true"
-	convertWarningsToExceptions="true"
->
-	<testsuites>
-		<testsuite name="testing">
-			<directory suffix="_test.php">./tests/phpunit</directory>
-			<exclude>./tests/test-sample.php</exclude>
-		</testsuite>
-	</testsuites>
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php"
+         colors="true"
+         verbose="true">
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>./tests/phpunit</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src/</directory>
+        </whitelist>
+    </filter>
 </phpunit>
+
