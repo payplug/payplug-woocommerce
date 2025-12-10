@@ -2,175 +2,178 @@
 
 namespace Payplug\PayplugWoocommerce\Admin;
 
-class Validator {
+class Validator
+{
+    public static function enabled($value)
+    {
+        if (1 == $value) {
+            return 'yes';
+        }
 
-	public static function enabled($value) {
+        if (0 == $value) {
+            return 'no';
+        }
 
-		if ($value == 1){
-			return "yes";
-		}
+        http_response_code(400);
+        wp_send_json_error(['error' => 'enabled is missing']);
+    }
 
-		if ($value == 0){
-			return "no";
-		}
+    public static function mode($value)
+    {
+        if (1 == $value) {
+            return 'no';
+        }
 
-		http_response_code(400);
-		wp_send_json_error(['error' => 'enabled is missing']);
-	}
+        if (0 == $value) {
+            return 'yes';
+        }
 
-	public static function mode($value) {
-		if ($value == 1){
-			return "no";
-		}
+        http_response_code(400);
+        wp_send_json_error(['error' => 'mode is missing']);
+    }
 
-		if ($value == 0){
-			return "yes";
-		}
+    public static function payment_method($value)
+    {
+        if (!empty($value) && in_array($value, ['redirect', 'popup', 'integrated'])) {
+            return true;
+        }
 
-		http_response_code(400);
-		wp_send_json_error(['error' => 'mode is missing']);
-	}
+        http_response_code(400);
+        wp_send_json_error(['error' => 'payment_method is missing']);
+    }
 
-	public static function payment_method($value) {
+    public static function debug($value)
+    {
+        if (1 == $value) {
+            return 'yes';
+        }
 
-		if ( !empty($value) && in_array($value, ['redirect', 'popup', 'integrated']) ) {
-			return true;
-		}
+        if (0 == $value) {
+            return 'no';
+        }
 
-		http_response_code(400);
-		wp_send_json_error(['error' => 'payment_method is missing']);
-	}
+        http_response_code(400);
+        wp_send_json_error(['error' => 'mode is missing']);
 
-	public static function debug($value) {
+        return 'no';
+    }
 
-		if ($value == 1){
-			return "yes";
-		}
+    public static function oneclick($value)
+    {
+        if (1 == $value) {
+            return 'yes';
+        }
 
-		if ($value == 0){
-			return "no";
-		}
+        if (0 == $value) {
+            return 'no';
+        }
 
-		http_response_code(400);
-		wp_send_json_error(['error' => 'mode is missing']);
+        http_response_code(400);
+        wp_send_json_error(['error' => 'oneclick is missing']);
+    }
 
-		return "no";
-	}
+    public static function genericPaymentGateway($value, $payment, $test_mode)
+    {
+        if ($test_mode) {
+            return 'no';
+        }
 
-	public static function oneclick($value) {
+        if (1 == $value || $value) {
+            return 'yes';
+        }
 
-		if ($value == 1){
-			return "yes";
-		}
+        return 'no';
+    }
 
-		if ($value == 0){
-			return "no";
-		}
+    /**
+     * prevent saving when neither cart and checkout is enabled.
+     *
+     * @param $cart
+     * @param $product
+     * @param $checkout
+     * @param mixed $apple_pay
+     * @param mixed $carriers
+     *
+     * @return true
+     */
+    public static function applePayPaymentGatewayOptions($apple_pay, $cart, $product, $checkout, $carriers)
+    {
+        if ('no' === $apple_pay) {
+            return true;
+        }
 
-		http_response_code(400);
-		wp_send_json_error(['error' => 'oneclick is missing']);
-	}
+        if ('no' === $cart && 'no' === $product && 'no' === $checkout) {
+            http_response_code(200);
 
-	public static function genericPaymentGateway($value, $payment, $test_mode) {
+            $arr = [
+                'msg' => __('applepay_cart_checkout_option_validation', 'payplug'),
+                'class' => 'error',
+                'title' => __('applepay_cart_checkout_option_validation_title', 'payplug'),
+                'close' => __('payplug_ok', 'payplug'),
+            ];
 
-		if($test_mode){
-			return "no";
-		}
+            wp_send_json_error($arr);
+        }
 
-		if ($value == 1 || $value){
-			return "yes";
-		}
+        if (('yes' === $cart || 'yes' === $product) && empty($carriers)) {
+            http_response_code(200);
 
-		return "no";
-	}
+            $arr = [
+                'msg' => __('applepay_cart_carrier_enabled', 'payplug'),
+                'class' => 'error',
+                'title' => __('applepay_cart_checkout_option_validation_title', 'payplug'),
+                'close' => __('payplug_ok', 'payplug'),
+            ];
 
-	/**
-	 * prevent saving when neither cart and checkout is enabled
-	 *
-	 * @param $cart
-	 * @param $product
-	 * @param $checkout
-	 * @return true
-	 */
-	public static function applePayPaymentGatewayOptions($apple_pay, $cart, $product, $checkout, $carriers){
+            wp_send_json_error($arr);
+        }
 
-		if($apple_pay === "no"){
-			return true;
-		}
+        return true;
+    }
 
-		if( $cart === "no" && $product === "no" && $checkout === "no" ){
-			http_response_code(200);
+    public static function oney($value)
+    {
+        if (1 == $value) {
+            return 'yes';
+        }
 
-			$arr = [
-				"msg"=>__( 'applepay_cart_checkout_option_validation', 'payplug' ),
-				"class"=>"error",
-				"title"=>__( 'applepay_cart_checkout_option_validation_title', 'payplug' ),
-				"close"=> __( 'payplug_ok', 'payplug' )
-			];
+        return 'no';
+        http_response_code(400);
+        wp_send_json_error(['error' => 'oney is missing']);
+    }
 
-			wp_send_json_error($arr);
-		}
+    public static function oney_type($value)
+    {
+        if (isset($value) && !empty($value)) {
+            if (in_array($value, ['with_fees', 'without_fees'])) {
+                return true;
+            }
+        }
 
-		if( ($cart === "yes" || $product === "yes") && empty($carriers)){
-			http_response_code(200);
+        return false;
+    }
 
-			$arr = [
-				"msg"=>__( 'applepay_cart_carrier_enabled', 'payplug' ),
-				"class"=>"error",
-				"title"=>__( 'applepay_cart_checkout_option_validation_title', 'payplug' ),
-				"close"=> __( 'payplug_ok', 'payplug' )
-			];
+    public static function oney_thresholds($min, $max)
+    {
+        $rmin = 100;
+        $rmax = 3000;
+        if ($min > 99 && $min < $max) {
+            $rmin = $min;
+        }
 
-			wp_send_json_error($arr);
-		}
+        if ($max <= 3000 && $max > $min) {
+            $rmax = $max;
+        }
 
-		return true;
+        return ['min' => $rmin, 'max' => $rmax];
+    }
 
-	}
+    public static function oney_product_animation($status)
+    {
+        if ($status) {
+            return 'yes';
+        }
 
-	public static function oney($value) {
-
-		if ($value == 1){
-			return "yes";
-		}
-
-		return "no";
-
-		http_response_code(400);
-		wp_send_json_error(['error' => 'oney is missing']);
-	}
-
-	public static function oney_type($value) {
-		if (isset($value) && !empty($value)) {
-			if (in_array($value, ['with_fees', 'without_fees'])) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static function oney_thresholds($min, $max) {
-
-		$rmin = 100;
-		$rmax = 3000;
-		if( $min > 99 && $min<$max){
-			$rmin = $min;
-		}
-
-		if( $max <= 3000 && $max>$min ){
-			$rmax = $max;
-		}
-
-		return array("min"=>$rmin, "max"=>$rmax);
-	}
-
-	public static function oney_product_animation($status){
-
-		if($status){
-			return "yes";
-		}else{
-			return "no";
-		}
-
-	}
+        return 'no';
+    }
 }

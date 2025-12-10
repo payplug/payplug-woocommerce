@@ -10,105 +10,78 @@
  * Do not modify this file directly!
  */
 
-
-return array (
-  'generalDesc' => 
-  array (
-    'NationalNumberPattern' => '[19]\\d\\d',
-    'PossibleLength' => 
-    array (
-      0 => 3,
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'tollFree' => 
-  array (
-    'NationalNumberPattern' => '100|911',
-    'ExampleNumber' => '100',
-    'PossibleLength' => 
-    array (
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'premiumRate' => 
-  array (
-    'PossibleLength' => 
-    array (
-      0 => -1,
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'emergency' => 
-  array (
-    'NationalNumberPattern' => '100|911',
-    'ExampleNumber' => '100',
-    'PossibleLength' => 
-    array (
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'shortCode' => 
-  array (
-    'NationalNumberPattern' => '1(?:00|76)|911',
-    'ExampleNumber' => '100',
-    'PossibleLength' => 
-    array (
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'standardRate' => 
-  array (
-    'PossibleLength' => 
-    array (
-      0 => -1,
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'carrierSpecific' => 
-  array (
-    'NationalNumberPattern' => '176',
-    'ExampleNumber' => '176',
-    'PossibleLength' => 
-    array (
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'smsServices' => 
-  array (
-    'NationalNumberPattern' => '176',
-    'ExampleNumber' => '176',
-    'PossibleLength' => 
-    array (
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'id' => 'AW',
-  'countryCode' => 0,
-  'internationalPrefix' => '',
-  'sameMobileAndFixedLinePattern' => false,
-  'numberFormat' => 
-  array (
-  ),
-  'intlNumberFormat' => 
-  array (
-  ),
-  'mainCountryForCode' => false,
-  'leadingZeroPossible' => false,
-  'mobileNumberPortableRegion' => false,
-);
+return [
+    'generalDesc' => [
+        'NationalNumberPattern' => '[19]\\d\\d',
+        'PossibleLength' => [
+            0 => 3,
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'tollFree' => [
+        'NationalNumberPattern' => '100|911',
+        'ExampleNumber' => '100',
+        'PossibleLength' => [
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'premiumRate' => [
+        'PossibleLength' => [
+            0 => -1,
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'emergency' => [
+        'NationalNumberPattern' => '100|911',
+        'ExampleNumber' => '100',
+        'PossibleLength' => [
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'shortCode' => [
+        'NationalNumberPattern' => '1(?:00|76)|911',
+        'ExampleNumber' => '100',
+        'PossibleLength' => [
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'standardRate' => [
+        'PossibleLength' => [
+            0 => -1,
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'carrierSpecific' => [
+        'NationalNumberPattern' => '176',
+        'ExampleNumber' => '176',
+        'PossibleLength' => [
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'smsServices' => [
+        'NationalNumberPattern' => '176',
+        'ExampleNumber' => '176',
+        'PossibleLength' => [
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'id' => 'AW',
+    'countryCode' => 0,
+    'internationalPrefix' => '',
+    'sameMobileAndFixedLinePattern' => false,
+    'numberFormat' => [
+    ],
+    'intlNumberFormat' => [
+    ],
+    'mainCountryForCode' => false,
+    'leadingZeroPossible' => false,
+    'mobileNumberPortableRegion' => false,
+];

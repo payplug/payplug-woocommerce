@@ -3,12 +3,11 @@
 namespace libphonenumber;
 
 /**
- * Interface MatcherAPIInterface
+ * Interface MatcherAPIInterface.
  *
  * Internal phonenumber matching API used to isolate the underlying implementation of the
  * matcher and allow different implementations to be swapped in easily.
  *
- * @package libphonenumber
  * @internal
  */
 interface MatcherAPIInterface
@@ -18,9 +17,9 @@ interface MatcherAPIInterface
      * the national number pattern defined in the given {@code PhoneNumberDesc} message.
      *
      * @param string $number
-     * @param PhoneNumberDesc $numberDesc
-     * @param boolean $allowPrefixMatch
-     * @return boolean
+     * @param bool $allowPrefixMatch
+     *
+     * @return bool
      */
     public function matchNationalNumber($number, PhoneNumberDesc $numberDesc, $allowPrefixMatch);
 }

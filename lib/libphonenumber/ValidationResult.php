@@ -8,7 +8,7 @@ namespace libphonenumber;
 class ValidationResult
 {
     /**
-     * The number length matches that of valid numbers for this region
+     * The number length matches that of valid numbers for this region.
      */
     const IS_POSSIBLE = 0;
 
