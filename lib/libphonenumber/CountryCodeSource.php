@@ -3,7 +3,7 @@
 namespace libphonenumber;
 
 /**
- * Country code source from number
+ * Country code source from number.
  */
 class CountryCodeSource
 {

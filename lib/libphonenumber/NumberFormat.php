@@ -3,7 +3,7 @@
 namespace libphonenumber;
 
 /**
- * Number Format
+ * Number Format.
  */
 class NumberFormat
 {
@@ -29,7 +29,7 @@ class NumberFormat
     /**
      * @var array
      */
-    protected $leadingDigitsPattern = array();
+    protected $leadingDigitsPattern = [];
 
     /**
      * @var string
@@ -76,7 +76,7 @@ class NumberFormat
         $this->hasFormat = false;
         $this->format = null;
 
-        $this->leadingDigitsPattern = array();
+        $this->leadingDigitsPattern = [];
 
         $this->hasNationalPrefixFormattingRule = false;
         $this->nationalPrefixFormattingRule = null;
@@ -91,7 +91,7 @@ class NumberFormat
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function hasPattern()
     {
@@ -108,6 +108,7 @@ class NumberFormat
 
     /**
      * @param string $value
+     *
      * @return NumberFormat
      */
     public function setPattern($value)
@@ -119,7 +120,7 @@ class NumberFormat
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function hasNationalPrefixOptionalWhenFormatting()
     {
@@ -127,7 +128,7 @@ class NumberFormat
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getNationalPrefixOptionalWhenFormatting()
     {
@@ -135,7 +136,7 @@ class NumberFormat
     }
 
     /**
-     * @param boolean $nationalPrefixOptionalWhenFormatting
+     * @param bool $nationalPrefixOptionalWhenFormatting
      */
     public function setNationalPrefixOptionalWhenFormatting($nationalPrefixOptionalWhenFormatting)
     {
@@ -144,7 +145,7 @@ class NumberFormat
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function hasFormat()
     {
@@ -161,6 +162,7 @@ class NumberFormat
 
     /**
      * @param string $value
+     *
      * @return NumberFormat
      */
     public function setFormat($value)
@@ -189,6 +191,7 @@ class NumberFormat
 
     /**
      * @param int $index
+     *
      * @return string
      */
     public function getLeadingDigitsPattern($index)
@@ -198,6 +201,7 @@ class NumberFormat
 
     /**
      * @param string $value
+     *
      * @return NumberFormat
      */
     public function addLeadingDigitsPattern($value)
@@ -208,7 +212,7 @@ class NumberFormat
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function hasNationalPrefixFormattingRule()
     {
@@ -225,6 +229,7 @@ class NumberFormat
 
     /**
      * @param string $value
+     *
      * @return NumberFormat
      */
     public function setNationalPrefixFormattingRule($value)
@@ -246,7 +251,7 @@ class NumberFormat
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function hasDomesticCarrierCodeFormattingRule()
     {
@@ -263,6 +268,7 @@ class NumberFormat
 
     /**
      * @param string $value
+     *
      * @return NumberFormat
      */
     public function setDomesticCarrierCodeFormattingRule($value)
@@ -274,7 +280,6 @@ class NumberFormat
     }
 
     /**
-     * @param NumberFormat $other
      * @return NumberFormat
      */
     public function mergeFrom(NumberFormat $other)
@@ -286,7 +291,7 @@ class NumberFormat
             $this->setFormat($other->getFormat());
         }
         $leadingDigitsPatternSize = $other->leadingDigitsPatternSize();
-        for ($i = 0; $i < $leadingDigitsPatternSize; $i++) {
+        for ($i = 0; $i < $leadingDigitsPatternSize; ++$i) {
             $this->addLeadingDigitsPattern($other->getLeadingDigitsPattern($i));
         }
         if ($other->hasNationalPrefixFormattingRule()) {
@@ -307,7 +312,7 @@ class NumberFormat
      */
     public function toArray()
     {
-        $output = array();
+        $output = [];
         $output['pattern'] = $this->getPattern();
         $output['format'] = $this->getFormat();
 
@@ -328,9 +333,6 @@ class NumberFormat
         return $output;
     }
 
-    /**
-     * @param array $input
-     */
     public function fromArray(array $input)
     {
         $this->setPattern($input['pattern']);
@@ -339,10 +341,10 @@ class NumberFormat
             $this->addLeadingDigitsPattern($leadingDigitsPattern);
         }
 
-        if (isset($input['nationalPrefixFormattingRule']) && $input['nationalPrefixFormattingRule'] !== '') {
+        if (isset($input['nationalPrefixFormattingRule']) && '' !== $input['nationalPrefixFormattingRule']) {
             $this->setNationalPrefixFormattingRule($input['nationalPrefixFormattingRule']);
         }
-        if (isset($input['domesticCarrierCodeFormattingRule']) && $input['domesticCarrierCodeFormattingRule'] !== '') {
+        if (isset($input['domesticCarrierCodeFormattingRule']) && '' !== $input['domesticCarrierCodeFormattingRule']) {
             $this->setDomesticCarrierCodeFormattingRule($input['domesticCarrierCodeFormattingRule']);
         }
 

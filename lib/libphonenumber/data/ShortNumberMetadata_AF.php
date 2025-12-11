@@ -10,110 +10,83 @@
  * Do not modify this file directly!
  */
 
-
-return array (
-  'generalDesc' => 
-  array (
-    'NationalNumberPattern' => '[14]\\d\\d(?:\\d{2})?',
-    'PossibleLength' => 
-    array (
-      0 => 3,
-      1 => 5,
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'tollFree' => 
-  array (
-    'NationalNumberPattern' => '1(?:02|19)',
-    'ExampleNumber' => '102',
-    'PossibleLength' => 
-    array (
-      0 => 3,
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'premiumRate' => 
-  array (
-    'PossibleLength' => 
-    array (
-      0 => -1,
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'emergency' => 
-  array (
-    'NationalNumberPattern' => '1(?:02|19)',
-    'ExampleNumber' => '102',
-    'PossibleLength' => 
-    array (
-      0 => 3,
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'shortCode' => 
-  array (
-    'NationalNumberPattern' => '1(?:02|19)|40404',
-    'ExampleNumber' => '102',
-    'PossibleLength' => 
-    array (
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'standardRate' => 
-  array (
-    'PossibleLength' => 
-    array (
-      0 => -1,
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'carrierSpecific' => 
-  array (
-    'NationalNumberPattern' => '404\\d\\d',
-    'ExampleNumber' => '40400',
-    'PossibleLength' => 
-    array (
-      0 => 5,
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'smsServices' => 
-  array (
-    'NationalNumberPattern' => '404\\d\\d',
-    'ExampleNumber' => '40400',
-    'PossibleLength' => 
-    array (
-      0 => 5,
-    ),
-    'PossibleLengthLocalOnly' => 
-    array (
-    ),
-  ),
-  'id' => 'AF',
-  'countryCode' => 0,
-  'internationalPrefix' => '',
-  'sameMobileAndFixedLinePattern' => false,
-  'numberFormat' => 
-  array (
-  ),
-  'intlNumberFormat' => 
-  array (
-  ),
-  'mainCountryForCode' => false,
-  'leadingZeroPossible' => false,
-  'mobileNumberPortableRegion' => false,
-);
+return [
+    'generalDesc' => [
+        'NationalNumberPattern' => '[14]\\d\\d(?:\\d{2})?',
+        'PossibleLength' => [
+            0 => 3,
+            1 => 5,
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'tollFree' => [
+        'NationalNumberPattern' => '1(?:02|19)',
+        'ExampleNumber' => '102',
+        'PossibleLength' => [
+            0 => 3,
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'premiumRate' => [
+        'PossibleLength' => [
+            0 => -1,
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'emergency' => [
+        'NationalNumberPattern' => '1(?:02|19)',
+        'ExampleNumber' => '102',
+        'PossibleLength' => [
+            0 => 3,
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'shortCode' => [
+        'NationalNumberPattern' => '1(?:02|19)|40404',
+        'ExampleNumber' => '102',
+        'PossibleLength' => [
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'standardRate' => [
+        'PossibleLength' => [
+            0 => -1,
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'carrierSpecific' => [
+        'NationalNumberPattern' => '404\\d\\d',
+        'ExampleNumber' => '40400',
+        'PossibleLength' => [
+            0 => 5,
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'smsServices' => [
+        'NationalNumberPattern' => '404\\d\\d',
+        'ExampleNumber' => '40400',
+        'PossibleLength' => [
+            0 => 5,
+        ],
+        'PossibleLengthLocalOnly' => [
+        ],
+    ],
+    'id' => 'AF',
+    'countryCode' => 0,
+    'internationalPrefix' => '',
+    'sameMobileAndFixedLinePattern' => false,
+    'numberFormat' => [
+    ],
+    'intlNumberFormat' => [
+    ],
+    'mainCountryForCode' => false,
+    'leadingZeroPossible' => false,
+    'mobileNumberPortableRegion' => false,
+];
