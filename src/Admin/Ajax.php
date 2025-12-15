@@ -7,7 +7,6 @@ use Payplug\Exception\HttpException;
 use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\PayplugWoocommerce\Controller\ApplePay;
-use Payplug\PayplugWoocommerce\Gateway\AccountGateway;
 use Payplug\PayplugWoocommerce\Gateway\AmericanExpress;
 use Payplug\PayplugWoocommerce\Gateway\Bancontact;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
@@ -17,6 +16,7 @@ use Payplug\PayplugWoocommerce\Gateway\PPRO\Mybank;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Satispay;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Exception\PayplugException;
+use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
 use WP_REST_Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -30,6 +30,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Ajax
 {
+	use GatewayGetter;
+
 	public function __construct()
 	{
 		$permission = (current_user_can('editor') || current_user_can('administrator'));
@@ -38,7 +40,7 @@ class Ajax
 			//Path to REST route and the callback function
 			register_rest_route( 'payplug_api', '/save/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'payplug_save_data' ],
+				'callback' => [ $this, 'save_action' ],
 				'permission_callback' => function () use ($permission)  {return $permission ;},
 				'show_in_index' => false
 			) );
@@ -50,7 +52,7 @@ class Ajax
 			) );
 			register_rest_route( 'payplug_api', '/login/', array(
 				'methods' => 'POST',
-				'callback' => [ $this, 'payplug_login' ],
+				'callback' => [ $this, 'login_action' ],
 				'permission_callback' => function () use ($permission)  {return $permission ;},
 				'show_in_index' => false
 			) );
@@ -125,7 +127,6 @@ class Ajax
 				'callback' => [ $this, 'api_check_integrated_payment' ],
 				'permission_callback' => function () use ($permission) { return $permission ; }
 			) );
-
 		});
 	}
 
@@ -208,9 +209,9 @@ class Ajax
 		}
 
 		wp_send_json_error(array(
-			"title" => __( 'payplug_enable_feature', 'payplug' ),
-			"msg" => __( 'payplug_bancontact_access_error', 'payplug' ),
-			"close" => __( 'payplug_ok', 'payplug' )
+			'title' => __( 'payplug_enable_feature', 'payplug' ),
+			'msg' => __( 'payplug_bancontact_access_error', 'payplug' ),
+			'close' => __( 'payplug_ok', 'payplug' )
 		));
 
 	}
@@ -226,9 +227,9 @@ class Ajax
 		}
 
 		wp_send_json_error(array(
-			"title" => __( 'payplug_enable_feature', 'payplug' ),
-			"msg" => __( 'payplug_applepay_access_error', 'payplug' ),
-			"close" => __( 'payplug_ok', 'payplug' )
+			'title' => __( 'payplug_enable_feature', 'payplug' ),
+			'msg' => __( 'payplug_applepay_access_error', 'payplug' ),
+			'close' => __( 'payplug_ok', 'payplug' )
 		));
 
 	}
@@ -241,9 +242,9 @@ class Ajax
 		}
 
 		wp_send_json_error(array(
-			"title" => __( 'payplug_enable_feature', 'payplug' ),
-			"msg" => __( 'payplug_amex_access_error', 'payplug' ),
-			"close" => __( 'payplug_ok', 'payplug' )
+			'title' => __( 'payplug_enable_feature', 'payplug' ),
+			'msg' => __( 'payplug_amex_access_error', 'payplug' ),
+			'close' => __( 'payplug_ok', 'payplug' )
 		));
 
 	}
@@ -259,13 +260,13 @@ class Ajax
 
 		if(!$oney){
 			$anchor_text = __( 'payplug_oney_error_link', 'payplug' );
-			$anchor_url = "https://portal.payplug.com/login";
+			$anchor_url = 'https://portal.payplug.com/login';
 			$anchor   = sprintf(  ' <a href="%s" target="_blank">%s</a>', $anchor_url, $anchor_text );
 			$message = __( 'payplug_oney_error_description', 'payplug' ) . $anchor;
 			wp_send_json_error(array(
-				"title" => __( 'payplug_oney_error_title', 'payplug' ),
-				"msg" => $message,
-				"close" => __( 'payplug_ok', 'payplug' )
+				'title' => __( 'payplug_oney_error_title', 'payplug' ),
+				'msg' => $message,
+				'close' => __( 'payplug_ok', 'payplug' )
 			));
 		}
 
@@ -278,9 +279,9 @@ class Ajax
 		$enabled = isset($account['httpResponse']['payment_methods']['satispay']['enabled']) ? $account['httpResponse']['payment_methods']['satispay']['enabled']: false;
 		if(!$enabled){
 			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_satispay_access_error', 'payplug' ),
-				"close" => __( 'payplug_ok', 'payplug' )
+				'title' => __( 'payplug_enable_feature', 'payplug' ),
+				'msg' => __( 'payplug_satispay_access_error', 'payplug' ),
+				'close' => __( 'payplug_ok', 'payplug' )
 			));
 		}
 
@@ -293,9 +294,9 @@ class Ajax
 		$enabled = isset($account['httpResponse']['payment_methods']['mybank']['enabled']) ? $account['httpResponse']['payment_methods']['mybank']['enabled']: false;
 		if(!$enabled){
 			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_mybank_access_error', 'payplug' ),
-				"close" => __( 'payplug_ok', 'payplug' )
+				'title' => __( 'payplug_enable_feature', 'payplug' ),
+				'msg' => __( 'payplug_mybank_access_error', 'payplug' ),
+				'close' => __( 'payplug_ok', 'payplug' )
 			));
 		}
 
@@ -308,9 +309,9 @@ class Ajax
 		$enabled = isset($account['httpResponse']['payment_methods']['ideal']['enabled']) ? $account['httpResponse']['payment_methods']['ideal']['enabled']: false;
 		if(!$enabled){
 			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_ideal_access_error', 'payplug' ),
-				"close" => __( 'payplug_ok', 'payplug' )
+				'title' => __( 'payplug_enable_feature', 'payplug' ),
+				'msg' => __( 'payplug_ideal_access_error', 'payplug' ),
+				'close' => __( 'payplug_ok', 'payplug' )
 			));
 		}
 
@@ -366,7 +367,7 @@ class Ajax
 		$payplug_gateway->settings['payplug_test_key'] = $keys['test'];
 		$payplug_gateway->settings['payplug_live_key'] = $keys['live'];
 		if ( ! empty( $keys['live'] ) ) {
-			$payplug_gateway->settings['mode'] = 'yes';
+			$payplug_gateway->settings['mode'] = true;
 		}
 
 		return update_option(
@@ -377,92 +378,6 @@ class Ajax
 			),
 			'yes'
 		);
-	}
-
-	/**
-	 *
-	 * Ajax paypal login
-	 *
-	 * @return void
-	 */
-	public function payplug_login()
-	{
-		return $this->login_action();
-
-		$data = json_decode(file_get_contents('php://input'), true);
-
-		$email = sanitize_email($data['payplug_email']);
-		$password = base64_decode(wp_unslash($data['payplug_password']));
-		$wp_nonce = !empty($data['_wpnonce']) ? $data['_wpnonce'] : null;
-
-		delete_option( 'woocommerce_payplug_settings' );
-		delete_site_option( 'woocommerce_payplug_settings' );
-
-		try {
-			$payplug = new PayplugGateway();
-			$api_keys = $payplug->retrieve_user_api_keys($email, $password);
-			if ( is_wp_error( $api_keys ) ) {
-				$this->login_wrong_credentials_error();
-			}
-
-			$form_fields = $payplug->get_form_fields();
-			$merchant_id = isset($api_keys['test']) ? $payplug->retrieve_merchant_id($api_keys['test']) : '';
-
-			foreach ($form_fields as $key => $field) {
-				if (in_array($field['type'], ['title', 'login'])) {
-					continue;
-				}
-
-				switch ($key) {
-					case 'enabled':
-						$val = 'yes';
-						break;
-					case 'mode':
-						$val = 'no';
-						break;
-					case 'payplug_test_key':
-						$val = !empty($api_keys['test']) ? esc_attr($api_keys['test']) : null;
-						break;
-					case 'payplug_live_key':
-						$val = !empty($api_keys['live']) ? esc_attr($api_keys['live']) : null;
-						break;
-					case 'payplug_merchant_id':
-						$val = esc_attr($merchant_id);
-						break;
-					case 'email':
-						$val = esc_html($email);
-						break;
-					default:
-						$val = $payplug->get_option($key);
-				}
-
-				$data[$key] = $val;
-			}
-
-			var_dump($data);
-			die(var_dump(get_option('woocommerce_payplug_settings', [])));
-
-			$payplug->set_post_data($data);
-			update_option(
-				$payplug->get_option_key(),
-				apply_filters('woocommerce_settings_api_sanitized_fields_' . $payplug->id, $data)
-			);
-
-			$user = [
-				"logged" => true,
-				"email" => $email,
-				"mode" => PayplugWoocommerceHelper::check_mode() ? 0 : 1
-			];
-			$wp = [
-				"WP" => [
-					"_wpnonce" => $wp_nonce,
-				]
-			];
-
-			wp_send_json_success( ["settings" => $user + $wp] + ( new Vue )->init() );
-		} catch (HttpException $e) {
-			$this->login_wrong_credentials_error();
-		}
 	}
 
 	/**
@@ -484,15 +399,15 @@ class Ajax
 		$wp_nonce = wp_create_nonce();
 
 		$wp = [
-			"logged" => PayplugWoocommerceHelper::user_logged_in(),
-			"mode" => PayplugWoocommerceHelper::check_mode() ? 0 : 1,
-			"WP" =>  [
-				"_wpnonce" => $wp_nonce,
+			'logged' => $this->get_gateway('account')->is_logged(),
+			'mode' => PayplugWoocommerceHelper::check_mode() ? 0 : 1,
+			'WP' =>  [
+				'_wpnonce' => $wp_nonce,
 			]
 		];
 
 		return wp_send_json_success([
-				"settings" => $wp
+				'settings' => $wp
 			] + (new Vue)->init());
 	}
 
@@ -503,16 +418,16 @@ class Ajax
 
 		PayplugWoocommerceHelper::payplug_logout();
 		$wp = [
-			"logged" => PayplugWoocommerceHelper::user_logged_in(),
-			"mode" => PayplugWoocommerceHelper::check_mode() ? 0 : 1
+			'logged' => $this->get_gateway('account')->is_logged(),
+			'mode' => PayplugWoocommerceHelper::check_mode() ? 0 : 1
 		];
 
 		http_response_code(200);
 		wp_send_json_success(array(
-			"message" => __('Successfully logged out.', 'payplug'),
-			"status" => ( new Vue )->payplug_section_status(),
-			"settings" => $wp,
-			"subscribe" => ( new Vue )->payplug_section_subscribe() // When Logging out the Status Block needs to be updated
+			'message' => __('Successfully logged out.', 'payplug'),
+			'status' => ( new Vue )->payplug_section_status(),
+			'settings' => $wp,
+			'subscribe' => ( new Vue )->payplug_section_subscribe() // When Logging out the Status Block needs to be updated
 		));
 
 	}
@@ -522,17 +437,17 @@ class Ajax
 		$live_key = PayplugWoocommerceHelper::get_live_key();
 		if(empty($live_key)){
 			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __('Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug'),
-				"close" => __( 'payplug_ok', 'payplug' )
+				'title' => __( 'payplug_enable_feature', 'payplug' ),
+				'msg' => __('Your account does not support LIVE mode at the moment, it must be validated first. If your account has already been validated, please log out and log in again.', 'payplug'),
+				'close' => __( 'payplug_ok', 'payplug' )
 			));
 		}
 	}
 
 	private function optionUnnavailableInTestMode(){
 		wp_send_json_error(array(
-			"title" => __( 'payplug_enable_feature', 'payplug' ),
-			"msg" => __( 'payplug_unavailable_testmode_description', 'payplug' )
+			'title' => __( 'payplug_enable_feature', 'payplug' ),
+			'msg' => __( 'payplug_unavailable_testmode_description', 'payplug' )
 		));
 	}
 
@@ -542,85 +457,81 @@ class Ajax
 	 *
 	 * @return null
 	 */
-	public function payplug_save_data( WP_REST_Request $request ) {
-
-		$payplug = new PayplugGateway();
-		$options = $payplug->settings;
-		if (PayplugWoocommerceHelper::user_logged_in()) {
-
-			$data = json_decode(file_get_contents('php://input'), true);
-
-
-
-			$options['enabled'] = Validator::enabled($data['payplug_enable']);
-			$options['mode'] = Validator::mode($data['payplug_sandbox']);
-
-			$test_mode = $options['mode'] === 'yes' ? false : true;
-
-			$options['title'] = trim(wp_strip_all_tags($data['standard_payment_title']));
-			$options['description'] = trim(wp_strip_all_tags($data['standard_payment_description']));
-			$options['payment_method'] = (Validator::payment_method($data['payplug_embeded'])) ? $data['payplug_embeded'] : $options['payplug_embeded'];
-			$options['oneclick'] = Validator::oneclick($data['enable_one_click']);
-
-			$options['oney'] = Validator::oney($data['enable_oney']);
-			$options['payplug'] = Validator::genericPaymentGateway($data['enable_standard'], "Payplug", false);
-			$options['bancontact'] = Validator::genericPaymentGateway($data['enable_bancontact'], "Bancontact", $test_mode);
-
-			$options['apple_pay'] = Validator::genericPaymentGateway($data['enable_applepay'], "Apple Pay", $test_mode);
-			$options['applepay_carriers'] = (!empty($data['applepay_carriers'])) ? $data['applepay_carriers'] : [];
-			$options['applepay_checkout'] = Validator::genericPaymentGateway($data['enable_applepay_checkout'], "Apple Pay Checkout", $test_mode);
-			$options['applepay_cart'] = Validator::genericPaymentGateway($data['enable_applepay_cart'], "Apple Pay Cart", $test_mode);
-			$options['applepay_product'] = Validator::genericPaymentGateway($data['enable_applepay_product'], "Apple Pay Product", $test_mode);
-
-			Validator::applePayPaymentGatewayOptions($options['apple_pay'], $options['applepay_cart'], $options['applepay_product'], $options['applepay_checkout'], $options['applepay_carriers']);
-			if (($options['apple_pay'] === 'yes') && ($options['applepay_checkout'] === 'no') && ($options['applepay_cart'] === 'no') && ($options['applepay_product'] === 'no')) {
-				$options['applepay_checkout'] = 'yes';
-			}
-
-
-			$options['american_express'] = Validator::genericPaymentGateway($data['enable_american_express'],"American Express", $test_mode);
-			$options['satispay'] = Validator::genericPaymentGateway($data['enable_satispay'], "Satispay", $test_mode);
-			$options['ideal'] = Validator::genericPaymentGateway($data['enable_ideal'], "iDEAL", $test_mode);
-			$options['mybank'] = Validator::genericPaymentGateway($data['enable_mybank'], "Mybank", $test_mode);
-			$options['oney_type'] = (Validator::oney_type($data['payplug_oney'])) ? $data['payplug_oney'] : 'with_fees';
-			$thresholds = (Validator::oney_thresholds($data['oney_min_amounts'], $data['oney_max_amounts']));
-			$options['oney_thresholds_min'] = $thresholds['min'];
-			$options['oney_thresholds_max'] = $thresholds['max'];
-			$options['oney_product_animation'] = Validator::oney_product_animation($data['enable_oney_product_animation']);
-			$options['debug'] = Validator::debug($data['enable_debug']);
-
-			//force save
-			if( update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false ) ){
-
-				//delete the transient, so it refresh the permissions on the init
-				$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
-				delete_transient($transient_key);
-
-				http_response_code(200);
-				wp_send_json_success( array(
-					"title" => null,
-					"msg" => __( 'payplug_save_success_message', 'payplug' ),
-					"close" => __( 'payplug_ok', 'payplug' ),
-				));
-			}else{
-				http_response_code(200);
-				wp_send_json_error([
-					"title" => null,
-					"close" => __( 'payplug_ok', 'payplug' ),
-					"msg" => "These settings are already saved !"]);
-			}
-
-		} else {
-			http_response_code(403);
-			wp_send_json_error("You are not logged in !");
-		}
-
-
-	}
+//	public function payplug_save_data( WP_REST_Request $request ) {
+//
+//		$payplug = new PayplugGateway();
+//		$options = $payplug->settings;
+//		if ($this->get_gateway('account')->is_logged()) {
+//
+//			$data = json_decode(file_get_contents('php://input'), true);
+//
+//			$options['enabled'] = (bool) $data['payplug_enable'];
+//			$options['mode'] = Validator::mode($data['payplug_sandbox']);
+//
+//			$test_mode = !(bool) $options['mode'];
+//
+//			$options['title'] = trim(wp_strip_all_tags($data['standard_payment_title']));
+//			$options['description'] = trim(wp_strip_all_tags($data['standard_payment_description']));
+//			$options['payment_method'] = (Validator::payment_method($data['payplug_embeded'])) ? $data['payplug_embeded'] : $options['payplug_embeded'];
+//			$options['oneclick'] = Validator::oneclick($data['enable_one_click']);
+//
+//			$options['oney'] = Validator::oney($data['enable_oney']);
+//			$options['payplug'] = Validator::genericPaymentGateway($data['enable_standard'], "Payplug", false);
+//			$options['bancontact'] = Validator::genericPaymentGateway($data['enable_bancontact'], "Bancontact", $test_mode);
+//
+//			$options['apple_pay'] = Validator::genericPaymentGateway($data['enable_applepay'], "Apple Pay", $test_mode);
+//			$options['applepay_carriers'] = (!empty($data['applepay_carriers'])) ? $data['applepay_carriers'] : [];
+//			$options['applepay_checkout'] = Validator::genericPaymentGateway($data['enable_applepay_checkout'], "Apple Pay Checkout", $test_mode);
+//			$options['applepay_cart'] = Validator::genericPaymentGateway($data['enable_applepay_cart'], "Apple Pay Cart", $test_mode);
+//			$options['applepay_product'] = Validator::genericPaymentGateway($data['enable_applepay_product'], "Apple Pay Product", $test_mode);
+//
+//			Validator::applePayPaymentGatewayOptions($options['apple_pay'], $options['applepay_cart'], $options['applepay_product'], $options['applepay_checkout'], $options['applepay_carriers']);
+//			if (($options['apple_pay'] === 'yes') && ($options['applepay_checkout'] === 'no') && ($options['applepay_cart'] === 'no') && ($options['applepay_product'] === 'no')) {
+//				$options['applepay_checkout'] = 'yes';
+//			}
+//
+//
+//			$options['american_express'] = Validator::genericPaymentGateway($data['enable_american_express'],"American Express", $test_mode);
+//			$options['satispay'] = Validator::genericPaymentGateway($data['enable_satispay'], "Satispay", $test_mode);
+//			$options['ideal'] = Validator::genericPaymentGateway($data['enable_ideal'], "iDEAL", $test_mode);
+//			$options['mybank'] = Validator::genericPaymentGateway($data['enable_mybank'], "Mybank", $test_mode);
+//			$options['oney_type'] = (Validator::oney_type($data['payplug_oney'])) ? $data['payplug_oney'] : 'with_fees';
+//			$thresholds = (Validator::oney_thresholds($data['oney_min_amounts'], $data['oney_max_amounts']));
+//			$options['oney_thresholds_min'] = $thresholds['min'];
+//			$options['oney_thresholds_max'] = $thresholds['max'];
+//			$options['oney_product_animation'] = Validator::oney_product_animation($data['enable_oney_product_animation']);
+//			$options['debug'] = Validator::debug($data['enable_debug']);
+//
+//			//force save
+//			if( update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false ) ){
+//
+//				//delete the transient, so it refresh the permissions on the init
+//				$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
+//				delete_transient($transient_key);
+//
+//				http_response_code(200);
+//				wp_send_json_success( array(
+//					"title" => null,
+//					"msg" => __( 'payplug_save_success_message', 'payplug' ),
+//					"close" => __( 'payplug_ok', 'payplug' ),
+//				));
+//			}else{
+//				http_response_code(200);
+//				wp_send_json_error([
+//					"title" => null,
+//					"close" => __( 'payplug_ok', 'payplug' ),
+//					"msg" => "These settings are already saved !']);
+//			}
+//
+//		} else {
+//			http_response_code(403);
+//			wp_send_json_error("You are not logged in !");
+//		}
+//	}
 
 	public function payplug_check_requirements() {
 		wp_send_json_success(array(
-			"status" => ( new Vue )->payplug_section_status()
+			'status' => ( new Vue )->payplug_section_status()
 		));
 	}
 
@@ -632,9 +543,9 @@ class Ajax
 		if( ! isset($account['httpResponse']['permissions']['can_use_integrated_payments'])
 		    || ! $account['httpResponse']['permissions']['can_use_integrated_payments'] ) {
 			wp_send_json_error(array(
-				"title" => __( 'payplug_enable_feature', 'payplug' ),
-				"msg" => __( 'payplug_integrated_access_error', 'payplug' ),
-				"close" => __( 'payplug_ok', 'payplug' )
+				'title' => __( 'payplug_enable_feature', 'payplug' ),
+				'msg' => __( 'payplug_integrated_access_error', 'payplug' ),
+				'close' => __( 'payplug_ok', 'payplug' )
 			));
 		}
 
@@ -643,20 +554,115 @@ class Ajax
 
 	}
 
-	protected function login_action()
+	public function login_action()
 	{
 		$data = json_decode(file_get_contents('php://input'), true);
 		$email = sanitize_email($data['payplug_email']);
 		$password = base64_decode(wp_unslash($data['payplug_password']));
 		$wp_nonce = !empty($data['_wpnonce']) ? $data['_wpnonce'] : null;
 
-		delete_option('woocommerce_payplug_settings');
-		delete_site_option('woocommerce_payplug_settings');
-
 		// use AccountGateway
-		echo '<pre>';
-		$account_gateway = new AccountGateway();
-		$register = $account_gateway->register((string) $email, (string) $password);
-		die(var_dump($register));
+		try{
+			$account_gateway = $this->get_gateway('account');
+			$register = $account_gateway->register((string) $email, (string) $password);
+
+			$user = [
+				'logged' => true,
+				'email' => $email,
+				'mode' => (bool) $register['mode'] ? 0 : 1,
+			];
+			$wp = [
+				'WP' => [
+					'_wpnonce' => $wp_nonce,
+				]
+			];
+			$vue = ( new Vue )->init();
+
+			wp_send_json_success( ['settings' => $user + $wp] + $vue );
+		} catch (HttpException $e) {
+			$this->login_wrong_credentials_error();
+		}
+	}
+
+	public function save_action( WP_REST_Request $request ) {
+		if (!$this->get_gateway('account')->is_logged()) {
+			http_response_code(403);
+			wp_send_json_error('You are not logged in !');
+		}
+
+		$payplug = new PayplugGateway();
+		$options = $payplug->settings;
+
+		$data = json_decode(file_get_contents('php://input'), true);
+
+		// global configuration
+		$options['enabled'] = (bool) $data['payplug_enable'];
+		$options['debug'] = (bool) $data['enable_debug'];
+		$options['mode'] = (bool) $data['payplug_sandbox'] ? false : true;
+
+		// payment configuration
+		$payment_methods = [
+			'oney',
+			'applepay',
+			'payplug',
+			'american_express',
+			'bancontact',
+			'satispay',
+			'mybank',
+			'ideal',
+		];
+		foreach ($payment_methods as $name) {
+			if (!isset($options['payment_methods']['configuration'][$name])) {
+				continue;
+			}
+			$options['payment_methods']['configuration'][$name]['active'] = (bool) $data['enable_' . $name];
+		}
+
+		// standard payment
+		$options['payment_methods']['configuration']['payplug']['active'] = (bool) $data['enable_standard'];
+		$options['payment_methods']['configuration']['payplug']['title'] = (string) $data['standard_payment_title'];
+		$options['payment_methods']['configuration']['payplug']['description'] = (string) $data['standard_payment_description'];
+		$options['payment_methods']['configuration']['payplug']['embedded_mode'] = (string) $data['payplug_embeded'];
+		$options['payment_methods']['configuration']['payplug']['save_card'] = (bool) $data['enable_one_click'];
+
+		// applepay payment
+		$options['payment_methods']['configuration']['applepay']['active'] = (bool) $data['enable_applepay'];
+		$options['payment_methods']['configuration']['applepay']['carriers'] = json_encode($data['applepay_carriers']);
+		$options['payment_methods']['configuration']['applepay']['display'] = json_encode([
+			'cart' => (bool) $data['enable_applepay_cart'],
+			'checkout' => (bool) $data['enable_applepay_checkout'],
+			'product' => (bool) $data['enable_applepay_product'],
+		]);
+
+		// oney payment
+		$options['payment_methods']['configuration']['oney']['active'] = json_encode($data['enable_oney']);
+		$options['payment_methods']['configuration']['oney']['cta_product'] = (bool) $data['enable_oney_product_animation'];
+		$options['payment_methods']['configuration']['oney']['custom_amounts'] = json_encode([
+			'min' => (int) $data['oney_min_amounts'],
+			'max' => (int) $data['oney_max_amounts'],
+		]);
+		$options['payment_methods']['configuration']['oney']['with_fees'] = 'with_fees' == (string) $data['payplug_oney'];
+
+		//
+		$update = $payplug->get_service('configuration')->update_options($options);
+
+		if($update){
+			//delete the transient, so it refresh the permissions on the init
+			$transient_key = PayplugWoocommerceHelper::get_transient_key($options);
+			delete_transient($transient_key);
+
+			http_response_code(200);
+			wp_send_json_success( array(
+				'title' => null,
+				'msg' => __( 'payplug_save_success_message', 'payplug' ),
+				'close' => __( 'payplug_ok', 'payplug' ),
+			));
+		}else{
+			http_response_code(200);
+			wp_send_json_error([
+				'title' => null,
+				'close' => __( 'payplug_ok', 'payplug' ),
+				'msg' => 'These settings are already saved !']);
+		}
 	}
 }

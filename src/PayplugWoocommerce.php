@@ -193,28 +193,32 @@ class PayplugWoocommerce
 		$options = get_option('woocommerce_payplug_settings', []);
 
 		//if live and don't have country setted on the option
-		if (!isset($options['payplug_merchant_country'])) {
-			$options['payplug_merchant_country'] = PayplugWoocommerceHelper::UpdateCountryOption($options);
+		if (!isset($options['company_iso'])) {
+			$options['company_iso'] = PayplugWoocommerceHelper::UpdateCountryOption($options);
 		}
 
 		//failsafe
-		if (empty($options['payplug_merchant_country']) || empty($options['oney_type'])) {
+		if (empty($options['company_iso']) || empty($options['payment_methods']['configuration']['oney']['with_fees'])) {
 			return;
 		}
 
-		if (!class_exists("\\Payplug\\PayplugWoocommerce\\Front\\PayplugOney\\Country\\Oney" . $options['payplug_merchant_country'])) {
+		if (!class_exists('\\Payplug\\PayplugWoocommerce\\Front\\PayplugOney\\Country\\Oney' . $options['company_iso'])) {
 			return;
 		}
 
-		switch ($options['oney_type']) {
-			case "without_fees" :
-				$class = "PayplugGatewayOney3xWithoutFees";
+		$oney_type = $options['payment_methods']['configuration']['oney']['with_fees']
+			? 'with_fees'
+			: 'without_fees';
+
+		switch ($oney_type) {
+			case 'without_fees' :
+				$class = 'PayplugGatewayOney3xWithoutFees';
 				break;
 			default:
-				$class = "PayplugGatewayOney3x";
+				$class = 'PayplugGatewayOney3x';
 				break;
 		}
-		new OneyAnimation($options['oney_type'], $class);
+		new OneyAnimation($oney_type, $class);
 	}
 
 	/**

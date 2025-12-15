@@ -12,16 +12,18 @@ class PayplugCreditCard extends PayplugGateway {
 	public function __construct() {
 		parent::__construct();
 
+		$configuration = $this->get_service('configuration');
+
 		$this->id                 = 'payplug';
 		$this->icon               = '';
 		$this->has_fields         = false;
 		$this->method_title       = _x('PayPlug', 'Gateway method title', 'payplug');
 		$this->method_description = __('Enable PayPlug for your customers.', 'payplug');
 		$this->new_method_label   = __('Pay with another credit card', 'payplug');
-		$this->title              = $this->get_option('title');
-		$this->description        = $this->get_option('description');
-		$this->oneclick       = (('yes' === $this->get_option('oneclick', 'no')) && (is_user_logged_in()));
-		$this->payment_method = $this->get_option('payment_method');
+		$this->title              = $configuration->get_option('payment_methods.configuration.payplug.title');
+		$this->description        = $configuration->get_option('payment_methods.configuration.payplug.description');
+		$this->oneclick       	  = $configuration->get_option('payment_methods.configuration.payplug.save_card') && is_user_logged_in();
+		$this->payment_method 	  = $configuration->get_option('payment_methods.configuration.embedded_mode');
 		$this->supports           = array(
 			'products',
 			'refunds',
@@ -36,7 +38,6 @@ class PayplugCreditCard extends PayplugGateway {
 			'subscription_payment_method_change_customer',
 			'subscription_payment_method_change_admin',
 			'multiple_subscriptions',
-
 		);
 
 		// Ensure the description is not empty to correctly display users's save cards
@@ -51,7 +52,7 @@ class PayplugCreditCard extends PayplugGateway {
 		}
 
 		//add fields of IP to the description
-		if($this->payment_method === 'integrated'){
+		if('integrated' == $this->payment_method){
 			$this->has_fields = true;
 		}
 
@@ -62,7 +63,6 @@ class PayplugCreditCard extends PayplugGateway {
 			add_action('woocommerce_scheduled_subscription_payment_' . $this->id,
 				array($this, 'scheduled_subscription_payment'), 10, 2);
 		}
-
 	}
 
 	/**
@@ -71,10 +71,10 @@ class PayplugCreditCard extends PayplugGateway {
 	 */
 	private function handle_cc_enabled(){
 
-		if (!empty($this->settings["enabled"]) && $this->settings["enabled"] === "yes") {
-			$this->enabled = !empty($this->settings[$this->id]) ? $this->settings[$this->id] : $this->settings["enabled"];
+		if (!empty($this->settings['enabled']) && $this->settings['enabled']) {
+			$this->enabled = !empty($this->settings[$this->id]) ? $this->settings[$this->id] : $this->settings['enabled'];
 		} else {
-			$this->enabled = "no";
+			$this->enabled = false;
 		}
 
 		return $this->enabled;
@@ -118,7 +118,7 @@ class PayplugCreditCard extends PayplugGateway {
 		}
 
 		// If PayPlug is not enabled bail.
-		if ('no' === $this->enabled) {
+		if (!$this->enabled) {
 			return;
 		}
 
@@ -145,7 +145,6 @@ class PayplugCreditCard extends PayplugGateway {
 		}
 
 	}
-
 
 	/**
 	 * Integrated payment form scripts.

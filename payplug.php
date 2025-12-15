@@ -54,7 +54,7 @@ function init() {
 
 	// parse the English translation file
 	$path = WP_PLUGIN_DIR . '/' . plugin_basename( dirname( __FILE__ ) ) . '/languages/payplug-en_US.mo';
-	$GLOBALS["mo"]->import_from_file($path);
+	$GLOBALS['mo']->import_from_file($path);
 }
 
 function create_lock_table(){
@@ -88,8 +88,8 @@ function wpdocs_translate_text($msgstr, $msgid, $domain)
 	$pattern = '/^payplug_.+/';
 
 	if (preg_match($pattern, $msgstr) === 1) {
-		if(isset($GLOBALS["mo"]->entries[$msgstr]))
-			return $GLOBALS["mo"]->entries[$msgstr]->translations[0];
+		if(isset($GLOBALS['mo']->entries[$msgstr]))
+			return $GLOBALS['mo']->entries[$msgstr]->translations[0];
 	}
 
 	return $msgstr;

@@ -3,11 +3,11 @@
 namespace Payplug\PayplugWoocommerce\Service;
 
 use Payplug\Payplug;
-use Payplug\PayplugWoocommerce\Traits\Configuration;
+use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
-class API
+class Api
 {
-	use Configuration;
+	use ServiceGetter;
 
 	protected $api;
 
@@ -17,16 +17,20 @@ class API
 	public function create_client_id_and_secret(){}
 	public function generate_jwt_one_shot(){}
 	public function generate_jwt(){}
+
 	public function get_account(){
 		if (!$this->api) {
 			$this->initialize();
-		die(var_dump(__LINE__));
 		}
-		die(var_dump(__LINE__));
 		$account = $this->do_request_with_fallback( '\Payplug\Authentication::getAccount', [$this->api]);
-		die(var_dump($account));
-		return $account;
+		return [
+			'result' => $account['result'],
+			'response' => isset($account['response']['httpResponse']) && !empty($account['response']['httpResponse'])
+				? $account['response']['httpResponse']
+				: null,
+		];
 	}
+
 	public function get_keys_by_login($email = '', $password = ''){
 		$keys = $this->do_request_with_fallback( '\Payplug\Authentication::getKeysByLogin', [$email, $password]);
 		return [
@@ -45,22 +49,23 @@ class API
 	{
 		$bearer_token = $this->get_bearer_token();
 		$this->api = new Payplug($bearer_token);
-		die(var_dump(get_class($this->api)));
 	}
-
 	protected function get_mode()
 	{
-		$options = $this->get_options();
+		$configuration = $this->get_service('configuration');
+		$options = $configuration->get_options();
 		return $options['mode'];
 	}
-
 	protected function get_bearer_token()
 	{
-		$options = $this->get_options();
-		$mode = $this->get_mode();
-		$key = $options['payplug_' . $mode . '_key'];
+		$configuration = $this->get_service('configuration');
+		$options = $configuration->get_options();
 
-		$jwt = isset($options['client_data']) && isset($options['client_data']['jwt']) ? $options['client_data']['jwt'] : [];
+		$api_keys = json_decode($options['api_key'], true);
+		$mode = $options['mode'];
+		$key = $api_keys[$mode];
+
+		$jwt = isset($options['jwt']) ? json_decode($options['jwt'], true) : [];
 		if(!empty($jwt) && !empty($jwt[$mode])) {
 			// todo: Validate token usage
 			$key = $jwt[$mode]['token'];

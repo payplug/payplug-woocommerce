@@ -152,7 +152,7 @@ class PayplugApi {
     public function simulate_oney_payment($price, $oney_type = 'with_fees')
     {
         $country = PayplugWoocommerceHelper::get_payplug_merchant_country();
-        $oney_fees = ["x3_" . $oney_type, "x4_" . $oney_type];
+        $oney_fees = ['x3_' . $oney_type, 'x4_' . $oney_type];
 
 	    try {
 		    try {

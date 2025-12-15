@@ -37,7 +37,7 @@ Abstract class OneyBase
 
 		$options = get_option('woocommerce_payplug_settings', []);
 
-		if (isset($options['oney_product_animation']) && ($options['oney_product_animation'] == 'yes')){
+		if ($options['payment_methods']['configuration']['oney']['cta_product']){
 			add_action( 'woocommerce_before_add_to_cart_form', [ $this, 'showOneyAnimationProduct' ] );
 
 		}
@@ -163,7 +163,6 @@ HTML;
 		$class = new $class();
 		echo $class::payWithOney($this->oney);
 		echo $class::disabledOneyPopup($this->oney);
-
 	}
 
 	/**
@@ -171,7 +170,7 @@ HTML;
 	 * @return String
 	 */
 	public function setCountry($options){
-		$this->country = !empty($options["payplug_merchant_country"]) ? $options["payplug_merchant_country"] :  "FR";
+		$this->country = !empty($options['payplug_merchant_country']) ? $options['payplug_merchant_country'] :  "FR";
 	}
 
 	/**

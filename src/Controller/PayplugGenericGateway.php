@@ -19,7 +19,6 @@ use Payplug\Resource\Refund as RefundResource;
 
 class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuilder
 {
-
 	/**
 	 * @var string
 	 */
@@ -72,21 +71,21 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	public function checkGateway()
 	{
 		//check if module is enabled
-		if(!empty($this->settings['enabled']) && 'no' === $this->settings['enabled']){
+		if(!isset($this->settings['enabled']) || !$this->settings['enabled']){
 			return false;
 		}
 
-		$account = PayplugWoocommerceHelper::generic_get_account_data_from_options( $this->id );
+		// todo: delete this usage to avoid call to getAccount resource each checkout loading
+	 	$account = PayplugWoocommerceHelper::generic_get_account_data_from_options( $this->id );
 		$options = PayplugWoocommerceHelper::get_payplug_options();
 
 		if( !$this->check_api_gateway_enable($account)){
 			return false;
 		}
 
-		if (empty($options) || empty($options[$this->id]) || $options[$this->id] === 'no') {
+		if (!$options['payment_methods']['configuration'][$this->id]['active']) {
 			return false;
 		}
-
 
 		if(!is_admin() && !PayplugWoocommerceHelper::is_checkout_block()){
 			if (empty(WC()->cart) && !is_admin()) {
@@ -123,9 +122,9 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	protected function check_api_gateway_enable($account){
 
 		if (
-			isset( $account["payment_methods"] )  &&
-			empty( $account["payment_methods"][ $this->id ] )  &&
-			!$account["payment_methods"][ $this->id ]['enabled']
+			isset( $account['payment_methods'] )  &&
+			empty( $account['payment_methods'][ $this->id ] )  &&
+			!$account['payment_methods'][ $this->id ]['enabled']
 		) {
 			return false;
 		}
@@ -141,7 +140,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	 * @return bool
 	 */
 	public function check_billing_country_permissions($account, $billing_code){
-		$this->allowed_country_codes = !empty($account["payment_methods"][ $this->id ]['allowed_countries']) ? $account["payment_methods"][ $this->id ]['allowed_countries'] : null;
+		$this->allowed_country_codes = !empty($account['payment_methods'][ $this->id ]['allowed_countries']) ? $account['payment_methods'][ $this->id ]['allowed_countries'] : null;
 
 		if (is_array($this->allowed_country_codes)) {
 			if ( in_array( "ALL", $this->allowed_country_codes) || empty( $this->allowed_country_codes ) ) {
@@ -170,10 +169,10 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	private function process_standard_intent_payment($order){
 
 		if ( !is_wc_endpoint_url('order-pay') &&
-			empty($_POST["payplug_non_blocks"]) &&
+			empty($_POST['payplug_non_blocks']) &&
 			PayplugWoocommerceHelper::is_checkout_block() &&
 			(
-				( $this->id === "payplug" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
+				( $this->id === "standard" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
 				( $this->id === "american_express" && $this->payment_method === 'popup')
 			) &&
 			!empty($order->get_transaction_id()) ) {
@@ -473,15 +472,15 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		$payment_methods = [];
 
 		if ( class_exists("OrderUtil") && OrderUtil::custom_orders_table_usage_is_enabled() ) {
-			$order_id = !empty($_GET["id"]) ? $_GET["id"] : null;
+			$order_id = !empty($_GET['id']) ? $_GET['id'] : null;
 
 		}else{
 
 			if(!empty($post->ID)){
 				$order_id = $post->ID;
 
-			}else if( !empty($_GET["id"]) ){
-				$order_id = $_GET["id"];
+			}else if( !empty($_GET['id']) ){
+				$order_id = $_GET['id'];
 
 			}else{
 				$order_id = null;

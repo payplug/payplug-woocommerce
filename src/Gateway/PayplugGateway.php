@@ -14,6 +14,7 @@ use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\Helper\Lock;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
 use WC_Blocks_Utils;
@@ -27,6 +28,8 @@ use WC_Payment_Tokens;
  */
 class PayplugGateway extends WC_Payment_Gateway_CC
 {
+	use ServiceGetter;
+
 	const OPTION_NAME = "payplug_config";
 
 	/**
@@ -111,6 +114,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 	const ENABLE_ON_TEST_MODE = true;
 
+	public $configuration;
+
 	/**
      * Logging method.
      *
@@ -142,13 +147,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     {
 		//required plugin id
 		$this->id = 'payplug';
-		$this->supports           = array(
+		$this->supports = array(
 			'products',
 			'refunds',
 			'tokenization',
 		);
 
-		$payplug_gateways = array('payplug', 'american_express', 'apple_pay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees', 'satispay', 'ideal', 'mybank');
+		$payplug_gateways = array('payplug', 'american_express', 'applepay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees', 'satispay', 'ideal', 'mybank');
 
 		//save buttom admin
 		if ((!empty($_GET['section'])) && (in_array($_GET['section'], $payplug_gateways))) {
@@ -159,26 +164,52 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $this->requirements = new PayplugGatewayRequirements($this);
         if ($this->user_logged_in()) {
             $this->init_payplug();
-
         }
 
-        $this->mode           = 'yes' === $this->get_option('mode', 'no') ? 'live' : 'test';
-        $this->debug          = 'yes' === $this->get_option('debug', 'no');
-        $this->email          = $this->get_option('email');
-
-		$this->oney_type      = $this->get_option('oney_type', 'with_fees');
-	    $oney_range = PayplugWoocommerceHelper::get_min_max_oney();
-	    $this->min_oney_price = (isset($oney_range['min'])) ? intval($oney_range['min']) : 100;
-	    $this->max_oney_price = (isset($oney_range['max'])) ? intval($oney_range['max']) : 3000;
-	    $this->oney_thresholds_min = $this->get_option('oney_thresholds_min', $this->min_oney_price );
-	    $this->oney_thresholds_max = $this->get_option('oney_thresholds_max', $this->max_oney_price );
+		$this->configuration = $this->get_service('configuration');
+		$this->mode = (bool) $this->configuration->get_option('mode') ? 'live' : 'test';
+		$this->debug = (bool) $this->configuration->get_option('debug');
+		$this->email = (string) $this->configuration->get_option('email');
 
 		//admin form
         $this->init_form_fields();
 
 		//used for oney
-        $this->payplug_merchant_country = PayplugWoocommerceHelper::get_payplug_merchant_country();
-        $this->oney_product_animation = $this->get_option('oney_product_animation');
+		// todo: wrap&refacto this code in oney gateway
+//		if(!is_array($payment_methods) || empty($payment_methods)) {
+//			$this->min_oney_price = (int) 100;
+//			$this->max_oney_price = (int) 3000;
+//			$this->oney_type = false;
+//			$this->oney_thresholds_min = (int) $this->min_oney_price;
+//			$this->oney_thresholds_max = (int) $this->max_oney_price;
+//			$this->oney_product_animation = false;
+//		} else {
+//			$oney_configuration = $payment_methods['configuration']['oney'];
+//			$oney_permissions = $payment_methods['permissions']['oney_x3_with_fees'];
+//			$oney_amount = json_decode($oney_permissions['amounts'], true);
+//
+//			$oney_range = [
+//				'min' => reset($oney_amount['min']),
+//				'max' => reset($oney_amount['max']),
+//			];
+//			$this->min_oney_price = (int) $oney_range['min']/100;
+//			$this->max_oney_price = (int) $oney_range['max']/100;
+//
+//			$custom_oney_amount = json_decode($oney_configuration['custom_amounts'], true);
+//			$custom_oney_range = !empty($custom_oney_amount)
+//				? [
+//					'min' => $custom_oney_amount['min'],
+//					'max' => $custom_oney_amount['max'],
+//				]
+//				: [
+//					'min' => reset($oney_amount['min']),
+//					'max' => reset($oney_amount['max']),
+//				];
+//			$this->oney_type = $oney_configuration['with_fees'];
+//			$this->oney_thresholds_min = (int) $custom_oney_range['min']/100;
+//			$this->oney_thresholds_max = (int) $custom_oney_range['max']/100;
+//			$this->oney_product_animation = $oney_configuration['cta_product'];
+//		}
 
         add_filter('woocommerce_get_customer_payment_tokens', [$this, 'filter_tokens'], 10, 3);
 
@@ -292,7 +323,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         }
 
         $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'apple_pay', 'american_express', "satispay","mybank","ideal" ])) {
+        if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'applepay', 'american_express', "satispay","mybank","ideal" ])) {
             return;
         }
 
@@ -342,7 +373,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function is_available()
     {
-        if ('yes' === $this->enabled) {
+        if ($this->enabled) {
             return $this->requirements->satisfy_requirements() && !empty($this->get_api_key($this->get_current_mode()));
         }
 
@@ -355,7 +386,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function init_settings()
     {
         parent::init_settings();
-        $this->enabled = !empty($this->settings['enabled']) && 'yes' === $this->settings['enabled'] ? 'yes' : 'no';
+        $this->enabled = !empty($this->settings['enabled']) && (bool) $this->settings['enabled'];
     }
 
     /**
@@ -373,13 +404,25 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$domain_bancontact = __( 'payplug_bancontact_activation_url', 'payplug' );
 		$bancontact_call_to_action = sprintf(  ' <a id="bancontact_call_to_action" href="https://%s" target="_blank">%s</a>', $domain_bancontact, $anchor_bancontact );
 
+
+		$oney_cfg = $this->configuration->get_option('payment_methods.configuration.oney');
+		if(!empty($oney_cfg)) {
+			$oney_amount = json_decode($oney_cfg['custom_amounts'], true);
+			$oney_amount['min'] = (float) $oney_amount['min'] / 100;
+			$oney_amount['max'] = (float) $oney_amount['max'] / 100;
+		} else {
+			$oney_amount = [
+				'min' => 100,
+				'max' => 3000,
+			];
+		}
         $fields = [
             'enabled'                 => [
                 'title'       => __('Enable/Disable', 'payplug'),
                 'type'        => 'checkbox',
                 'label'       => __('Enable PayPlug', 'payplug'),
                 'description' => __('Only Euro payments can be processed with PayPlug.', 'payplug'),
-                'default'     => 'no',
+                'default'     => false,
             ],
             'title'                   => [
                 'title'       => __('Title', 'payplug'),
@@ -407,18 +450,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'type'    => 'login',
                 'default' => '',
             ],
-            'payplug_test_key'        => [
-                'type'    => 'hidden',
-                'default' => '',
-            ],
-            'payplug_live_key'        => [
-                'type'    => 'hidden',
-                'default' => '',
-            ],
-            'payplug_merchant_id'     => [
-                'type'    => 'hidden',
-                'default' => '',
-            ],
             'title_testmode'          => [
                 'title' => __('Mode', 'payplug'),
                 'type'  => 'title',
@@ -430,7 +461,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'yes'         => 'Live',
                 'no'          => 'Test',
                 'description' => __('In TEST mode, all payments will be simulations and will not generate real transactions.', 'payplug'),
-                'default'     => 'no',
+                'default'     => false,
                 'hide_label'  => true,
             ],
             'title_settings'          => [
@@ -453,7 +484,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'type'        => 'checkbox',
                 'description' => __('Debug mode saves additional information on your server for each operation done via the PayPlug plugin (Developer setting).', 'payplug'),
                 'label'       => __('Activate debug mode', 'payplug'),
-                'default'     => 'yes',
+                'default'     => true,
 				'desc_tip'    => false
             ],
             'title_advanced_settings' => [
@@ -469,7 +500,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 'type'        => 'checkbox',
                 'label'       => __('Activate', 'payplug'),
                 'description' => __('Allow your customers to save their credit card information for later purchases.', 'payplug'),
-                'default'     => 'no',
+                'default'     => false,
 				'desc_tip'    => false
             ],
 			'bancontact'                 => [
@@ -479,7 +510,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'description' => '<p class="description" id="bancontact_test_mode_description"> '. __('payplug_bancontact_testmode_description', 'payplug') .' </p>' .
 								 '<p class="description" id="bancontact_live_mode_description_disabled"> '. __('payplug_bancontact_livemode_description_disabled', 'payplug') .' </p>' .
 								 $bancontact_call_to_action,
-				'default'     => 'no',
+				'default'     => false,
 			],
 			'apple_pay'                 => [
 				'title'       => __('payplug_apple_pay_activate_title', 'payplug'),
@@ -487,7 +518,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'label'       => __('Activate', 'payplug'),
 				'description' => '<p class="description" id="apple_pay_test_mode_description"> '. __('payplug_apple_pay_testmode_description', 'payplug') .' </p>' .
 								 '<p class="description" id="apple_pay_live_mode_description"> '. __('payplug_apple_pay_livemode_description', 'payplug') .' </p>' ,
-				'default'     => 'no',
+				'default'     => false,
 			],
 			'american_express'          => [
 				'title'       => __('payplug_amex_title', 'payplug'),
@@ -495,7 +526,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'label'       => __('payplug_amex_activate', 'payplug'),
 				'description' => '<p class="description" id="amex_test_mode_description"> '. __('payplug_amex_testmode_description', 'payplug') .' </p>' .
 								 '<p class="description" id="amex_live_mode_description"> '. __('payplug_amex_livemode_description', 'payplug') .' </p>' ,
-				'default'     => 'no',
+				'default'     => false,
 			],
 			'oney'                => [
 				'title'       => __('3x 4x Oney payments', 'payplug'),
@@ -503,7 +534,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'label'       => __('Activate', 'payplug'),
 				// TRAD
 				'description' => sprintf(__('Allow your customers to split payments into 3 or 4 installments, for orders between %s€ and %s€', 'payplug'), $this->min_oney_price, $this->max_oney_price) . $link,
-				'default'     => 'no',
+				'default'     => false,
 				'desc_tip'    => false
 			],
 	        'oney_type'           => [
@@ -525,28 +556,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		        'title'       => '',
 		        'type'        => 'oney_thresholds',
 		        'description' => sprintf(__('I would like to offer guaranteed payment in installments for amounts between %s€ and %s€.', 'payplug'),
-                    '<b class="min">' . $this->oney_thresholds_min . '</b>', '<b class="max">' . $this->oney_thresholds_max . '</b>'),
+                    '<b class="min">' . $oney_amount['min'] . '</b>', '<b class="max">' . $oney_amount['max'] . '</b>'),
 		        'desc_tip'    => false
-	        ],
-	        'oney_thresholds_min' => [
-		        'title'       => '',
-		        'type'        => 'hidden',
-		        'label'       => '',
-		        'description' => '',
-		        'default'     => 'no',
-	        ],
-	        'oney_thresholds_max' => [
-		        'title'       => '',
-		        'type'        => 'hidden',
-		        'label'       => '',
-		        'description' => '',
-		        'default'     => 'no',
 	        ],
 			'oney_product_animation' => [
 				'title'       => __('oney_installments_pop_up', 'payplug'),
 				'description' => __('display_the_oney_installments_pop_up_on_the_product_page', 'payplug'),
 				'label'       => __('Activate', 'payplug'),
-				'default'     => 'no',
+				'default'     => false,
 				'desc_tip'    => false,
 				'type' => 'oney_product_animation'
 			],
@@ -750,7 +767,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				( $this->id === "payplug" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
 				( $this->id === "american_express" && $this->payment_method === 'popup')
 			) &&
-			$_GET["wc-ajax"] !== "payplug_order_review_url"
+			$_GET['wc-ajax'] !== "payplug_order_review_url"
 		) {
 
 			$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
@@ -1249,7 +1266,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function get_current_mode()
     {
-        return ('yes' === $this->get_option('mode')) ? 'live' : 'test';
+        return $this->get_option('mode') ? 'live' : 'test';
     }
 
     /**
@@ -1261,31 +1278,26 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function get_api_key($mode = 'test')
     {
-
 		$options = PayplugWoocommerceHelper::get_payplug_options();
-
-		$key = $options['payplug_' . $mode . '_key'];
-		$jwt = isset($options['client_data']) && isset($options['client_data']['jwt']) ? $options['client_data']['jwt'] : [];
+		$api_key = json_decode($options['api_key'], true);
+		$key = $api_key[$mode];
+		$jwt = isset($options) && isset($options['jwt']) ? $options['jwt'] : [];
 
 		if(!empty($jwt) && !empty($jwt[$mode])) {
-			$client_data = isset($options['client_data']) ? $options['client_data'] : [];
 			$this->api = new PayplugApi($this);
-			$validate_jwt = $this->api->validate_jwt(
-				array_key_exists($mode, $client_data) ? $client_data[$mode] : [],
-				$jwt[$mode]
-			);
+			$client_data = isset($options['oauth_client_data'])
+				? json_decode($options['oauth_client_data'], true)
+				: [];
+			$validate_jwt = $this->api->validate_jwt($client_data[$mode], $jwt[$mode]);
 
 			if ($validate_jwt['token']) {
 				$key = $validate_jwt['token'];
 
 				if ($validate_jwt['need_update']) {
-					if (!isset($options['client_data'])) {
-						$options['client_data'] = [];
+					if (!isset($options['jwt'])) {
+						$options['jwt'] = [];
 					}
-					if (!isset($options['client_data']['jwt'])) {
-						$options['client_data']['jwt'] = [];
-					}
-					$options['client_data']['jwt'][$mode] = $validate_jwt['token'];
+					$options['jwt'][$mode] = $validate_jwt['token'];
 					update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false );
 				}
 			}
@@ -1301,7 +1313,14 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function get_merchant_id()
     {
-        return $this->get_option('payplug_merchant_id', '');
+		$company_id = json_decode($this->configuration->get('company_id'), true);
+        return isset($company_id['live']) && $company_id['live']
+			? $company_id['live']
+			: (
+				isset($company_id['live']) && $company_id['live']
+				? $company_id['test']
+				: ''
+			);
     }
 
     /**
@@ -1311,13 +1330,20 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function user_logged_in()
     {
-		$options = PayplugWoocommerceHelper::get_payplug_options();
+		$configuration = $this->get_service('configuration');
+		$options = $configuration->get_options();
+		if (empty($options)) {
+			return false;
+		}
 
-		if (isset($options['client_data']) && isset($options['client_data']['jwt']['test']['access_token'])) {
+		$jwt = json_decode($options['jwt'], true);
+		if(!empty($jwt) && isset($jwt['test']) && isset($jwt['test']['access_token'])) {
 			return true;
 		}
 
-        return !empty($options['payplug_test_key']);
+		$api_key = json_decode($options['api_key'], true);
+
+		return !empty($api_key) && isset($api_key['test']) && !empty($api_key['test']);
     }
 
     /**
@@ -1347,7 +1373,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             }
         }
 
-		if($this->oney_type == 'with_fees'){
+		if((bool) $this->configuration->get_option('payment_methods.configuration.oney.with_fees')){
 			unset($gateways['oney_x3_without_fees']);
 			unset($gateways['oney_x4_without_fees']);
 		} else{
@@ -1376,15 +1402,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	{
 		$options = get_option( 'woocommerce_payplug_settings' );
 
-		if (!isset($options['client_data']) || empty($options['client_data'])) {
+		if (!isset($options['oauth_client_data']) || empty($options['oauth_client_data'])) {
 			return false;
 		}
 
-		$client_data = $options['client_data'];
+		$client_data = $options['oauth_client_data'];
 		$jwt = [];
-
 		$this->api = new PayplugApi($this);
-
 		foreach ($client_data as $key => $data) {
 			if (empty($data)) {
 				$jwt[$key] = [];
@@ -1413,7 +1437,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 			}
 		}
-		$options['client_data']['jwt'] = $jwt;
+		$options['jwt'] = $jwt;
 		return update_option( 'woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false );
 	}
 

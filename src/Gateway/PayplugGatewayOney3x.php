@@ -45,19 +45,18 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
 
         self::set_oney_configuration();
 
+
 		if (is_checkout()) {
 			if ($this->check_oney_is_available() === self::ONEY_DISALBE_CHECKOUT_OPTIONS) {
-				$this->enabled = 'no';
+				$this->enabled = false;
 			}
 		}
-
 	}
 
 	public function validate_checkout(){
-
 		$posted_data = $this->get_post_data();
 
-		if( in_array($posted_data['payment_method'], ["oney_x3_with_fees","oney_x4_with_fees", "oney_x3_without_fees", "oney_x4_without_fees"] ) ){
+		if( in_array($posted_data['payment_method'], ['oney_x3_with_fees","oney_x4_with_fees", "oney_x3_without_fees", "oney_x4_without_fees'] ) ){
 			if ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED) {
 				throw new \Exception(__('Unavailable for the specified country.'));
 
@@ -93,7 +92,6 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
      */
     public function get_icon()
     {
-
 		$disable='';
         if ($this->check_oney_is_available() === true) {
             $total_price = floatval(WC()->cart->total);
@@ -190,9 +188,14 @@ HTML;
         $total_price = floatval($cart->total);
 		$products_qty = (int) $cart->cart_contents_count;
 
+		$oney_cfg = $this->configuration->get_option('payment_methods.configuration.oney');
+		$oney_amount = json_decode($oney_cfg['custom_amounts'], true);
+		$oney_amount['min'] = (float) $oney_amount['min'] / 100;
+		$oney_amount['max'] = (float) $oney_amount['max'] / 100;
+
 		// Min and max
-        if ($total_price < $this->oney_thresholds_min || $total_price > $this->oney_thresholds_max) {
-            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->oney_thresholds_min , $this->oney_thresholds_max ).'</div>';
+        if ($total_price < $oney_amount['min'] || $total_price > $oney_amount['max']) {
+            $this->description = '<div class="payment_method_oney_x3_with_fees_disabled">'.sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $oney_amount['min'] , $oney_amount['max'] ).'</div>';
             return false;
         }
 
@@ -380,7 +383,6 @@ HTML;
         }
     }
 
-
     /**
      * Check if the gatteway is allowed for the order amount
      *
@@ -390,7 +392,6 @@ HTML;
     public function check_gateway($gateways)
     {
         if (isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id) {
-
 	        //remove gateway if thresholds/country criteria are not met
 	        if( $this->check_oney_is_available() === false){
 		        unset($gateways[$this->id]);
@@ -404,6 +405,7 @@ HTML;
 				$gateways = parent::check_gateway($gateways);
             }
         }
+
         return $gateways;
     }
 
@@ -484,15 +486,8 @@ HTML;
 	}
 
 	public function checkGateway() {
-
 		$options = PayplugWoocommerceHelper::get_payplug_options();
-
-		if (empty($options) || !isset($options['oney'] ) || $options['oney'] === 'no') {
-			return false;
-		}
-
-		return true;
-
+		return empty($options) ? false : $options['payment_methods']['configuration']['oney']['active'];
 	}
 
 }
