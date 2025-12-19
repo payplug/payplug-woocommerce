@@ -47,7 +47,15 @@ class PayplugOney extends PayplugGenericBlock {
 		];
 		$data['description']   = $this->gateway->description;
 		$data['oney_response'] = $this->gateway->api->simulate_oney_payment( $this->total_price, 'with_fees' );
-
+		// Normalize total_cost from cents to euros
+		if ( is_array( $data['oney_response'] ) ) {
+			foreach ( $data['oney_response'] as &$plan ) {
+				if ( isset( $plan['total_cost'] ) ) {
+					$plan['total_cost'] = $plan['total_cost'] / 100;
+				}
+			}
+			unset( $plan );
+		}
 		$data['currency'] = get_woocommerce_currency_symbol( get_option( 'woocommerce_currency' ) );
 
 		$data['translations']['bring']               = __( 'Bring', 'payplug' );
