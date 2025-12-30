@@ -794,15 +794,45 @@ class PayplugWoocommerceHelper {
 	}
 
 	public static function available_shipping_methods($carriers = []) {
+		// Build enabled shipping methods based on active Zone
+		$enabled_method_types = [];
+
+		if (class_exists('\\WC_Shipping_Zones')) {
+			// Regular zones
+			$zones = \WC_Shipping_Zones::get_zones();
+			foreach ($zones as $zone) {
+				$methods = isset($zone['shipping_methods']) ? $zone['shipping_methods'] : [];
+				foreach ($methods as $m) {
+					if (!empty($m->enabled)) {
+						$enabled_method_types[$m->id] = true;
+					}
+				}
+			}
+
+			// Locations not covered by zones (zone 0)
+			$defaultZone = new \WC_Shipping_Zone(0);
+			foreach ($defaultZone->get_shipping_methods(true) as $m) {
+				if (!empty($m->enabled)) {
+					$enabled_method_types[$m->id] = true;
+				}
+			}
+		}
+
 		$shippings = WC()->shipping()->get_shipping_methods();
 		$shippings_methods = [];
+
 		foreach ($shippings as $shipping) {
-			array_push($shippings_methods,[
+			// Only keep shipping method types that are currently enabled in at least one zone
+			if (!isset($enabled_method_types[$shipping->id])) {
+				continue;
+			}
+			$shippings_methods[] = [
 				"id_carrier" => $shipping->id,
 				"name" => $shipping->method_title,
-				"checked" => in_array($shipping->id, $carriers)
-			]);
+				"checked" => in_array($shipping->id, $carriers, true)
+			];
 		}
+
 		return $shippings_methods;
 	}
 
