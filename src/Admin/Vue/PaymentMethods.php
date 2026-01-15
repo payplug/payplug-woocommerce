@@ -445,6 +445,64 @@ class PaymentMethods
 	}
 
 	/**
+	 * @param $active
+	 * @return array
+	 */
+	public static function payment_method_wero($active = false)
+	{
+		return [
+			"type" => "payment_method",
+			"name" => "wero",
+			"title" => __('payplug_wero_activate', 'payplug'),
+			"image" => esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/wero.svg'),
+			"checked" => $active,
+			"available_test_mode" => false,
+			"descriptions" => [
+				"live" => [
+					"description" => __('payplug_section_wero_payment_description', 'payplug'),
+					"link_know_more" => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_wero_more_url', 'payplug'), "_blank"),
+				],
+				"sandbox" => [
+					"description" => __('payplug_wero_unavailable_testmode_description', 'payplug'),
+					"link_know_more" => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_wero_more_url', 'payplug'), "_blank"),
+				]
+			],
+			"options" => [
+				self::get_allowed_countries("wero")
+			],
+		];
+	}
+
+	/**
+	 * @param $active
+	 * @return array
+	 */
+	public static function payment_method_bizum($active = false)
+	{
+		return [
+			"type" => "payment_method",
+			"name" => "bizum",
+			"title" => __('payplug_bizum_activate', 'payplug'),
+			"image" => esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/bizum.svg'),
+			"checked" => $active,
+			"available_test_mode" => false,
+			"descriptions" => [
+				"live" => [
+					"description" => __('payplug_section_bizum_payment_description', 'payplug'),
+					"link_know_more" => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_bizum_more_url', 'payplug'), "_blank"),
+				],
+				"sandbox" => [
+					"description" => __('payplug_bizum_unavailable_testmode_description', 'payplug'),
+					"link_know_more" => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_bizum_more_url', 'payplug'), "_blank"),
+				]
+			],
+			"options" => [
+				self::get_allowed_countries("bizum")
+			],
+		];
+	}
+
+	/**
 	 * @param $id
 	 * @return false|string
 	 */

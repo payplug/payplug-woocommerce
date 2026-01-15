@@ -59,7 +59,7 @@ class Metabox {
 			return;
 		}
 
-		if( !in_array($order->get_payment_method(), ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'applepay', 'american_express', 'satispay', 'sofort', 'ideal', 'mybank'])){
+		if( !in_array($order->get_payment_method(), ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees','bancontact', 'applepay', 'american_express', 'satispay', 'sofort', 'ideal', 'mybank', 'wero', 'bizum'])){
 			return;
 		}
 

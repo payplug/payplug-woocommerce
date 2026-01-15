@@ -14,6 +14,8 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Ideal;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Mybank;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Satispay;
+use Payplug\PayplugWoocommerce\Gateway\PPRO\Wero;
+use Payplug\PayplugWoocommerce\Gateway\PPRO\Bizum;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Exception\PayplugException;
 use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
@@ -126,6 +128,18 @@ class Ajax
 				'methods' => 'POST',
 				'callback' => [ $this, 'api_check_integrated_payment' ],
 				'permission_callback' => function () use ($permission) { return $permission ; }
+			) );
+			register_rest_route( 'payplug_api', '/wero_permissions/', array(
+				'methods' => 'POST',
+				'callback' => [ $this, 'api_check_wero_permissions' ],
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
+			) );
+			register_rest_route( 'payplug_api', '/bizum_permissions/', array(
+				'methods' => 'POST',
+				'callback' => [ $this, 'api_check_bizum_permissions' ],
+				'permission_callback' => function () use ($permission)  {return $permission ;},
+				'show_in_index' => false
 			) );
 		});
 	}
@@ -312,6 +326,36 @@ class Ajax
 				'title' => __( 'payplug_enable_feature', 'payplug' ),
 				'msg' => __( 'payplug_ideal_access_error', 'payplug' ),
 				'close' => __( 'payplug_ok', 'payplug' )
+			));
+		}
+
+		wp_send_json_success($enabled);
+	}
+
+	public function api_check_wero_permissions(WP_REST_Request $request) {
+		$account = $this->generic_get_account($request, Wero::ENABLE_ON_TEST_MODE);
+
+		$enabled = isset($account['httpResponse']['payment_methods']['wero']['enabled']) ? $account['httpResponse']['payment_methods']['wero']['enabled']: false;
+		if(!$enabled){
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => __( 'payplug_wero_access_error', 'payplug' ),
+				"close" => __( 'payplug_ok', 'payplug' )
+			));
+		}
+
+		wp_send_json_success($enabled);
+	}
+
+	public function api_check_bizum_permissions(WP_REST_Request $request) {
+		$account = $this->generic_get_account($request, Bizum::ENABLE_ON_TEST_MODE);
+
+		$enabled = isset($account['httpResponse']['payment_methods']['bizum']['enabled']) ? $account['httpResponse']['payment_methods']['bizum']['enabled']: false;
+		if(!$enabled){
+			wp_send_json_error(array(
+				"title" => __( 'payplug_enable_feature', 'payplug' ),
+				"msg" => __( 'payplug_bizum_access_error', 'payplug' ),
+				"close" => __( 'payplug_ok', 'payplug' )
 			));
 		}
 
@@ -610,6 +654,8 @@ class Ajax
 			'satispay',
 			'mybank',
 			'ideal',
+			'wero',
+			'bizum',
 		];
 		foreach ($payment_methods as $name) {
 			if (!isset($options['payment_methods']['configuration'][$name])) {
