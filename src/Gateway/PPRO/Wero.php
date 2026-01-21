@@ -11,7 +11,6 @@ class Wero extends PayplugGenericGateway
 
 	public function __construct()
 	{
-
 		parent::__construct();
 
 		//since we're calling the parent construct we need to redefine the payment properties
@@ -25,15 +24,13 @@ class Wero extends PayplugGenericGateway
 
 		//WOOCO FIELDS
 		$this->has_fields = false;
-		$this->enabled = true;
+		$this->enabled = 'yes';
 
 		if (!$this->checkGateway()) {
-			$this->enabled = false;
+			$this->enabled = 'no';
 		}
 
-
 		add_action('woocommerce_order_item_add_action_buttons', [$this, 'refund_not_available']);
-
 	}
 
 }

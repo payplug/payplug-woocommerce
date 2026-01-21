@@ -25,10 +25,10 @@ class Bizum extends PayplugGenericGateway
 
 		//WOOCO FIELDS
 		$this->has_fields = false;
-		$this->enabled = true;
+		$this->enabled = 'yes';
 
 		if (!$this->checkGateway()) {
-			$this->enabled = false;
+			$this->enabled = 'no';
 		}
 
 

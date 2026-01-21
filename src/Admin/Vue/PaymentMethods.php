@@ -219,7 +219,7 @@ class PaymentMethods
 	 */
 	public static function payment_method_applepay($active, $options, $carriers = [])
 	{
-		$display = json_decode($options['payment_methods']['configuration']['applepay']['display'], true);
+		$display = json_decode($options['payment_methods']['configuration']['apple_pay']['display'], true);
 		$checkout = (bool) $display['checkout'];
 		$cart = (bool) $display['cart'];
 		$product = (bool) $display['product'];

@@ -35,7 +35,7 @@ const Icon = () => {
 /**
  * Payplug payment method config object.
  */
-const Wero = {
+const Bizum = {
 	name: "bizum",
 	label: <Label />,
 	content: <Content />,

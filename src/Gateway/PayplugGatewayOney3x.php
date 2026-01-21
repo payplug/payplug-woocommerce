@@ -47,7 +47,7 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
 
 		if (is_checkout()) {
 			if ($this->check_oney_is_available() === self::ONEY_DISALBE_CHECKOUT_OPTIONS) {
-				$this->enabled = false;
+				$this->enabled = 'no';
 			}
 		}
 	}
@@ -187,7 +187,7 @@ HTML;
         $total_price = floatval($cart->total);
 		$products_qty = (int) $cart->cart_contents_count;
 
-		$oney_cfg = $this->configuration->get_option('payment_methods.configuration.oney');
+		$oney_cfg = $this->get_configuration()->get_option('payment_methods.configuration.oney');
 		$oney_amount = json_decode($oney_cfg['custom_amounts'], true);
 		$oney_amount['min'] = (float) $oney_amount['min'] / 100;
 		$oney_amount['max'] = (float) $oney_amount['max'] / 100;
