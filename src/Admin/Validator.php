@@ -57,7 +57,7 @@ class Validator {
 		return false;
 	}
 
-	public static function oneclick($value) {
+	public static function save_card($value) {
 
 		if ($value == 1){
 			return true;

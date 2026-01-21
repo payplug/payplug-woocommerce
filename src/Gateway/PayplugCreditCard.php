@@ -7,7 +7,7 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 class PayplugCreditCard extends PayplugGateway {
 
-	public $oneclick = false;
+	public $save_card = false;
 
 	public function __construct() {
 		parent::__construct();
@@ -18,10 +18,10 @@ class PayplugCreditCard extends PayplugGateway {
 		$this->method_title       = _x('PayPlug', 'Gateway method title', 'payplug');
 		$this->method_description = __('Enable PayPlug for your customers.', 'payplug');
 		$this->new_method_label   = __('Pay with another credit card', 'payplug');
-		$this->title              = $this->configuration->get_option('payment_methods.configuration.payplug.title');
-		$this->description        = $this->configuration->get_option('payment_methods.configuration.payplug.description');
-		$this->oneclick       	  = $this->configuration->get_option('payment_methods.configuration.payplug.save_card') && is_user_logged_in();
-		$this->payment_method 	  = $this->configuration->get_option('payment_methods.configuration.payplug.embedded_mode');
+		$this->title              = $this->get_configuration()->get_option('payment_methods.configuration.payplug.title');
+		$this->description        = $this->get_configuration()->get_option('payment_methods.configuration.payplug.description');
+		$this->save_card       	  = $this->get_configuration()->get_option('payment_methods.configuration.payplug.save_card') && is_user_logged_in();
+		$this->embedded_mode 	  = $this->get_configuration()->get_option('payment_methods.configuration.payplug.embedded_mode');
 
 
 		$this->supports           = array(
@@ -41,7 +41,7 @@ class PayplugCreditCard extends PayplugGateway {
 		);
 
 		// Ensure the description is not empty to correctly display users's save cards
-		if (empty($this->description) && $this->oneclick_available()) {
+		if (empty($this->description) && $this->save_card_available()) {
 			$this->description = ' ';
 		}
 
@@ -52,7 +52,7 @@ class PayplugCreditCard extends PayplugGateway {
 		}
 
 		//add fields of IP to the description
-		if('integrated' == $this->payment_method){
+		if('integrated' == $this->embedded_mode){
 			$this->has_fields = true;
 		}
 
@@ -72,9 +72,10 @@ class PayplugCreditCard extends PayplugGateway {
 	private function handle_cc_enabled(){
 
 		if (!empty($this->settings['enabled']) && $this->settings['enabled']) {
-			$this->enabled = !empty($this->settings[$this->id]) ? $this->settings[$this->id] : $this->settings['enabled'];
+			$enabled = !empty($this->settings[$this->id]) ? $this->settings[$this->id] : $this->settings['enabled'];
+			$this->enabled = $enabled ? 'yes' : 'no';
 		} else {
-			$this->enabled = false;
+			$this->enabled = 'yes';
 		}
 
 		return $this->enabled;
@@ -104,7 +105,6 @@ class PayplugCreditCard extends PayplugGateway {
 		return $icons_str;
 	}
 
-
 	/**
 	 * Embedded payment form scripts.
 	 *
@@ -118,7 +118,7 @@ class PayplugCreditCard extends PayplugGateway {
 		}
 
 		// If PayPlug is not enabled bail.
-		if (!$this->enabled) {
+		if ('no' == $this->enabled) {
 			return;
 		}
 
@@ -133,13 +133,13 @@ class PayplugCreditCard extends PayplugGateway {
 		wp_enqueue_style('payplug-checkout');
 
 		if (
-			('integrated' == $this->payment_method && !PayplugWoocommerceHelper::is_checkout_block()) ||
-			('integrated' == $this->payment_method && is_wc_endpoint_url('order-pay') )
+			('integrated' == $this->embedded_mode && !PayplugWoocommerceHelper::is_checkout_block()) ||
+			('integrated' == $this->embedded_mode && is_wc_endpoint_url('order-pay') )
 		) {
 			$this->integrated_payments_scripts();
 		}
 
-		if (('popup' == $this->payment_method ) && ('payplug' == $this->id || 'american_express' == $this->id) && !PayplugWoocommerceHelper::is_checkout_block() ) {
+		if (('popup' == $this->embedded_mode ) && ('payplug' == $this->id || 'american_express' == $this->id) && !PayplugWoocommerceHelper::is_checkout_block() ) {
 			$this->popup_payments_scripts();
 		}
 	}
@@ -201,7 +201,7 @@ class PayplugCreditCard extends PayplugGateway {
 			'nonce'    => [
 				'checkout' => wp_create_nonce('woocommerce-process_checkout'),
 			],
-			'is_embedded' => 'redirect' !== $this->payment_method
+			'is_embedded' => 'redirect' !== $this->embedded_mode
 		]);
 
 		wp_enqueue_script('payplug-checkout');
@@ -218,11 +218,11 @@ class PayplugCreditCard extends PayplugGateway {
 			echo wpautop(wptexturize($description));
 		}
 
-		if(($this->payment_method === 'integrated') ){
-			echo IntegratedPayment::template_form($this->oneclick);
+		if('integrated' == $this->embedded_mode){
+			echo IntegratedPayment::template_form($this->save_card);
 		}
 
-		if ($this->oneclick_available()) {
+		if ($this->save_card_available()) {
 			$this->tokenization_script();
 			$this->saved_payment_methods();
 		}

@@ -17,7 +17,7 @@ class IntegratedPayment
 		$this->options = $options;
 	}
 
-	static public function template_form($oneClick){
+	static public function template_form($save_card){
 
 		$logo = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/logo-payplug.png';
 		$lock = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
@@ -26,7 +26,7 @@ class IntegratedPayment
 			return $fn;
 		};
 
-		if($oneClick) {
+		if($save_card) {
 			$saved = <<<HTML
 					<div class="payplug IntegratedPayment_container -saveCard" data-e2e-name="saveCard">
 						<label><input type="checkbox" name="savecard"><span></span>{$f(__('payplug_integrated_payment_oneClick', 'payplug'))}</label>

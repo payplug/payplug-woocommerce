@@ -3,7 +3,7 @@
 namespace Payplug\PayplugWoocommerce\Gateway;
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -20,11 +20,13 @@ use Automattic\WooCommerce\Utilities\OrderUtil;
  *
  * @package Payplug\PayplugWoocommerce\Gateway
  */
-class PayplugResponse {
+class PayplugResponse
+{
 
 	private $gateway;
 
-	public function __construct( PayplugGateway $gateway ) {
+	public function __construct(PayplugGateway $gateway)
+	{
 		$this->gateway = $gateway;
 	}
 
@@ -56,43 +58,39 @@ class PayplugResponse {
 		 * Checking if it is coming from the order confirmation page or the IPN
 		 *
 		 */
-
 		if (($gateway_id == $this->gateway->id) || (!empty($source) && ($source === "ipn"))) {
-
 			// Ignore cancelled orders
 			if ($order->has_status('refunded')) {
-				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order has been refunded. Ignoring IPN', $order_id));
+				PayplugGateway::log(sprintf('Order #%s : ' . $this->gateway_name($gateway_id) . ' order has been refunded. Ignoring IPN', $order_id));
 				return;
 			}
 			$paid_date = $order->get_date_paid();
-			if( isset($paid_date) && !$order->is_paid()){
+			if (isset($paid_date) && !$order->is_paid()) {
 				$finished_status = wc_get_is_paid_statuses();
 				$order->set_status($finished_status[0]);
 			}
 
 			// Ignore paid orders
-			if ( $order->is_paid() ) {
-				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' order is already complete. Ignoring IPN. "' . !empty($source) ? '[IPN]' : ''. '"', $order_id));
+			if ($order->is_paid()) {
+				PayplugGateway::log(sprintf('Order #%s : ' . $this->gateway_name($gateway_id) . ' order is already complete. Ignoring IPN. "' . !empty($source) ? '[IPN]' : '' . '"', $order_id));
 				return;
 			}
 
 			// Handle failed payments
 			if (!empty($resource->failure)) {
-				if($order->get_status() != "failed"){
-					$order->update_status( 'failed', sprintf(__('PayPlug %s OK | Transaction %s failed : %s', 'payplug'), strtoupper($source), $resource->id, wc_clean($resource->failure->message)) );
+				if ($order->get_status() != "failed") {
+					$order->update_status('failed', sprintf(__('PayPlug %s OK | Transaction %s failed : %s', 'payplug'), strtoupper($source), $resource->id, wc_clean($resource->failure->message)));
 				}
 
 				/** This action is documented in src/Gateway/PayplugResponse */
 				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
 				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
-				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment IPN %s processing completed but failed.', $order_id, $resource->id));
+				PayplugGateway::log(sprintf('Order #%s : ' . $this->gateway_name($gateway_id) . ' payment IPN %s processing completed but failed.', $order_id, $resource->id));
 				wc_increase_stock_levels($order);
 				return;
-			}
-
-			elseif (( $resource->failure == null ) && !empty($resource->payment_method['is_pending'])
-				&& ( $resource->payment_method['is_pending'] == true )) {
-				$this->handle_pending_oney( $order, $resource, $source );
+			} elseif (($resource->failure == null) && !empty($resource->payment_method['is_pending'])
+				&& ($resource->payment_method['is_pending'] == true)) {
+				$this->handle_pending_oney($order, $resource, $source);
 			}
 
 			// Save Logs of the payment for the different payment gateways:
@@ -102,7 +100,7 @@ class PayplugResponse {
 				$gateway_id = $resource->payment_method['type'];
 
 				switch ($gateway_id) {
-					case 'oney_' === substr( $gateway_id, 0, 5 ):
+					case 'oney_' === substr($gateway_id, 0, 5):
 						$this->oney_ipn($resource);
 						break;
 					case 'bancontact' :
@@ -115,12 +113,10 @@ class PayplugResponse {
 						$this->amex_ipn($resource, $source);
 						break;
 				}
-
-			} elseif ($gateway_id == "payplug") {
+			} elseif ('payplug' == $gateway_id) {
 				if (!$is_payment_with_token) {
 					$this->payplug_ipn($resource, $source);
 				}
-
 			}
 
 			// Handle successful payments
@@ -129,7 +125,7 @@ class PayplugResponse {
 					$this->maybe_save_card($resource);
 				}
 				$this->maybe_save_address_hash($resource);
-				$order->add_order_note(sprintf(__('PayPlug %s OK | Transaction %s', 'payplug'), strtoupper($source) ,wc_clean($resource->id)));
+				$order->add_order_note(sprintf(__('PayPlug %s OK | Transaction %s', 'payplug'), strtoupper($source), wc_clean($resource->id)));
 				$order->payment_complete(wc_clean($resource->id));
 				if (PayplugWoocommerceHelper::is_pre_30()) {
 					$order->reduce_order_stock();
@@ -142,9 +138,8 @@ class PayplugResponse {
 				 */
 				\do_action('payplug_gateway_payment_response_processed', $order_id, $resource);
 				PayplugWoocommerceHelper::set_flag_ipn_order($order, $metadata, false);
-				PayplugGateway::log(sprintf('Order #%s : '. $this->gateway_name($gateway_id) .' payment %s %s processing completed successfully.', strtoupper($source), $order_id, $resource->id));
+				PayplugGateway::log(sprintf('Order #%s : ' . $this->gateway_name($gateway_id) . ' payment %s %s processing completed successfully.', strtoupper($source), $order_id, $resource->id));
 			}
-
 		}
 	}
 
@@ -158,9 +153,10 @@ class PayplugResponse {
 	 * @return void
 	 */
 
-	public function handle_pending_oney($order, $resource, $source) {
+	public function handle_pending_oney($order, $resource, $source)
+	{
 		$order->add_order_note(sprintf(__('PayPlug %s OK | Transaction %s | Payment PENDING to be checked by an Oney agent', 'payplug'), strtoupper($source), wc_clean($resource->id)));
-		wc_reduce_stock_levels( $order );
+		wc_reduce_stock_levels($order);
 	}
 
 	/**
@@ -168,9 +164,10 @@ class PayplugResponse {
 	 *
 	 * @param $resource
 	 */
-	public function payplug_ipn($resource, $source) {
-		$order_id = wc_clean( $resource->metadata['order_id'] );
-		PayplugGateway::log( sprintf( 'Order #%s : Begin processing Payplug payment %s %s', $order_id, strtoupper($source), $resource->id ) );
+	public function payplug_ipn($resource, $source)
+	{
+		$order_id = wc_clean($resource->metadata['order_id']);
+		PayplugGateway::log(sprintf('Order #%s : Begin processing Payplug payment %s %s', $order_id, strtoupper($source), $resource->id));
 	}
 
 	/**
@@ -178,9 +175,10 @@ class PayplugResponse {
 	 *
 	 * @param $resource
 	 */
-	public function bancontact_ipn($resource, $source) {
-		$order_id = wc_clean( $resource->metadata['order_id'] );
-		PayplugGateway::log( sprintf( 'Order #%s : Begin processing Bancontact payment %s %s', $order_id, strtoupper($source), $resource->id ) );
+	public function bancontact_ipn($resource, $source)
+	{
+		$order_id = wc_clean($resource->metadata['order_id']);
+		PayplugGateway::log(sprintf('Order #%s : Begin processing Bancontact payment %s %s', $order_id, strtoupper($source), $resource->id));
 	}
 
 	/**
@@ -188,9 +186,10 @@ class PayplugResponse {
 	 *
 	 * @param $resource
 	 */
-	public function apple_pay_ipn($resource, $source) {
-		$order_id = wc_clean( $resource->metadata['order_id'] );
-		PayplugGateway::log( sprintf( 'Order #%s : Begin processing Apple Pay payment %s %s', $order_id, strtoupper($source), $resource->id ) );
+	public function apple_pay_ipn($resource, $source)
+	{
+		$order_id = wc_clean($resource->metadata['order_id']);
+		PayplugGateway::log(sprintf('Order #%s : Begin processing Apple Pay payment %s %s', $order_id, strtoupper($source), $resource->id));
 	}
 
 	/**
@@ -198,9 +197,10 @@ class PayplugResponse {
 	 *
 	 * @param $resource
 	 */
-	public function amex_ipn($resource, $source) {
-		$order_id = wc_clean( $resource->metadata['order_id'] );
-		PayplugGateway::log( sprintf( 'Order #%s : Begin processing Amex payment %s %s', $order_id, strtoupper($source), $resource->id ) );
+	public function amex_ipn($resource, $source)
+	{
+		$order_id = wc_clean($resource->metadata['order_id']);
+		PayplugGateway::log(sprintf('Order #%s : Begin processing Amex payment %s %s', $order_id, strtoupper($source), $resource->id));
 	}
 
 	/**
@@ -208,20 +208,21 @@ class PayplugResponse {
 	 *
 	 * @param $resource
 	 */
-	public function oney_ipn( $resource ) {
+	public function oney_ipn($resource)
+	{
 		$gateway_id = $resource->payment_method['type'];
-		$order_id = wc_clean( $resource->metadata['order_id'] );
+		$order_id = wc_clean($resource->metadata['order_id']);
 
-		if ( ( $resource->is_paid == true ) && ( $resource->failure == null ) ) {
-			PayplugGateway::log( sprintf( 'Order #%s : '. $this->gateway_name($gateway_id) .' payment SUCCESS', $order_id ) );
+		if (($resource->is_paid == true) && ($resource->failure == null)) {
+			PayplugGateway::log(sprintf('Order #%s : ' . $this->gateway_name($gateway_id) . ' payment SUCCESS', $order_id));
 		}
 
-		if ( ( $resource->is_paid == false ) && ( $resource->failure != null ) ) {
-			PayplugGateway::log( sprintf( 'Order #%s : '. $this->gateway_name($gateway_id) .' payment FAILED', $order_id ) );
+		if (($resource->is_paid == false) && ($resource->failure != null)) {
+			PayplugGateway::log(sprintf('Order #%s : ' . $this->gateway_name($gateway_id) . ' payment FAILED', $order_id));
 		}
 
-		if ( ( $resource->is_paid == false ) && ( $resource->failure == null ) && ( $resource->payment_method['is_pending'] == true ) ) {
-			PayplugGateway::log( sprintf( 'Order #%s : '. $this->gateway_name($gateway_id) .' payment PENDING and checked by an Oney agent', $order_id ) );
+		if (($resource->is_paid == false) && ($resource->failure == null) && ($resource->payment_method['is_pending'] == true)) {
+			PayplugGateway::log(sprintf('Order #%s : ' . $this->gateway_name($gateway_id) . ' payment PENDING and checked by an Oney agent', $order_id));
 		}
 	}
 
@@ -230,7 +231,8 @@ class PayplugResponse {
 	 *
 	 * @param $gateway_id
 	 */
-	private function gateway_name($gateway_id){
+	private function gateway_name($gateway_id)
+	{
 		return ucwords(str_replace('_', ' ', $gateway_id));
 	}
 
@@ -243,22 +245,23 @@ class PayplugResponse {
 	 *
 	 * @throws \Exception
 	 */
-	public function process_refund( $resource, $ignore_woocommerce_refund = true ) {
-		$refund_id      = wc_clean( $resource->id );
-		$transaction_id = wc_clean( $resource->payment_id );
-		$order          = $this->get_order_from_transaction_id( $transaction_id );
-		if ( ! $order ) {
-			PayplugGateway::log( sprintf( 'Coudn\'t find order for transaction %s (Refund %s).', wc_clean( $resource->payment_id ), wc_clean( $resource->id ) ), 'error' );
+	public function process_refund($resource, $ignore_woocommerce_refund = true)
+	{
+		$refund_id = wc_clean($resource->id);
+		$transaction_id = wc_clean($resource->payment_id);
+		$order = $this->get_order_from_transaction_id($transaction_id);
+		if (!$order) {
+			PayplugGateway::log(sprintf('Coudn\'t find order for transaction %s (Refund %s).', wc_clean($resource->payment_id), wc_clean($resource->id)), 'error');
 
 			return;
 		}
 		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 
-		PayplugGateway::log( sprintf( 'Order #%s : Begin processing refund IPN %s', $order_id, $resource->id ) );
+		PayplugGateway::log(sprintf('Order #%s : Begin processing refund IPN %s', $order_id, $resource->id));
 
-		$refund_exist = $this->refund_exist_for_order( $order_id, $refund_id );
-		if ( $refund_exist ) {
-			PayplugGateway::log( sprintf( 'Order #%s : Refund has already been processed. Ignoring IPN.', $order_id ) );
+		$refund_exist = $this->refund_exist_for_order($order_id, $refund_id);
+		if ($refund_exist) {
+			PayplugGateway::log(sprintf('Order #%s : Refund has already been processed. Ignoring IPN.', $order_id));
 
 			return;
 		}
@@ -266,63 +269,64 @@ class PayplugResponse {
 		// Since refund notification doesn't contain the full resource, we need to retrieve
 		// the refund resource to access its metadata.
 		try {
-			$refund = $this->gateway->api->refund_retrieve( $transaction_id, $refund_id );
-		} catch ( \Exception $e ) {
-			PayplugGateway::log( sprintf( 'Order #%s : Fail to retrieve refund data with error %s', $order_id, $e->getMessage() ) );
+			$refund = $this->gateway->api->refund_retrieve($transaction_id, $refund_id);
+		} catch (\Exception $e) {
+			PayplugGateway::log(sprintf('Order #%s : Fail to retrieve refund data with error %s', $order_id, $e->getMessage()));
 
 			return;
 		}
 
 		if (
 			$ignore_woocommerce_refund
-			&& isset( $refund->metadata['refund_from'] )
+			&& isset($refund->metadata['refund_from'])
 			&& 'woocommerce' === $refund->metadata['refund_from']
 		) {
-			PayplugGateway::log( sprintf( 'Order #%s : Refund created by WooCommerce. Ignoring IPN.', $order_id ) );
+			PayplugGateway::log(sprintf('Order #%s : Refund created by WooCommerce. Ignoring IPN.', $order_id));
 
 			return;
 		}
 
-		$refund = wc_create_refund( [
-			'amount'         => ( (int) $resource->amount ) / 100,
-			'reason'         => isset( $resource->metadata['reason'] ) ? $resource->metadata['reason'] : null,
-			'order_id'       => (int) $order_id,
-			'refund_id'      => 0,
+		$refund = wc_create_refund([
+			'amount' => ((int)$resource->amount) / 100,
+			'reason' => isset($resource->metadata['reason']) ? $resource->metadata['reason'] : null,
+			'order_id' => (int)$order_id,
+			'refund_id' => 0,
 			'refund_payment' => false,
-		] );
-		if ( is_wp_error( $refund ) ) {
-			PayplugGateway::log( $refund->get_error_message() );
+		]);
+		if (is_wp_error($refund)) {
+			PayplugGateway::log($refund->get_error_message());
 		}
 
-		$refund_meta_key = sprintf( '_pr_%s', wc_clean( $resource->id ) );
-		if ( PayplugWoocommerceHelper::is_pre_30() ) {
-			update_post_meta( $order_id, $refund_meta_key, $resource->id );
+		$refund_meta_key = sprintf('_pr_%s', wc_clean($resource->id));
+		if (PayplugWoocommerceHelper::is_pre_30()) {
+			update_post_meta($order_id, $refund_meta_key, $resource->id);
 		} else {
-			$order->add_meta_data( $refund_meta_key, $resource->id, true );
+			$order->add_meta_data($refund_meta_key, $resource->id, true);
 			$order->save();
 		}
 
-		$note = sprintf( __( 'Refund %s : Refunded %s', 'payplug' ), wc_clean( $resource->id ), wc_price( ( (int) $resource->amount ) / 100 ) );
-		if ( ! empty( $resource->metadata['reason'] ) ) {
-			$note .= sprintf( ' (%s)', esc_html( $resource->metadata['reason'] ) );
+		$note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($resource->id), wc_price(((int)$resource->amount) / 100));
+		if (!empty($resource->metadata['reason'])) {
+			$note .= sprintf(' (%s)', esc_html($resource->metadata['reason']));
 		}
-		$order->add_order_note( $note );
+		$order->add_order_note($note);
 
 		/**
 		 * Fires once a refund response has been processed.
 		 *
-		 * @param int            $order_id Order ID
+		 * @param int $order_id Order ID
 		 * @param RefundResource $resource Refund resource
 		 */
-		\do_action( 'payplug_gateway_refund_response_processed', $order_id, $resource );
+		\do_action('payplug_gateway_refund_response_processed', $order_id, $resource);
 
 		try {
-			$payment = $this->gateway->api->payment_retrieve( $transaction_id );
-			$metadata = PayplugWoocommerceHelper::extract_transaction_metadata( $payment );
-			PayplugWoocommerceHelper::save_transaction_metadata( $order, $metadata );
-		} catch ( \Exception $e ) {}
+			$payment = $this->gateway->api->payment_retrieve($transaction_id);
+			$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
+			PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
+		} catch (\Exception $e) {
+		}
 
-		PayplugGateway::log( sprintf( 'Order #%s : Refund IPN %s processing completed.', $order_id, $resource->id ) );
+		PayplugGateway::log(sprintf('Order #%s : Refund IPN %s processing completed.', $order_id, $resource->id));
 	}
 
 	/**
@@ -332,16 +336,17 @@ class PayplugResponse {
 	 *
 	 * @return bool|\WC_Order
 	 */
-	protected function get_order_from_transaction_id( $transaction_id ) {
+	protected function get_order_from_transaction_id($transaction_id)
+	{
 		global $wpdb;
 
-		if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
+		if (OrderUtil::custom_orders_table_usage_is_enabled()) {
 
 			$orders = wc_get_orders(
 				array(
 					'field_query' => array(
 						array(
-							'field'        => 'transaction_id',
+							'field' => 'transaction_id',
 							'value' => $transaction_id
 						),
 					),
@@ -351,7 +356,7 @@ class PayplugResponse {
 			$order_id = $order->get_id();
 			//$sql = "SELECT o.id FROM $wpdb->wc_orders o WHERE o.transaction_id = %s";
 
-		}else{
+		} else {
 			$order_id = $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_transaction_id' AND meta_value = %s",
@@ -360,7 +365,7 @@ class PayplugResponse {
 			);
 		}
 
-		return ! is_null( $order_id ) ? wc_get_order( $order_id ) : false;
+		return !is_null($order_id) ? wc_get_order($order_id) : false;
 	}
 
 	/**
@@ -370,10 +375,11 @@ class PayplugResponse {
 	 *
 	 * @return bool
 	 */
-	protected function refund_exist_for_order( $order_id, $refund_id ) {
+	protected function refund_exist_for_order($order_id, $refund_id)
+	{
 		global $wpdb;
 
-		if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
+		if (OrderUtil::custom_orders_table_usage_is_enabled()) {
 
 			$results = wc_get_orders(
 				array(
@@ -382,16 +388,16 @@ class PayplugResponse {
 							'field_query' => array(
 								'relation' => 'AND',
 								array(
-									'field'   => 'meta_key',
-									'value'   => '_pr_' . esc_sql( $refund_id ),
+									'field' => 'meta_key',
+									'value' => '_pr_' . esc_sql($refund_id),
 								),
 								array(
-									'field'   => 'meta_value',
-									'value'   => $refund_id
+									'field' => 'meta_value',
+									'value' => $refund_id
 								),
 								array(
-									'field'   => 'order_id',
-									'value'   => (int) $order_id
+									'field' => 'order_id',
+									'value' => (int)$order_id
 								),
 							)
 						)
@@ -399,7 +405,7 @@ class PayplugResponse {
 				)
 			);
 
-		}else{
+		} else {
 			$sql = "
 			SELECT p.ID
 				FROM $wpdb->posts p
@@ -408,7 +414,7 @@ class PayplugResponse {
 				WHERE 1=1
 				AND p.post_type = %s
 				AND p.ID = %d
-				AND pm.meta_key LIKE '_pr_" . esc_sql( $refund_id ) . "'
+				AND pm.meta_key LIKE '_pr_" . esc_sql($refund_id) . "'
 				AND pm.meta_value = %s
 			LIMIT 1
 			";
@@ -417,13 +423,13 @@ class PayplugResponse {
 				$wpdb->prepare(
 					$sql,
 					'shop_order',
-					(int) $order_id,
+					(int)$order_id,
 					$refund_id
 				)
 			);
 		}
 
-		return ! empty( $results ) ? true : false;
+		return !empty($results) ? true : false;
 	}
 
 	/**
@@ -433,60 +439,61 @@ class PayplugResponse {
 	 *
 	 * @return bool
 	 */
-	protected function maybe_save_card( $resource ) {
+	protected function maybe_save_card($resource)
+	{
 
-		if ( ! isset( $resource->card ) || empty( $resource->card->id ) ) {
+		if (!isset($resource->card) || empty($resource->card->id)) {
 			return false;
 		}
 
-		if ( ! isset( $resource->metadata['customer_id'] ) ) {
+		if (!isset($resource->metadata['customer_id'])) {
 			return false;
 		}
 
-		$customer = get_user_by( 'id', $resource->metadata['customer_id'] );
-		if ( ! $customer || 0 === (int) $customer->ID ) {
+		$customer = get_user_by('id', $resource->metadata['customer_id']);
+		if (!$customer || 0 === (int)$customer->ID) {
 			return false;
 		}
 
 		$merchant_id = $this->gateway->get_merchant_id();
-		if ( empty( $merchant_id ) ) {
+		if (empty($merchant_id)) {
 			return false;
 		}
 
-		PayplugGateway::log( sprintf( 'Saving card from transaction %s for customer %s', wc_clean( $resource->id ), $customer->ID ) );
+		PayplugGateway::log(sprintf('Saving card from transaction %s for customer %s', wc_clean($resource->id), $customer->ID));
 
-        $token = new WC_Payment_Token_CC();
-        $existing_tokens = WC_Payment_Tokens::get_customer_tokens( $customer->ID , $this->gateway->id );
-        $set_token = wc_clean( $resource->card->id );
-        $set_last4 = wc_clean( $resource->card->last4 );
-        $set_expiry_year =  wc_clean( $resource->card->exp_year ) ;
-        $set_expiry_month = zeroise( (int) wc_clean( $resource->card->exp_month ), 2 ) ;
-        $set_card_type =  \strtolower( wc_clean( $resource->card->brand ) ) ;
-        if(!empty($existing_tokens)) {
-            foreach($existing_tokens as $token_id => $existing_token) {
-                $current_data = $existing_token->get_data();
-                if( $current_data['token'] === $set_token &&
-                    $current_data['last4'] === $set_last4 &&
-                    $current_data['expiry_year'] === $set_expiry_year &&
-                    $current_data['expiry_month'] === $set_expiry_month &&
-                    $current_data['card_type'] === $set_card_type) {
-                    $token->set_id($current_data['id']);
-                }
-            }
-        }
+		$token = new WC_Payment_Token_CC();
+		$existing_tokens = WC_Payment_Tokens::get_customer_tokens($customer->ID, $this->gateway->id);
+		$set_token = wc_clean($resource->card->id);
+		$set_last4 = wc_clean($resource->card->last4);
+		$set_expiry_year = wc_clean($resource->card->exp_year);
+		$set_expiry_month = zeroise((int)wc_clean($resource->card->exp_month), 2);
+		$set_card_type = \strtolower(wc_clean($resource->card->brand));
+		if (!empty($existing_tokens)) {
+			foreach ($existing_tokens as $token_id => $existing_token) {
+				$current_data = $existing_token->get_data();
+				if ($current_data['token'] === $set_token &&
+					$current_data['last4'] === $set_last4 &&
+					$current_data['expiry_year'] === $set_expiry_year &&
+					$current_data['expiry_month'] === $set_expiry_month &&
+					$current_data['card_type'] === $set_card_type) {
+					$token->set_id($current_data['id']);
+				}
+			}
+		}
 
-		$token->set_token( $set_token );
-		$token->set_gateway_id( 'payplug' );
-		$token->set_last4( $set_last4 );
-		$token->set_expiry_year( $set_expiry_year );
-		$token->set_expiry_month( $set_expiry_month );
-		$token->set_card_type( $set_card_type );
-		$token->set_user_id( $customer->ID );
-		$token->add_meta_data( 'mode', $resource->is_live ? 'live' : 'test', true );
-		$token->add_meta_data( 'payplug_account', \wc_clean( $merchant_id ), true );
+		$token->set_token($set_token);
+		$token->set_gateway_id('payplug');
+		$token->set_last4($set_last4);
+		$token->set_expiry_year($set_expiry_year);
+		$token->set_expiry_month($set_expiry_month);
+		$token->set_card_type($set_card_type);
+		$token->set_user_id($customer->ID);
+		$token->add_meta_data('mode', $resource->is_live ? 'live' : 'test', true);
+		$token->add_meta_data('payplug_account', \wc_clean($merchant_id), true);
 		$token->save();
 
-		PayplugGateway::log( sprintf( 'Payment card saved', wc_clean( $resource->id ), $customer->ID ) );
+		PayplugGateway::log(sprintf('Payment card saved', wc_clean($resource->id), $customer->ID));
 
 		return true;
 	}
@@ -498,27 +505,28 @@ class PayplugResponse {
 	 *
 	 * @return bool
 	 */
-	protected function maybe_save_address_hash( $resource ) {
+	protected function maybe_save_address_hash($resource)
+	{
 
-		if ( ! isset( $resource->metadata['customer_id'] ) ) {
+		if (!isset($resource->metadata['customer_id'])) {
 			return false;
 		}
 
-		$customer = get_user_by( 'id', $resource->metadata['customer_id'] );
-		if ( ! $customer || 0 === (int) $customer->ID ) {
+		$customer = get_user_by('id', $resource->metadata['customer_id']);
+		if (!$customer || 0 === (int)$customer->ID) {
 			return false;
 		}
 
 		$shipping = [];
-		foreach ( PayplugAddressData::$address_fields as $field ) {
-			$shipping[ $field ] = $resource->shipping->{$field};
+		foreach (PayplugAddressData::$address_fields as $field) {
+			$shipping[$field] = $resource->shipping->{$field};
 		}
 
-		$shipping_hash = PayplugAddressData::hash_address( $shipping );
-		$hash_list     = PayplugAddressData::get_customer_addresses_hash( $customer->ID );
-		$hash_list[]   = $shipping_hash;
-		$hash_list     = array_unique( $hash_list );
-		PayplugAddressData::update_customer_addresses_hash( $customer->ID, $hash_list );
+		$shipping_hash = PayplugAddressData::hash_address($shipping);
+		$hash_list = PayplugAddressData::get_customer_addresses_hash($customer->ID);
+		$hash_list[] = $shipping_hash;
+		$hash_list = array_unique($hash_list);
+		PayplugAddressData::update_customer_addresses_hash($customer->ID, $hash_list);
 
 		return true;
 	}

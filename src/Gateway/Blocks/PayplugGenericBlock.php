@@ -105,16 +105,17 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
 		$min_amount = PayplugWoocommerceHelper::get_minimum_amount();
 		$max_amount = PayplugWoocommerceHelper::get_maximum_amount();
 		$configuration = $this->get_service('configuration');
-		$oneclick = $configuration->get_option('payment_methods.configuration.payplug.save_card')
+		$save_card = $configuration->get_option('payment_methods.configuration.payplug.save_card')
 			&& $cart_total_cents >= $min_amount
 			&& $cart_total_cents <= $max_amount;
+
 		return [
 			'enabled' => $this->is_active(),
 			'name' => $this->gateway->id,
 			'title' => $this->gateway->title,
 			'description' => $this->gateway->description,
 			'allowed_country_codes' => $this->allowed_country_codes,
-			'oneclick' => $oneclick
+			'save_card' => $save_card
 		];
 	}
 }
