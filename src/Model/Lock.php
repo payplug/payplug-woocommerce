@@ -11,7 +11,7 @@ class Lock
 	static function create_lock_table(){
 		global $wpdb;
 
-		$sql = 'CREATE TABLE  IF NOT EXISTS `{$wpdb->base_prefix}woocommerce_payplug_lock` (';
+		$sql = 'CREATE TABLE  IF NOT EXISTS `' . $wpdb->base_prefix . 'woocommerce_payplug_lock` (';
 		$sql .= ' `payment_id` VARCHAR(50) NOT NULL,';
 		$sql .= ' `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,';
 		$sql .= ' PRIMARY KEY (`payment_id`));';
@@ -53,6 +53,10 @@ class Lock
 	static function insert_lock($payment_id){
 		global $wpdb;
 		$wpdb->hide_errors();
+		$lock_table_exists = self::check_table_exists();
+		if (!$lock_table_exists) {
+			self::create_lock_table();
+		}
 		$wpdb->insert($wpdb->base_prefix . 'woocommerce_payplug_lock', array("payment_id" => $payment_id));
 		return $wpdb->insert_id;
 	}
@@ -129,5 +133,12 @@ class Lock
 
 	}
 
-
+	static function check_table_exists(){
+		global $wpdb;
+		$table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
+		$table_exists = $wpdb->get_var( $wpdb->prepare(
+			"SHOW TABLES LIKE %s", $table_name
+		) );
+		return $table_exists === $table_name;
+	}
 }

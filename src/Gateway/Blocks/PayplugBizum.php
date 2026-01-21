@@ -1,13 +1,11 @@
 <?php
 
-
 namespace Payplug\PayplugWoocommerce\Gateway\Blocks;
 
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 class PayplugBizum extends PayplugGenericBlock
 {
-
 	/**
 	 * Payment method name/id/slug.
 	 *
@@ -26,6 +24,7 @@ class PayplugBizum extends PayplugGenericBlock
 			"src" => esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $this->gateway->image),
 			'icon_alt' => $data['name'],
 		];
+
 		return $data;
 	}
 }

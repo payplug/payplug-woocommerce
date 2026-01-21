@@ -46,8 +46,8 @@ class PayplugPermissions {
 	 * @param PayplugGateway $gateway
 	 */
 	public function __construct( PayplugGateway $gateway) {
-		$this->gateway_mode = $gateway->configuration->get_option('mode');
-		$api_key = json_decode($gateway->configuration->get_option('api_key'), true);
+		$this->gateway_mode = $gateway->get_configuration()->get_option('mode');
+		$api_key = json_decode($gateway->get_configuration()->get_option('api_key'), true);
 
 		// todo: check if we should get the jwt instead api key
 		if (!isset($api_key['live']) || !isset($api_key['test'])) {

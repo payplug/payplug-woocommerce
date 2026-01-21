@@ -12,7 +12,7 @@ class PayplugApplePay extends PayplugGenericBlock
 	 *
 	 * @var string
 	 */
-	protected $name = "applepay";
+	protected $name = 'apple_pay';
 
 	/**
  	* Returns an associative array of data to be exposed for the payment method's client side.

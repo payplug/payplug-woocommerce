@@ -140,7 +140,6 @@ class PayplugWoocommerceRequest {
 
 
 		$this->process_order_payment($order_id, $payment_method);
-
 	}
 
 	/**
@@ -181,8 +180,6 @@ class PayplugWoocommerceRequest {
 			wp_send_json( $result );
 		}
 	}
-
-
 
 	/**
 	 * Update Payplug API Payment for Apple Pay
@@ -391,7 +388,7 @@ class PayplugWoocommerceRequest {
 		$payment_data = [
 			'amount'           => $amount,
 			'currency'         => get_woocommerce_currency(),
-			'allow_save_card'  => $this->gateway->oneclick_available() && (int) $customer_id > 0,
+			'allow_save_card'  => $this->gateway->save_card_available() && (int) $customer_id > 0,
 			'billing'          => $address_data->get_billing(),
 			'shipping'         => $address_data->get_shipping(),
 			'hosted_payment'   => [

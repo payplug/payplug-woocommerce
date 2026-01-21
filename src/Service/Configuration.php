@@ -4,7 +4,7 @@ namespace Payplug\PayplugWoocommerce\Service;
 
 class Configuration
 {
-	private $current_configuration = null;
+	private $current_configuration = [];
 	private $expected_fields = [
 		// merchant configuration
 		'email' => [
@@ -13,7 +13,7 @@ class Configuration
 		],
 		'company_id' => [
 			'type' => 'string',
-			'default' => '{}',
+			'default' => '',
 		],
 		'company_iso' => [
 			'type' => 'string',
@@ -376,7 +376,7 @@ class Configuration
 						'default' => 3,
 					],
 				],
-				'applepay' => [
+				'apple_pay' => [
 					'active' => [
 						'type' => 'bool',
 						'default' => false,
@@ -500,6 +500,39 @@ class Configuration
 			'type' => 'bool',
 			'default' => false,
 		],
+		'version' => [
+			'type' => 'string',
+			'default' => '',
+		],
+	];
+	private $old_keys = [
+		'american_express' => 'payment_methods.configuration.american_express.active',
+		'apple_pay' => 'payment_methods.configuration.apple_pay.active',
+		'applepay_carriers' => 'payment_methods.configuration.apple_pay.carriers',
+		'applepay_cart' => 'payment_methods.configuration.apple_pay.display.cart',
+		'applepay_checkout' => 'payment_methods.configuration.apple_pay.display.checkout',
+		'applepay_product' => 'payment_methods.configuration.apple_pay.display.product',
+		'bancontact' => 'payment_methods.configuration.bancontact.active',
+		'debug' => 'debug',
+		'description' => 'payment_methods.configuration.payplug.description',
+		'email' => 'email',
+		'enabled' => 'enabled',
+		'ideal' => 'payment_methods.configuration.ideal.active',
+		'mode' => 'mode',
+		'mybank' => 'payment_methods.configuration.mybank.active',
+		'oneclick' => 'payment_methods.configuration.payplug.save_card',
+		'oney' => 'payment_methods.configuration.oney.active',
+		'oney_product_animation' => 'payment_methods.configuration.oney.cta_product',
+		'oney_thresholds_max' => 'payment_methods.configuration.oney.custom_amounts.max',
+		'oney_thresholds_min' => 'payment_methods.configuration.oney.custom_amounts.min',
+		'oney_type' => 'payment_methods.configuration.oney.with_fees',
+		'payment_method' => 'payment_methods.configuration.payplug.embedded_mode',
+		'payplug' => 'payment_methods.configuration.payplug.active',
+		'payplug_live_key' => 'api_key.live',
+		'payplug_merchant_id' => 'company_id',
+		'payplug_test_key' => 'api_key.test',
+		'satispay' => 'payment_methods.configuration.satispay.active',
+		'title' => 'payment_methods.configuration.payplug.title',
 	];
 
 	public function __construct()
@@ -507,13 +540,23 @@ class Configuration
 		$this->current_configuration = get_option('woocommerce_payplug_settings', []);
 	}
 
+	/**
+	 * @description initialize option from expected fields
+	 * @return array
+	 */
 	public function initialize_option()
 	{
 		$options = $this->extract_options_from_fields();
 		return $this->update_options($options);
 	}
 
-	public function extract_options_from_fields($fields = null) {
+	/**
+	 * @description get default configuration value from expected fields (recursively)
+	 * @param $fields
+	 * @return array
+	 */
+	public function extract_options_from_fields($fields = null)
+	{
 		if ($fields === null) {
 			$fields = $this->get_expected_fields();
 		}
@@ -528,18 +571,33 @@ class Configuration
 		return $options;
 	}
 
-	public function clean_option() {
+	/**
+	 * @description Delete all configurations related to the plugin
+	 * @return void
+	 */
+	public function clean_option()
+	{
 		$this->current_configuration = null;
 		delete_option('woocommerce_payplug_settings');
 		delete_site_option('woocommerce_payplug_settings');
 	}
 
+	/**
+	 * @description Get configurations
+	 * @return mixed
+	 */
 	public function get_options()
 	{
 		return $this->current_configuration;
 	}
 
-	// todo: add default return value
+	/**
+	 * @description Return configuration value for a given key
+	 * todo: add default return value
+	 * @param $option_name
+	 * @param $options
+	 * @return mixed|null
+	 */
 	public function get_option($option_name = '', $options = null)
 	{
 		if (!is_string($option_name) || empty($option_name)) {
@@ -553,13 +611,13 @@ class Configuration
 
 		// Get first iteration
 		$name = reset($option_name);
-		if(!array_key_exists($name, $options)) {
+		if (!array_key_exists($name, $options)) {
 			return null;
 		}
 
 		// if no more sub option, return current one
 		unset($option_name[0]);
-		if(empty($option_name)) {
+		if (empty($option_name)) {
 			return $options[$name];
 		}
 
@@ -568,7 +626,12 @@ class Configuration
 		return $this->get_option($option_name, $options[$name]);
 	}
 
-	// todo: check return value type
+	/**
+	 * @description Update confurations values
+	 * todo: check return value type
+	 * @param $options_to_update
+	 * @return mixed
+	 */
 	public function update_options($options_to_update = [])
 	{
 		$options = $this->get_options();
@@ -579,6 +642,31 @@ class Configuration
 		return update_option('woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options));
 	}
 
+	/**
+	 * @description Update confurations for a given key
+	 * @param $key
+	 * @param $value
+	 * @return array
+	 */
+	public function update_option($key = '', $value = null) {
+		if (!is_string($key) || empty($key)) {
+			return [];
+		}
+
+		if (!array_key_exists($key, $this->expected_fields)) {
+			return [];
+		}
+
+		$options = $this->get_options();
+		$options[$key] = $value = null;
+		return $this->update_options($options);
+	}
+
+	/**
+	 * @description Update payment configuration permission
+	 * @param $payment_permissions
+	 * @return mixed
+	 */
 	public function update_payment_permissions($payment_permissions = [])
 	{
 		$options = $this->get_options();
@@ -587,7 +675,98 @@ class Configuration
 		return update_option('woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options));
 	}
 
-	public function get_expected_fields() {
+	/**
+	 * @description Get the expected fields
+	 * @return array
+	 */
+	public function get_expected_fields()
+	{
 		return $this->expected_fields;
+	}
+
+	/**
+	 * @description Validate if the current configuration is valide (for example: when plugin is upgraded)
+	 * @return array
+	 */
+	public function validate_configuration()
+	{
+		$options = $this->extract_options_from_fields();
+		foreach ($this->old_keys as $key => $value) {
+			if (!isset($this->current_configuration[$key])) {
+				continue;
+			}
+			switch ($key) {
+				case 'applepay_carriers':
+					$carriers = $this->current_configuration['applepay_carriers'];
+					if (!empty($carriers)) {
+						$options['payment_methods']['configuration']['apple_pay']['carriers'] = json_encode($carriers);
+					}
+					break;
+
+				case 'applepay_cart':
+				case 'applepay_checkout':
+				case 'applepay_product':
+					$display = str_replace('applepay_', '', $key);
+					$applepay_display = json_decode($options['payment_methods']['configuration']['apple_pay']['display'], true);
+					$applepay_display[$display] = 'yes' == $this->current_configuration[$key];
+					$options['payment_methods']['configuration']['apple_pay']['display'] = json_encode($applepay_display);
+					break;
+				case 'oney_product_animation':
+					$options['payment_methods']['configuration']['oney']['cta_product'] = 'yes' == $this->current_configuration['oney_product_animation'];
+					break;
+				case 'oney_thresholds_min':
+				case 'oney_thresholds_max':
+					$thresholds = str_replace('oney_thresholds_', '', $key);
+					$custom_amounts = json_decode($options['payment_methods']['configuration']['oney']['custom_amounts'], true);
+					$custom_amounts[$thresholds] = $this->current_configuration[$key];
+					$options['payment_methods']['configuration']['oney']['custom_amounts'] = json_encode($custom_amounts);
+					break;
+				case 'oney_type':
+					$options['payment_methods']['configuration']['oney']['with_fees'] = $this->current_configuration['oney_type'];
+					break;
+				case 'description':
+					$options['payment_methods']['configuration']['payplug']['description'] = $this->current_configuration['description'];
+					break;
+				case 'payment_method':
+					$options['payment_methods']['configuration']['payplug']['embedded_mode'] = $this->current_configuration['payment_method'];
+					break;
+				case 'oneclick':
+					$options['payment_methods']['configuration']['payplug']['save_card'] = 'yes' == $this->current_configuration['oneclick'];
+					break;
+				case 'title':
+					$options['payment_methods']['configuration']['payplug']['title'] = $this->current_configuration['title'];
+					break;
+
+				case 'payplug_test_key':
+				case 'payplug_live_key':
+					$mode = str_replace('payplug_', '', $key);
+					$mode = str_replace('_key', '', $mode);
+					$api = json_decode($options['api_key'], true);
+					$api[$mode] = $this->current_configuration['payplug_' . $mode . '_key'];
+					$options['api_key'] = json_encode($api);
+					break;
+
+				case 'payplug_merchant_id':
+					$options['company_id'] = $this->current_configuration['payplug_merchant_id'];
+					break;
+
+				case 'american_express':
+				case 'apple_pay':
+				case 'bancontact':
+				case 'ideal':
+				case 'mybank':
+				case 'oney':
+				case 'payplug':
+				case 'satispay':
+					$options['payment_methods']['configuration'][$key]['active'] = 'yes' == $this->current_configuration[$key];
+					break;
+
+				default:
+					$value = 'no' == $this->current_configuration[$key] ? false : $this->current_configuration[$key];
+					$options[$key] = 'yes' == $value ? true : $value;
+					break;
+			}
+		}
+		return $options;
 	}
 }
