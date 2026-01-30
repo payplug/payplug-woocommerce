@@ -125,6 +125,28 @@ class PaymentGateways {
 			"image" => '<img src="'.PAYPLUG_GATEWAY_PLUGIN_URL.'/assets/images/checkout/satispay.svg" alt="satispay Icon" class="payplug-payment-icon" />',
 			"enable" => "no",
 			"enable_on_test_mode" => false,
+		),
+		"wero" => array(
+			"id" => "wero",
+			"title" => "Pay with Wero",
+			"method_title" => "Pay with Wero",
+			"description" => "",
+			"method_description" => "",
+			"has_fields" => false,
+			"image" => '<img src="'.PAYPLUG_GATEWAY_PLUGIN_URL.'/assets/images/checkout/wero.svg" alt="wero Icon" class="payplug-payment-icon" />',
+			"enable" => "no",
+			"enable_on_test_mode" => false,
+		),
+		"bizum" => array(
+			"id" => "bizum",
+			"title" => "Pay with Bizum",
+			"method_title" => "Pay with Bizum",
+			"description" => "",
+			"method_description" => "",
+			"has_fields" => false,
+			"image" => '<img src="'.PAYPLUG_GATEWAY_PLUGIN_URL.'/assets/images/checkout/bizum.svg" alt="bizum Icon" class="payplug-payment-icon" />',
+			"enable" => "no",
+			"enable_on_test_mode" => false,
 		)
 	);
 

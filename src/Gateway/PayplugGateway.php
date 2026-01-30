@@ -284,7 +284,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		}
 
 		$payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-		if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees', 'bancontact', 'applepay', 'american_express', "satispay", "mybank", "ideal"])) {
+		if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees', 'bancontact', 'applepay', 'american_express', "satispay", "mybank", "ideal","wero","bizum"])) {
 			return;
 		}
 
@@ -795,7 +795,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 */
 	public function process_standard_payment($order, $amount, $customer_id)
 	{
-
 		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 
 		$intent = $this->process_standard_intent_payment($order);
@@ -898,7 +897,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
 				'cancel' => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null
 			);
-
 		} catch (HttpException $e) {
 			PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
 			throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
@@ -984,7 +982,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
 
 			$this->response->process_payment($payment, true);
-
 			if (($payment->__get('is_paid'))) {
 				$redirect = $order->get_checkout_order_received_url();
 			} else if (isset($payment->__get('hosted_payment')->payment_url)) {
