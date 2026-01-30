@@ -177,6 +177,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			) &&
 			!empty($order->get_transaction_id()) ) {
 
+
 			$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 
 			try {
@@ -242,6 +243,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		}
 
 		$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
+
 		try {
 
 			//if there's no auth to process payment
@@ -250,13 +252,11 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			}
 
 			$address_data = PayplugAddressData::from_order($order);
-
 			$return_url = esc_url_raw($order->get_checkout_order_received_url());
 
 			if (!(substr( $return_url, 0, 4 ) === "http")) {
 				$return_url = get_site_url().$return_url;
 			}
-
 			$payment_data = [
 				'amount'           => $amount,
 				'currency'         => get_woocommerce_currency(),
@@ -276,6 +276,9 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 				"save_card"=> false,
 				"force_3ds"=> false
 			];
+			if ( !empty($payment_data['billing']['landline_phone_number']) ) {
+				$payment_data['billing']['mobile_phone_number'] = $payment_data['billing']['landline_phone_number'];
+			}
 
 			if (PayplugWoocommerceHelper::is_checkout_block() && is_checkout()) {
 				$payment_data['metadata']['woocommerce_block'] = "CHECKOUT";
@@ -283,7 +286,6 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			} elseif (PayplugWoocommerceHelper::is_cart_block() && is_cart()) {
 				$payment_data['metadata']['woocommerce_block'] = "CART";
 			}
-
 			/**
 			 * Filter the payment data before it's used
 			 *
@@ -294,7 +296,6 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			 */
 			$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
 			$payment      = $this->api->payment_create($payment_data);
-
 			// Save transaction id for the order
 			PayplugWoocommerceHelper::is_pre_30()
 				? update_post_meta($order_id, '_transaction_id', $payment->id)
