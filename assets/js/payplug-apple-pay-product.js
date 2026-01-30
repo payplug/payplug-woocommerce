@@ -37,7 +37,7 @@
 				apple_pay_params.ajax_url_applepay_get_shippings
 
 			).done(function(results){
-				if(results.data.length === 0){
+				if(results.data.length === 0 || apple_pay_params.is_virtual){
 					//$apple_pay_button.remove();
 					apple_pay_params.carriers = [];
 					return;
