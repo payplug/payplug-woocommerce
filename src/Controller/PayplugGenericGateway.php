@@ -168,13 +168,12 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	 * @throws \Exception
 	 */
 	private function process_standard_intent_payment($order){
-
 		if ( !is_wc_endpoint_url('order-pay') &&
 			empty($_POST["payplug_non_blocks"]) &&
 			PayplugWoocommerceHelper::is_checkout_block() &&
 			(
-				( $this->id === "payplug" && ($this->payment_method === 'integrated'|| $this->payment_method === 'popup') ) ||
-				( $this->id === "american_express" && $this->payment_method === 'popup')
+				( $this->id === "payplug" && ($this->settings['payment_method'] === 'integrated'|| $this->settings['payment_method'] === 'popup') ) ||
+				( $this->id === "american_express" && $this->settings['payment_method'] === 'popup')
 			) &&
 			!empty($order->get_transaction_id()) ) {
 
