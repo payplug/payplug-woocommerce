@@ -248,11 +248,11 @@ class ApplePay {
 			$order->remove_item($item_id);
 		}
 
+		$use_taxes = false;
 		$shipping_zone = \WC_Shipping_Zones::get_zone_matching_package( $package );
 		if ( $shipping_zone && !empty( $selected_shipping_method ) ) {
 
 			$shipping_methods = $shipping_zone->get_shipping_methods( true );
-			$use_taxes = false;
 
 			foreach ( $shipping_methods as $shipping_method ) {
 				if ( ! $shipping_method->supports( 'shipping-zones' ) || ! $shipping_method->is_enabled() ) {
