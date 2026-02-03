@@ -7,11 +7,11 @@ class Validator {
 	public static function enabled($value) {
 
 		if ($value == 1){
-			return "yes";
+			return true;
 		}
 
 		if ($value == 0){
-			return "no";
+			return false;
 		}
 
 		http_response_code(400);
@@ -20,11 +20,11 @@ class Validator {
 
 	public static function mode($value) {
 		if ($value == 1){
-			return "no";
+			return false;
 		}
 
 		if ($value == 0){
-			return "yes";
+			return true;
 		}
 
 		http_response_code(400);
@@ -44,27 +44,27 @@ class Validator {
 	public static function debug($value) {
 
 		if ($value == 1){
-			return "yes";
+			return true;
 		}
 
 		if ($value == 0){
-			return "no";
+			return false;
 		}
 
 		http_response_code(400);
 		wp_send_json_error(['error' => 'mode is missing']);
 
-		return "no";
+		return false;
 	}
 
 	public static function oneclick($value) {
 
 		if ($value == 1){
-			return "yes";
+			return true;
 		}
 
 		if ($value == 0){
-			return "no";
+			return false;
 		}
 
 		http_response_code(400);
@@ -74,14 +74,14 @@ class Validator {
 	public static function genericPaymentGateway($value, $payment, $test_mode) {
 
 		if($test_mode){
-			return "no";
+			return false;
 		}
 
 		if ($value == 1 || $value){
-			return "yes";
+			return true;
 		}
 
-		return "no";
+		return false;
 	}
 
 	/**
@@ -94,31 +94,31 @@ class Validator {
 	 */
 	public static function applePayPaymentGatewayOptions($apple_pay, $cart, $product, $checkout, $carriers){
 
-		if($apple_pay === "no"){
+		if($apple_pay === false){
 			return true;
 		}
 
-		if( $cart === "no" && $product === "no" && $checkout === "no" ){
+		if( $cart === false && $product === false && $checkout === false ){
 			http_response_code(200);
 
 			$arr = [
-				"msg"=>__( 'applepay_cart_checkout_option_validation', 'payplug' ),
-				"class"=>"error",
-				"title"=>__( 'applepay_cart_checkout_option_validation_title', 'payplug' ),
-				"close"=> __( 'payplug_ok', 'payplug' )
+				'msg'=>__( 'applepay_cart_checkout_option_validation', 'payplug' ),
+				'class'=>'error',
+				'title'=>__( 'applepay_cart_checkout_option_validation_title', 'payplug' ),
+				'close'=> __( 'payplug_ok', 'payplug' )
 			];
 
 			wp_send_json_error($arr);
 		}
 
-		if( ($cart === "yes" || $product === "yes") && empty($carriers)){
+		if( ($cart === true || $product === true) && empty($carriers)){
 			http_response_code(200);
 
 			$arr = [
-				"msg"=>__( 'applepay_cart_carrier_enabled', 'payplug' ),
-				"class"=>"error",
-				"title"=>__( 'applepay_cart_checkout_option_validation_title', 'payplug' ),
-				"close"=> __( 'payplug_ok', 'payplug' )
+				'msg' => __( 'applepay_cart_carrier_enabled', 'payplug' ),
+				'class' => 'error',
+				'title' => __( 'applepay_cart_checkout_option_validation_title', 'payplug' ),
+				'close' =>  __( 'payplug_ok', 'payplug' )
 			];
 
 			wp_send_json_error($arr);
@@ -131,10 +131,10 @@ class Validator {
 	public static function oney($value) {
 
 		if ($value == 1){
-			return "yes";
+			return true;
 		}
 
-		return "no";
+		return false;
 
 		http_response_code(400);
 		wp_send_json_error(['error' => 'oney is missing']);
@@ -167,9 +167,9 @@ class Validator {
 	public static function oney_product_animation($status){
 
 		if($status){
-			return "yes";
+			return true;
 		}else{
-			return "no";
+			return false;
 		}
 
 	}

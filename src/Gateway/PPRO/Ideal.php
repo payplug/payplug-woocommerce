@@ -28,10 +28,10 @@ class Ideal extends PayplugGenericGateway
 
 		//WOOCO FIELDS
 		$this->has_fields = false;
-		$this->enabled = "yes";
+		$this->enabled = true;
 
 		if (!$this->checkGateway()) {
-			$this->enabled = "no";
+			$this->enabled = false;
 		}
 
 

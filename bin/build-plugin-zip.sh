@@ -41,7 +41,8 @@ fi
 # Remove ignored files to reset repository to pristine condition. Previous test
 # ensures that changed files abort the plugin build.
 status "Cleaning working directory..."
-git clean -xdf
+git status
+git clean -xdf -e assets/dist/
 
 # Run the build
 status "Installing dependencies..."

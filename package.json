@@ -1,6 +1,6 @@
 {
   "name": "payplug",
-  "version": "1.0.0",
+  "version": "2.16.0",
   "description": "PayPLug CSS assets management",
   "license": "GPL-3.0-or-later",
   "author": "PayPlug",
@@ -35,7 +35,8 @@
     "@woocommerce/settings": "^1.0.0",
     "jquery": "^3.7.1",
     "sass": "^1.68.0",
-    "trim-newlines": "^5.0.0"
+    "trim-newlines": "^5.0.0",
+    "payplug-ui-plugins-bo": "^2.1.0"
   },
   "main": "webpack.config.js",
   "directories": {
