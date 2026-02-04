@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.8\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1091,6 +1091,12 @@ msgstr "Paga con MyBank"
 
 msgid "pay_with_ideal"
 msgstr "Paga con iDEAL"
+
+msgid "pay_with_wero"
+msgstr "Paga con Wero"
+
+msgid "pay_with_bizum"
+msgstr "Paga con Bizum"
 
 msgid "satispay_threshold"
 msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ and %s€ per pagare tramite Satispay."

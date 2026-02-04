@@ -912,3 +912,9 @@ msgstr "Don't have an account ?"
 
 msgid "payplug_section_oauth_login_btn_connect"
 msgstr "Connect account"
+
+msgid "pay_with_wero"
+msgstr "Pay with Wero"
+
+msgid "pay_with_bizum"
+msgstr "Pay with Bizum"
