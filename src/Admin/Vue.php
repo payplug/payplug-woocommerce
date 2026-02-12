@@ -27,7 +27,7 @@ class Vue
 	public function __construct()
 	{
 		$payplug = (new PayplugGateway());
-		$this->configuration = $payplug->get_service('configuration');
+		$this->configuration = $payplug->get_configuration();
 		$this->options = $payplug->settings;
 	}
 
@@ -360,7 +360,7 @@ class Vue
 		$payment_configuration = $this->options['payment_methods']['configuration'];
 
 		// get applepay carriers
-		$carriers = json_decode($payment_configuration['applepay']['carriers'], true);
+		$carriers = json_decode($payment_configuration['apple_pay']['carriers'], true);
 		$carriers = empty($carriers) ? [] : $carriers;
 
 		$section = [
@@ -377,7 +377,7 @@ class Vue
 			'options' => [
 				(new PaymentMethods($this->options))->payment_method_standard(),
 				PaymentMethods::payment_method_amex($payment_configuration['american_express']['active']),
-				PaymentMethods::payment_method_applepay($payment_configuration['applepay']['active'], $this->options, $carriers),
+				PaymentMethods::payment_method_applepay($payment_configuration['apple_pay']['active'], $this->options, $carriers),
 				PaymentMethods::payment_method_bancontact($payment_configuration['bancontact']['active']),
 				PaymentMethods::payment_method_satispay($payment_configuration['satispay']['active']),
 				PaymentMethods::payment_method_mybank($payment_configuration['mybank']['active']),

@@ -24,6 +24,7 @@ class PayplugWero extends PayplugGenericBlock
 			"src" => esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $this->gateway->image),
 			'icon_alt' => $data['name'],
 		];
+
 		return $data;
 	}
 }

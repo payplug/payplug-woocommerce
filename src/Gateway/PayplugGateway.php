@@ -47,11 +47,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	/**
 	 * @var string
 	 */
-	public $payment_method;
+	public $embedded_mode;
 	/**
 	 * @var bool
 	 */
-	public $oneclick;
+	public $save_card;
 
 	/**
 	 * @var string
@@ -114,7 +114,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 	const ENABLE_ON_TEST_MODE = true;
 
-	public $configuration;
+	public $configuration = null;
 
 	/**
 	 * Logging method.
@@ -152,9 +152,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			'refunds',
 			'tokenization',
 		);
-		$this->configuration = $this->get_service('configuration');
 
-		$payplug_gateways = array('payplug', 'american_express', 'applepay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees', 'satispay', 'ideal', 'mybank');
+		$payplug_gateways = array('payplug', 'american_express', 'apple_pay', 'bancontact', 'oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees', 'satispay', 'ideal', 'mybank', 'wero', 'bizum');
 
 		//save buttom admin
 		if ((!empty($_GET['section'])) && (in_array($_GET['section'], $payplug_gateways))) {
@@ -167,19 +166,20 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$this->init_payplug();
 		}
 
-		$this->mode = (bool)$this->configuration->get_option('mode') ? 'live' : 'test';
-		$this->debug = (bool)$this->configuration->get_option('debug');
-		$this->email = (string)$this->configuration->get_option('email');
+		$this->mode = (bool)$this->get_configuration()->get_option('mode') ? 'live' : 'test';
+		$this->debug = (bool)$this->get_configuration()->get_option('debug');
+		$this->email = (string)$this->get_configuration()->get_option('email');
 
 		//admin form
 		$this->init_form_fields();
 
-		add_filter('woocommerce_get_customer_payment_tokens', [$this, 'filter_tokens'], 10, 3);
+		 add_filter('woocommerce_get_customer_payment_tokens', [$this, 'filter_tokens'], 10, 3);
 
 		self::$log_enabled = $this->debug;
 
 		add_filter('woocommerce_get_order_item_totals', [$this, 'customize_gateway_title'], 10, 2);
 		add_action('woocommerce_thankyou', [$this, 'validate_payment']);
+		add_action('the_post', [$this, 'validate_payment']);
 		add_action('woocommerce_available_payment_gateways', [$this, 'check_gateway']);
 	}
 
@@ -284,7 +284,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		}
 
 		$payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
-		if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees', 'bancontact', 'applepay', 'american_express', "satispay", "mybank", "ideal","wero","bizum"])) {
+		if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees', 'bancontact', 'apple_pay', 'american_express', 'satispay', 'mybank', 'ideal','wero','bizum'])) {
 			return;
 		}
 
@@ -297,7 +297,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 			$lock_id = Lock::handle_insert($save_request, $transaction_id);
 			if (!$lock_id) {
-//				return;
+				return;
 			}
 
 			try {
@@ -331,7 +331,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 */
 	public function is_available()
 	{
-		if ($this->enabled) {
+		if ('yes' == $this->enabled) {
 			return $this->requirements->satisfy_requirements() && !empty($this->get_api_key($this->get_current_mode()));
 		}
 
@@ -344,7 +344,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	public function init_settings()
 	{
 		parent::init_settings();
-		$this->enabled = !empty($this->settings['enabled']) && (bool)$this->settings['enabled'];
+		$enabled = !empty($this->settings['enabled']) && (bool)$this->settings['enabled'];
+		$this->enabled = $enabled ? 'yes' : 'no';
 	}
 
 	/**
@@ -363,7 +364,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$bancontact_call_to_action = sprintf(' <a id="bancontact_call_to_action" href="https://%s" target="_blank">%s</a>', $domain_bancontact, $anchor_bancontact);
 
 
-		$oney_cfg = $this->configuration->get_option('payment_methods.configuration.oney');
+		$oney_cfg = $this->get_configuration()->get_option('payment_methods.configuration.oney');
 		if (!empty($oney_cfg)) {
 			$oney_amount = json_decode($oney_cfg['custom_amounts'], true);
 			$oney_amount['min'] = (float)$oney_amount['min'] / 100;
@@ -453,7 +454,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 				),
 				'type' => 'title',
 			],
-			'oneclick' => [
+			'save_card' => [
 				'title' => __('One Click Payment', 'payplug'),
 				'type' => 'checkbox',
 				'label' => __('Activate', 'payplug'),
@@ -531,7 +532,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			if ($this->permissions->has_permissions(PayplugPermissions::SAVE_CARD)) {
 				unset($fields['title_advanced_settings']);
 			} else if ('live' === $this->get_current_mode()) {
-				$fields['oneclick']['disabled'] = true;
+				$fields['save_card']['disabled'] = true;
 			}
 		}
 
@@ -576,14 +577,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 */
 	public function filter_tokens($tokens, $user_id, $gateway_id)
 	{
-
 		if (!is_user_logged_in() || !class_exists('WC_Payment_Gateway_CC')) {
 			return $tokens;
 		}
 
-		if ($this->oneclick === false) {
+		$saved_card = $this->get_configuration()->get_option('payment_methods.configuration.payplug.save_card')
+			&& is_user_logged_in();
+
+		if (!$saved_card) {
 			foreach ($tokens as $token_id => $token) {
-				if ($token->get_gateway_id() === "payplug") {
+				if ('payplug' == (string) $token->get_gateway_id()) {
 					unset($tokens[$token_id]);
 				}
 			}
@@ -592,7 +595,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 		/* @var \WC_Payment_Token_CC $token */
 		foreach ($tokens as $k => $token) {
-
 			if ($this->id !== $token->get_gateway_id()) {
 				continue;
 			}
@@ -638,7 +640,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			echo wpautop(wptexturize($description));
 		}
 
-		if ($this->oneclick_available()) {
+		if ($this->save_card_available()) {
 			$this->tokenization_script();
 			$this->saved_payment_methods();
 		}
@@ -722,8 +724,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		if (!is_wc_endpoint_url('order-pay') &&
 			PayplugWoocommerceHelper::is_checkout_block() &&
 			(
-				('payplug' == $this->id && ('integrated' == $this->payment_method || 'popup' == $this->payment_method)) ||
-				('american_express' == $this->id && 'popup' == $this->payment_method)
+				('payplug' == $this->id && in_array($this->embedded_mode, ['integrated', 'popup'])) ||
+				('american_express' == $this->id && 'popup' == $this->embedded_mode)
 			) &&
 			$_GET['wc-ajax'] !== "payplug_order_review_url"
 		) {
@@ -814,7 +816,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$payment_data = [
 				'amount' => $amount,
 				'currency' => get_woocommerce_currency(),
-				'allow_save_card' => $this->oneclick_available() && (int)$customer_id > 0,
+				'allow_save_card' => $this->save_card_available() && (int)$customer_id > 0,
 				'billing' => $address_data->get_billing(),
 				'shipping' => $address_data->get_shipping(),
 				'hosted_payment' => [
@@ -836,7 +838,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			}
 
 			//IP request required variables
-			if ($this->payment_method === 'integrated') {
+			if ('integrated' == $this->embedded_mode) {
 				$payment_data['initiator'] = 'PAYER';
 				$payment_data['integration'] = 'INTEGRATED_PAYMENT';
 				unset($payment_data['hosted_payment']['cancel_url']);
@@ -1233,6 +1235,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	{
 		$options = PayplugWoocommerceHelper::get_payplug_options();
 		$api_key = json_decode($options['api_key'], true);
+
+		if(empty($api_key)) {
+			return '';
+		}
+
 		$key = $api_key[$mode];
 		$jwt = isset($options) && isset($options['jwt']) ? $options['jwt'] : [];
 
@@ -1266,14 +1273,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 */
 	public function get_merchant_id()
 	{
-		$company_id = json_decode($this->configuration->get('company_id'), true);
-		return isset($company_id['live']) && $company_id['live']
-			? $company_id['live']
-			: (
-			isset($company_id['live']) && $company_id['live']
-				? $company_id['test']
-				: ''
-			);
+		return $this->get_configuration()->get_option('company_id');
 	}
 
 	/**
@@ -1283,7 +1283,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 */
 	public function user_logged_in()
 	{
-		$options = $this->configuration->get_options();
+		$options = $this->get_configuration()->get_options();
 		if (empty($options)) {
 			return false;
 		}
@@ -1303,10 +1303,10 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 *
 	 * @return bool
 	 */
-	public function oneclick_available()
+	public function save_card_available()
 	{
-		return $this->id === "payplug" && $this->user_logged_in()
-			&& $this->oneclick
+		return 'payplug' == $this->id && $this->user_logged_in()
+			&& $this->save_card
 			&& $this->permissions->has_permissions(PayplugPermissions::SAVE_CARD);
 	}
 
@@ -1325,7 +1325,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			}
 		}
 
-		if ((bool)$this->configuration->get_option('payment_methods.configuration.oney.with_fees')) {
+		if ((bool)$this->get_configuration()->get_option('payment_methods.configuration.oney.with_fees')) {
 			unset($gateways['oney_x3_without_fees']);
 			unset($gateways['oney_x4_without_fees']);
 		} else {
@@ -1348,7 +1348,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$status = $order->get_status();
 		return $order && $this->supports('refunds') && $status !== "cancelled" && $status !== "failed";
 	}
-
 
 	public function tmp_generate_jwt()
 	{
@@ -1393,4 +1392,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		return update_option('woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false);
 	}
 
+	public function get_configuration()
+	{
+		$this->configuration = empty($this->configuration)
+			? $this->get_service('configuration')
+			: $this->configuration;
+		return $this->configuration;
+	}
 }

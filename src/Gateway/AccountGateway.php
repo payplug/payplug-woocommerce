@@ -2,6 +2,7 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway;
 
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 use Payplug\PayplugWoocommerce\Traits\Configuration;
 
@@ -18,10 +19,9 @@ class AccountGateway
 
 	private function get_configuration()
 	{
-		if (!$this->configuration) {
-			$this->configuration = $this->get_service('configuration');
-		}
-
+		$this->configuration = empty($this->configuration)
+			? $this->get_service('configuration')
+			: $this->configuration;
 		return $this->configuration;
 	}
 
@@ -40,6 +40,7 @@ class AccountGateway
 		// if keys got, register keys in database
 		$secret_keys = $keys['response']['secret_keys'];
 		$options_to_update = [
+			'version' => PAYPLUG_GATEWAY_VERSION,
 			'enabled' => true,
 			'mode' => isset($secret_keys['live']) && !empty($secret_keys['live']) ? 'live' : 'test',
 			'email' => $email,
@@ -51,11 +52,18 @@ class AccountGateway
 		$this->get_configuration()->update_options($options_to_update);
 
 		// then get permissions
-		$formated_account_permissions = $this->get_permissions();
+		$formated_permissions = $this->get_permissions();
+		if(empty($formated_permissions)) {
+			return [];
+		}
+
+		// then get test merchant id
+		$company_id = $this->get_merchant_id();
+		$formated_permissions['global']['company_id'] = $company_id;
 
 		// and update options
-		$this->get_configuration()->update_options($formated_account_permissions['global']);
-		$this->get_configuration()->update_payment_permissions($formated_account_permissions['payment_methods']);
+		$this->get_configuration()->update_options($formated_permissions['global']);
+		$this->get_configuration()->update_payment_permissions($formated_permissions['payment_methods']);
 
 		return $this->get_configuration()->get_options();
 	}
@@ -79,15 +87,26 @@ class AccountGateway
 
 	}
 
-	public function get_permissions()
+	public function get_permissions($mode = '')
 	{
 		$api = $this->get_service('api');
-		$account_permissions = $api->get_account();
+		$account_permissions = $api->get_account($mode);
 		return $this->format_account_permissions($account_permissions['response']);
+	}
+
+	public function get_merchant_id()
+	{
+		$api = $this->get_service('api');
+		$account_permissions = $api->get_account('test');
+		return $account_permissions['response']['id'];
 	}
 
 	protected function format_account_permissions($account_permissions = [])
 	{
+		if(!is_array($account_permissions) || empty($account_permissions)) {
+			return [];
+		}
+
 		$expected_fields = $this->get_configuration()->get_expected_fields();
 		$options = $this->get_configuration()->get_options();
 
@@ -98,12 +117,10 @@ class AccountGateway
 		foreach ($expected_fields as $key => $field) {
 			switch (true) {
 				case 'company_id' == $key:
-					$company_id = json_decode($options['company_id'], true);
-					$company_id[$options['mode']] = $account_permissions['id'];
-					$value = json_encode($company_id);
+					$value = (string) $account_permissions['id'];
 					break;
 				case 'company_iso' == $key:
-					$value = (string)$account_permissions['country'];
+					$value = (string) $account_permissions['country'];
 					break;
 				case 'currencies' == $key:
 					$value = json_encode($account_permissions['configuration']['currencies']);

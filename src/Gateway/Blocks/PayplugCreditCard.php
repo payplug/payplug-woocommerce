@@ -30,7 +30,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 		$data['popup'] = false;
 		$data['payment_method'] = $this->get_name();
 		$data['supports'] = $this->get_supported_features();
-		$data['showSaveOption'] = !empty($this->gateway->oneclick) ? $this->gateway->oneclick : false;
+		$data['showSaveOption'] = !empty($this->gateway->save_card) ? $this->gateway->save_card : false;
 		$configuration = $this->get_service('configuration');
 		$embedded_mode = $configuration->get_option('payment_methods.configuration.payplug.embedded_mode');
 		switch ($embedded_mode) {
@@ -125,7 +125,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 			'nonce' => [
 				'checkout' => wp_create_nonce('woocommerce-process_checkout'),
 			],
-			'is_embedded' => 'redirect' !== $this->gateway->payment_method
+			'is_embedded' => 'redirect' !== $this->gateway->embedded_mode
 		]);
 
 		wp_enqueue_script('payplug-popup');

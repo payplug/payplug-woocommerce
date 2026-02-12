@@ -31,8 +31,14 @@ use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugIdeal;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugWero;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugBizum;
 
+use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
+use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
+
 class PayplugWoocommerce
 {
+	use ServiceGetter;
+	use GatewayGetter;
+
 	/**
 	 * @var PayplugWoocommerce
 	 */
@@ -123,6 +129,8 @@ class PayplugWoocommerce
 
 			return;
 		}
+
+		$this->check_upgrade();
 
 		if (PayplugWoocommerceHelper::is_pre_30()) {
 			require_once PAYPLUG_GATEWAY_PLUGIN_DIR . '/woocommerce-compat.php';
@@ -252,6 +260,11 @@ class PayplugWoocommerce
 				}
 			);
 		}
+	}
+
+	private function check_upgrade()
+	{
+		return $this->get_service('upgrade')->run_upgrade();
 	}
 
 }

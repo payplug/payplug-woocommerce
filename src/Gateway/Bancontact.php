@@ -29,7 +29,7 @@ class Bancontact  extends PayplugGenericGateway
 		$this->image = 'lg-bancontact-checkout.svg';
 
 		if(!$this->checkGateway()){
-			$this->enabled = false;
+			$this->enabled = 'no';
 		}
 
 	}

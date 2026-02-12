@@ -25,7 +25,6 @@ use WC_Subscriptions;
  */
 class PayplugWoocommerceHelper
 {
-
 	use ServiceGetter;
 
 	/**
@@ -421,7 +420,6 @@ class PayplugWoocommerceHelper
 	 */
 	public static function get_transaction_metadata($order)
 	{
-
 		if (PayplugWoocommerceHelper::is_pre_30()) {
 			return get_post_meta($order->id, '_payplug_metadata', true);
 		} else {
@@ -532,9 +530,11 @@ class PayplugWoocommerceHelper
 			$account = get_transient($transient_key);
 		}
 
-		$helper = new self();
-		$configuration = $helper->get_service('configuration');
-		$account['permissions']['payplug'] = $configuration->get_option('payment_methods.configuration.payplug.active');
+		if (!empty($account)) {
+			$helper = new self();
+			$configuration = $helper->get_service('configuration');
+			$account['permissions']['payplug'] = $configuration->get_option('payment_methods.configuration.payplug.active');
+		}
 
 		return $account;
 	}
@@ -795,7 +795,8 @@ class PayplugWoocommerceHelper
 
 	public static function payplug_logout()
 	{
-		delete_option('woocommerce_payplug_settings');
+		$helper = new self();
+		$helper->get_service('configuration')->clean_option();
 		set_transient(PayplugWoocommerceHelper::get_transient_key(self::get_payplug_options()), null);
 	}
 
@@ -808,7 +809,8 @@ class PayplugWoocommerceHelper
 		\Payplug\PayplugWoocommerce\Model\Lock::delete_lock_table();
 	}
 
-	public static function available_shipping_methods($carriers = []) {
+	public static function available_shipping_methods($carriers = [])
+	{
 		// Build enabled shipping methods based on active Zone
 		$enabled_method_types = [];
 
@@ -860,7 +862,7 @@ class PayplugWoocommerceHelper
 	public static function get_applepay_options()
 	{
 		$options = self::get_payplug_options();
-		$applepay_configuration = $options['payment_methods']['configuration']['applepay'];
+		$applepay_configuration = $options['payment_methods']['configuration']['apple_pay'];
 		$applepay_display = json_decode($applepay_configuration['display'], true);
 		$applepay = [
 			'enabled' => (bool)$applepay_configuration['active'],

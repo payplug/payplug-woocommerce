@@ -66,7 +66,7 @@ class PayplugOney extends PayplugGenericBlock {
 		$data['allowed_country_codes']               = $this->gateway->allowed_country_codes;
 
 
-		$oney_cfg = $this->gateway->configuration->get_option('payment_methods.configuration.oney');
+		$oney_cfg = $this->gateway->get_configuration()->get_option('payment_methods.configuration.oney');
 		$oney_amount = json_decode($oney_cfg['custom_amounts'], true);
 		$data['requirements'] = [
 			'max_quantity'          => $this->gateway::ONEY_PRODUCT_QUANTITY_MAXIMUM,
