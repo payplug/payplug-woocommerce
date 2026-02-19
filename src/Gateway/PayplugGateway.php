@@ -81,7 +81,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	/**
 	 * @var PayplugApi
 	 */
-	public $api;
+	public $payplug_api;
 
 	/**
 	 * @var \WC_Logger
@@ -113,8 +113,6 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	public $max_oney_price, $oney_thresholds_max;
 
 	const ENABLE_ON_TEST_MODE = true;
-
-	public $configuration = null;
 
 	/**
 	 * Logging method.
@@ -166,9 +164,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$this->init_payplug();
 		}
 
-		$this->mode = (bool)$this->get_configuration()->get_option('mode') ? 'live' : 'test';
-		$this->debug = (bool)$this->get_configuration()->get_option('debug');
-		$this->email = (string)$this->get_configuration()->get_option('email');
+		$this->mode = (bool) $this->get_configuration()->get_option('mode') ? 'live' : 'test';
+		$this->debug = (bool) $this->get_configuration()->get_option('debug');
+		$this->email = (string) $this->get_configuration()->get_option('email');
 
 		//admin form
 		$this->init_form_fields();
@@ -301,7 +299,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			}
 
 			try {
-				$payment = $this->api->payment_retrieve($transaction_id);
+				$payment = $this->payplug_api->payment_retrieve($transaction_id);
 			} catch (\Exception $e) {
 				PayplugGateway::log(
 					sprintf(
@@ -550,8 +548,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 */
 	public function init_payplug()
 	{
-		$this->api = new PayplugApi($this);
-		$this->api->init();
+		$this->payplug_api = new PayplugApi($this);
+		$this->payplug_api->init();
 
 		$this->permissions = new PayplugPermissions($this);
 		$this->response = new PayplugResponse($this);
@@ -607,7 +605,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			}
 
 			// check if token is available for the current gateway mode
-			if ($this->mode !== $token->get_meta('mode', true)) {
+			if ($this->mode == $token->get_meta('mode', true)) {
 				unset($tokens[$k]);
 				continue;
 			}
@@ -732,7 +730,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 
 			try {
-				$payment = $this->api->payment_retrieve($order->get_transaction_id());
+				$payment = $this->payplug_api->payment_retrieve($order->get_transaction_id());
 				if (ob_get_length() > 0) {
 					ob_clean();
 				}
@@ -862,7 +860,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			 * @param PayplugAddressData $address_data
 			 */
 			$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
-			$payment = $this->api->payment_create($payment_data);
+			$payment = $this->payplug_api->payment_create($payment_data);
 
 			// Save transaction id for the order
 			PayplugWoocommerceHelper::is_pre_30()
@@ -965,7 +963,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 
 			/** This filter is documented in src/Gateway/PayplugGateway */
 			$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
-			$payment = $this->api->payment_create($payment_data);
+			$payment = $this->payplug_api->payment_create($payment_data);
 
 			// Save transaction id for the order
 			PayplugWoocommerceHelper::is_pre_30()
@@ -1073,7 +1071,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 		$data = apply_filters('payplug_gateway_refund_data', $data, $order_id, $transaction_id);
 
 		try {
-			$refund = $this->api->refund_create($transaction_id, $data);
+			$refund = $this->payplug_api->refund_create($transaction_id, $data);
 
 			/**
 			 * Fires once a refund has been created.
@@ -1099,7 +1097,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			$order->add_order_note($note);
 
 			try {
-				$payment = $this->api->payment_retrieve($transaction_id);
+				$payment = $this->payplug_api->payment_retrieve($transaction_id);
 				$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
 				PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
 			} catch (\Exception $e) {
@@ -1221,7 +1219,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 */
 	public function get_current_mode()
 	{
-		return $this->get_option('mode') ? 'live' : 'test';
+		return $this->get_configuration()->get_option('mode');
 	}
 
 	/**
@@ -1233,37 +1231,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	 */
 	public function get_api_key($mode = 'test')
 	{
-		$options = PayplugWoocommerceHelper::get_payplug_options();
-		$api_key = json_decode($options['api_key'], true);
-
-		if(empty($api_key)) {
-			return '';
-		}
-
-		$key = $api_key[$mode];
-		$jwt = isset($options) && isset($options['jwt']) ? $options['jwt'] : [];
-
-		if (!empty($jwt) && !empty($jwt[$mode])) {
-			$this->api = new PayplugApi($this);
-			$client_data = isset($options['oauth_client_data'])
-				? json_decode($options['oauth_client_data'], true)
-				: [];
-			$validate_jwt = $this->api->validate_jwt($client_data[$mode], $jwt[$mode]);
-
-			if ($validate_jwt['token']) {
-				$key = $validate_jwt['token'];
-
-				if ($validate_jwt['need_update']) {
-					if (!isset($options['jwt'])) {
-						$options['jwt'] = [];
-					}
-					$options['jwt'][$mode] = $validate_jwt['token'];
-					update_option('woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false);
-				}
-			}
-		}
-
-		return isset($key['access_token']) ? $key['access_token'] : $key;
+		return $this->get_api()->get_bearer_token($mode);
 	}
 
 	/**
@@ -1284,7 +1252,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	public function user_logged_in()
 	{
 		$options = $this->get_configuration()->get_options();
-		if (empty($options)) {
+		if (empty($options) || !isset($options['api_key']) || !isset($options['jwt'])) {
 			return false;
 		}
 
@@ -1347,56 +1315,5 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	{
 		$status = $order->get_status();
 		return $order && $this->supports('refunds') && $status !== "cancelled" && $status !== "failed";
-	}
-
-	public function tmp_generate_jwt()
-	{
-		$options = get_option('woocommerce_payplug_settings');
-
-		if (!isset($options['oauth_client_data']) || empty($options['oauth_client_data'])) {
-			return false;
-		}
-
-		$client_data = $options['oauth_client_data'];
-		$jwt = [];
-		$this->api = new PayplugApi($this);
-		foreach ($client_data as $key => $data) {
-			if (empty($data)) {
-				$jwt[$key] = [];
-				continue;
-			}
-
-			if (($key == 'live') && isset($data['client_id']) && isset($data['client_secret'])) {
-
-				$generated_jwt = $this->api->generateJWT($data['client_id'], $data['client_secret']);
-
-				if (empty($generated_jwt['httpResponse'])) {
-					return false;
-				}
-				$jwt[$key] = $generated_jwt['httpResponse'];
-
-			}
-
-			if (($key == 'test') && isset($data['client_id']) && isset($data['client_secret'])) {
-
-				$generated_jwt = $this->api->generateJWT($data['client_id'], $data['client_secret']);
-
-				if (empty($generated_jwt['httpResponse'])) {
-					return false;
-				}
-				$jwt[$key] = $generated_jwt['httpResponse'];
-
-			}
-		}
-		$options['jwt'] = $jwt;
-		return update_option('woocommerce_payplug_settings', apply_filters('woocommerce_settings_api_sanitized_fields_payplug', $options), false);
-	}
-
-	public function get_configuration()
-	{
-		$this->configuration = empty($this->configuration)
-			? $this->get_service('configuration')
-			: $this->configuration;
-		return $this->configuration;
 	}
 }

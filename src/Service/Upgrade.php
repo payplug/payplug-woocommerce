@@ -14,6 +14,11 @@ class Upgrade
 	{
 		// Check if new options need to be setted
 		$configuration = $this->get_service('configuration');
+
+		if (empty($configuration->get_option('email'))) {
+			return;
+		}
+
 		$version = $configuration->get_option('version');
 
 		if(!empty($version) && version_compare($version, PAYPLUG_GATEWAY_VERSION, ">=")) {

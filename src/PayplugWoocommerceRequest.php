@@ -35,14 +35,11 @@ class PayplugWoocommerceRequest {
 	 */
 	protected $gateway;
 
-	protected $configuration;
-
 	/**
 	 * PayplugWoocommerceRequest constructor.
 	 */
 	public function __construct() {
-		$this->configuration = $this->get_service('configuration');
-		$this->settings = $this->configuration->get_options();
+		$this->settings = $this->get_configuration()->get_options();
 
 		if ( empty( $this->settings ) || ! isset( $this->settings['enabled'] ) || !(bool) $this->settings['enabled'] ) {
 			return;
@@ -119,7 +116,7 @@ class PayplugWoocommerceRequest {
 		$payment_method = $_POST['payment_method'];
 
 		if($payment_method === 'payplug' || $payment_method === 'american_express'){
-			$method = $this->configuration->get_option('payment_methods.configuration.payplug.embedded_mode');
+			$method = $this->get_configuration()->get_option('payment_methods.configuration.payplug.embedded_mode');
 			if('integrated' != $method && 'popup' != $method){
 				$this->ajax_create_order();
 			}
@@ -425,7 +422,7 @@ class PayplugWoocommerceRequest {
 			$payment_data['metadata']['applepay_workflow'] = 'checkout';
 		}
 
-		$method = $this->configuration->get_option('payment_methods.configuration.payplug.embedded_mode');
+		$method = $this->get_configuration()->get_option('payment_methods.configuration.payplug.embedded_mode');
 
 		if('integrated' == $method && $this->gateway->id === 'payplug') {
 			$payment_data['initiator'] = 'PAYER';
