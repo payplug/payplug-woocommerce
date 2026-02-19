@@ -467,7 +467,7 @@ class PayplugWoocommerceHelper
 	 */
 	public static function get_transient_key($options)
 	{
-		$transient_key = PayplugGateway::OPTION_NAME . (array_key_exists('mode', $options) && (bool)$options['mode'] ? '_live' : '_test');
+		$transient_key = PayplugGateway::OPTION_NAME . (array_key_exists('mode', $options) && (bool) $options['mode'] ? '_live' : '_test');
 		return $transient_key;
 	}
 
@@ -550,7 +550,7 @@ class PayplugWoocommerceHelper
 		$configuration = $helper->get_service('configuration');
 		$options = $configuration->get_options();
 
-		if (empty($options)) {
+		if (empty($options) || !isset($options['api_key']) || !isset($options['jwt'])) {
 			return [];
 		}
 
@@ -570,11 +570,11 @@ class PayplugWoocommerceHelper
 			return [];
 		}
 
-		if ((bool)$options['mode'] && empty($live_key)) {
+		if ((bool)$options ['mode'] && empty($live_key)) {
 			return [];
 		}
 
-		if (!(bool)$options['mode'] && empty($test_key)) {
+		if (!(bool) $options['mode'] && empty($test_key)) {
 			return [];
 		}
 

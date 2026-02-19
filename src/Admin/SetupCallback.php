@@ -1,4 +1,5 @@
 <?php
+
 namespace Payplug\PayplugWoocommerce\Admin;
 
 // Exit if accessed directly
@@ -12,23 +13,23 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugApi;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Exception;
+use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
 /**
  * PayPlug Setup Callback Handler
  * Handles the callback after a user has been authenticated on the PayPlug Portal
  */
-class SetupCallback {
-
+class SetupCallback
+{
 	use ServiceGetter;
-	public $configuration;
+	use GatewayGetter;
 
 	/**
 	 * Initialize the handler
 	 */
-	public function __construct() {
-		$this->configuration = $this->get_service('configuration');
-
+	public function __construct()
+	{
 		add_action('admin_init', array($this, 'handle_setup_callback'), 5);
 		add_action('admin_init', array($this, 'handle_oauth_callback'), 5);
 	}
@@ -36,7 +37,8 @@ class SetupCallback {
 	/**
 	 * Handle the setup callback from PayPlug Portal
 	 */
-	public function handle_setup_callback() {
+	public function handle_setup_callback()
+	{
 		// Check if we're on the PayPlug settings page
 		if (!$this->is_payplug_settings_page()) {
 			return;
@@ -44,48 +46,25 @@ class SetupCallback {
 
 		// Check if we have the client_id and company_id parameters
 		if (isset($_GET['client_id']) && isset($_GET['company_id'])) {
-
 			$client_id = sanitize_text_field($_GET['client_id']);
 			$company_id = sanitize_text_field($_GET['company_id']);
-
-			$this->process_setup_credentials($client_id, $company_id);
-
-			try {
-				// Generate a code verifier
-				$code_verifier = bin2hex(openssl_random_pseudo_bytes(50));
-
-				set_transient('payplug_code_verifier', $code_verifier, 3600); // Expires in 1 hour
-
-				$oauth_callback_uri = admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug');
-
-				// Store the redirect URI in a transient for the callback
-				set_transient('payplug_oauth_callback_uri', $oauth_callback_uri, 3600);
-
-				// Initiate OAuth flow using the PayPlug library
-				Authentication::initiateOAuth($client_id, $oauth_callback_uri, $code_verifier);
-
-				// This function will perform the redirect and exit
-
-			} catch (Exception $e) {
-				PayplugGateway::log(sprintf('OAuth initiation error: %s', $e->getMessage()), 'error');
-				// Redirect back to settings page with error
-				wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug'));
-				exit;
-			}
+			$this
+				->get_gateway('account')
+				->initialize_jwt($client_id, $company_id);
 		}
 
 		// Display success message if setup was successful
 		if (isset($_GET['setup_success']) && $_GET['setup_success'] == '1') {
-			add_action('admin_notices', function() {
+			add_action('admin_notices', function () {
 				echo '<div class="notice notice-success is-dismissible">' .
-				     '<p>' . esc_html__('PayPlug account successfully connected!', 'payplug') . '</p>' .
-				     '</div>';
+					'<p>' . esc_html__('PayPlug account successfully connected!', 'payplug') . '</p>' .
+					'</div>';
 			});
 		}
 
 		// Display error message if setup failed
 		if (isset($_GET['setup_error'])) {
-			add_action('admin_notices', function() {
+			add_action('admin_notices', function () {
 				$error_type = sanitize_text_field($_GET['setup_error']);
 				$error_message = '';
 
@@ -101,8 +80,8 @@ class SetupCallback {
 				}
 
 				echo '<div class="notice notice-error is-dismissible">' .
-				     '<p>' . esc_html($error_message) . '</p>' .
-				     '</div>';
+					'<p>' . esc_html($error_message) . '</p>' .
+					'</div>';
 			});
 		}
 	}
@@ -111,166 +90,39 @@ class SetupCallback {
 	 * Handle the OAuth callback
 	 */
 	public function handle_oauth_callback() {
+		$account_gateway = $this->get_gateway('account');
 		if (!isset($_GET['code'])) {
 			return;
 		}
-		$authorization_code = sanitize_text_field($_GET['code']);
-
-		$code_verifier = get_transient('payplug_code_verifier');
-		$callback_uri = get_transient('payplug_oauth_callback_uri');
-
-		$options = PayplugWoocommerceHelper::get_payplug_options();
-		$client_id = isset($options['oauth_client_id']) ? $options['oauth_client_id'] : '';
-
-		if (empty($code_verifier) || empty($callback_uri) || empty($client_id)) {
-			PayplugGateway::log('Missing OAuth parameters for token exchange', 'error');
-			wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug'));
-			exit;
-		}
+		$register_jwt = false;
 
 		try {
-			$jwt_response = Authentication::generateJWTOneShot(
-				$authorization_code,
-				$callback_uri,
-				$client_id,
-				$code_verifier
-			);
-
-
-			if (empty($jwt_response) || !isset($jwt_response['httpResponse']) || !isset($jwt_response['httpResponse']['access_token'])) {
-				PayplugGateway::log('Failed to obtain access token from authorization code', 'error');
-				wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug&setup_error=token_exchange'));
-				exit;
+			$authorization_code = sanitize_text_field($_GET['code']);
+			$register_jwt = $account_gateway->register_jwt((string) $authorization_code);
+			if($register_jwt) {
+				PayplugGateway::log('Successfully obtained and stored access token');
 			}
-
-			// Get the tokens from the response
-			$access_token = $jwt_response['httpResponse']['access_token'];
-
-			// Update settings with tokens
-			$options = PayplugWoocommerceHelper::get_payplug_options();
-
-			$id_token = $jwt_response['httpResponse']['id_token'];
-			$id_token_split = explode('.', $id_token);
-			$payload = base64_decode($id_token_split[1]);
-			$payload_decode = json_decode($payload, true);
-
-			$email = isset($payload_decode['email']) ? $payload_decode['email'] : '';
-
-			Payplug::init(['secretKey' => $access_token]);
-
-			$company_id = PayplugWooCommerceHelper::get_payplug_options()['oauth_company_id'];
-
-			$auth_live = Authentication::createClientIdAndSecret($company_id, 'WooCommerce', 'live');
-			$auth_test = Authentication::createClientIdAndSecret($company_id, 'WooCommerce', 'test');
-
-			$oauth_client_data = [];
-			if (!empty($auth_live['httpResponse']) ) {
-				$oauth_client_data['live'] = [
-					'client_secret' => $auth_live['httpResponse']['client_secret'],
-					'client_id' => $auth_live['httpResponse']['client_id'],
-				];
-			}
-
-			if (!empty($auth_test['httpResponse']) ) {
-				$oauth_client_data['test'] = [
-					'client_secret' => $auth_test['httpResponse']['client_secret'],
-					'client_id' => $auth_test['httpResponse']['client_id'],
-				];
-			}
-			$this->configuration->update_option('oauth_client_data', $oauth_client_data);
-
-
-			$payplug = new PayplugGateway();
-
-			$payplug->tmp_generate_jwt();
-
-			$options = PayplugWoocommerceHelper::get_payplug_options();
-			$jwt = json_decode($options['jwt'], true);
-			$merchant_id = $payplug->retrieve_merchant_id($jwt['test']['access_token']);
-
-			// Save settings
-			$form_fields = $payplug->get_form_fields();
-
-			foreach ($form_fields as $key => $field) {
-				if (in_array($field['type'], ['title', 'login'])) {
-					continue;
-				}
-
-				switch ($key) {
-					case 'enabled':
-						$val = true;
-						break;
-					case 'mode':
-						$val = false;
-						break;
-//					case 'payplug_test_key':
-//						$val = !empty($api_keys['test']) ? esc_attr($api_keys['test']) : null;
-//						break;
-//					case 'payplug_live_key':
-//						$val = !empty($api_keys['live']) ? esc_attr($api_keys['live']) : null;
-//						break;
-					case 'email':
-						$val = esc_html($email);
-						break;
-//					case 'payplug_merchant_id':
-//						$val = esc_attr($merchant_id);
-//						break;
-					default:
-						$val = $payplug->get_option($key);
-				}
-
-				$options[$key] = $val;
-			}
-
-
-			$payplug->set_post_data($options);
-			$payplug->get_service('configuration')->update_options($options);
-
-			// Clean up transients
-			delete_transient('payplug_code_verifier');
-			delete_transient('payplug_oauth_callback_uri');
-
-			PayplugGateway::log('Successfully obtained and stored access token');
-
-			// Redirect to success page
-			wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug'));
-			exit;
-
 		} catch (Exception $e) {
 			PayplugGateway::log(sprintf('Token exchange error: %s', $e->getMessage()), 'error');
-			wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug'));
-			exit;
 		}
+
+		if (!$register_jwt) {
+			$this->get_configuration()->clean_option();
+		}
+
+		// Redirect to success page
+		wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug'));
+		exit;
 	}
 
 	/**
 	 * Check if we're on the PayPlug settings page
 	 */
-	private function is_payplug_settings_page() {
+	private function is_payplug_settings_page()
+	{
 		return is_admin() &&
-		       isset($_GET['page']) && $_GET['page'] === 'wc-settings' &&
-		       isset($_GET['tab']) && $_GET['tab'] === 'checkout' &&
-		       isset($_GET['section']) && $_GET['section'] === 'payplug';
-	}
-
-	/**
-	 * Process the setup credentials
-	 */
-	private function process_setup_credentials($client_id, $company_id) {
-		// Get the current PayPlug settings
-		$options = PayplugWoocommerceHelper::get_payplug_options();
-
-		// Update the settings with the new credentials
-		$options['oauth_client_id'] = $client_id;
-		$options['oauth_company_id'] = $company_id;
-
-		// Save the updated settings
-		update_option('woocommerce_payplug_settings', $options);
-
-		// Log the successful connection
-		PayplugGateway::log(sprintf('PayPlug Setup: Received client_id %s and company_id %s',
-			substr($client_id, 0, 6) . '***',
-			substr($company_id, 0, 6) . '***'
-		));
+			isset($_GET['page']) && $_GET['page'] === 'wc-settings' &&
+			isset($_GET['tab']) && $_GET['tab'] === 'checkout' &&
+			isset($_GET['section']) && $_GET['section'] === 'payplug';
 	}
 }
