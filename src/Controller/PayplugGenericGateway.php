@@ -83,6 +83,11 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			return false;
 		}
 
+		if (!isset($options['payment_methods']) || empty($options['payment_methods']))
+		{
+			return false;
+		}
+
 		if (!$options['payment_methods']['configuration'][$this->id]['active']) {
 			return false;
 		}

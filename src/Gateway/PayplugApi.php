@@ -28,6 +28,8 @@ class PayplugApi {
 	 */
 	protected $gateway;
 
+	private $api_payplug;
+
 	/**
 	 * PayplugApi constructor.
 	 *
@@ -55,31 +57,16 @@ class PayplugApi {
 	 */
 	public function init() {
 		$current_mode = $this->gateway->get_current_mode();
-		$key          = $this->gateway->get_api_key( $current_mode );
-
-        Payplug::init(array(
-            'secretKey' => $key,
-            'apiVersion' => "2019-08-06",
-        ));
+		$bearer_token = $this->gateway->get_api_key( $current_mode );
+		$this->api_payplug = Payplug::init([
+			'secretKey' => (string) $bearer_token,
+			'apiVersion' => '2019-08-06'
+		]);
 		HttpClient::setDefaultUserAgentProduct(
 			'PayPlug-WooCommerce',
 			PAYPLUG_GATEWAY_VERSION,
 			sprintf( 'WooCommerce/%s', WC()->version )
 		);
-	}
-
-	/**
-	 * Generate the JWT from API
-	 *
-	 * @param string $client_id
-	 * @param string $client_secret
-	 *
-	 * @return array
-	 * @throws \Payplug\Exception\ConfigurationException
-	 */
-	public function generateJWT($client_id = '', $client_secret = '')
-	{
-		return $this->do_request_with_fallback( '\Payplug\Authentication::generateJWT', [$client_id, $client_secret]);
 	}
 
 	/**

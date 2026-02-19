@@ -486,7 +486,7 @@ HTML;
 
 	public function checkGateway() {
 		$options = PayplugWoocommerceHelper::get_payplug_options();
-		return empty($options) ? false : $options['payment_methods']['configuration']['oney']['active'];
+		return empty($options) || !isset($options['payment_methods']) ? false : $options['payment_methods']['configuration']['oney']['active'];
 	}
 
 }

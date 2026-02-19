@@ -2,6 +2,8 @@
 
 namespace Payplug\PayplugWoocommerce\Service;
 
+use Payplug\Authentication;
+use Payplug\Core\HttpClient;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
@@ -9,20 +11,19 @@ class Api
 {
 	use ServiceGetter;
 
-	protected $api;
-
-	public function __construct() {
-	}
+	protected $api_payplug;
 
 	/**
 	 * @description get merchant account permission
+	 * @param $mode
 	 * @return array
+	 * @throws \Payplug\Exception\ConfigurationException
 	 */
 	public function get_account($mode = ''){
-		if (!$this->api) {
+		if (!$this->api_payplug) {
 			$this->initialize($mode);
 		}
-		$account = $this->do_request_with_fallback( '\Payplug\Authentication::getAccount', [$this->api]);
+		$account = $this->do_request_with_fallback( '\Payplug\Authentication::getAccount', [$this->api_payplug]);
 		return [
 			'result' => $account['result'],
 			'response' => isset($account['response']['httpResponse']) && !empty($account['response']['httpResponse'])
@@ -56,18 +57,21 @@ class Api
 	protected function initialize($mode = '')
 	{
 		$bearer_token = $this->get_bearer_token($mode);
-		$this->api = new Payplug($bearer_token);
+		$this->api_payplug = new Payplug($bearer_token, '2019-08-06');
+		HttpClient::setDefaultUserAgentProduct(
+			'PayPlug-WooCommerce',
+			PAYPLUG_GATEWAY_VERSION,
+			sprintf( 'WooCommerce/%s', WC()->version )
+		);
 	}
 
 	/**
 	 * @description get current mode configured (live|test)
-	 * @return mixed
+	 * @return string
 	 */
 	protected function get_mode()
 	{
-		$configuration = $this->get_service('configuration');
-		$options = $configuration->get_options();
-		return $options['mode'];
+		return $this->get_configuration()->get_option('mode') ? 'live' : 'test';
 	}
 
 	/**
@@ -75,22 +79,22 @@ class Api
 	 * @param $mode
 	 * @return string
 	 */
-	protected function get_bearer_token($mode = '')
+	public function get_bearer_token($mode = true)
 	{
-		$configuration = $this->get_service('configuration');
-		$options = $configuration->get_options();
-
-		$api_keys = json_decode($options['api_key'], true);
-		$mode = $mode
+		$options = $this->get_configuration()->get_options();
+		$api_keys = isset($options['api_key'])
+			? json_decode($options['api_key'], true)
+			: [];
+		$mode = is_string($mode) && !empty($mode)
 			? $mode
-			: ($options['mode'] ? 'live' : 'test');
+			: $this->get_mode();
 		$bearer_token = isset($api_keys[$mode]) ? $api_keys[$mode] : '';
 
 		$jwt = isset($options['jwt']) ? json_decode($options['jwt'], true) : [];
 		$oauth_client_data = isset($options['oauth_client_data']) ? json_decode($options['oauth_client_data'], true) : [];
 
 		if(!empty($jwt) && !empty($jwt[$mode]) && !empty($oauth_client_data) && !empty($oauth_client_data[$mode])) {
-			$validate_jwt = $this->validate_jwt($oauth_client_data[$mode], $jwt['$mode']);
+			$validate_jwt = $this->validate_jwt($oauth_client_data[$mode], $jwt[$mode]);
 
 			if (!$validate_jwt['result'] || empty($validate_jwt['token'])) {
 				return '';
@@ -101,7 +105,7 @@ class Api
 			$jwt[$mode] = $token_validated;
 
 			if ($validate_jwt['need_update']) {
-				$configuration->update_option('jwt', json_encode($jwt));
+				$this->get_configuration()->update_option('jwt', json_encode($jwt));
 			}
 
 			$bearer_token = $jwt[$mode]['access_token'];
@@ -117,7 +121,13 @@ class Api
 	 * @return array
 	 */
 	protected function validate_jwt($oauth_client_data = [], $jwt = []) {
-		return $this->do_request_with_fallback( '\Payplug\Authentication::validateJWT', [$oauth_client_data, $jwt]);
+		$request = $this->do_request_with_fallback( '\Payplug\Authentication::validateJWT', [$oauth_client_data, $jwt]);
+		if (!$request['result']) {
+			return [];
+		}
+		return isset($request['response']) ?
+			$request['response']
+			: [];
 	}
 
 	/**
@@ -158,11 +168,80 @@ class Api
 		return call_user_func_array( $callback, $params );
 	}
 
- 	// todo: this method bellow should be implemented, do no removed it for now
-	public function create_client_id_and_secret(){}
-	public function generate_jwt_one_shot(){}
-	public function generate_jwt(){}
+	/**
+	 * @description create client id and secret
+	 * @param $access_token
+	 * @param $company_id
+	 * @param $mode
+	 * @return array
+	 * @throws \Payplug\Exception\ConfigurationException
+	 */
+	public function create_client_id_and_secret($access_token = '', $company_id = '', $mode = 'live'){
+		Payplug::init([
+			'secretKey' => $access_token,
+		]);
+		$request = $this->do_request_with_fallback( '\Payplug\Authentication::createClientIdAndSecret', [$company_id, 'WooCommerce', $mode]);
+		if(!$request['result']){
+			return [];
+		}
+		return isset($request['response']['httpResponse']) ?
+			$request['response']['httpResponse']
+			: [];
+	}
+
+	/**
+	 * @description generate jwt
+	 * @param $client_id
+	 * @param $client_secret
+	 * @return array
+	 */
+	public function generate_jwt($client_id = '', $client_secret = '')
+	{
+		$request=  $this->do_request_with_fallback( '\Payplug\Authentication::generateJWT', [$client_id, $client_secret]);
+		if (!$request['result']) {
+			return [];
+		}
+		return isset($request['response']['httpResponse']) ?
+			$request['response']['httpResponse']
+			: [];
+	}
+
+	/**
+	 * @description initiate oauth
+	 * @param $client_id
+	 * @param $oauth_callback_uri
+	 * @param $code_verifier
+	 * @return void
+	 */
+	public function initiate_oauth($client_id, $oauth_callback_uri, $code_verifier){
+		return $this->do_request('\Payplug\Authentication::initiateOAuth', [$client_id, $oauth_callback_uri, $code_verifier]);
+	}
+
+	/**
+	 * @description generate jwt one shot
+	 * @param $authorization_code
+	 * @param $callback_uri
+	 * @param $client_id
+	 * @param $code_verifier
+	 * @return array
+	 */
+	public function generate_jwt_one_shot($authorization_code, $callback_uri, $client_id, $code_verifier)
+	{
+		$request = $this->do_request_with_fallback( '\Payplug\Authentication::generateJWTOneShot', [
+			$authorization_code,
+			$callback_uri,
+			$client_id,
+			$code_verifier
+		]);
+		if (!$request['result']) {
+			return [];
+		}
+		return isset($request['response']['httpResponse']) ?
+			$request['response']['httpResponse']
+			: [];
+	}
+
+	// todo: this method bellow should be implemented, do no removed it for now
 	public function get_permissions(){}
 	public function get_register_url(){}
-	public function initiate_oauth(){}
 }
