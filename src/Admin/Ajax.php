@@ -530,6 +530,9 @@ class Ajax
 		try{
 			$account_gateway = $this->get_gateway('account');
 			$register = $account_gateway->register((string) $email, (string) $password);
+			if(empty($register)) {
+				$this->login_wrong_credentials_error();
+			}
 
 			$user = [
 				'logged' => true,

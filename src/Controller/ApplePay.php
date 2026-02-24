@@ -114,6 +114,12 @@ class ApplePay extends PayplugGateway
 			return false;
 		}
 
+
+		if (!isset($options['payment_methods']) || empty($options['payment_methods']))
+		{
+			return false;
+		}
+
 		//it's disabled
 		if(!(bool) $options['payment_methods']['configuration']['apple_pay']['active']){
 			return false;

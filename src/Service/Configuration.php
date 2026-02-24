@@ -45,6 +45,10 @@ class Configuration
 			'type' => 'string',
 			'default' => '',
 		],
+		'oauth_callback_uri' => [
+			'type' => 'string',
+			'default' => '',
+		],
 		'oauth_code_verifier' => [
 			'type' => 'string',
 			'default' => '',
@@ -658,7 +662,7 @@ class Configuration
 		}
 
 		$options = $this->get_options();
-		$options[$key] = $value = null;
+		$options[$key] = $value;
 		return $this->update_options($options);
 	}
 
