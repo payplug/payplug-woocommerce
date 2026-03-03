@@ -46,7 +46,7 @@ class PayplugOney extends PayplugGenericBlock {
 			'alt'   => $this->gateway->title
 		];
 		$data['description']   = $this->gateway->description;
-		$data['oney_response'] = $this->gateway->api->simulate_oney_payment( $this->total_price, 'with_fees' );
+		$data['oney_response'] = $this->gateway->payplug_api->simulate_oney_payment( $this->total_price, 'with_fees' );
 		// Normalize total_cost from cents to euros
 		if ( is_array( $data['oney_response'] ) ) {
 			foreach ( $data['oney_response'] as &$plan ) {

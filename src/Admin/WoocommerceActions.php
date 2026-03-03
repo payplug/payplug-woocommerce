@@ -76,7 +76,7 @@ class WoocommerceActions {
 		}
 		try {
 			PayplugGateway::log( sprintf( 'Order #%s : Retrieve payment data for transaction %s.', $order_id, $transaction_id ), 'info' );
-			$payment = $gateway->api->payment_retrieve( $transaction_id );
+			$payment = $gateway->payplug_api->payment_retrieve( $transaction_id );
 			PayplugGateway::log( sprintf( 'Order #%s : Process payment data.', $order_id ), 'info' );
 
 			$gateway->response->process_payment( $payment );
@@ -93,7 +93,7 @@ class WoocommerceActions {
 		PayplugGateway::log( sprintf( 'Order #%s : Payment data updated.', $order_id ), 'info' );
 		try {
 			PayplugGateway::log( sprintf( 'Order #%s : Retrieve refunds for transaction %s', $order_id, $transaction_id ), 'info' );
-			$refunds = $gateway->api->refund_list( $transaction_id );
+			$refunds = $gateway->payplug_api->refund_list( $transaction_id );
 			if ( ! empty( $refunds ) ) {
 				PayplugGateway::log( sprintf( 'Order #%s : Found %d refund(s) for the transaction.', $order_id, count( $refunds ) ), 'info' );
 				foreach ( $refunds as $refund ) {
