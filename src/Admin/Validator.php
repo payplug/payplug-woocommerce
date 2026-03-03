@@ -125,7 +125,6 @@ class Validator {
 		}
 
 		return true;
-
 	}
 
 	public static function oney($value) {
