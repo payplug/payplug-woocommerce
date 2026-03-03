@@ -185,7 +185,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 
 			try {
-				$payment = $this->api->payment_retrieve($order->get_transaction_id());
+				$payment = $this->payplug_api->payment_retrieve($order->get_transaction_id());
 				if (ob_get_length() > 0) {
 					ob_clean();
 				}
@@ -299,7 +299,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			 * @param PayplugAddressData $address_data
 			 */
 			$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
-			$payment = $this->api->payment_create($payment_data);
+			$payment = $this->payplug_api->payment_create($payment_data);
 
 			// Save transaction id for the order
 			PayplugWoocommerceHelper::is_pre_30()
@@ -414,7 +414,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 		$data = apply_filters('payplug_gateway_refund_data', $data, $order_id, $transaction_id);
 
 		try {
-			$refund = $this->api->refund_create($transaction_id, $data);
+			$refund = $this->payplug_api->refund_create($transaction_id, $data);
 
 			if ($refund->object === "error") {
 				PayplugGateway::log(__('payplug_ppro_flag_error', 'payplug'), 'error');
@@ -445,7 +445,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			$order->add_order_note($note);
 
 			try {
-				$payment = $this->api->payment_retrieve($transaction_id);
+				$payment = $this->payplug_api->payment_retrieve($transaction_id);
 				$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
 				PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
 			} catch (\Exception $e) {
