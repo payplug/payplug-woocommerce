@@ -23,6 +23,7 @@ class Vue
 
 	private $configuration;
 	private $options;
+	private $payplug_api;
 
 	public function __construct()
 	{
@@ -81,9 +82,9 @@ class Vue
 		if (empty(PayplugWoocommerceHelper::get_live_key())) {
 			$inactive = true;
 		}
-		$this->api = new PayplugApi($this);
+		$this->payplug_api = new PayplugApi($this);
 		$callback_uri = get_admin_url(null, '/admin.php?page=wc-settings&tab=checkout&section=payplug');
-		$register_url = $this->api->retrieve_register_url($callback_uri);
+		$register_url = $this->payplug_api->retrieve_register_url($callback_uri);
 
 		return [
 			'title' => __('payplug_section_logged_title', 'payplug'),
@@ -211,9 +212,9 @@ class Vue
 	 */
 	public function payplug_section_oauth_login()
 	{
-		$this->api = new PayplugApi($this);
+		$this->payplug_api = new PayplugApi($this);
 		$callback_uri = get_admin_url(null, '/admin.php?page=wc-settings&tab=checkout&section=payplug');
-		$register_url = $this->api->retrieve_register_url($callback_uri);
+		$register_url = $this->payplug_api->retrieve_register_url($callback_uri);
 
 		$oauth_login = [
 			'name' => 'oauthLogin',

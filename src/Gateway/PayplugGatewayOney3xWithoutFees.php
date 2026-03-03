@@ -37,7 +37,7 @@ class PayplugGatewayOney3xWithoutFees extends PayplugGatewayOney3x
 		$disable='';
         if ($this->check_oney_is_available() === true) {
 	        $total_price = floatval(WC()->cart->total);
-	        $this->oney_response = $this->api->simulate_oney_payment($total_price,'without_fees');
+	        $this->oney_response = $this->payplug_api->simulate_oney_payment($total_price,'without_fees');
 
 			if( empty($this->oney_response)){
 				$disable='disable-checkout-icons';

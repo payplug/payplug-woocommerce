@@ -416,7 +416,7 @@ class ApplePay extends PayplugGateway
 			$order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
 
 			try {
-				$payment = $this->api->payment_retrieve($order->get_transaction_id());
+				$payment = $this->payplug_api->payment_retrieve($order->get_transaction_id());
 				if (ob_get_length() > 0) {
 					ob_clean();
 				}
@@ -526,7 +526,7 @@ class ApplePay extends PayplugGateway
 			 * @param PayplugAddressData $address_data
 			 */
 			$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
-			$payment      = $this->api->payment_create($payment_data);
+			$payment      = $this->payplug_api->payment_create($payment_data);
 
 			// Save transaction id for the order
 			PayplugWoocommerceHelper::is_pre_30()

@@ -269,7 +269,7 @@ class PayplugResponse
 		// Since refund notification doesn't contain the full resource, we need to retrieve
 		// the refund resource to access its metadata.
 		try {
-			$refund = $this->gateway->api->refund_retrieve($transaction_id, $refund_id);
+			$refund = $this->gateway->payplug_api->refund_retrieve($transaction_id, $refund_id);
 		} catch (\Exception $e) {
 			PayplugGateway::log(sprintf('Order #%s : Fail to retrieve refund data with error %s', $order_id, $e->getMessage()));
 
@@ -320,7 +320,7 @@ class PayplugResponse
 		\do_action('payplug_gateway_refund_response_processed', $order_id, $resource);
 
 		try {
-			$payment = $this->gateway->api->payment_retrieve($transaction_id);
+			$payment = $this->gateway->payplug_api->payment_retrieve($transaction_id);
 			$metadata = PayplugWoocommerceHelper::extract_transaction_metadata($payment);
 			PayplugWoocommerceHelper::save_transaction_metadata($order, $metadata);
 		} catch (\Exception $e) {
