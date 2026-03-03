@@ -248,7 +248,7 @@ class PayplugCreditCard extends PayplugGateway {
 		if (!empty($parent_tokens)) {
 			$token = $parent_tokens[0];
 		} else {
-			$token = $this->api->payment_retrieve($payplug_parent_meta['transaction_id'])->card->id;
+			$token = $this->payplug_api->payment_retrieve($payplug_parent_meta['transaction_id'])->card->id;
 		}
 
 		if (!$token) {
@@ -294,7 +294,7 @@ class PayplugCreditCard extends PayplugGateway {
 			/** This filter is documented in src/Gateway/PayplugGateway */
 			$payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
 
-			$payment      = $this->api->payment_create($payment_data);
+			$payment      = $this->payplug_api->payment_create($payment_data);
 
 			// Save transaction id for the order
 			PayplugWoocommerceHelper::is_pre_30()

@@ -94,7 +94,7 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
 		$disable='';
         if ($this->check_oney_is_available() === true) {
             $total_price = floatval(WC()->cart->total);
-            $this->oney_response = $this->api->simulate_oney_payment($total_price, 'with_fees');
+            $this->oney_response = $this->payplug_api->simulate_oney_payment($total_price, 'with_fees');
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
 	        $total_price_oney = floatval($this->oney_response['x3_with_fees']['down_payment_amount']);
 			foreach ($this->oney_response['x3_with_fees']['installments'] as $installment) {
@@ -344,7 +344,7 @@ HTML;
              * @param PayplugAddressData $address_data
              */
             $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
-            $payment      = $this->api->payment_create($payment_data);
+            $payment      = $this->payplug_api->payment_create($payment_data);
 
             // Save transaction id for the order
             PayplugWoocommerceHelper::is_pre_30()
@@ -419,7 +419,7 @@ HTML;
             $order_metadata = $order->get_meta('_payplug_metadata');
 
 			if ( is_array($order_metadata) && !empty($order_metadata['transaction_id']) ){
-	            $payment  = $this->api->payment_retrieve($order_metadata['transaction_id']);
+	            $payment  = $this->payplug_api->payment_retrieve($order_metadata['transaction_id']);
     	        $today = current_time('Y-m-d H:i:s');
         	    $can_refund_date = date('Y-m-d H:i:s', $payment->__get('refundable_after'));
 				if ($can_refund_date >= $today) {
