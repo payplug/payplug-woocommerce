@@ -6,6 +6,7 @@ import { getSetting } from '@woocommerce/settings';
 const settings = getSetting( 'wero_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
 const label = decodeEntities( settings?.title ) || defaultLabel;
+const allowed_country_codes = settings?.allowed_country_codes;
 
 /**
  * Content component
@@ -40,7 +41,13 @@ const Wero = {
 	label: <Label />,
 	content: <Content />,
 	edit: <Content />,
-	canMakePayment: () => true,
+	canMakePayment: data => {
+		if (allowed_country_codes.includes(data.billingData.country)) {
+			return true;
+		} else {
+			return false;
+		}
+	},
 	ariaLabel: label,
 	supports: {
 		features: settings.supports,
