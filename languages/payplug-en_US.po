@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.8\n"
 
 msgid "payplug_advanced_settings"
 msgstr "Advanced Settings"
@@ -487,6 +487,9 @@ msgstr "Pay with Wero"
 msgid "pay_with_bizum"
 msgstr "Pay with Bizum"
 
+msgid "pay_with_scalapay"
+msgstr "Pay with Scalapay"
+
 msgid "satispay_threshold"
 msgstr "The total amount of your order should be between %s€ and %s€ to pay with Satispay."
 
@@ -570,6 +573,21 @@ msgstr "Bizum is unavailable in TEST mode. Please switch your Payplug module to 
 
 msgid "payplug_bizum_access_error"
 msgstr "You don't have access to this feature yet. To activate Bizum, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248663314844' target='_blank'>the following form</a>"
+
+msgid "payplug_scalapay_activate"
+msgstr "Scalapay payments"
+
+msgid "payplug_scalapay_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089119071132"
+
+msgid "payplug_section_scalapay_payment_description"
+msgstr "Allow your customers to pay via Scalapay."
+
+msgid "payplug_scalapay_unavailable_testmode_description"
+msgstr "Scalapay is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_scalapay_access_error"
+msgstr "You don't have access to this feature yet. To activate Scalapay, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248663314844' target='_blank'>the following form</a>"
 
 msgid "payplug_refund_disabled_error"
 msgstr ""
