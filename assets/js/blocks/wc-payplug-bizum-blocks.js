@@ -1509,6 +1509,7 @@ __webpack_require__.r(__webpack_exports__);
 const settings = (0,_woocommerce_settings__WEBPACK_IMPORTED_MODULE_3__.getSetting)('bizum_data', {});
 const defaultLabel = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Gateway method title', 'payplug');
 const label = (0,_wordpress_html_entities__WEBPACK_IMPORTED_MODULE_2__.decodeEntities)(settings?.title) || defaultLabel;
+const allowed_country_codes = settings?.allowed_country_codes;
 
 /**
  * Content component
@@ -1547,7 +1548,13 @@ const Bizum = {
   label: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(Label, {}),
   content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(Content, {}),
   edit: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(Content, {}),
-  canMakePayment: () => true,
+  canMakePayment: data => {
+  	if (allowed_country_codes.includes(data.billingData.country)) {
+  		return true;
+  	} else {
+  		return false;
+  	}
+  },
   ariaLabel: label,
   supports: {
     features: settings.supports

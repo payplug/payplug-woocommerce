@@ -239,15 +239,12 @@ class Ajax
 
 	public function api_check_applepay_permissions(WP_REST_Request $request)
 	{
-		wp_send_json_success(true);
-
 		$account = $this->generic_get_account($request, ApplePay::ENABLE_ON_TEST_MODE);
 
 		if ($account['httpResponse']['payment_methods']['apple_pay']['enabled']) {
 			if (in_array($_SERVER['HTTP_HOST'], $account['httpResponse']['payment_methods']['apple_pay']['allowed_domain_names'])) {
 				wp_send_json_success(true);
 			}
-
 		}
 
 		wp_send_json_error(array(
