@@ -605,7 +605,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 			}
 
 			// check if token is available for the current gateway mode
-			if ($this->mode == $token->get_meta('mode', true)) {
+			if ($this->mode != $token->get_meta('mode', true)) {
 				unset($tokens[$k]);
 				continue;
 			}
