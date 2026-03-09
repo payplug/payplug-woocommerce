@@ -5,14 +5,14 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2021-02-26 14:03+0000\n"
-"PO-Revision-Date: 2026-01-27 17:00+0000\n"
+"PO-Revision-Date: 2026-03-06 12:44+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Manual Translation\n"
+"X-Generator: Poedit 3.8\n"
 
 #: src/Gateway/PayplugGateway.php:383
 msgid " I have integrated the Oney legal notices into the GCSs of my site"
@@ -1107,6 +1107,15 @@ msgstr "Pagar con MyBank"
 msgid "pay_with_ideal"
 msgstr "Pagar con iDEAL"
 
+msgid "pay_with_wero"
+msgstr "Pagar con Wero"
+
+msgid "pay_with_bizum"
+msgstr "Pagar con Bizum"
+
+msgid "pay_with_scalapay"
+msgstr "Pagar con Scalapay"
+
 msgid "satispay_threshold"
 msgstr "El importe total de su carrito debe estar entre %s€ y %s€ para pagar con Satispay."
 
@@ -1160,6 +1169,51 @@ msgstr "Todavía no tiene acceso a esta funcionalidad. Para activar MyBank, dir�
 
 msgid "payplug_ideal_access_error"
 msgstr "Todavía no tiene acceso a esta funcionalidad. Para activar iDEAL, diríjase a <a href='https://support.payplug.com/hc/es/requests/new?ticket_form_id=8248663314844' target='_blank'>este formulario</a>"
+
+msgid "payplug_wero_activate"
+msgstr "Pago Wero"
+
+msgid "payplug_wero_more_url"
+msgstr "https://support.payplug.com/hc/es/articles/8089119071132"
+
+msgid "payplug_section_wero_payment_description"
+msgstr "Permita a sus clientes pagar vía Wero."
+
+msgid "payplug_wero_unavailable_testmode_description"
+msgstr "Wero no está disponible en modo TEST. Para activarlo, cambie su módulo Payplug a modo LIVE."
+
+msgid "payplug_wero_access_error"
+msgstr "Todavía no tiene acceso a esta funcionalidad. Para activar Wero, diríjase a <a href='https://support.payplug.com/hc/es/requests/new?ticket_form_id=8248663314844' target='_blank'>este formulario</a>"
+
+msgid "payplug_bizum_activate"
+msgstr "Pago Bizum"
+
+msgid "payplug_bizum_more_url"
+msgstr "https://support.payplug.com/hc/es/articles/8089119071132"
+
+msgid "payplug_section_bizum_payment_description"
+msgstr "Permita a sus clientes pagar vía Bizum."
+
+msgid "payplug_bizum_unavailable_testmode_description"
+msgstr "Bizum no está disponible en modo TEST. Para activarlo, cambie su módulo Payplug a modo LIVE."
+
+msgid "payplug_bizum_access_error"
+msgstr "Todavía no tiene acceso a esta funcionalidad. Para activar Bizum, diríjase a <a href='https://support.payplug.com/hc/es/requests/new?ticket_form_id=8248663314844' target='_blank'>este formulario</a>"
+
+msgid "payplug_scalapay_activate"
+msgstr "Pago Scalapay"
+
+msgid "payplug_scalapay_more_url"
+msgstr "https://support.payplug.com/hc/es/articles/8089119071132"
+
+msgid "payplug_section_scalapay_payment_description"
+msgstr "Permita a sus clientes pagar vía Scalapay."
+
+msgid "payplug_scalapay_unavailable_testmode_description"
+msgstr "Scalapay no está disponible en modo TEST. Para activarlo, cambie su módulo Payplug a modo LIVE."
+
+msgid "payplug_scalapay_access_error"
+msgstr "Todavía no tiene acceso a esta funcionalidad. Para activar Scalapay, diríjase a <a href='https://support.payplug.com/hc/es/requests/new?ticket_form_id=8248663314844' target='_blank'>este formulario</a>"
 
 msgid "payplug_refund_disabled_error"
 msgstr ""
