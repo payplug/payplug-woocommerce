@@ -503,6 +503,35 @@ class PaymentMethods
 	}
 
 	/**
+	 * @param $active
+	 * @return array
+	 */
+	public static function payment_method_scalapay($active = false)
+	{
+		return [
+			"type" => "payment_method",
+			"name" => "scalapay",
+			"title" => __('payplug_scalapay_activate', 'payplug'),
+			"image" => esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/scalapay.svg'),
+			"checked" => $active,
+			"available_test_mode" => false,
+			"descriptions" => [
+				"live" => [
+					"description" => __('payplug_section_scalapay_payment_description', 'payplug'),
+					"link_know_more" => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_scalapay_more_url', 'payplug'), "_blank"),
+				],
+				"sandbox" => [
+					"description" => __('payplug_scalapay_unavailable_testmode_description', 'payplug'),
+					"link_know_more" => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_scalapay_more_url', 'payplug'), "_blank"),
+				]
+			],
+			"options" => [
+				self::get_allowed_countries("scalapay")
+			],
+		];
+	}
+
+	/**
 	 * @param $id
 	 * @return false|string
 	 */
