@@ -385,6 +385,7 @@ class Vue
 				PaymentMethods::payment_method_ideal($payment_configuration['ideal']['active']),
 				PaymentMethods::payment_method_wero($payment_configuration['wero']['active']),
 				PaymentMethods::payment_method_bizum($payment_configuration['bizum']['active']),
+				PaymentMethods::payment_method_scalapay($payment_configuration['scalapay']['active']),
 			]
 		];
 

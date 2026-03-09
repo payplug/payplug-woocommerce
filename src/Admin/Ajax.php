@@ -16,6 +16,7 @@ use Payplug\PayplugWoocommerce\Gateway\PPRO\Mybank;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Satispay;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Wero;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Bizum;
+use Payplug\PayplugWoocommerce\Gateway\PPRO\Scalapay;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Exception\PayplugException;
 use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
@@ -170,6 +171,14 @@ class Ajax
 			register_rest_route('payplug_api', '/bizum_permissions/', array(
 				'methods' => 'POST',
 				'callback' => [$this, 'api_check_bizum_permissions'],
+				'permission_callback' => function () use ($permission) {
+					return $permission;
+				},
+				'show_in_index' => false
+			));
+			register_rest_route('payplug_api', '/scalapay_permissions/', array(
+				'methods' => 'POST',
+				'callback' => [$this, 'api_check_scalapay_permissions'],
 				'permission_callback' => function () use ($permission) {
 					return $permission;
 				},
@@ -408,6 +417,22 @@ class Ajax
 		wp_send_json_success($enabled);
 	}
 
+	public function api_check_scalapay_permissions(WP_REST_Request $request)
+	{
+		$account = $this->generic_get_account($request, Scalapay::ENABLE_ON_TEST_MODE);
+
+		$enabled = isset($account['httpResponse']['payment_methods']['scalapay']['enabled']) ? $account['httpResponse']['payment_methods']['scalapay']['enabled'] : false;
+		if (!$enabled) {
+			wp_send_json_error(array(
+				"title" => __('payplug_enable_feature', 'payplug'),
+				"msg" => __('payplug_scalapay_access_error', 'payplug'),
+				"close" => __('payplug_ok', 'payplug')
+			));
+		}
+
+		wp_send_json_success($enabled);
+	}
+
 	private function generic_get_account($request, $enable_on_test_mode)
 	{
 
@@ -633,6 +658,7 @@ class Ajax
 			'ideal',
 			'wero',
 			'bizum',
+			'scalapay',
 		];
 		foreach ($payment_methods as $name) {
 			if (!isset($options['payment_methods']['configuration'][$name])) {
