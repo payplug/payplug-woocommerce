@@ -30,6 +30,7 @@ use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugSatispay;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugIdeal;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugWero;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugBizum;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugScalapay;
 
 use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
@@ -178,6 +179,7 @@ class PayplugWoocommerce
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Satispay';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Wero';
 		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Bizum';
+		$methods[] = __NAMESPACE__ . '\\Gateway\\PPRO\\Scalapay';
 
 		$methods[] = __NAMESPACE__ . '\\Controller\\ApplePay';
 
@@ -253,6 +255,7 @@ class PayplugWoocommerce
 					$payment_method_registry->register(new PayplugMybank());
 					$payment_method_registry->register(new PayplugWero());
 					$payment_method_registry->register(new PayplugBizum());
+					$payment_method_registry->register(new PayplugScalapay());
 					$payment_method_registry->register(new PayplugApplePay());
 					$payment_method_registry->register(new PayplugOney3x());
 					$payment_method_registry->register(new PayplugOney4x());

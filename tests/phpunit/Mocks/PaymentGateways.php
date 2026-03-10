@@ -147,6 +147,17 @@ class PaymentGateways {
 			"image" => '<img src="'.PAYPLUG_GATEWAY_PLUGIN_URL.'/assets/images/checkout/bizum.svg" alt="bizum Icon" class="payplug-payment-icon" />',
 			"enable" => "no",
 			"enable_on_test_mode" => false,
+		),
+		"scalapay" => array(
+			"id" => "scalapay",
+			"title" => "Pay with Scalapay",
+			"method_title" => "Pay with Scalapay",
+			"description" => "",
+			"method_description" => "",
+			"has_fields" => false,
+			"image" => '<img src="'.PAYPLUG_GATEWAY_PLUGIN_URL.'/assets/images/checkout/scalapay.svg" alt="scalapay Icon" class="payplug-payment-icon" />',
+			"enable" => "no",
+			"enable_on_test_mode" => false,
 		)
 	);
 
