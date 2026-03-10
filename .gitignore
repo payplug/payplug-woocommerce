@@ -31,9 +31,6 @@ node_modules
 # Vendor
 vendor
 
-# unit tests
-tests
-
 # raw block files
 /src/Gateway/Blocks/
 
