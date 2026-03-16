@@ -407,7 +407,7 @@ class Configuration
 						'type' => 'bool',
 						'default' => false,
 					],
-					'default_amount' => [
+					'default_amounts' => [
 						'type' => 'string',
 						'default' => '{"min":10000, "max":300000}',
 					],
