@@ -83,8 +83,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 			return false;
 		}
 
-		if (!isset($options['payment_methods']) || empty($options['payment_methods']))
-		{
+		if (!isset($options['payment_methods']) || empty($options['payment_methods'])) {
 			return false;
 		}
 
@@ -170,14 +169,15 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 	 * @return array|null
 	 * @throws \Exception
 	 */
-	private function process_standard_intent_payment($order){
+	private function process_standard_intent_payment($order)
+	{
 		$embedded_mode = $this->settings['payment_methods']['configuration']['payplug']['embedded_mode'];
-		if ( !is_wc_endpoint_url('order-pay') &&
+		if (!is_wc_endpoint_url('order-pay') &&
 			empty($_POST['payplug_non_blocks']) &&
 			PayplugWoocommerceHelper::is_checkout_block() &&
 			(
-				( $this->id === 'payplug' && in_array($embedded_mode, ['integrated', 'popup'])) ||
-				( $this->id === 'american_express' && 'popup' == $embedded_mode)
+				($this->id === 'payplug' && in_array($embedded_mode, ['integrated', 'popup'])) ||
+				($this->id === 'american_express' && 'popup' == $embedded_mode)
 			) &&
 			!empty($order->get_transaction_id())) {
 
@@ -280,7 +280,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 				'save_card' => false,
 				'force_3ds' => false
 			];
-			if ( !empty($payment_data['billing']['landline_phone_number']) ) {
+			if (!empty($payment_data['billing']['landline_phone_number'])) {
 				$payment_data['billing']['mobile_phone_number'] = $payment_data['billing']['landline_phone_number'];
 			}
 
