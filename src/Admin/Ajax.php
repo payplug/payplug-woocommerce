@@ -635,8 +635,8 @@ class Ajax
 		$options['payment_methods']['configuration']['oney']['active'] = (bool)$data['enable_oney'];
 		$options['payment_methods']['configuration']['oney']['cta_product'] = (bool)$data['enable_oney_product_animation'];
 		$options['payment_methods']['configuration']['oney']['custom_amounts'] = json_encode([
-			'min' => (int)$data['oney_min_amounts'],
-			'max' => (int)$data['oney_max_amounts'],
+			'min' => (int)$data['oney_min_amounts']*100,
+			'max' => (int)$data['oney_max_amounts']*100,
 		]);
 		$options['payment_methods']['configuration']['oney']['with_fees'] = 'with_fees' == (string)$data['payplug_oney'];
 
