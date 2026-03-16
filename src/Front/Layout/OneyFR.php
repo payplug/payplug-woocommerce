@@ -18,8 +18,8 @@ class OneyFR extends OneyBase implements InterfaceOneyLayout
 	 * @param OneyWithoutFees $oney
 	 * @return string
 	 */
-	static function simulationPopupContentWithoutFees( $oney ){
-
+	static function simulationPopupContentWithoutFees($oney)
+	{
 		$simulationResponse = $oney->getSimulation();
 
 		$x4 = $simulationResponse['x4_without_fees'];
@@ -28,9 +28,11 @@ class OneyFR extends OneyBase implements InterfaceOneyLayout
 		$financing_cost_3x = intval($x3['total_cost']) / 100;
 		$financing_cost_4x = intval($x4['total_cost']) / 100;
 
-		$f = function($fn) { return $fn; };
+		$f = function ($fn) {
+			return $fn;
+		};
 
-		 return <<<HTML
+		return <<<HTML
                 <div id='oney-popup-close'>
                     <div class='oney-popup-close-mdiv'>
                         <div class='oney-popup-close-md'></div>
@@ -78,7 +80,9 @@ HTML;
 		$financing_cost_3x = intval($x3['total_cost']) / 100;
 		$financing_cost_4x = intval($x4['total_cost']) / 100;
 
-		$f = function($fn) { return $fn; };
+		$f = function ($fn) {
+			return $fn;
+		};
 
 		return <<<HTML
                 <div id='oney-popup-close'>
@@ -120,17 +124,19 @@ HTML;
 	 */
 	static function footerOneyWithoutFees($min, $max)
 	{
-		$f = function($fn) { return $fn; };
+		$f = function ($fn) {
+			return $fn;
+		};
 
 		$footer = <<<HTML
  			<div class='oney-cgv-content oney-cgv-footer'>
  				{$f(sprintf(
-					esc_html__("Offre de financement sans assurance avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s€ à %s€. Sous réserve d’acceptation par Oney Bank. Vous disposez d’un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51286585€ - 34 Avenue de Flandre 59 170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07023 261 %s .  Correspondance : CS 60 006 - 59895 Lille Cedex - %s", "payplug"),
-					$min,
-					$max,
-					__("<a href='https://www.orias.fr' target='_empty' > www.orias.fr </a>"),
-					__("<a href=\"https://www.oney.fr\" target=\"_empty\" > www.oney.fr </a>")
-				))}
+			esc_html__("Offre de financement sans assurance avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s€ à %s€. Sous réserve d’acceptation par Oney Bank. Vous disposez d’un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51286585€ - 34 Avenue de Flandre 59 170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07023 261 %s .  Correspondance : CS 60 006 - 59895 Lille Cedex - %s", "payplug"),
+			$min,
+			$max,
+			__("<a href='https://www.orias.fr' target='_empty' > www.orias.fr </a>"),
+			__("<a href=\"https://www.oney.fr\" target=\"_empty\" > www.oney.fr </a>")
+		))}
 			</div>
 HTML;
 
@@ -145,17 +151,19 @@ HTML;
 	 */
 	static function footerOneyWithFees($min, $max)
 	{
-		$f = function($fn) { return $fn; };
+		$f = function ($fn) {
+			return $fn;
+		};
 
 		return <<<HTML
  			<div class='oney-cgv-content oney-cgv-footer'>
- 				{$f( sprintf(
-					esc_html__("Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par Oney Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 %s Correspondance : CS 60 006 - 59895 Lille Cedex - %s"),
-					$min,
-					$max,
-					__("<a href='https://www.orias.fr' target='_empty' > www.orias.fr </a>"),
-					__("<a href=\"https://www.oney.fr\" target=\"_empty\" > www.oney.fr </a>")
-				))}
+ 				{$f(sprintf(
+			esc_html__("Offre de financement avec apport obligatoire, réservée aux particuliers et valable pour tout achat de %s€ à %s€. Sous réserve d'acceptation par Oney Bank. Vous disposez d'un délai de 14 jours pour renoncer à votre crédit. Oney Bank - SA au capital de 51 286 585€ - 34 Avenue de Flandre 59170 Croix - 546 380 197 RCS Lille Métropole - n° Orias 07 023 261 %s Correspondance : CS 60 006 - 59895 Lille Cedex - %s"),
+			$min,
+			$max,
+			__("<a href='https://www.orias.fr' target='_empty' > www.orias.fr </a>"),
+			__("<a href=\"https://www.oney.fr\" target=\"_empty\" > www.oney.fr </a>")
+		))}
 			</div>
 HTML;
 
@@ -171,7 +179,7 @@ HTML;
 		return '<div class="payplug-oney ' . $oney->isDisable() . '" id="oney-popup">
 			<div class="payplug-lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 			<div id="oney-popup-error">
-				<div class="oney-error range"> ' . sprintf( __('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $oney->get_min_amount(), $oney->get_max_amount()) . '</div>
+				<div class="oney-error range"> ' . sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $oney->get_min_amount(), $oney->get_max_amount()) . '</div>
 				<div class="oney-error qty">' . sprintf(__('The payment with Oney is unavailable because you have more than %s items in your cart.', 'payplug'), PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM) . '</div>
 			</div>
 		</div>';
@@ -186,17 +194,17 @@ HTML;
 		$variations = $oney->getVariations();
 
 		$html = '
-			<div class="payplug-oney ' . $oney->isDisable(). '"
+			<div class="payplug-oney ' . $oney->isDisable() . '"
 				 data-is-cart="' . (is_cart() ? 1 : 0) . '"
 				 data-total-products="' . $oney->getTotalProducts() . '"
-				 data-price="' .  $oney->getTotalPrice() .'"
-				 data-max-oney-qty="' .  PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM .'"
-				 data-min-oney="' .  $oney->get_min_amount() . '"
-				 data-max-oney="' .  $oney->get_max_amount() . '" >';
+				 data-price="' . $oney->getTotalPrice() . '"
+				 data-max-oney-qty="' . PayplugGatewayOney3x::ONEY_PRODUCT_QUANTITY_MAXIMUM . '"
+				 data-min-oney="' . $oney->get_min_amount() . '"
+				 data-max-oney="' . $oney->get_max_amount() . '" >';
 		$html .= __('OR PAY IN', 'payplug');
-		if(!empty($variations)){
-			foreach($variations as $id => $price){
-				$html .= '<input type="hidden" name="variation_' . $id. '" value = "' . $price. '" />';
+		if (!empty($variations)) {
+			foreach ($variations as $id => $price) {
+				$html .= '<input type="hidden" name="variation_' . $id . '" value = "' . $price . '" />';
 			}
 		}
 		$html .= '<div class="payplug-oney-popup">
@@ -206,5 +214,4 @@ HTML;
 			</div>';
 		return $html;
 	}
-
 }
