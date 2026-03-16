@@ -210,7 +210,7 @@ class PayplugWoocommerce
 		}
 
 		//failsafe
-		if (empty($options['company_iso']) || empty($options['payment_methods']['configuration']['oney']['with_fees'])) {
+		if (empty($options['company_iso']) || !isset($options['payment_methods']['configuration']['oney']['with_fees'])) {
 			return;
 		}
 
@@ -230,6 +230,7 @@ class PayplugWoocommerce
 				$class = 'PayplugGatewayOney3x';
 				break;
 		}
+
 		new OneyAnimation($oney_type, $class);
 	}
 

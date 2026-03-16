@@ -9,7 +9,7 @@ use function is_cart;
 use function is_checkout;
 use function is_product;
 
-Abstract class OneyBase
+abstract class OneyBase
 {
 
 	/**
@@ -31,14 +31,14 @@ Abstract class OneyBase
 
 	public function __construct()
 	{
-		add_action( 'wp_ajax_simulate_oney_payment', [ $this, 'simulateOneyPayment' ]);
-		add_action( 'wp_ajax_nopriv_simulate_oney_payment', [ $this, 'simulateOneyPayment' ]);
+		add_action('wp_ajax_simulate_oney_payment', [$this, 'simulateOneyPayment']);
+		add_action('wp_ajax_nopriv_simulate_oney_payment', [$this, 'simulateOneyPayment']);
 		add_action('woocommerce_cart_totals_after_order_total', [$this, 'showOneyAnimationCart']);
 
 		$options = get_option('woocommerce_payplug_settings', []);
 
-		if ($options['payment_methods']['configuration']['oney']['cta_product']){
-			add_action( 'woocommerce_before_add_to_cart_form', [ $this, 'showOneyAnimationProduct' ] );
+		if ($options['payment_methods']['configuration']['oney']['cta_product']) {
+			add_action('woocommerce_before_add_to_cart_form', [$this, 'showOneyAnimationProduct']);
 
 		}
 	}
@@ -47,7 +47,8 @@ Abstract class OneyBase
 	 * request simulation
 	 * print results
 	 */
-	public function simulateOneyPayment(){
+	public function simulateOneyPayment()
+	{
 		$simulation = new OneySimulation($this->oney);
 		$this->simulation = $simulation->OneySimulation();
 		$html = $this->drawAnimation();
@@ -65,10 +66,11 @@ Abstract class OneyBase
 	 * draw html popup
 	 * @return string
 	 */
-	public function drawAnimation(){
+	public function drawAnimation()
+	{
 		$class = "Payplug\\PayplugWoocommerce\\Front\\Layout\\Oney" . $this->getCountry();
 
-		switch($this->oney->getOneyType()){
+		switch ($this->oney->getOneyType()) {
 			case "without_fees":
 				$footer = $class::footerOneyWithoutFees($this->oney->get_min_amount(), $this->oney->get_max_amount());
 				$content = $class::simulationPopupContentWithoutFees($this);
@@ -95,15 +97,15 @@ HTML;
 	public function showOneyAnimationCart()
 	{
 
-		if ( ( is_cart() ) && PayplugWoocommerceHelper::is_oney_available() && !PayplugWoocommerceHelper::is_subscription()) {
+		if ((is_cart()) && PayplugWoocommerceHelper::is_oney_available() && !PayplugWoocommerceHelper::is_subscription()) {
 			global $product;
 
-			$total_price = (is_numeric( floatval(WC()->cart->total))) ? floatval(WC()->cart->total) : (float)($product->get_price());
+			$total_price = (is_numeric(floatval(WC()->cart->total))) ? floatval(WC()->cart->total) : (float)($product->get_price());
 			$this->oney->setTotalPrice($total_price);
 			$this->oney->handleTotalProducts();
 
 			//don't show animation
-			if ( !PayplugWoocommerceHelper::check_order_max_amount($this->oney->getTotalPrice()) ) {
+			if (!PayplugWoocommerceHelper::check_order_max_amount($this->oney->getTotalPrice())) {
 				return false;
 			}
 
@@ -125,15 +127,15 @@ HTML;
 	{
 		global $product;
 
-		if ( (is_product()) && PayplugWoocommerceHelper::is_oney_available() && !in_array($product->get_type(), array("subscription", "downloadable_subscription", "virtual_subscription", "variable-subscription")) ) {
+		if ((is_product()) && PayplugWoocommerceHelper::is_oney_available() && !in_array($product->get_type(), array("subscription", "downloadable_subscription", "virtual_subscription", "variable-subscription"))) {
 			$price = $product->get_price();
 
-			if(method_exists($product,"get_available_variations")){
+			if (method_exists($product, "get_available_variations")) {
 				$available_variations = $product->get_available_variations();
 			}
 
-			if(!empty($available_variations)){
-				foreach ($available_variations as $k => $value){
+			if (!empty($available_variations)) {
+				foreach ($available_variations as $k => $value) {
 					$this->oney->setVariations($value);
 				}
 			}
@@ -142,7 +144,7 @@ HTML;
 			$this->oney->handleTotalProducts();
 
 			//don't show animation
-			if ( !PayplugWoocommerceHelper::check_order_max_amount($price) ) {
+			if (!PayplugWoocommerceHelper::check_order_max_amount($price)) {
 				return false;
 			}
 
@@ -158,7 +160,8 @@ HTML;
 	/**
 	 * get Html for Oney
 	 */
-	public function oneyGeneratePopup(){
+	public function oneyGeneratePopup()
+	{
 		$class = "Payplug\\PayplugWoocommerce\\Front\\Layout\\Oney" . $this->getCountry();
 		$class = new $class();
 		echo $class::payWithOney($this->oney);
@@ -169,21 +172,24 @@ HTML;
 	 * @param $options
 	 * @return String
 	 */
-	public function setCountry($options){
-		$this->country = !empty($options['payplug_merchant_country']) ? $options['payplug_merchant_country'] :  "FR";
+	public function setCountry($options)
+	{
+		$this->country = !empty($options['payplug_merchant_country']) ? $options['payplug_merchant_country'] : "FR";
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getCountry(){
+	public function getCountry()
+	{
 		return $this->country;
 	}
 
 	/**
 	 * @return array|OneySimulation
 	 */
-	public function getSimulation(){
+	public function getSimulation()
+	{
 		return $this->simulation;
 	}
 
