@@ -469,6 +469,13 @@ class Vue
 	{
 		$default_amounts = json_decode($this->options['payment_methods']['configuration']['oney']['default_amounts'], true);
 
+		// Convert cents
+		$min = $min/100;
+		$max = $max/100;
+		$default_amounts['min'] = $default_amounts['min']/100;
+		$default_amounts['max'] = $default_amounts['max']/100;
+		//
+
 		$thresholds = [
 			'name' => 'thresholds',
 			'image_url' => esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.svg'),
