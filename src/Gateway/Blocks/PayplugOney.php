@@ -34,9 +34,9 @@ class PayplugOney extends PayplugGenericBlock {
 		if ( PayplugWoocommerceHelper::is_cart_block() && is_cart() && !PayplugWoocommerceHelper::is_subscription() ) {
 			$data['oney_cart_label'] = __( 'OR PAY IN', 'payplug' );
 			if ($this->gateway->settings['payment_methods']['configuration']['oney']['with_fees']) {
-				$data['oney_cart_logo'] = esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/Oneywithoutfees3x4x.png' );
-			} else {
 				$data['oney_cart_logo'] = esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/lg-3x4xoney.png' );
+			} else {
+				$data['oney_cart_logo'] = esc_url( PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/Oneywithoutfees3x4x.png' );
 			}
 		}
 
