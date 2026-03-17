@@ -39,7 +39,6 @@ abstract class OneyBase
 
 		if ($options['payment_methods']['configuration']['oney']['cta_product']) {
 			add_action('woocommerce_before_add_to_cart_form', [$this, 'showOneyAnimationProduct']);
-
 		}
 	}
 
@@ -96,7 +95,6 @@ HTML;
 	 */
 	public function showOneyAnimationCart()
 	{
-
 		if ((is_cart()) && PayplugWoocommerceHelper::is_oney_available() && !PayplugWoocommerceHelper::is_subscription()) {
 			global $product;
 
