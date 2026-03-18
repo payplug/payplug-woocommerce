@@ -7,9 +7,9 @@ Abstract Class OneyBase implements InterfaceOneyResources
 
 	public function __construct()
 	{
-		add_action( 'wp_enqueue_scripts', [self::class, 'addOneyCSS']);
-		add_action( 'wp_enqueue_scripts', [self::class, 'addOneyJs']);
-		add_action( 'wp_enqueue_scripts', [self::class, 'addOneyScript']);
+		add_action( 'wp_enqueue_scripts', [self::addOneyCSS() ]);
+		add_action( 'wp_enqueue_scripts', [self::addOneyJs() ]);
+		add_action( 'wp_enqueue_scripts', [self::addOneyScript()]);
 	}
 
 	/**
@@ -21,6 +21,7 @@ Abstract Class OneyBase implements InterfaceOneyResources
 			'ajax_url'      => admin_url('admin-ajax.php'),
 			'ajax_action'   => 'simulate_oney_payment'
 		));
+
 	}
 
 	/**

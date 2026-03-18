@@ -272,7 +272,7 @@ Abstract Class OneyBase implements InterfaceOney
 	 * @return array
 	 */
 	public function setVariations($variations){
-		$this->variations[$variations['variation_id']] = (float) $variations['display_price'];
+		$this->variations[$variations['variation_id']] = (float) $variations["display_price"];
 	}
 
 
