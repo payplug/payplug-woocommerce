@@ -9,7 +9,7 @@ use function is_cart;
 use function is_checkout;
 use function is_product;
 
-abstract class OneyBase
+Abstract class OneyBase
 {
 
 	/**
@@ -31,8 +31,8 @@ abstract class OneyBase
 
 	public function __construct()
 	{
-		add_action('wp_ajax_simulate_oney_payment', [$this, 'simulateOneyPayment']);
-		add_action('wp_ajax_nopriv_simulate_oney_payment', [$this, 'simulateOneyPayment']);
+		add_action( 'wp_ajax_simulate_oney_payment', [ $this, 'simulateOneyPayment' ]);
+		add_action( 'wp_ajax_nopriv_simulate_oney_payment', [ $this, 'simulateOneyPayment' ]);
 		add_action('woocommerce_cart_totals_after_order_total', [$this, 'showOneyAnimationCart']);
 
 		$options = get_option('woocommerce_payplug_settings', []);
