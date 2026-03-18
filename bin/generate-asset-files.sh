@@ -21,6 +21,6 @@ echo "Copying assets..."
 cp ./node_modules/payplug-ui-plugins-bo/js/app.js ./assets/dist/js/app-${version}.js
 cp ./node_modules/payplug-ui-plugins-bo/js/chunk-vendors.js ./assets/dist/js/chunk-vendors-${version}.js
 cp ./node_modules/payplug-ui-plugins-bo/css/app.css ./assets/dist/css/app-${version}.css
-cp ./node_modules/payplug-ui-plugins-bo/img/*.svg ./assets/dist/img/
+cp ./node_modules/payplug-ui-plugins-bo/img/* ./assets/dist/img/
 
 echo "Done."
