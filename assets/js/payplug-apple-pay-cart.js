@@ -142,7 +142,7 @@
 				let currentShippingCost = shippingMethod.amount;
 
 				const newTotalAmount = parseFloat(baseTotal) + parseFloat(currentShippingCost);
-				session.amount = newTotalAmount * 100;
+				session.amount = parseFloat(newTotalAmount / 100) * 100;
 
 				const update = {
 					newTotal: {
@@ -194,7 +194,7 @@
 							'payment_id': session.payment_id,
 							'payment_token': event.payment.token,
 							'order_id': session.order_id,
-							'amount': session.amount/100
+							'amount': session.amount
 						},
 						dataType: 'json',
 						success:function(res) {
