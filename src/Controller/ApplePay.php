@@ -225,27 +225,25 @@ class ApplePay extends PayplugGateway
 		if ($product->get_type() != "simple" && $product->get_type() != "variable") {
 			return;
 		}
-
+		$apple_pay_params = [
+			'ajax_url_applepay_get_shippings' => \WC_AJAX::get_endpoint('applepay_get_shippings'),
+			'ajax_url_place_order_with_dummy_data' => \WC_AJAX::get_endpoint('place_order_with_dummy_data'),
+			'ajax_url_update_applepay_order' => \WC_AJAX::get_endpoint('update_applepay_order'),
+			'ajax_url_update_applepay_payment' => \WC_AJAX::get_endpoint('update_applepay_payment'),
+			'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
+			'ajax_url_applepay_cancel_order' => \WC_AJAX::get_endpoint('applepay_cancel_order'),
+			'ajax_url_applepay_empty_cart' => \WC_AJAX::get_endpoint('applepay_empty_cart'),
+			'ajax_url_applepay_add_to_cart' => \WC_AJAX::get_endpoint('applepay_add_to_cart'),
+			'is_product' => is_product(),
+			'is_virtual' => $product->is_virtual(),
+			'cart_shipping' => WC()->cart->get_shipping_total(),
+			'countryCode' => WC()->customer->get_billing_country(),
+			'currencyCode' => get_woocommerce_currency(),
+			'apple_pay_domain' => $_SERVER['HTTP_HOST']
+		];
 		wp_enqueue_script( 'apple-pay-sdk', 'https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js', array(), false, true );
 		wp_enqueue_script('payplug-apple-pay-product', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-apple-pay-product.js', ['jquery', 'apple-pay-sdk'], PAYPLUG_GATEWAY_VERSION, true);
-		wp_localize_script( 'payplug-apple-pay-product', 'apple_pay_params',
-			array(
-				'ajax_url_applepay_get_shippings' => \WC_AJAX::get_endpoint('applepay_get_shippings'),
-				'ajax_url_place_order_with_dummy_data' => \WC_AJAX::get_endpoint('place_order_with_dummy_data'),
-				'ajax_url_update_applepay_order' => \WC_AJAX::get_endpoint('update_applepay_order'),
-				'ajax_url_update_applepay_payment' => \WC_AJAX::get_endpoint('update_applepay_payment'),
-				'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
-				'ajax_url_applepay_cancel_order' => \WC_AJAX::get_endpoint('applepay_cancel_order'),
-				'ajax_url_applepay_empty_cart' => \WC_AJAX::get_endpoint('applepay_empty_cart'),
-				'ajax_url_applepay_add_to_cart' => \WC_AJAX::get_endpoint('applepay_add_to_cart'),
-				'is_product' => is_product(),
-				'is_virtual' => $product->is_virtual(),
-				'cart_shipping' => WC()->cart->get_shipping_total(),
-				'countryCode' => WC()->customer->get_billing_country(),
-				'currencyCode' => get_woocommerce_currency(),
-				'apple_pay_domain' => $_SERVER['HTTP_HOST']
-			)
-		);
+		wp_localize_script( 'payplug-apple-pay-product', 'apple_pay_params', $apple_pay_params);
 
 		if($this->checkButtonVisibility()){
 			echo $this->get_description();

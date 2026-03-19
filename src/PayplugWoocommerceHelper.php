@@ -730,6 +730,10 @@ class PayplugWoocommerceHelper
 	 */
 	public static function UpdateCountryOption($options)
 	{
+		if(!isset($options['api_key'])) {
+			$options['company_iso'] = 'FR';
+			return $options['company_iso'];
+		}
 
 		try {
 			$api_key = json_decode($options['api_key'], true);
