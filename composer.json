@@ -1,7 +1,7 @@
 {
   "name": "payplug/payplug-woocommerce",
   "description": "",
-  "version": "2.16.0",
+  "version": "2.16.1",
   "license": "GPL-3.0-or-later",
   "type": "wordpress-plugin",
   "keywords": ["payplug", "woocommerce", "gateway"],
