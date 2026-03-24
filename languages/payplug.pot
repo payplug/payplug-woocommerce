@@ -887,6 +887,21 @@ msgstr "Bizum is unavailable in TEST mode. Please switch your Payplug module to 
 msgid "payplug_bizum_access_error"
 msgstr "You don't have access to this feature yet. To activate Bizum, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248663314844' target='_blank'>the following form</a>"
 
+msgid "payplug_scalapay_activate"
+msgstr "Scalapay payments"
+
+msgid "payplug_scalapay_more_url"
+msgstr "https://support.payplug.com/hc/en-gb/articles/8089119071132"
+
+msgid "payplug_section_scalapay_payment_description"
+msgstr "Allow your customers to pay via Scalapay."
+
+msgid "payplug_scalapay_unavailable_testmode_description"
+msgstr "Scalapay is unavailable in TEST mode. Please switch your Payplug module to LIVE mode to activate it."
+
+msgid "payplug_scalapay_access_error"
+msgstr "You don't have access to this feature yet. To activate Scalapay, please fill in <a href='https://support.payplug.com/hc/en-gb/requests/new?ticket_form_id=8248663314844' target='_blank'>the following form</a>"
+
 msgid "applepay_cart_checkout_option_validation"
 msgstr "Unable to save the configuration. Please select at least one page to offer Apple Pay: Checkout Page or Cart Page."
 
@@ -918,3 +933,6 @@ msgstr "Pay with Wero"
 
 msgid "pay_with_bizum"
 msgstr "Pay with Bizum"
+
+msgid "pay_with_scalapay"
+msgstr "Pay with Scalapay"
