@@ -8,7 +8,7 @@
  * Text Domain:     payplug
  * Domain Path:     /languages
  * Version:         2.16.0
- * WC tested up to: 10.4.3
+ * WC tested up to: 10.6.1
  * Requires plugins: woocommerce
  * License:         GPLv3 or later
  * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
