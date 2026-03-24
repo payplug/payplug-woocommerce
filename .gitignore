@@ -38,6 +38,3 @@ vendor
 # Temporary files
 *~
 /cypress/
-
-# Assets
-assets/dist/
