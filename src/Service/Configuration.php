@@ -481,7 +481,7 @@ class Configuration
 				'scalapay' => [
 					'active' => [
 						'type' => 'bool',
-						'default' => true,
+						'default' => false,
 					],
 				],
 			],
