@@ -1288,8 +1288,11 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 	{
 		if (!empty(WC()->cart) && isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id) {
 			$order_amount = $this->get_order_total();
-			if ($order_amount < self::MIN_AMOUNT || $order_amount > self::MAX_AMOUNT) {
-				unset($gateways[$this->id]);
+			foreach ($gateways[$this->id]->settings['payment_methods']['permissions'] as $key => &$permission) {
+				$method_amounts = json_decode($permission['amounts'], true);
+				if ($order_amount < $method_amounts['min']['EUR']/100 || $order_amount > $method_amounts['max']['EUR']/100) {
+					unset($gateways[$key]);
+				}
 			}
 		}
 
