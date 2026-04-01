@@ -1,160 +1,193 @@
 name: Payplug Woocommerce CI
-on: [ push ]
+#on: [ push ]
+#jobs:
+#  Generate-Zip-File:
+#    name: 1) Generate-Zip-File
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Check out repository code ${{ github.workflow }}
+#        uses: actions/checkout@v3
+#      #- name: Generate assets files
+#      #  run: ./bin/generate-asset-files.sh
+#      - name: Start the zip generation
+#        run: ./bin/build-plugin-zip.sh qa
+#      - uses: actions/upload-artifact@v4
+#        with:
+#          name: payplug-woocommerce.zip
+#          path: /home/runner/work/payplug-woocommerce/payplug-woocommerce.zip
+#      - run: echo "🍏 This job's status is ${{ job.status }}."
+#
+#  Check-PHP-Compatibility-5-6:
+#    name: 2) Check PHP Compatibility 5.6
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Check out repository code ${{ github.workflow }}
+#        uses: actions/checkout@v3
+#      - name: Install composer dependencies
+#        uses: ramsey/composer-install@v2
+#        with:
+#          composer-options: "--ignore-platform-reqs"
+#      - name: Install "PHPCompatibility" coding standard
+#        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
+#      - name: Test php version 5.6
+#        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.6
+#
+#  Check-PHP-Compatibility-7-0:
+#    name: 3) Check PHP Compatibility 7.0
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Check out repository code ${{ github.workflow }}
+#        uses: actions/checkout@v3
+#      - name: Install composer dependencies
+#        uses: ramsey/composer-install@v2
+#        with:
+#          composer-options: "--ignore-platform-reqs"
+#      - name: Install "PHPCompatibility" coding standard
+#        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
+#      - name: Test php version 7.0
+#        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.0
+#
+#  Check-PHP-Compatibility-7-1:
+#    name: 4) Check PHP Compatibility 7.1
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Check out repository code ${{ github.workflow }}
+#        uses: actions/checkout@v3
+#      - name: Install composer dependencies
+#        uses: ramsey/composer-install@v2
+#        with:
+#          composer-options: "--ignore-platform-reqs"
+#      - name: Install "PHPCompatibility" coding standard
+#        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
+#      - name: Test php version 7.1
+#        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.1
+#
+#  Check-PHP-Compatibility-7-2:
+#    name: 5) Check PHP Compatibility 7.2
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Check out repository code ${{ github.workflow }}
+#        uses: actions/checkout@v3
+#      - name: Install composer dependencies
+#        uses: ramsey/composer-install@v2
+#        with:
+#          composer-options: "--ignore-platform-reqs"
+#      - name: Install "PHPCompatibility" coding standard
+#        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
+#      - name: Test php version 7.2
+#        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.2
+#
+#  Check-PHP-Compatibility-7-3:
+#    name: 6) Check PHP Compatibility 7.3
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Check out repository code ${{ github.workflow }}
+#        uses: actions/checkout@v3
+#      - name: Install composer dependencies
+#        uses: ramsey/composer-install@v2
+#        with:
+#          composer-options: "--ignore-platform-reqs"
+#      - name: Install "PHPCompatibility" coding standard
+#        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
+#      - name: Test php version 7.3
+#        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.3
+#
+#  Check-PHP-Compatibility-7-4:
+#    name: 7) Check PHP Compatibility 7.4
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Check out repository code ${{ github.workflow }}
+#        uses: actions/checkout@v3
+#      - name: Install composer dependencies
+#        uses: ramsey/composer-install@v2
+#        with:
+#          composer-options: "--ignore-platform-reqs"
+#      - name: Install "PHPCompatibility" coding standard
+#        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
+#      - name: Test php version 7.4
+#        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.4
+#
+#  Check-PHP-Compatibility-8-0:
+#    name: 8) Check PHP Compatibility 8.0
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Check out repository code ${{ github.workflow }}
+#        uses: actions/checkout@v3
+#      - name: Install composer dependencies
+#        uses: ramsey/composer-install@v2
+#        with:
+#          composer-options: "--ignore-platform-reqs"
+#      - name: Install "PHPCompatibility" coding standard
+#        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
+#      - name: Test php version 8.0
+#        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 8.0
+#
+#  Check-PHP-Compatibility-8-1:
+#    name: 9) Check PHP Compatibility 8.1
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Check out repository code ${{ github.workflow }}
+#        uses: actions/checkout@v3
+#      - name: Install composer dependencies
+#        uses: ramsey/composer-install@v2
+#        with:
+#          composer-options: "--ignore-platform-reqs"
+#      - name: Install "PHPCompatibility" coding standard
+#        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
+#      - name: Test php version 8.1
+#        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 8.1
+#
+#  sonarcloud:
+#      runs-on: ubuntu-latest
+#      continue-on-error: true
+#      steps:
+#      - uses: actions/checkout@v3
+#        with:
+#          # Disabling shallow clone is recommended for improving relevancy of reporting
+#          fetch-depth: 0
+#      - name: SonarCloud Scan
+#        uses: sonarsource/sonarqube-scan-action@master
+#        env:
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#        with:
+#          projectBaseDir: .
+#          args: >
+#            -Dsonar.organization=${{ secrets.SONAR_ORGA }}
+#            -Dsonar.projectKey=github-payplug-payplug-woocommerce
+#            -Dsonar.sources=lib/
+#            -Dsonar.test.exclusions=tests/**
+#            -Dsonar.tests=tests/
+#            -Dsonar.verbose=true
+
+
+### ---------|  New CI workflow starting ---------| ###
+on:
+  push:
+    branches-ignore:
+      - develop
+      - main
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - develop
+    types: [opened, synchronize, reopened, closed]
+
 jobs:
-  Generate-Zip-File:
-    name: 1) Generate-Zip-File
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code ${{ github.workflow }}
-        uses: actions/checkout@v3
-      #- name: Generate assets files
-      #  run: ./bin/generate-asset-files.sh
-      - name: Start the zip generation
-        run: ./bin/build-plugin-zip.sh qa
-      - uses: actions/upload-artifact@v4
-        with:
-          name: payplug-woocommerce.zip
-          path: /home/runner/work/payplug-woocommerce/payplug-woocommerce.zip
-      - run: echo "🍏 This job's status is ${{ job.status }}."
-
-  Check-PHP-Compatibility-5-6:
-    name: 2) Check PHP Compatibility 5.6
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code ${{ github.workflow }}
-        uses: actions/checkout@v3
-      - name: Install composer dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: "--ignore-platform-reqs"
-      - name: Install "PHPCompatibility" coding standard
-        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
-      - name: Test php version 5.6
-        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.6
-
-  Check-PHP-Compatibility-7-0:
-    name: 3) Check PHP Compatibility 7.0
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code ${{ github.workflow }}
-        uses: actions/checkout@v3
-      - name: Install composer dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: "--ignore-platform-reqs"
-      - name: Install "PHPCompatibility" coding standard
-        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
-      - name: Test php version 7.0
-        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.0
-
-  Check-PHP-Compatibility-7-1:
-    name: 4) Check PHP Compatibility 7.1
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code ${{ github.workflow }}
-        uses: actions/checkout@v3
-      - name: Install composer dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: "--ignore-platform-reqs"
-      - name: Install "PHPCompatibility" coding standard
-        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
-      - name: Test php version 7.1
-        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.1
-
-  Check-PHP-Compatibility-7-2:
-    name: 5) Check PHP Compatibility 7.2
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code ${{ github.workflow }}
-        uses: actions/checkout@v3
-      - name: Install composer dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: "--ignore-platform-reqs"
-      - name: Install "PHPCompatibility" coding standard
-        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
-      - name: Test php version 7.2
-        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.2
-
-  Check-PHP-Compatibility-7-3:
-    name: 6) Check PHP Compatibility 7.3
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code ${{ github.workflow }}
-        uses: actions/checkout@v3
-      - name: Install composer dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: "--ignore-platform-reqs"
-      - name: Install "PHPCompatibility" coding standard
-        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
-      - name: Test php version 7.3
-        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.3
-
-  Check-PHP-Compatibility-7-4:
-    name: 7) Check PHP Compatibility 7.4
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code ${{ github.workflow }}
-        uses: actions/checkout@v3
-      - name: Install composer dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: "--ignore-platform-reqs"
-      - name: Install "PHPCompatibility" coding standard
-        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
-      - name: Test php version 7.4
-        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 7.4
-
-  Check-PHP-Compatibility-8-0:
-    name: 8) Check PHP Compatibility 8.0
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code ${{ github.workflow }}
-        uses: actions/checkout@v3
-      - name: Install composer dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: "--ignore-platform-reqs"
-      - name: Install "PHPCompatibility" coding standard
-        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
-      - name: Test php version 8.0
-        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 8.0
-
-  Check-PHP-Compatibility-8-1:
-    name: 9) Check PHP Compatibility 8.1
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code ${{ github.workflow }}
-        uses: actions/checkout@v3
-      - name: Install composer dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: "--ignore-platform-reqs"
-      - name: Install "PHPCompatibility" coding standard
-        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
-      - name: Test php version 8.1
-        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 8.1
+  # -----------------------------------------------------------------------
+  # 1. QUALITY — static analysis & code style on PHP 8.4 source
+  #    Runs on: push to feature branch  |  PR opened/updated → develop
+  # -----------------------------------------------------------------------
+  quality:
+    if: github.ref_type != 'tag' && github.event.action != 'closed'
+    uses: payplug/template-ci/.github/workflows/php-quality-wooco.yml@main
+    with:
+      php-version: '7.2'
 
   sonarcloud:
-      runs-on: ubuntu-latest
-      continue-on-error: true
-      steps:
-      - uses: actions/checkout@v3
-        with:
-          # Disabling shallow clone is recommended for improving relevancy of reporting
-          fetch-depth: 0
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectBaseDir: .
-          args: >
-            -Dsonar.organization=${{ secrets.SONAR_ORGA }}
-            -Dsonar.projectKey=github-payplug-payplug-woocommerce
-            -Dsonar.sources=lib/
-            -Dsonar.test.exclusions=tests/**
-            -Dsonar.tests=tests/
-            -Dsonar.verbose=true
+    uses: payplug/template-ci/.github/workflows/sonarcloud.yml@main
+    with:
+      project-name: 'github-payplug-payplug-woocommerce'
+    secrets:
+      sonar-orga: ${{ secrets.SONAR_ORGA }}
+      sonar-token: ${{ secrets.SONAR_TOKEN }}
