@@ -81,6 +81,10 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 2.17.1 =
+* Patch: Fix for Payplug plugin upgrade disconnecting
+
+== Changelog ==
 = 2.17.0 =
 * New feature: Add Scalapay payment method
 
