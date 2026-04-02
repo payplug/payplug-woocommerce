@@ -1,0 +1,122 @@
+name: Release Finish
+
+# Automatically triggered when a release/* branch is merged into master.
+# Builds the production zip (with prod values injected from secrets, never committed),
+# then tags the release and publishes it as a GitHub Release with the zip attached.
+on:
+  pull_request:
+    branches:
+      - master
+    types: [closed]
+
+# Write access is required to push the tag and create the GitHub Release
+permissions:
+  contents: write
+
+jobs:
+  release-finish:
+    # Only run when an actual merge happened (not a closed-without-merge PR)
+    # and only when the source branch is a release/* branch
+    if: >
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'release/')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      # Read the version directly from the PHP constant — single source of truth
+      - name: Extract version
+        id: meta
+        run: |
+          VERSION=$(grep -oP "define\('PAYPLUG_GATEWAY_VERSION',\s*'\K[^']+" payplug.php)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "zip_name=payplug-woocommerce-${VERSION}.zip" >> $GITHUB_OUTPUT
+
+      # Install PHP dependencies without dev packages to keep the zip lean
+      - name: Install Composer dependencies (no dev)
+        run: composer install --prefer-dist --no-dev -o
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # Build compiled CSS assets that are included in the distributed zip
+      - name: Install npm dependencies & build assets
+        run: |
+          npm install
+          npm run build:css
+
+      # Replace QA values with production values directly in the working tree.
+      # These changes are intentionally NOT committed — they only exist in the zip artifact.
+      - name: Inject production values
+        env:
+          CDN_PAYPLUG_PROD: ${{ secrets.CDN_PAYPLUG_PROD }}
+        run: |
+          python3 << 'PYEOF'
+          import os, re
+
+          cdn_prod = os.environ['CDN_PAYPLUG_PROD']
+
+          # payplug-config.php: fill in the production CDN URL (empty in the repo)
+          with open('payplug-config.php', 'r') as f:
+              content = f.read()
+          content = re.sub(
+              r"define\('IP_API',\s*'[^']*'\)",
+              f"define('IP_API', '{cdn_prod}')",
+              content
+          )
+          with open('payplug-config.php', 'w') as f:
+              f.write(content)
+
+          # assets/js/payplug-domain.js: the PAYPLUG_DOMAIN constant must not ship in production.
+          # Keep only the first line (the file-level comment) and drop everything else.
+          with open('assets/js/payplug-domain.js', 'r') as f:
+              lines = f.readlines()
+          with open('assets/js/payplug-domain.js', 'w') as f:
+              f.write(lines[0])
+
+          PYEOF
+
+      # Build the zip from the parent directory so the archive contains a
+      # payplug-woocommerce/ root folder, matching the expected WordPress plugin structure.
+      # Exclusions come from .distignore, except vendor which is required at runtime.
+      - name: Build distribution zip
+        run: |
+          VERSION="${{ steps.meta.outputs.version }}"
+          PLUGIN_DIR=$(basename "$PWD")
+          cd ..
+
+          # Read .distignore and convert each entry to a zip --exclude flag.
+          # vendor is explicitly kept: it is excluded from WordPress.org SVN deploys
+          # but must be present in the distributed zip for the plugin to function.
+          EXCLUDES=()
+          while IFS= read -r line || [[ -n "$line" ]]; do
+            [[ "$line" =~ ^#.*$ || -z "$line" ]] && continue
+            [[ "$line" == "vendor" ]] && continue
+            EXCLUDES+=("--exclude=${PLUGIN_DIR}/${line}")
+          done < "${PLUGIN_DIR}/.distignore"
+          # Also exclude SCSS source files (compiled CSS is already included)
+          EXCLUDES+=("--exclude=${PLUGIN_DIR}/assets/scss*")
+
+          zip -r "payplug-woocommerce-${VERSION}.zip" "$PLUGIN_DIR" "${EXCLUDES[@]}"
+          mv "payplug-woocommerce-${VERSION}.zip" "${PLUGIN_DIR}/"
+
+      # Tag the merge commit on master — this is the canonical release point
+      - name: Create and push tag
+        run: |
+          git tag "${{ steps.meta.outputs.version }}"
+          git push origin "${{ steps.meta.outputs.version }}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.version }}
+          name: ${{ steps.meta.outputs.version }}
+          files: ${{ steps.meta.outputs.zip_name }}

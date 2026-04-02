@@ -1,0 +1,106 @@
+name: Release Start
+
+# Triggered automatically when a release/X.Y.Z branch is pushed and contains a release.json.
+# Reads release metadata from release.json, applies version bumps to payplug.php and readme.txt,
+# then commits the result. URLs are left empty — they are injected by the CI at artifact build time.
+#
+# Expected release.json format:
+# {
+#   "version": "X.Y.Z",
+#   "wc_tested_up_to": "X.Y.Z",
+#   "wp_tested_up_to": "X.Y.Z",
+#   "changelog": "* New feature: ...\n* Bug fix: ..."
+# }
+on:
+  push:
+    branches:
+      - 'release/**'
+    # Only trigger when release.json is part of the push,
+    # so the bot's follow-up commit (which only touches payplug.php and readme.txt)
+    # does not re-trigger this workflow.
+    paths:
+      - 'release.json'
+
+# Write access is required to commit and push the version bump back to the release branch
+permissions:
+  contents: write
+
+jobs:
+  release-start:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Extract version from release.json early so it can be reused in later steps
+      - name: Read release.json
+        id: release
+        run: echo "version=$(jq -r .version release.json)" >> $GITHUB_OUTPUT
+
+      # Apply all version bumps in a single Python step.
+      # Using Python to safely handle multiline changelog input and regex replacements.
+      - name: Update version files
+        run: |
+          python3 << 'PYEOF'
+          import json, re
+
+          with open('release.json', 'r') as f:
+              data = json.load(f)
+
+          version    = data['version']
+          wc_version = data['wc_tested_up_to']
+          wp_version = data['wp_tested_up_to']
+          changelog  = data['changelog']
+
+          # --- payplug.php ---
+          with open('payplug.php', 'r') as f:
+              content = f.read()
+
+          # Update Version header comment
+          content = re.sub(r'(\* Version:\s+)[\d.]+',          rf'\g<1>{version}',    content)
+          # Update WC tested up to header comment
+          content = re.sub(r'(\* WC tested up to:\s+)[\d.]+',  rf'\g<1>{wc_version}', content)
+          # Update PAYPLUG_GATEWAY_VERSION constant
+          content = re.sub(
+              r"define\('PAYPLUG_GATEWAY_VERSION',\s*'[^']+'\)",
+              f"define('PAYPLUG_GATEWAY_VERSION', '{version}')",
+              content
+          )
+
+          with open('payplug.php', 'w') as f:
+              f.write(content)
+
+          # --- readme.txt ---
+          with open('readme.txt', 'r') as f:
+              content = f.read()
+
+          # Update Stable tag (version distributed on WordPress.org)
+          content = re.sub(r'^Stable tag:.*$',   f'Stable tag: {version}',      content, flags=re.MULTILINE)
+          # Update Tested up to (maximum WordPress version tested)
+          content = re.sub(r'^Tested up to:.*$', f'Tested up to: {wp_version}', content, flags=re.MULTILINE)
+
+          # Prepend new changelog block before the first existing == Changelog ==.
+          # Each version gets its own == Changelog == header to match the existing format.
+          new_block = f"== Changelog ==\n= {version} =\n{changelog}\n\n"
+          content = content.replace('== Changelog ==', new_block + '== Changelog ==', 1)
+
+          with open('readme.txt', 'w') as f:
+              f.write(content)
+
+          PYEOF
+
+      # Commit only the two modified files — release.json is intentionally not staged
+      - name: Commit and push
+        run: |
+          git add payplug.php readme.txt
+          git commit -m "Bump version ${{ steps.release.outputs.version }} and update changelog"
+          git push

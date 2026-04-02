@@ -188,6 +188,7 @@ jobs:
     uses: payplug/template-ci/.github/workflows/sonarcloud.yml@main
     with:
       project-name: 'github-payplug-payplug-woocommerce'
+      src-folder: 'src/'
     secrets:
       sonar-orga: ${{ secrets.SONAR_ORGA }}
       sonar-token: ${{ secrets.SONAR_TOKEN }}
