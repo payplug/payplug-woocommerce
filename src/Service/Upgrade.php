@@ -21,7 +21,7 @@ class Upgrade
 
 		$version = $configuration->get_option('version');
 
-		if(!empty($version) && version_compare($version, PAYPLUG_GATEWAY_VERSION, ">=")) {
+		if(!empty($version) && version_compare($version, PAYPLUG_MAX_VERSION_FOR_UPGRADE, ">=")) {
 			return;
 		}
 
