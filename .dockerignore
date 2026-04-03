@@ -1,0 +1,20 @@
+# Version control
+.git
+.github
+
+# IDE
+.idea
+
+# Node
+node_modules
+
+# PHP / Composer (rebuilt inside the container)
+vendor
+
+# Built assets (rebuilt inside the container as needed)
+assets/dist
+
+# Temporary / generated files
+var/
+*.zip
+.php-cs-fixer.cache

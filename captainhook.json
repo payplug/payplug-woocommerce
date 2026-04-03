@@ -19,7 +19,7 @@
         }
       },
       {
-        "action": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --diff",
+        "action": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --diff",
         "options": {}
       }
     ],
