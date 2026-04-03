@@ -162,12 +162,6 @@ name: Payplug Woocommerce CI
 
 ### ---------|  New CI workflow starting ---------| ###
 on:
-  push:
-    branches-ignore:
-      - develop
-      - main
-    tags:
-      - '*'
   pull_request:
     branches:
       - develop
@@ -175,17 +169,34 @@ on:
 
 jobs:
   # -----------------------------------------------------------------------
-  # 1. QUALITY — static analysis & code style on PHP 8.4 source
-  #    Runs on: push to feature branch  |  PR opened/updated → develop
+  # 1. QUALITY — static analysis & code style
   # -----------------------------------------------------------------------
   quality:
-    if: github.ref_type != 'tag' && github.event.action != 'closed'
+    if: github.event.action != 'closed'
     uses: payplug/template-ci/.github/workflows/php-quality-wooco.yml@main
     with:
       php-version: '7.2'
 
+  # -----------------------------------------------------------------------
+  # 2. QA ZIP — build and upload a QA-ready zip artifact
+  # -----------------------------------------------------------------------
+  build-qa-zip:
+    if: github.event.action != 'closed'
+    uses: payplug/template-ci/.github/workflows/wooco-zip-qa-generation.yml@main
+    needs: quality
+    with:
+      php-version: '7.2'
+      node-version: '20'
+    secrets:
+      payplug-domain-qa: ${{ secrets.PAYPLUG_DOMAIN_QA }}
+      cdn-payplug-qa: ${{ secrets.CDN_PAYPLUG_QA }}
+
+  # -----------------------------------------------------------------------
+  # 3. SONARCLOUD — code quality analysis
+  # -----------------------------------------------------------------------
   sonarcloud:
     uses: payplug/template-ci/.github/workflows/sonarcloud.yml@main
+    needs: build-qa-zip
     with:
       project-name: 'github-payplug-payplug-woocommerce'
       src-folder: 'src/'

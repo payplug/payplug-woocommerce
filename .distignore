@@ -5,8 +5,12 @@ docker-compose.yml
 .distignore
 .editorconfig
 .git
+.github
 .gitignore
 .gitattributes
+captainhook.json
+phpstan.neon
+.php-cs-fixer.dist.php
 .gitlab-ci.yml
 .travis.yml
 .DS_Store
