@@ -40,7 +40,7 @@ vendor
 phpstan.neon
 .php-cs-fixer.cache
 
-# PHPStan
+# Claude
 var/
 .claude
-
+RELEASE.md

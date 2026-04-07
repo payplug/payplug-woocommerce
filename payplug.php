@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('PAYPLUG_GATEWAY_VERSION', '2.17.0');
+define('PAYPLUG_GATEWAY_VERSION', '2.17.1');
 define('PAYPLUG_MAX_VERSION_FOR_UPGRADE', '2.16.1');
 define('PAYPLUG_GATEWAY_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('PAYPLUG_GATEWAY_PLUGIN_URL', plugin_dir_url(__FILE__));

@@ -28,7 +28,7 @@ comp-install:  ## Install Composer dependencies
 update:  ## Update Composer dependencies
 	$(PHP) composer update
 
-install: build update shell
+install: build update
 # ─── Quality ───────────────────────────────────────────────────────────────────
 
 stan:  ## Run PHPStan static analysis
