@@ -1,22 +1,5 @@
 name: Payplug Woocommerce CI
-#on: [ push ]
-#jobs:
-#  Generate-Zip-File:
-#    name: 1) Generate-Zip-File
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Check out repository code ${{ github.workflow }}
-#        uses: actions/checkout@v3
-#      #- name: Generate assets files
-#      #  run: ./bin/generate-asset-files.sh
-#      - name: Start the zip generation
-#        run: ./bin/build-plugin-zip.sh qa
-#      - uses: actions/upload-artifact@v4
-#        with:
-#          name: payplug-woocommerce.zip
-#          path: /home/runner/work/payplug-woocommerce/payplug-woocommerce.zip
-#      - run: echo "🍏 This job's status is ${{ job.status }}."
-#
+
 #  Check-PHP-Compatibility-5-6:
 #    name: 2) Check PHP Compatibility 5.6
 #    runs-on: ubuntu-latest
@@ -178,12 +161,32 @@ jobs:
       php-version: '7.2'
 
   # -----------------------------------------------------------------------
-  # 2. QA ZIP — build and upload a QA-ready zip artifact
+  # 2. CHECK PHP COMPATIBILITY — 5.6 to 8.1
+  # -----------------------------------------------------------------------
+  check-php-compatibility:
+    if: github.event.action != 'closed'
+    name: Check PHP Compatibility (5.6 - 8.1)
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          composer-options: "--ignore-platform-reqs"
+      - name: Install "PHPCompatibility" coding standard
+        run: vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
+      - name: Check PHP compatibility 5.6 - 8.1
+        run: vendor/bin/phpcs --colors -s ./src/ --standard=PHPCompatibility --runtime-set testVersion 5.6-8.1
+
+  # -----------------------------------------------------------------------
+  # 3. QA ZIP — build and upload a QA-ready zip artifact
   # -----------------------------------------------------------------------
   build-qa-zip:
     if: github.event.action != 'closed'
     uses: payplug/template-ci/.github/workflows/wooco-zip-qa-generation.yml@main
-    needs: quality
+    needs: [quality, check-php-compatibility]
     with:
       php-version: '7.2'
       node-version: '20'

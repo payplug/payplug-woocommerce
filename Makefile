@@ -35,10 +35,10 @@ stan:  ## Run PHPStan static analysis
 	$(PHP) vendor/bin/phpstan analyse --memory-limit=4G
 
 cs-lint:  ## Check code style without making changes (dry-run)
-	$(PHP) vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --diff --dry-run
+	$(PHP) vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --diff --dry-run
 
 cs-fix:  ## Fix code style automatically
-	$(PHP) vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php
+	$(PHP) vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php
 
 # PHP compatibility check: runs phpcs against src/ for a given PHP target version.
 # The container always runs on the default PHP (8.2); only the *checked* version changes.

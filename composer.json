@@ -57,7 +57,7 @@
   "scripts": {
     "post-install-cmd": "vendor/bin/captainhook install --force --skip-existing",
     "post-update-cmd": "vendor/bin/captainhook install --force --skip-existing",
-    "stan": "vendor/bin/phpstan analyse --configuration=phpstan.neon --memory-limit=512M",
+    "stan": "vendor/bin/phpstan analyse --configuration=phpstan.dist.neon --memory-limit=512M",
     "cs-lint": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff",
     "cs-fix": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php"
   }

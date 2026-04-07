@@ -37,6 +37,7 @@ vendor
 
 # PHP CS Fixer
 .php-cs-fixer.php
+phpstan.neon
 .php-cs-fixer.cache
 
 # PHPStan

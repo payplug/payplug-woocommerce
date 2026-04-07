@@ -10,6 +10,32 @@
       }
     ]
   },
+  "post-checkout": {
+    "enabled": true,
+    "actions": [
+      {
+        "action": "cp phpstan.dist.neon phpstan.neon",
+        "options": {}
+      },
+      {
+        "action": "cp .php-cs-fixer.dist.php .php-cs-fixer.php",
+        "options": {}
+      }
+    ]
+  },
+  "post-merge": {
+    "enabled": true,
+    "actions": [
+      {
+        "action": "cp phpstan.dist.neon phpstan.neon",
+        "options": {}
+      },
+      {
+        "action": "cp .php-cs-fixer.dist.php .php-cs-fixer.php",
+        "options": {}
+      }
+    ]
+  },
   "pre-commit": {
     "actions": [
       {
@@ -19,7 +45,7 @@
         }
       },
       {
-        "action": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --diff",
+        "action": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --diff",
         "options": {}
       }
     ],
