@@ -1,0 +1,11 @@
+parameters:
+    level: 1
+    phpVersion: 70400
+    paths:
+        - src
+    bootstrapFiles:
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+

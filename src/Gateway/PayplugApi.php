@@ -7,131 +7,142 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+use Payplug\Core\HttpClient;
 use Payplug\Exception\BadRequestException;
+use Payplug\Exception\ForbiddenException;
 use Payplug\Exception\NotFoundException;
 use Payplug\Exception\PayplugServerException;
 use Payplug\Exception\UnauthorizedException;
-use Payplug\Exception\ForbiddenException;
 use Payplug\Payplug;
-use Payplug\Core\HttpClient;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 /**
  * Handle calls to PayPlug PHP client.
- *
- * @package Payplug\PayplugWoocommerce\Gateway
  */
-class PayplugApi {
+class PayplugApi
+{
+    /**
+     * @var PayplugGateway
+     */
+    protected $gateway;
 
-	/**
-	 * @var PayplugGateway
-	 */
-	protected $gateway;
+    private $api_payplug;
 
-	private $api_payplug;
+    /**
+     * PayplugApi constructor.
+     *
+     * @param PayplugGateway $gateway
+     */
+    public function __construct($gateway)
+    {
+        $this->gateway = $gateway;
+    }
 
-	/**
-	 * PayplugApi constructor.
-	 *
-	 * @param PayplugGateway $gateway
-	 */
-	public function __construct( $gateway ) {
-		$this->gateway = $gateway;
-	}
+    /**
+     * Get register url
+     *
+     * @param string $callback_uri
+     *
+     * @throws \Payplug\Exception\ConfigurationException
+     *
+     * @return object
+     */
+    public function retrieve_register_url($callback_uri)
+    {
+        return $this->do_request_with_fallback('\Payplug\Authentication::getRegisterUrl', [$callback_uri, $callback_uri]);
+    }
 
-	/**
-	 * Get register url
-	 *
-	 * @param string $callback_uri
-	 *
-	 * @return object
-	 * @throws \Payplug\Exception\ConfigurationException
-	 */
-	public function retrieve_register_url($callback_uri)
-	{
-		return $this->do_request_with_fallback( '\Payplug\Authentication::getRegisterUrl', [$callback_uri, $callback_uri] );
-	}
+    /**
+     * Configure PayPlug client.
+     */
+    public function init()
+    {
+        $current_mode = $this->gateway->get_current_mode();
+        $bearer_token = $this->gateway->get_api_key($current_mode);
+        $this->api_payplug = Payplug::init([
+            'secretKey' => (string) $bearer_token,
+            'apiVersion' => '2019-08-06',
+        ]);
+        HttpClient::setDefaultUserAgentProduct(
+            'PayPlug-WooCommerce',
+            PAYPLUG_GATEWAY_VERSION,
+            sprintf('WooCommerce/%s', WC()->version)
+        );
+    }
 
-	/**
-	 * Configure PayPlug client.
-	 */
-	public function init() {
-		$current_mode = $this->gateway->get_current_mode();
-		$bearer_token = $this->gateway->get_api_key( $current_mode );
-		$this->api_payplug = Payplug::init([
-			'secretKey' => (string) $bearer_token,
-			'apiVersion' => '2019-08-06'
-		]);
-		HttpClient::setDefaultUserAgentProduct(
-			'PayPlug-WooCommerce',
-			PAYPLUG_GATEWAY_VERSION,
-			sprintf( 'WooCommerce/%s', WC()->version )
-		);
-	}
+    /**
+     * Retrieve payment data from PayPlug API.
+     *
+     * @param string $transaction_id
+     *
+     * @throws \Payplug\Exception\ConfigurationException
+     *
+     * @return null|\Payplug\Resource\Payment
+     */
+    public function payment_retrieve($transaction_id)
+    {
+        return $this->do_request_with_fallback('\Payplug\Payment::retrieve', $transaction_id);
+    }
 
-	/**
-	 * Retrieve payment data from PayPlug API.
-	 *
-	 * @param string $transaction_id
-	 *
-	 * @return null|\Payplug\Resource\Payment
-	 * @throws \Payplug\Exception\ConfigurationException
-	 */
-	public function payment_retrieve( $transaction_id ) {
-		return $this->do_request_with_fallback( '\Payplug\Payment::retrieve', $transaction_id );
-	}
+    /**
+     * Create a payment.
+     *
+     * @param array $data
+     *
+     * @return null|\Payplug\Resource\Payment
+     */
+    public function payment_create($data)
+    {
+        return $this->do_request('\Payplug\Payment::create', [$data]);
+    }
 
-	/**
-	 * Create a payment.
-	 *
-	 * @param array $data
-	 *
-	 * @return null|\Payplug\Resource\Payment
-	 */
-	public function payment_create( $data ) {
-		return $this->do_request( '\Payplug\Payment::create', [ $data ] );
-	}
+    /**
+     * Retrieve all refunds associated with a payment.
+     *
+     * @param string $transaction_id
+     *
+     * @throws \Payplug\Exception\ConfigurationException
+     *
+     * @return \Payplug\Resource\Refund[]
+     */
+    public function refund_list($transaction_id)
+    {
+        return $this->do_request_with_fallback('\Payplug\Refund::listRefunds', $transaction_id);
+    }
 
-	/**
-	 * Retrieve all refunds associated with a payment.
-	 *
-	 * @param string $transaction_id
-	 *
-	 * @return \Payplug\Resource\Refund[]
-	 * @throws \Payplug\Exception\ConfigurationException
-	 */
-	public function refund_list( $transaction_id ) {
-		return $this->do_request_with_fallback( '\Payplug\Refund::listRefunds', $transaction_id );
-	}
+    /**
+     * Retrieve refund data from PayPlug API.
+     *
+     * @param string $transaction_id
+     * @param string $refund_id
+     *
+     * @throws \Payplug\Exception\ConfigurationException
+     *
+     * @return \Payplug\Resource\Refund
+     */
+    public function refund_retrieve($transaction_id, $refund_id)
+    {
+        return $this->do_request_with_fallback('\Payplug\Refund::retrieve', [$transaction_id, $refund_id]);
+    }
 
-	/**
-	 * Retrieve refund data from PayPlug API.
-	 *
-	 * @param string $transaction_id
-	 * @param string $refund_id
-	 *
-	 * @return \Payplug\Resource\Refund
-	 * @throws \Payplug\Exception\ConfigurationException
-	 */
-	public function refund_retrieve( $transaction_id, $refund_id ) {
-		return $this->do_request_with_fallback( '\Payplug\Refund::retrieve', [ $transaction_id, $refund_id ] );
-	}
+    /**
+     * Create a refund.
+     *
+     * @param string $transaction_id
+     * @param array $data
+     *
+     * @throws \Payplug\Exception\ConfigurationException
+     *
+     * @return null|\Payplug\Resource\Refund
+     *
+     * @author Clément Boirie
+     */
+    public function refund_create($transaction_id, $data)
+    {
+        return $this->do_request_with_fallback('\Payplug\Refund::create', [$transaction_id, $data]);
+    }
 
-	/**
-	 * Create a refund.
-	 *
-	 * @param string $transaction_id
-	 * @param array $data
-	 *
-	 * @return null|\Payplug\Resource\Refund
-	 * @throws \Payplug\Exception\ConfigurationException
-	 * @author Clément Boirie
-	 */
-	public function refund_create( $transaction_id, $data ) {
-		return $this->do_request_with_fallback( '\Payplug\Refund::create', [ $transaction_id, $data ] );
-	}
-
-	/**
+    /**
      * Simulate a oney payment
      *
      * @return array
@@ -141,110 +152,116 @@ class PayplugApi {
         $country = PayplugWoocommerceHelper::get_payplug_merchant_country();
         $oney_fees = ['x3_' . $oney_type, 'x4_' . $oney_type];
 
-	    try {
-		    try {
-			    try {
-				    try {
-					    $response = $this->do_request('\Payplug\OneySimulation::getSimulations', [[
-						    "amount" => intval(floatval($price) * 100),
-						    "country" => $country,
-						    "operations" => $oney_fees
-					    ]]);
-					    PayplugWoocommerceHelper::oney_simulation_values($oney_fees, $response);
-				    } catch (PayplugServerException $e) {
-					    $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
-				    }
-			    } catch (BadRequestException $e) {
-				    $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
-			    }
-		    } catch (UnauthorizedException $e) {
-			    $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
-		    }
-	    } catch (ForbiddenException $e) {
-		    $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
-	    }
+        try {
+            try {
+                try {
+                    try {
+                        $response = $this->do_request('\Payplug\OneySimulation::getSimulations', [[
+                            'amount' => intval(floatval($price) * 100),
+                            'country' => $country,
+                            'operations' => $oney_fees,
+                        ]]);
+                        PayplugWoocommerceHelper::oney_simulation_values($oney_fees, $response);
+                    } catch (PayplugServerException $e) {
+                        $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
+                    }
+                } catch (BadRequestException $e) {
+                    $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
+                }
+            } catch (UnauthorizedException $e) {
+                $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
+            }
+        } catch (ForbiddenException $e) {
+            $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
+        }
 
         return $response;
     }
 
-	public function validate_jwt($client_data, $jwt)
-	{
-		return $this->do_request_with_fallback( '\Payplug\Authentication::validateJWT', [$client_data, $jwt] );
-	}
+    public function validate_jwt($client_data, $jwt)
+    {
+        return $this->do_request_with_fallback('\Payplug\Authentication::validateJWT', [$client_data, $jwt]);
+    }
 
-	/**
-	 * Invoke PayPlug API. If it fail it switch to the other mode and retry the same request.
-	 *
-	 * @param callable $callback
-	 * @param array $params
-	 *
-	 * @return object
-	 * @throws \Payplug\Exception\ConfigurationException
-	 */
-	protected function do_request_with_fallback( $callback, $params = [] ) {
-		try {
-			$response = $this->do_request( $callback, $params );
-		} catch ( NotFoundException $e ) {
-			try {
-				$this->switch_mode();
-				$response = $this->do_request( $callback, $params );
-				$this->restore_mode();
-			} catch ( \Exception $e ) {
-				$this->restore_mode();
-				throw $e;
-			}
-		}
+    /**
+     * Invoke PayPlug API. If it fail it switch to the other mode and retry the same request.
+     *
+     * @param callable $callback
+     * @param array $params
+     *
+     * @throws \Payplug\Exception\ConfigurationException
+     *
+     * @return object
+     */
+    protected function do_request_with_fallback($callback, $params = [])
+    {
+        try {
+            $response = $this->do_request($callback, $params);
+        } catch (NotFoundException $e) {
+            try {
+                $this->switch_mode();
+                $response = $this->do_request($callback, $params);
+                $this->restore_mode();
+            } catch (\Exception $e) {
+                $this->restore_mode();
+                throw $e;
+            }
+        }
 
-		return $response;
-	}
+        return $response;
+    }
 
-	/**
-	 * Invoke PayPlug API.
-	 *
-	 * @param callable $callback
-	 * @param array $params
-	 *
-	 * @return object
-	 */
-	protected function do_request( $callback, $params = [] ) {
+    /**
+     * Invoke PayPlug API.
+     *
+     * @param callable $callback
+     * @param array $params
+     *
+     * @return object
+     */
+    protected function do_request($callback, $params = [])
+    {
+        if (!is_array($params)) {
+            $params = [$params];
+        }
 
-		if ( ! is_array( $params ) ) {
-			$params = [ $params ];
-		}
+        return call_user_func_array($callback, $params);
+    }
 
-		return call_user_func_array( $callback, $params );
-	}
+    /**
+     * Reconfigure PayPlug client with new secret keys.
+     *
+     * @throws \Payplug\Exception\ConfigurationException
+     */
+    protected function switch_mode()
+    {
+        $switched_mode = 'test' === $this->gateway->get_current_mode() ? 'live' : 'test';
+        $new_key = $this->gateway->get_api_key($switched_mode);
+        if (empty($new_key)) {
+            throw new \Exception(sprintf(
+                'No secret key available for the %s mode',
+                $switched_mode
+            ));
+        }
 
-	/**
-	 * Reconfigure PayPlug client with new secret keys.
-	 *
-	 * @throws \Payplug\Exception\ConfigurationException
-	 */
-	protected function switch_mode() {
-		$switched_mode = 'test' === $this->gateway->get_current_mode() ? 'live' : 'test';
-		$new_key       = $this->gateway->get_api_key( $switched_mode );
-		if ( empty( $new_key ) ) {
-			throw new \Exception( sprintf(
-				'No secret key available for the %s mode', $switched_mode
-			) );
-		}
+        Payplug::setSecretKey($new_key);
+    }
 
-		Payplug::setSecretKey( $new_key );
-	}
+    /**
+     * Restore PayPlug client secret keys for the current mode.
+     *
+     * @throws \Payplug\Exception\ConfigurationException
+     */
+    protected function restore_mode()
+    {
+        $key = $this->gateway->get_api_key($this->gateway->get_current_mode());
+        if (empty($key)) {
+            throw new \Exception(sprintf(
+                'No secret key available for the %s mode',
+                $this->gateway->get_current_mode()
+            ));
+        }
 
-	/**
-	 * Restore PayPlug client secret keys for the current mode.
-	 *
-	 * @throws \Payplug\Exception\ConfigurationException
-	 */
-	protected function restore_mode() {
-		$key = $this->gateway->get_api_key( $this->gateway->get_current_mode() );
-		if ( empty( $key ) ) {
-			throw new \Exception( sprintf(
-				'No secret key available for the %s mode', $this->gateway->get_current_mode()
-			) );
-		}
-
-		Payplug::setSecretKey( $key );
-	}
+        Payplug::setSecretKey($key);
+    }
 }

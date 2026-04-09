@@ -1,9 +1,19 @@
 # A set of files you probably don't want in your WordPress.org distribution
+docker
+docker-compose.yml
+.dockerignore
 .distignore
 .editorconfig
 .git
+.github
 .gitignore
 .gitattributes
+captainhook.json
+phpstan.neon
+.php-cs-fixer.dist.php
+phpstan.dist.neon
+Makefile
+release.json
 .gitlab-ci.yml
 .travis.yml
 .DS_Store

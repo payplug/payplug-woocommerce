@@ -1,0 +1,20 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.2}
+    volumes:
+      - .:/app
+      # Persist the Composer package cache across container rebuilds
+      - composer_cache:/root/.composer/cache
+    working_dir: /app
+    environment:
+      COMPOSER_MEMORY_LIMIT: -1
+      # Set to "debug" (or "coverage", "profile") to activate Xdebug.
+      # Leave at "off" for normal use — zero performance overhead.
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+
+volumes:
+  composer_cache:

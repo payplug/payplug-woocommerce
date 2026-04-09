@@ -2,42 +2,35 @@
 
 namespace Payplug\PayplugWoocommerce\Controller;
 
-use Payplug\Payplug;
-use Payplug\Authentication;
-use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
-use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
-use Payplug\Exception\ForbiddenException;
-
 class IntegratedPayment
 {
-	protected $options;
+    protected $options;
 
-	public function __construct($options)
-	{
-		$this->options = $options;
-	}
+    public function __construct($options)
+    {
+        $this->options = $options;
+    }
 
-	static public function template_form($save_card){
+    public static function template_form($save_card)
+    {
+        $logo = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/logo-payplug.png';
+        $lock = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
+        $privacy_policy_url = __('payplug_integrated_payment_privacy_policy_url', 'payplug');
+        $f = function ($fn) {
+            return $fn;
+        };
 
-		$logo = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/logo-payplug.png';
-		$lock = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
-		$privacy_policy_url = __("payplug_integrated_payment_privacy_policy_url", "payplug");
-		$f = function ($fn) {
-			return $fn;
-		};
-
-		if($save_card) {
-			$saved = <<<HTML
+        if ($save_card) {
+            $saved = <<<HTML
 					<div class="payplug IntegratedPayment_container -saveCard" data-e2e-name="saveCard">
 						<label><input type="checkbox" name="savecard"><span></span>{$f(__('payplug_integrated_payment_oneClick', 'payplug'))}</label>
 					</div>
 HTML;
-		} else {
-			$saved = "";
-		}
+        } else {
+            $saved = '';
+        }
 
-
-		return <<<HTML
+        return <<<HTML
 			<form class="payplug IntegratedPayment -loaded">
 				<div class="payplug IntegratedPayment_container -cardHolder cardHolder-input-container" data-e2e-name="cardHolder"></div>
 				<div class="payplug IntegratedPayment_error -cardHolder -hide">
@@ -82,6 +75,5 @@ HTML;
 				</div>
 			</form>
 HTML;
-	}
-
+    }
 }
