@@ -4,7 +4,7 @@ namespace Payplug\PayplugWoocommerce\Admin;
 
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
-	exit;
+    exit;
 }
 
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
@@ -12,89 +12,87 @@ use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
 /**
  * Handle admin notices.
- *
- * @package Payplug\PayplugWoocommerce\Admin
  */
 class Notices
 {
-	use ServiceGetter;
+    use ServiceGetter;
 
-	private $options;
+    private $options;
 
-	public function __construct()
-	{
-		$this->options = $this->get_service('configuration')->get_options();
-//		$this->options = PayplugWoocommerceHelper::get_payplug_options();
-		//add_action( 'admin_notices', [ $this, 'admin_notices' ] );
-		//add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
-	}
+    public function __construct()
+    {
+        $this->options = $this->get_service('configuration')->get_options();
+        //		$this->options = PayplugWoocommerceHelper::get_payplug_options();
+        //add_action( 'admin_notices', [ $this, 'admin_notices' ] );
+        //add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
+    }
 
-	/**
-	 * Enqueue PayPlug notice style.
-	 *
-	 * @return void
-	 */
-	public function admin_enqueue_scripts()
-	{
-		$api_key = json_decode($this->options, true);
-		$test_key = !empty($api_key['test']) ? $api_key['test'] : '';
-		$live_key = !empty($api_key['live']) ? $api_key['live'] : '';
-		if (empty($test_key) && empty($live_key)) {
-			wp_enqueue_style(
-				'payplug-notice',
-				PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/notice.css',
-				[],
-				PAYPLUG_GATEWAY_VERSION
-			);
-		}
-	}
+    /**
+     * Enqueue PayPlug notice style.
+     *
+     * @return void
+     */
+    public function admin_enqueue_scripts()
+    {
+        $api_key = json_decode($this->options, true);
+        $test_key = !empty($api_key['test']) ? $api_key['test'] : '';
+        $live_key = !empty($api_key['live']) ? $api_key['live'] : '';
+        if (empty($test_key) && empty($live_key)) {
+            wp_enqueue_style(
+                'payplug-notice',
+                PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/notice.css',
+                [],
+                PAYPLUG_GATEWAY_VERSION
+            );
+        }
+    }
 
-	/**
-	 * Display admin notices.
-	 *
-	 * @return void
-	 */
-	public function admin_notices()
-	{
-		if (!current_user_can('manage_woocommerce')) {
-			return;
-		}
+    /**
+     * Display admin notices.
+     *
+     * @return void
+     */
+    public function admin_notices()
+    {
+        if (!current_user_can('manage_woocommerce')) {
+            return;
+        }
 
-		/*
-		 * Before Woocommerce 3.2.x, settings were saved just before displaying the page
-		 * which cause the admin_notice to display old data.
-		 *
-		 * This condition check if we are on the PayPlug gateway settings page and if we
-		 * have new settings to save. If true we hook the notice to a hook which will run after the new
-		 * settings have been saved.
-		 */
-		$screen = get_current_screen();
-		$wc = function_exists('WC') ? WC() : $GLOBALS['woocommerce'];
+        /*
+         * Before Woocommerce 3.2.x, settings were saved just before displaying the page
+         * which cause the admin_notice to display old data.
+         *
+         * This condition check if we are on the PayPlug gateway settings page and if we
+         * have new settings to save. If true we hook the notice to a hook which will run after the new
+         * settings have been saved.
+         */
+        $screen = get_current_screen();
+        $wc = function_exists('WC') ? WC() : $GLOBALS['woocommerce'];
 
-		if (
-			version_compare($wc->version, '3.2.0', '<')
-			&& !empty($_POST)
-			&& 'woocommerce_page_wc-settings' === $screen->id
-			&& isset($_GET['section'])
-			&& 'payplug' === $_GET['section']
-		) {
-			add_action('woocommerce_settings_saved', [$this, 'display_notice']);
+        if (
+            version_compare($wc->version, '3.2.0', '<')
+            && !empty($_POST)
+            && 'woocommerce_page_wc-settings' === $screen->id
+            && isset($_GET['section'])
+            && 'payplug' === $_GET['section']
+        ) {
+            add_action('woocommerce_settings_saved', [$this, 'display_notice']);
 
-			return;
-		}
+            return;
+        }
 
-		$this->display_notice();
-	}
+        $this->display_notice();
+    }
 
-	public function display_notice()
-	{
-		$testmode = isset($this->options['mode']) && !(bool) $this->options['mode'];
-		$api_key = json_decode($this->options, true);
-		$test_key = !empty($api_key['test']) ? $api_key['test'] : '';
-		$live_key = !empty($api_key['live']) ? $api_key['live'] : '';
+    public function display_notice()
+    {
+        $testmode = isset($this->options['mode']) && !(bool) $this->options['mode'];
+        $api_key = json_decode($this->options, true);
+        $test_key = !empty($api_key['test']) ? $api_key['test'] : '';
+        $live_key = !empty($api_key['live']) ? $api_key['live'] : '';
 
-		if (empty($test_key) && empty($live_key)) {
-			?>
+        if (empty($test_key) && empty($live_key)) {
+            ?>
 			<div class="notice notice--start">
 				<div class="inside">
 					<div class="main">
@@ -111,19 +109,19 @@ class Notices
 				</div>
 			</div>
 			<?php
-		} elseif (!empty($test_key) && empty($live_key)) {
-			?>
+        } elseif (!empty($test_key) && empty($live_key)) {
+            ?>
 			<div class="notice notice-warning">
 				<p><strong><?php _e('PayPlug is in TEST mode', 'payplug'); ?></strong></p>
 				<p><?php _e('Once your PayPlug account has been validated, please log out and log in again from the configuration page in order to activate LIVE mode.', 'payplug'); ?></p>
 			</div>
 			<?php
-		} elseif (!empty($live_key) && $testmode) {
-			?>
+        } elseif (!empty($live_key) && $testmode) {
+            ?>
 			<div class="notice notice-info">
 				<p><?php _e('Payments in TEST mode will be simulations and will not generate real transactions.', 'payplug'); ?></p>
 			</div>
 			<?php
-		}
-	}
+        }
+    }
 }
