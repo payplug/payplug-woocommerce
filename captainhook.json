@@ -1,0 +1,54 @@
+{
+  "commit-msg": {
+    "enabled": true,
+    "actions": [
+      {
+        "action": "\\CaptainHook\\App\\Hook\\Message\\Action\\Regex",
+        "options": {
+          "regex": "/^(PRE|MAG|SYL|SMP)-\\d+: .+/"
+        }
+      }
+    ]
+  },
+  "post-checkout": {
+    "enabled": true,
+    "actions": [
+      {
+        "action": "cp phpstan.dist.neon phpstan.neon",
+        "options": {}
+      },
+      {
+        "action": "cp .php-cs-fixer.dist.php .php-cs-fixer.php",
+        "options": {}
+      }
+    ]
+  },
+  "post-merge": {
+    "enabled": true,
+    "actions": [
+      {
+        "action": "cp phpstan.dist.neon phpstan.neon",
+        "options": {}
+      },
+      {
+        "action": "cp .php-cs-fixer.dist.php .php-cs-fixer.php",
+        "options": {}
+      }
+    ]
+  },
+  "pre-commit": {
+    "actions": [
+      {
+        "action": "\\CaptainHook\\App\\Hook\\Branch\\Action\\EnsureNaming",
+        "options": {
+          "regex": "/^(feature|fix|hotfix|refactor|release)\\/(PRE|MAG|SYL|SMP)-\\d+/"
+        }
+      },
+      {
+        "action": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --diff",
+        "options": {}
+      }
+    ],
+    "enabled": true
+  }
+}

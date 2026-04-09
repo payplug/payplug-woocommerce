@@ -4,11 +4,9 @@ namespace Payplug\PayplugWoocommerce\Front\Layout;
 
 interface InterfaceOneyResources
 {
+    public static function addOneyScript();
 
-	static function addOneyScript();
+    public static function addOneyCSS();
 
-	static function addOneyCSS();
-
-	static function addOneyJs();
-
+    public static function addOneyJs();
 }

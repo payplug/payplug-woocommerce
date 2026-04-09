@@ -9,20 +9,17 @@ if (!defined('ABSPATH')) {
 
 /**
  * PayPlug WooCommerce Gateway.
- *
- * @package Payplug\PayplugWoocommerce\Gateway
  */
 class PayplugGatewayOney4x extends PayplugGatewayOney3x
 {
-
     public function __construct()
     {
         parent::__construct();
-        $this->id                 = 'oney_x4_with_fees';
-        $this->method_title       = _x('PayPlug Oney 4x', 'Gateway method title', 'payplug');
+        $this->id = 'oney_x4_with_fees';
+        $this->method_title = _x('PayPlug Oney 4x', 'Gateway method title', 'payplug');
         $this->method_description = __('Enable PayPlug Oney 4x for your customers.', 'payplug');
-        $this->title              = __('Pay by card in 4x with Oney', 'payplug');
-		$this->has_fields = false;
+        $this->title = __('Pay by card in 4x with Oney', 'payplug');
+        $this->has_fields = false;
     }
 
     /**
@@ -33,20 +30,20 @@ class PayplugGatewayOney4x extends PayplugGatewayOney3x
     public function get_icon()
     {
         if ($this->check_oney_is_available() === true) {
-	        $total_price = floatval(WC()->cart->total);
-	        $this->oney_response = $this->payplug_api->simulate_oney_payment($total_price, 'with_fees');
+            $total_price = floatval(WC()->cart->total);
+            $this->oney_response = $this->payplug_api->simulate_oney_payment($total_price, 'with_fees');
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
-	        $total_price_oney = floatval($this->oney_response['x4_with_fees']['down_payment_amount']);
-	        foreach ($this->oney_response['x4_with_fees']['installments'] as $installment) {
-		        $total_price_oney = $total_price_oney + floatval($installment['amount']);
-	        }
+            $total_price_oney = floatval($this->oney_response['x4_with_fees']['down_payment_amount']);
+            foreach ($this->oney_response['x4_with_fees']['installments'] as $installment) {
+                $total_price_oney = $total_price_oney + floatval($installment['amount']);
+            }
 
-			$tax_cost = floatval($this->oney_response['x4_with_fees']['total_cost']) / 100;
-			$disable='';
+            $tax_cost = floatval($this->oney_response['x4_with_fees']['total_cost']) / 100;
+            $disable = '';
             $f = function ($fn) {
                 return $fn;
             };
-            if(is_array($this->oney_response)) {
+            if (is_array($this->oney_response)) {
                 $this->description = <<<HTML
                 <p>
                     <div class="payplug-oney-flex">
@@ -77,9 +74,9 @@ HTML;
             } else {
                 $this->description = $this->oney_response;
             }
-        }else {
-			$disable='disable-checkout-icons';
-		}
+        } else {
+            $disable = 'disable-checkout-icons';
+        }
 
         $available_img = 'x4_with_fees.svg';
         $icons = apply_filters('payplug_payment_icons', [
@@ -89,6 +86,7 @@ HTML;
         foreach ($icons as $icon) {
             $icons_str .= $icon;
         }
+
         return $icons_str;
     }
 }
