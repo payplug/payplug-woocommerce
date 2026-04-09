@@ -57,6 +57,7 @@ jobs:
       payplug-domain: ${{ secrets.PAYPLUG_DOMAIN_QA }}
       cdn-payplug: ${{ secrets.CDN_PAYPLUG_QA }}
       api-payplug: ${{ secrets.PAYPLUG_API_QA }}
+      api-payplug-retail: ${{ secrets.API_RETAIL_QA }}
 
   # -----------------------------------------------------------------------
   # 4. SONARCLOUD — code quality analysis (develop PRs only)
