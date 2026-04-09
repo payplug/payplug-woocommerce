@@ -11,20 +11,17 @@ if (!defined('ABSPATH')) {
 
 /**
  * PayPlug WooCommerce Gateway.
- *
- * @package Payplug\PayplugWoocommerce\Gateway
  */
 class PayplugGatewayOney3xWithoutFees extends PayplugGatewayOney3x
 {
-
     public function __construct()
     {
         parent::__construct();
-        $this->id                 = 'oney_x3_without_fees';
-        $this->method_title       = _x('PayPlug Oney 3x', 'Gateway method title', 'payplug');
+        $this->id = 'oney_x3_without_fees';
+        $this->method_title = _x('PayPlug Oney 3x', 'Gateway method title', 'payplug');
         $this->method_description = __('Enable PayPlug Oney 3x for your customers.', 'payplug');
-        $this->title              = __('Pay by credit card in 3x installments without fees with Oney', 'payplug');
-		$this->has_fields = false;
+        $this->title = __('Pay by credit card in 3x installments without fees with Oney', 'payplug');
+        $this->has_fields = false;
     }
 
     /**
@@ -34,27 +31,25 @@ class PayplugGatewayOney3xWithoutFees extends PayplugGatewayOney3x
      */
     public function get_icon()
     {
-		$disable='';
+        $disable = '';
         if ($this->check_oney_is_available() === true) {
-	        $total_price = floatval(WC()->cart->total);
-	        $this->oney_response = $this->payplug_api->simulate_oney_payment($total_price,'without_fees');
+            $total_price = floatval(WC()->cart->total);
+            $this->oney_response = $this->payplug_api->simulate_oney_payment($total_price, 'without_fees');
 
-			if( empty($this->oney_response)){
-				$disable='disable-checkout-icons';
-			}
+            if (empty($this->oney_response)) {
+                $disable = 'disable-checkout-icons';
+            }
 
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
             $f = function ($fn) {
                 return $fn;
             };
 
-
-            if(is_array($this->oney_response)) {
-
-	            $total_price_oney = floatval($this->oney_response['x3_without_fees']['down_payment_amount']);
-	            foreach ($this->oney_response['x3_without_fees']['installments'] as $installment) {
-		            $total_price_oney = $total_price_oney + floatval($installment['amount']);
-	            }
+            if (is_array($this->oney_response)) {
+                $total_price_oney = floatval($this->oney_response['x3_without_fees']['down_payment_amount']);
+                foreach ($this->oney_response['x3_without_fees']['installments'] as $installment) {
+                    $total_price_oney = $total_price_oney + floatval($installment['amount']);
+                }
 
                 $this->description = <<<HTML
                		<div class="payplug-oney-flex">
@@ -80,17 +75,17 @@ HTML;
             } else {
                 $this->description = $this->oney_response;
             }
-        }else{
-			$disable='disable-checkout-icons';
-		}
+        } else {
+            $disable = 'disable-checkout-icons';
+        }
 
-		$country = PayplugWoocommerceHelper::getISOCountryCode();
+        $country = PayplugWoocommerceHelper::getISOCountryCode();
 
-		if( file_exists(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/checkout/x3_without_fees_' .  $country . '.svg') ){
-			$image = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/checkout/x3_without_fees_' .  $country . '.svg';
-		}else{
-			$image = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/checkout/x3_without_fees_FR.svg';
-		}
+        if (file_exists(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/checkout/x3_without_fees_' . $country . '.svg')) {
+            $image = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/checkout/x3_without_fees_' . $country . '.svg';
+        } else {
+            $image = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/checkout/x3_without_fees_FR.svg';
+        }
 
         $icons = apply_filters('payplug_payment_icons', [
             'payplug' => sprintf('<img src="%s" alt="Oney 3x" class="payplug-payment-icon ' . $disable . '" />', esc_url($image)),
@@ -99,6 +94,7 @@ HTML;
         foreach ($icons as $icon) {
             $icons_str .= $icon;
         }
+
         return $icons_str;
     }
 }
