@@ -4,7 +4,6 @@
  *
  * This file contains the following configurations:
  * * required CDN path
- * @package payplug
  */
 
 /**
