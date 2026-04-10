@@ -56,7 +56,3 @@ jobs:
       cdn-payplug: ${{ secrets.CDN_PAYPLUG_PROD }}
       api-payplug: ${{ secrets.PAYPLUG_API_PROD }}
       api-payplug-retail: ${{ secrets.API_RETAIL_PROD }}
-
-  # -----------------------------------------------------------------------
-  # 3.TODO: MANUAL STEP - Upload release artifact to WooCommerce marketplace
-  # -----------------------------------------------------------------------
