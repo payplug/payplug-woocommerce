@@ -84,9 +84,6 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 = 2.17.2 =
 * Various improvements
 
-= 2.17.2 =
-* Various improvements
-
 = 2.17.1 =
 * Patch: Fix for Payplug plugin upgrade disconnecting
 
