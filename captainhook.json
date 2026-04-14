@@ -41,7 +41,7 @@
       {
         "action": "\\CaptainHook\\App\\Hook\\Branch\\Action\\EnsureNaming",
         "options": {
-          "regex": "/^(feature|fix|hotfix|refactor)\\/(PRE|MAG|SYL|SMP)-\\d+|release\\/\\d+\\.\\d+\\.\\d+/"
+          "regex": "/^(feature|fix|hotfix|refactor)\\/(PRE|MAG|SYL|SMP)-\\d+|(release|patch)\\/\\d+\\.\\d+\\.\\d+/"
         }
       },
       {
