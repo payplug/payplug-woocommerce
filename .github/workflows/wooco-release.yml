@@ -1,0 +1,36 @@
+name: WooCommerce — Release
+
+on:
+  # Trigger 1: reuse QA artifact when a release/ branch is merged into master
+  pull_request:
+    branches:
+      - master
+    types: [closed]
+
+  # Trigger 2: build prod zip when a tag is pushed
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  # -----------------------------------------------------------------------
+  # 1. REUSE QA ARTIFACT — download from the release/ PR run and re-upload
+  # -----------------------------------------------------------------------
+
+
+  # -----------------------------------------------------------------------
+  # 2. BUILD PROD ZIP — triggered on tag push
+  # -----------------------------------------------------------------------
+  build-prod-zip:
+    name: Build prod zip
+    if: github.event_name == 'push'
+    uses: payplug/template-ci/.github/workflows/wooco-zip-generation.yml@main
+    with:
+      php-version: '7.2'
+      node-version: '20'
+      env: prod
+      ref: ${{ github.ref }}
+    secrets:
+      cdn-payplug: ${{ secrets.CDN_PAYPLUG_PROD }}
+      api-payplug: ${{ secrets.PAYPLUG_API_PROD }}
+      api-payplug-retail: ${{ secrets.API_RETAIL_PROD }}

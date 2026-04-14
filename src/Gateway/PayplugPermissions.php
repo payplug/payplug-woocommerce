@@ -3,30 +3,28 @@
 namespace Payplug\PayplugWoocommerce\Gateway;
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+if (!defined('ABSPATH')) {
+    exit;
 }
 
-
-use Payplug\Payplug;
 use Payplug\Authentication;
 use Payplug\Exception\PayplugException;
+use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
-class PayplugPermissions {
+class PayplugPermissions
+{
+    const OPTION_NAME = 'payplug_permission';
+    const LIVE_MODE = 'use_live_mode';
+    const SAVE_CARD = 'can_save_cards';
+    const USE_ONEY = 'can_use_oney';
 
-	const OPTION_NAME = 'payplug_permission';
-	const LIVE_MODE = 'use_live_mode';
-	const SAVE_CARD = 'can_save_cards';
-	const USE_ONEY = 'can_use_oney';
-
-
-	/**
-	 * The current mode for the gateway.
-	 *
-	 * @var string
-	 */
-	private $gateway_mode;
+    /**
+     * The current mode for the gateway.
+     *
+     * @var string
+     */
+    private $gateway_mode;
 
     /**
      * The current key for account permissions.
@@ -35,100 +33,106 @@ class PayplugPermissions {
      */
     private $current_key;
 
-	/**
-	 * @var array
-	 */
-	private $permissions;
+    /**
+     * @var array
+     */
+    private $permissions;
 
-	/**
-	 * PayplugPermissions constructor.
-	 *
-	 * @param PayplugGateway $gateway
-	 */
-	public function __construct( PayplugGateway $gateway) {
-		$this->gateway_mode = $gateway->get_configuration()->get_option('mode');
-		$api_key = json_decode($gateway->get_configuration()->get_option('api_key'), true);
+    /**
+     * PayplugPermissions constructor.
+     *
+     * @param PayplugGateway $gateway
+     */
+    public function __construct(PayplugGateway $gateway)
+    {
+        $this->gateway_mode = $gateway->get_configuration()->get_option('mode');
+        $api_key = json_decode($gateway->get_configuration()->get_option('api_key'), true);
 
-		// todo: check if we should get the jwt instead api key
-		if (!isset($api_key['live']) || !isset($api_key['test'])) {
-			$this->current_key = '';
-		} else {
-			$this->current_key = "live" === $this->gateway_mode ? $api_key['live'] : $api_key['test'];
-		}
-		$this->load_permissions();
-	}
+        // todo: check if we should get the jwt instead api key
+        if (!isset($api_key['live']) || !isset($api_key['test'])) {
+            $this->current_key = '';
+        } else {
+            $this->current_key = 'live' === $this->gateway_mode ? $api_key['live'] : $api_key['test'];
+        }
+        $this->load_permissions();
+    }
 
-	/**
-	 * Get all permissions.
-	 *
-	 * @return array
-	 */
-	public function get_permissions() {
-		return $this->permissions;
-	}
+    /**
+     * Get all permissions.
+     *
+     * @return array
+     */
+    public function get_permissions()
+    {
+        return $this->permissions;
+    }
 
-	/**
-	 * Check if user has specific permission.
-	 *
-	 * @param string $user_can
-	 *
-	 * @return bool
-	 */
-	public function has_permissions( $user_can ) {
-		if ( empty( $user_can ) ) {
-			return false;
-		}
+    /**
+     * Check if user has specific permission.
+     *
+     * @param string $user_can
+     *
+     * @return bool
+     */
+    public function has_permissions($user_can)
+    {
+        if (empty($user_can)) {
+            return false;
+        }
 
-		return isset( $this->permissions[ $user_can ] ) && true === $this->permissions[ $user_can ];
-	}
+        return isset($this->permissions[$user_can]) && true === $this->permissions[$user_can];
+    }
 
-	/**
-	 * Delete permissions for the current mode.
-	 *
-	 * @return bool
-	 */
-	public function clear_permissions() {
-		return delete_transient( $this->get_key() );
-	}
+    /**
+     * Delete permissions for the current mode.
+     *
+     * @return bool
+     */
+    public function clear_permissions()
+    {
+        return delete_transient($this->get_key());
+    }
 
-	/**
-	 * Load permissions for the current mode.
-	 */
-	protected function load_permissions() {
-		$payplug_permissions = get_transient( $this->get_key() );
-		if ( ! empty( $payplug_permissions ) ) {
-			$this->permissions = $payplug_permissions;
+    /**
+     * Load permissions for the current mode.
+     */
+    protected function load_permissions()
+    {
+        $payplug_permissions = get_transient($this->get_key());
+        if (!empty($payplug_permissions)) {
+            $this->permissions = $payplug_permissions;
 
-			return true;
-		}
+            return true;
+        }
 
-		if(empty($this->current_key)){
-			return false;
-		}
+        if (empty($this->current_key)) {
+            return false;
+        }
 
-		try {
-			$response          = Authentication::getPermissions(new Payplug($this->current_key));
-			$this->permissions = ! empty( $response ) ? $response : [];
-			set_transient( $this->get_key(), $this->permissions, DAY_IN_SECONDS );
+        try {
+            $response = Authentication::getPermissions(new Payplug($this->current_key));
+            $this->permissions = !empty($response) ? $response : [];
+            set_transient($this->get_key(), $this->permissions, DAY_IN_SECONDS);
 
-			return true;
-		} catch ( PayplugException $e ) {
+            return true;
+        } catch (PayplugException $e) {
 
-			//logout
-			PayplugGateway::log(sprintf('Account request error from PayPlug API : %s', wc_print_r($e->getErrorObject(), true)), 'error');
-			PayplugWoocommerceHelper::payplug_logout();
-			$this->permissions = [];
-		}
+            //logout
+            PayplugGateway::log(sprintf('Account request error from PayPlug API : %s', wc_print_r($e->getErrorObject(), true)), 'error');
+            PayplugWoocommerceHelper::payplug_logout();
+            $this->permissions = [];
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Build the key to retrieve the permissions.
-	 *
-	 * @return string
-	 */
-	protected function get_key() {
-		return self::OPTION_NAME . '_' . $this->gateway_mode;
-	}
+    /**
+     * Build the key to retrieve the permissions.
+     *
+     * @return string
+     */
+    protected function get_key()
+    {
+        return self::OPTION_NAME . '_' . $this->gateway_mode;
+    }
 }

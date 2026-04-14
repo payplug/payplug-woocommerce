@@ -4,12 +4,15 @@ namespace Payplug\PayplugWoocommerce\Front\Layout;
 
 interface InterfaceOneyLayout
 {
+    public static function simulationPopupContentWithoutFees($oney);
 
-	static function simulationPopupContentWithoutFees($oney);
-	static function simulationPopupContent($oney);
-	static function footerOneyWithoutFees($min, $max);
-	static function footerOneyWithFees($min, $max);
-	static function disabledOneyPopup($oney);
-	static function payWithOney($oney);
+    public static function simulationPopupContent($oney);
 
+    public static function footerOneyWithoutFees($min, $max);
+
+    public static function footerOneyWithFees($min, $max);
+
+    public static function disabledOneyPopup($oney);
+
+    public static function payWithOney($oney);
 }

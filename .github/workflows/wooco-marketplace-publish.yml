@@ -1,0 +1,99 @@
+name: WooCommerce — Publish to Marketplace
+
+on:
+  # Triggered manually by creating a GitHub Release (not on every tag push)
+  release:
+    types: [published]
+
+jobs:
+  # -----------------------------------------------------------------------
+  # 1. VERIFY SVN — read-only auth check before the approval gate
+  # -----------------------------------------------------------------------
+  verify-svn:
+    name: Verify SVN connection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install SVN
+        run: sudo apt-get install -y subversion
+
+      - name: Check SVN connectivity and credentials
+        run: |
+          svn info "${{ vars.SVN_URL }}" \
+            --username "${{ vars.SVN_USERNAME }}" \
+            --password "${{ secrets.WORDPRESS_MARKETPLACE_PASSWORD }}" \
+            --no-auth-cache
+
+  # -----------------------------------------------------------------------
+  # 2. PUBLISH TO MARKETPLACE — manual approval gate; then SVN deploy
+  #    No need to have a stage in template-ci as it won't be reusable
+  # -----------------------------------------------------------------------
+  publish-to-marketplace:
+    needs: verify-svn
+    name: Publish to WordPress Marketplace
+    environment: wordpress-marketplace
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract version from tag
+        id: info
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Download prod artifact from tag push run
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: wooco-release.yml
+          tag: ${{ github.ref_name }}
+          name_is_regexp: true
+          name: .*-PROD
+          path: artifact/
+
+      - name: Find zip
+        id: zip
+        run: |
+          ZIP=$(find artifact/ -name '*.zip' | head -1)
+          echo "path=$ZIP" >> "$GITHUB_OUTPUT"
+
+      - name: Install SVN
+        run: sudo apt-get install -y subversion
+
+      - name: SVN checkout (shallow)
+        run: |
+          svn checkout "${{ vars.SVN_URL }}" svn-payplug \
+            --depth immediates \
+            --username "${{ vars.SVN_USERNAME }}" \
+            --password "${{ secrets.WORDPRESS_MARKETPLACE_PASSWORD }}" \
+            --no-auth-cache
+
+      - name: Update trunk (full depth)
+        run: |
+          svn update svn-payplug/trunk --set-depth infinity \
+            --username "${{ vars.SVN_USERNAME }}" \
+            --password "${{ secrets.WORDPRESS_MARKETPLACE_PASSWORD }}" \
+            --no-auth-cache
+
+      - name: Replace trunk content
+        run: |
+          svn delete --force svn-payplug/trunk/*
+          unzip -q "${{ steps.zip.outputs.path }}" -d tmp_extract/
+          cp -r tmp_extract/payplug-woocommerce/. svn-payplug/trunk/
+
+      - name: Add new files to SVN
+        run: svn add --force svn-payplug/trunk/*
+
+      - name: Create SVN tag
+        run: svn cp svn-payplug/trunk svn-payplug/tags/${{ steps.info.outputs.version }}
+
+      - name: SVN commit
+        run: |
+          svn ci svn-payplug \
+            -m "${{ steps.info.outputs.version }}" \
+            --username "${{ vars.SVN_USERNAME }}" \
+            --password "${{ secrets.WORDPRESS_MARKETPLACE_PASSWORD }}" \
+            --no-auth-cache
+
+      - name: Summary
+        run: |
+          echo "✅ PayPlug v${{ steps.info.outputs.version }} published successfully"
+          echo "SVN tag : ${{ vars.SVN_URL }}tags/${{ steps.info.outputs.version }}/"
+          echo "Plugin  : ${{ vars.WP_PLUGIN_URL }}"
