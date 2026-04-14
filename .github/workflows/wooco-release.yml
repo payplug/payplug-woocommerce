@@ -10,12 +10,12 @@ on:
   # Trigger 2: build prod zip when a tag is pushed
   push:
     tags:
-      - 'v*'
+      - '[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
-  # -----------------------------------------------------------------------
-  # 1. REUSE QA ARTIFACT — download from the release/ PR run and re-upload
-  # -----------------------------------------------------------------------
+  # --------------------------------------------------------------------------------
+  # 1. REUSE QA ARTIFACT — download from the release/ PR run and re-upload on master
+  # --------------------------------------------------------------------------------
   reuse-qa-artifact:
     name: Reuse QA artifact from release branch
     if: >
