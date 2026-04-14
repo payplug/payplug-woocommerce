@@ -13,9 +13,9 @@ on:
       - 'v*'
 
 jobs:
-  # -----------------------------------------------------------------------
-  # 1. REUSE QA ARTIFACT — download from the release/ PR run and re-upload
-  # -----------------------------------------------------------------------
+  # --------------------------------------------------------------------------------
+  # 1. REUSE QA ARTIFACT — download from the release/ PR run and re-upload on master
+  # --------------------------------------------------------------------------------
   reuse-qa-artifact:
     name: Reuse QA artifact from release branch
     if: >
