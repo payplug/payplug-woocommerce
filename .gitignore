@@ -44,3 +44,5 @@ phpstan.neon
 var/
 .claude
 RELEASE.md
+.act-artifacts
+
