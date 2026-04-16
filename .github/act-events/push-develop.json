@@ -1,0 +1,10 @@
+{
+  "ref": "refs/heads/develop",
+  "ref_name": "develop",
+  "repository": {
+    "full_name": "payplug/payplug-woocommerce",
+    "default_branch": "develop",
+    "name": "payplug-woocommerce"
+  },
+  "pusher": { "name": "github-actions" }
+}

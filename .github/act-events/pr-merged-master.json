@@ -1,0 +1,15 @@
+{
+  "action": "closed",
+  "pull_request": {
+    "merged": true,
+    "number": 1,
+    "title": "release: 2.17.3",
+    "head": { "ref": "release/2.17.3" },
+    "base": { "ref": "master" }
+  },
+  "repository": {
+    "full_name": "payplug/payplug-woocommerce",
+    "default_branch": "develop",
+    "name": "payplug-woocommerce"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "ref": "refs/tags/2.17.3",
+  "ref_name": "2.17.3",
+  "repository": {
+    "full_name": "payplug/payplug-woocommerce",
+    "default_branch": "develop",
+    "name": "payplug-woocommerce"
+  },
+  "pusher": { "name": "github-actions" }
+}
