@@ -1,11 +1,10 @@
 name: WooCommerce — Release
 
 on:
-  # Trigger 1: reuse QA artifact when a branch is merged into master or develop
+  # Trigger 1: reuse QA artifact when a release/ branch is merged into master
   pull_request:
     branches:
       - master
-      - develop
     types: [closed]
 
   # Trigger 2: reuse QA artifact on develop merge / build prod zip on tag push
@@ -37,15 +36,23 @@ jobs:
           name: .*-QA
           path: artifact/
 
+      - name: Flatten artifact directory
+        run: |
+          subdir=$(ls artifact/ | head -1)
+          mv "artifact/$subdir"/* artifact/
+          rm -rf "artifact/$subdir"
+
       - name: Sanitize branch name for artifact
         id: sanitize
         run: echo "artifact_name=qa-artifact-$(echo '${{ github.head_ref }}' | tr '/' '-')" >> $GITHUB_OUTPUT
+
       - name: Re-upload artifact on master merge
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.sanitize.outputs.artifact_name }}
           path: artifact/
           retention-days: 7
+
   # --------------------------------------------------------------------------------
   # 2. REUSE QA ARTIFACT — download from any PR run and re-upload on develop merge
   # --------------------------------------------------------------------------------
@@ -53,7 +60,7 @@ jobs:
     name: Reuse QA artifact from merged branch (develop)
     if: >
       github.event_name == 'push' &&
-            github.ref == 'refs/heads/develop'
+      github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     steps:
       - name: Download most recent QA artifact from CI
@@ -63,6 +70,12 @@ jobs:
           name_is_regexp: true
           name: .*-QA
           path: artifact/
+
+      - name: Flatten artifact directory
+        run: |
+          subdir=$(ls artifact/ | head -1)
+          mv "artifact/$subdir"/* artifact/
+          rm -rf "artifact/$subdir"
 
       - name: Re-upload artifact on develop push
         uses: actions/upload-artifact@v4
