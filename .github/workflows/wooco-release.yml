@@ -80,7 +80,7 @@ jobs:
       - name: Re-upload artifact on develop push
         uses: actions/upload-artifact@v4
         with:
-          name: qa-artifact-develop
+          name: ${{ steps.sanitize.outputs.artifact_name }}
           path: artifact/
           retention-days: 7
 
