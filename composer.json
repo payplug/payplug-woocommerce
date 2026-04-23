@@ -22,7 +22,8 @@
   "require": {
     "php": ">=7.4.0",
     "composer/installers": "^1.9",
-    "payplug/payplug-php": "^4.0.0"
+    "payplug/payplug-php": "^4.0.0",
+    "payplug/payplug-plugin-core": "^1.0"
   },
   "require-dev": {
     "captainhook/captainhook": "^5.14",
