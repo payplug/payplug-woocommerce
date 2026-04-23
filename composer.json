@@ -22,7 +22,8 @@
   "require": {
     "php": ">=7.4.0",
     "composer/installers": "^1.9",
-    "payplug/payplug-php": "^4.0.0"
+    "payplug/payplug-php": "^4.0.0",
+    "payplug/payplug-plugin-core": "dev-dist/php72/feature/PRE-3169-coverage-with-php8"
   },
   "require-dev": {
     "captainhook/captainhook": "^5.14",
@@ -63,5 +64,16 @@
     "stan": "vendor/bin/phpstan analyse --configuration=phpstan.dist.neon --memory-limit=512M",
     "cs-lint": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff",
     "cs-fix": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php"
-  }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://packagist.org",
+      "canonical": false
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/payplug/payplug-plugin-core"
+    }
+  ]
 }
