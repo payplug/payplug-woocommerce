@@ -9,18 +9,22 @@ if (!defined('ABSPATH')) {
 
 use Payplug\Core\HttpClient;
 use Payplug\Exception\BadRequestException;
+use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\ForbiddenException;
 use Payplug\Exception\NotFoundException;
 use Payplug\Exception\PayplugServerException;
 use Payplug\Exception\UnauthorizedException;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
 /**
  * Handle calls to PayPlug PHP client.
  */
 class PayplugApi
 {
+    use ServiceGetter;
+
     /**
      * @var PayplugGateway
      */
@@ -53,39 +57,38 @@ class PayplugApi
     }
 
     /**
-	 * Try to refresh the JWT and update the API key if successful.
-	 *
-	 * @param string $current_mode The current mode (test or live) for which to refresh the JWT.
-	 *
-	 * @return bool
+     * Try to refresh the JWT and update the API key if successful.
+     *
+     * @param string $current_mode The current mode (test or live) for which to refresh the JWT.
+     *
+     * @return bool
      */
     private function try_refresh_jwt($current_mode)
     {
         if (class_exists('Payplug\\PayplugWoocommerce\\Service\\Api')) {
-            $apiService = new \Payplug\PayplugWoocommerce\Service\Api();
+            $apiService = $this->get_api();
             $configuration = $this->gateway->get_configuration();
             $options = $configuration->get_options();
             $oauth_client_data = isset($options['oauth_client_data']) ? json_decode($options['oauth_client_data'], true) : [];
             $client_data = isset($oauth_client_data[$current_mode]) ? $oauth_client_data[$current_mode] : [];
-            $jwt = isset($options['jwt']) ? json_decode($options['jwt'], true) : [];
-            $jwt_data = isset($jwt[$current_mode]) ? $jwt[$current_mode] : [];
-            if (!empty($client_data) && !empty($jwt_data)) {
-                $new_jwt = $apiService->generate_jwt_one_shot(
-                    isset($jwt_data['authorization_code']) ? $jwt_data['authorization_code'] : '',
-                    isset($jwt_data['callback_uri']) ? $jwt_data['callback_uri'] : '',
+            if (!empty($client_data)) {
+                $new_jwt = $apiService->generate_jwt(
                     isset($client_data['client_id']) ? $client_data['client_id'] : '',
-                    isset($jwt_data['code_verifier']) ? $jwt_data['code_verifier'] : ''
+                    isset($client_data['client_secret']) ? $client_data['client_secret'] : ''
                 );
                 if (!empty($new_jwt) && isset($new_jwt['access_token'])) {
+                    $jwt = isset($options['jwt']) ? json_decode($options['jwt'], true) : [];
                     $jwt[$current_mode] = $new_jwt;
                     $api_keys = isset($options['api_key']) ? json_decode($options['api_key'], true) : [];
                     $api_keys[$current_mode] = $new_jwt['access_token'];
                     $configuration->update_option('jwt', json_encode($jwt));
                     $configuration->update_option('api_key', json_encode($api_keys));
+
                     return true;
                 }
             }
         }
+
         return false;
     }
 
@@ -94,8 +97,8 @@ class PayplugApi
      */
     public function init()
     {
-        $current_mode = $this->gateway->get_current_mode();
-        $bearer_token = $this->gateway->get_api_key($current_mode);
+        $current_mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+        $bearer_token = $this->get_api()->get_bearer_token($current_mode);
         try {
             $this->api_payplug = Payplug::init([
                 'secretKey' => (string) $bearer_token,
@@ -106,26 +109,25 @@ class PayplugApi
                 PAYPLUG_GATEWAY_VERSION,
                 sprintf('WooCommerce/%s', WC()->version)
             );
-        } catch (\Exception $e) {
-            $is401 = (method_exists($e, 'getCode') && $e->getCode() == 401) || strpos($e->getMessage(), '401') !== false;
-            if ($is401) {
-                if ($this->try_refresh_jwt($current_mode)) {
-                    $bearer_token = $this->gateway->get_api_key($current_mode);
-                    $this->api_payplug = Payplug::init([
-                        'secretKey' => (string) $bearer_token,
-                        'apiVersion' => '2019-08-06',
-                    ]);
-                    HttpClient::setDefaultUserAgentProduct(
-                        'PayPlug-WooCommerce',
-                        PAYPLUG_GATEWAY_VERSION,
-                        sprintf('WooCommerce/%s', WC()->version)
-                    );
-                    return;
-                } else {
-                    \Payplug\PayplugWoocommerce\PayplugWoocommerceHelper::payplug_logout();
+        } catch (ConfigurationException $e) {
+            if ($this->try_refresh_jwt($current_mode)) {
+                if (!is_string($bearer_token) || empty($bearer_token)) {
+                    PayplugWoocommerceHelper::payplug_logout();
+                    throw $e;
                 }
+                $this->api_payplug = Payplug::init([
+                    'secretKey' => (string) $bearer_token,
+                    'apiVersion' => '2019-08-06',
+                ]);
+                HttpClient::setDefaultUserAgentProduct(
+                    'PayPlug-WooCommerce',
+                    PAYPLUG_GATEWAY_VERSION,
+                    sprintf('WooCommerce/%s', WC()->version)
+                );
+            } else {
+                PayplugWoocommerceHelper::payplug_logout();
+                throw $e;
             }
-            throw $e;
         }
     }
 
@@ -284,7 +286,22 @@ class PayplugApi
             $params = [$params];
         }
 
-        return call_user_func_array($callback, $params);
+        try {
+            return call_user_func_array($callback, $params);
+        } catch (UnauthorizedException $e) {
+            $current_mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+            if ($this->try_refresh_jwt($current_mode)) {
+                Payplug::setSecretKey((string) $this->gateway->get_api_key($current_mode));
+                try {
+                    return call_user_func_array($callback, $params);
+                } catch (UnauthorizedException $e) {
+                    PayplugWoocommerceHelper::payplug_logout();
+                    throw $e;
+                }
+            }
+            PayplugWoocommerceHelper::payplug_logout();
+            throw $e;
+        }
     }
 
     /**

@@ -190,13 +190,28 @@ class PayplugWoocommerceRequest
                 'apiVersion' => '2019-08-06',
             ]);
         } catch (\Exception $e) {
-            if (method_exists($e, 'getCode') && $e->getCode() == 401) {
-                PayplugWoocommerceHelper::payplug_logout();
-            } elseif (strpos($e->getMessage(), '401') !== false) {
-                PayplugWoocommerceHelper::payplug_logout();
+            $is_401 = (method_exists($e, 'getCode') && $e->getCode() == 401)
+                || strpos($e->getMessage(), '401') !== false;
+            if ($is_401 && $this->try_refresh_jwt($apiService, $mode)) {
+                try {
+                    \Payplug\Payplug::init([
+                        'secretKey' => $apiService->get_bearer_token($mode),
+                        'apiVersion' => '2019-08-06',
+                    ]);
+                } catch (\Exception $e) {
+                    PayplugWoocommerceHelper::payplug_logout();
+                    wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
+
+                    return;
+                }
+            } else {
+                if ($is_401) {
+                    PayplugWoocommerceHelper::payplug_logout();
+                }
+                wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
+
+                return;
             }
-            wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
-            return;
         }
         $apple_pay = [];
         $apple_pay['payment_token'] = $_POST['payment_token'];
@@ -286,25 +301,40 @@ class PayplugWoocommerceRequest
             ]);
             $payment = \Payplug\Payment::retrieve($payment_id);
         } catch (\Exception $e) {
-            if (method_exists($e, 'getCode') && $e->getCode() == 401) {
-                PayplugWoocommerceHelper::payplug_logout();
-                wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
-                return;
-            } elseif (strpos($e->getMessage(), '401') !== false) {
-                PayplugWoocommerceHelper::payplug_logout();
-                wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
-                return;
+            $is_401 = (method_exists($e, 'getCode') && $e->getCode() == 401)
+                || strpos($e->getMessage(), '401') !== false;
+            if ($is_401) {
+                if ($this->try_refresh_jwt($apiService, $mode)) {
+                    try {
+                        \Payplug\Payplug::init([
+                            'secretKey' => $apiService->get_bearer_token($mode),
+                            'apiVersion' => '2019-08-06',
+                        ]);
+                        $payment = \Payplug\Payment::retrieve($payment_id);
+                    } catch (\Exception $e) {
+                        PayplugWoocommerceHelper::payplug_logout();
+                        wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
+
+                        return;
+                    }
+                } else {
+                    PayplugWoocommerceHelper::payplug_logout();
+                    wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
+
+                    return;
+                }
+            } else {
+                $order_id = $this->getOrderFromPaymentId($payment_id);
+                $order = wc_get_order($order_id);
+                PayplugGateway::log(
+                    sprintf(
+                        'Order #%s : An error occurred while retrieving the payment data with the message : %s',
+                        $order_id,
+                        $e->getMessage()
+                    )
+                );
+                wp_send_json_error($e->getMessage());
             }
-            $order_id = $this->getOrderFromPaymentId($payment_id);
-            $order = wc_get_order($order_id);
-            PayplugGateway::log(
-                sprintf(
-                    'Order #%s : An error occurred while retrieving the payment data with the message : %s',
-                    $order_id,
-                    $e->getMessage()
-                )
-            );
-            wp_send_json_error($e->getMessage());
         }
         $order_id = $this->getOrderFromPaymentId($payment_id);
         $order = wc_get_order($order_id);
@@ -326,6 +356,40 @@ class PayplugWoocommerceRequest
             'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
             'cancel' => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null,
         ]);
+    }
+
+    /**
+     * Attempt to regenerate the JWT for the given mode and persist the new token.
+     *
+     * @param \Payplug\PayplugWoocommerce\Service\Api $apiService
+     * @param string $mode
+     *
+     * @return bool True if a new JWT was successfully obtained and stored.
+     */
+    private function try_refresh_jwt($apiService, $mode)
+    {
+        $configuration = $this->get_configuration();
+        $options = $configuration->get_options();
+        $oauth_client_data = isset($options['oauth_client_data']) ? json_decode($options['oauth_client_data'], true) : [];
+        $client_data = isset($oauth_client_data[$mode]) ? $oauth_client_data[$mode] : [];
+        if (empty($client_data)) {
+            return false;
+        }
+        $new_jwt = $apiService->generate_jwt(
+            isset($client_data['client_id']) ? $client_data['client_id'] : '',
+            isset($client_data['client_secret']) ? $client_data['client_secret'] : ''
+        );
+        if (empty($new_jwt) || !isset($new_jwt['access_token'])) {
+            return false;
+        }
+        $jwt = isset($options['jwt']) ? json_decode($options['jwt'], true) : [];
+        $jwt[$mode] = $new_jwt;
+        $api_keys = isset($options['api_key']) ? json_decode($options['api_key'], true) : [];
+        $api_keys[$mode] = $new_jwt['access_token'];
+        $configuration->update_option('jwt', json_encode($jwt));
+        $configuration->update_option('api_key', json_encode($api_keys));
+
+        return true;
     }
 
     /**
