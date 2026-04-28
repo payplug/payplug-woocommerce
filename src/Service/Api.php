@@ -110,7 +110,7 @@ class Api
         if (!empty($jwt) && !empty($jwt[$mode]) && !empty($oauth_client_data) && !empty($oauth_client_data[$mode])) {
             $jwt_data = $jwt[$mode];
             $now = time();
-            $expires_date = isset($jwt_data['expires_date']) ? (int)$jwt_data['expires_date'] : 0;
+            $expires_date = isset($jwt_data['expires_date']) ? (int) $jwt_data['expires_date'] : 0;
             if ($expires_date > 0 && ($expires_date - $now) < 30) {
                 $new_jwt = $this->generate_jwt_one_shot(
                     isset($jwt_data['authorization_code']) ? $jwt_data['authorization_code'] : '',
@@ -226,9 +226,11 @@ class Api
         } catch (\Exception $e) {
             if (method_exists($e, 'getCode') && $e->getCode() == 401) {
                 \Payplug\PayplugWoocommerce\PayplugWoocommerceHelper::payplug_logout();
+
                 return [];
             } elseif (strpos($e->getMessage(), '401') !== false) {
                 \Payplug\PayplugWoocommerce\PayplugWoocommerceHelper::payplug_logout();
+
                 return [];
             }
             throw $e;

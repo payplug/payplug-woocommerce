@@ -196,6 +196,7 @@ class PayplugWoocommerceRequest
                 PayplugWoocommerceHelper::payplug_logout();
             }
             wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
+
             return;
         }
         $apple_pay = [];
@@ -289,10 +290,12 @@ class PayplugWoocommerceRequest
             if (method_exists($e, 'getCode') && $e->getCode() == 401) {
                 PayplugWoocommerceHelper::payplug_logout();
                 wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
+
                 return;
             } elseif (strpos($e->getMessage(), '401') !== false) {
                 PayplugWoocommerceHelper::payplug_logout();
                 wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
+
                 return;
             }
             $order_id = $this->getOrderFromPaymentId($payment_id);

@@ -53,11 +53,11 @@ class PayplugApi
     }
 
     /**
-	 * Try to refresh the JWT and update the API key if successful.
-	 *
-	 * @param string $current_mode The current mode (test or live) for which to refresh the JWT.
-	 *
-	 * @return bool
+     * Try to refresh the JWT and update the API key if successful.
+     *
+     * @param string $current_mode The current mode (test or live) for which to refresh the JWT.
+     *
+     * @return bool
      */
     private function try_refresh_jwt($current_mode)
     {
@@ -82,10 +82,12 @@ class PayplugApi
                     $api_keys[$current_mode] = $new_jwt['access_token'];
                     $configuration->update_option('jwt', json_encode($jwt));
                     $configuration->update_option('api_key', json_encode($api_keys));
+
                     return true;
                 }
             }
         }
+
         return false;
     }
 
@@ -106,6 +108,29 @@ class PayplugApi
                 PAYPLUG_GATEWAY_VERSION,
                 sprintf('WooCommerce/%s', WC()->version)
             );
+        } catch (\Payplug\Exception\ConfigurationException $e) {
+            // Tentative de refresh du JWT si token invalide
+            if ($this->try_refresh_jwt($current_mode)) {
+                $bearer_token = $this->gateway->get_api_key($current_mode);
+                if (!is_string($bearer_token) || empty($bearer_token)) {
+                    \Payplug\PayplugWoocommerce\PayplugWoocommerceHelper::payplug_logout();
+                    throw $e;
+                }
+                $this->api_payplug = Payplug::init([
+                    'secretKey' => (string) $bearer_token,
+                    'apiVersion' => '2019-08-06',
+                ]);
+                HttpClient::setDefaultUserAgentProduct(
+                    'PayPlug-WooCommerce',
+                    PAYPLUG_GATEWAY_VERSION,
+                    sprintf('WooCommerce/%s', WC()->version)
+                );
+
+                return;
+            } else {
+                \Payplug\PayplugWoocommerce\PayplugWoocommerceHelper::payplug_logout();
+                throw $e;
+            }
         } catch (\Exception $e) {
             $is401 = (method_exists($e, 'getCode') && $e->getCode() == 401) || strpos($e->getMessage(), '401') !== false;
             if ($is401) {
@@ -120,6 +145,7 @@ class PayplugApi
                         PAYPLUG_GATEWAY_VERSION,
                         sprintf('WooCommerce/%s', WC()->version)
                     );
+
                     return;
                 } else {
                     \Payplug\PayplugWoocommerce\PayplugWoocommerceHelper::payplug_logout();
