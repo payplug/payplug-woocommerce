@@ -181,24 +181,30 @@ class PayplugWoocommerceRequest
     public function applepay_update_payment()
     {
         $payment_id = $_POST['payment_id'];
-
+        $apiService = new \Payplug\PayplugWoocommerce\Service\Api();
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+        $bearer_token = $apiService->get_bearer_token($mode);
         try {
             \Payplug\Payplug::init([
-                'secretKey' => PayplugWoocommerceHelper::get_live_key(),
+                'secretKey' => $bearer_token,
                 'apiVersion' => '2019-08-06',
             ]);
-
-            $apple_pay = [];
-            $apple_pay['payment_token'] = $_POST['payment_token'];
-            $payment = \Payplug\Payment::retrieve($payment_id);
-
-            $data = ['apple_pay' => $apple_pay];
-            $update = $payment->update($data);
-
-            wp_send_json_success(['result' => $update->is_paid]);
         } catch (\Exception $e) {
-            wp_send_json_error($e->getMessage());
+            if (method_exists($e, 'getCode') && $e->getCode() == 401) {
+                PayplugWoocommerceHelper::payplug_logout();
+            } elseif (strpos($e->getMessage(), '401') !== false) {
+                PayplugWoocommerceHelper::payplug_logout();
+            }
+            wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
+
+            return;
         }
+        $apple_pay = [];
+        $apple_pay['payment_token'] = $_POST['payment_token'];
+        $payment = \Payplug\Payment::retrieve($payment_id);
+        $data = ['apple_pay' => $apple_pay];
+        $update = $payment->update($data);
+        wp_send_json_success(['result' => $update->is_paid]);
     }
 
     public function applepay_get_order_totals()
@@ -267,30 +273,33 @@ class PayplugWoocommerceRequest
     public function check_payment()
     {
         global $wpdb;
-
         $payment_id = $_POST['payment_id'];
-
         if (empty($payment_id)) {
             wp_send_json_error(__('Invalid request.', 'payplug'));
         }
-
-        if (PayplugWoocommerceHelper::check_mode()) {
-            $key = PayplugWoocommerceHelper::get_live_key();
-        } else {
-            $key = PayplugWoocommerceHelper::get_test_key();
-        }
-
+        $apiService = new \Payplug\PayplugWoocommerce\Service\Api();
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+        $bearer_token = $apiService->get_bearer_token($mode);
         try {
             \Payplug\Payplug::init([
-                'secretKey' => $key,
+                'secretKey' => $bearer_token,
                 'apiVersion' => '2019-08-06',
             ]);
-
             $payment = \Payplug\Payment::retrieve($payment_id);
         } catch (\Exception $e) {
+            if (method_exists($e, 'getCode') && $e->getCode() == 401) {
+                PayplugWoocommerceHelper::payplug_logout();
+                wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
+
+                return;
+            } elseif (strpos($e->getMessage(), '401') !== false) {
+                PayplugWoocommerceHelper::payplug_logout();
+                wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
+
+                return;
+            }
             $order_id = $this->getOrderFromPaymentId($payment_id);
             $order = wc_get_order($order_id);
-
             PayplugGateway::log(
                 sprintf(
                     'Order #%s : An error occurred while retrieving the payment data with the message : %s',
@@ -298,17 +307,13 @@ class PayplugWoocommerceRequest
                     $e->getMessage()
                 )
             );
-
             wp_send_json_error($e->getMessage());
         }
-
         $order_id = $this->getOrderFromPaymentId($payment_id);
         $order = wc_get_order($order_id);
         $return_url = esc_url_raw($order->get_checkout_order_received_url());
-
         if ((isset($payment->failure)) && (!empty($payment->failure)) || ($payment->is_paid === false && is_null($payment->paid_at))) {
             $order->update_status('failed', __('Order cancelled by customer.', 'woocommerce'));
-
             wp_send_json_error(
                 [
                     'code' => isset($payment->failure->code) ? $payment->failure->code : 500,

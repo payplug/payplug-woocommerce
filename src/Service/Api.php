@@ -108,21 +108,36 @@ class Api
         $oauth_client_data = isset($options['oauth_client_data']) ? json_decode($options['oauth_client_data'], true) : [];
 
         if (!empty($jwt) && !empty($jwt[$mode]) && !empty($oauth_client_data) && !empty($oauth_client_data[$mode])) {
-            $validate_jwt = $this->validate_jwt($oauth_client_data[$mode], $jwt[$mode]);
-
-            if (!$validate_jwt['result'] || empty($validate_jwt['token'])) {
-                return '';
+            $jwt_data = $jwt[$mode];
+            $now = time();
+            $expires_date = isset($jwt_data['expires_date']) ? (int) $jwt_data['expires_date'] : 0;
+            if ($expires_date > 0 && ($expires_date - $now) < 30) {
+                $new_jwt = $this->generate_jwt_one_shot(
+                    isset($jwt_data['authorization_code']) ? $jwt_data['authorization_code'] : '',
+                    isset($jwt_data['callback_uri']) ? $jwt_data['callback_uri'] : '',
+                    isset($oauth_client_data[$mode]['client_id']) ? $oauth_client_data[$mode]['client_id'] : '',
+                    isset($jwt_data['code_verifier']) ? $jwt_data['code_verifier'] : ''
+                );
+                if (!empty($new_jwt) && isset($new_jwt['access_token'])) {
+                    $jwt[$mode] = $new_jwt;
+                    $api_keys[$mode] = $new_jwt['access_token'];
+                    $this->get_configuration()->update_option('jwt', json_encode($jwt));
+                    $this->get_configuration()->update_option('api_key', json_encode($api_keys));
+                    $bearer_token = $new_jwt['access_token'];
+                }
+            } else {
+                $validate_jwt = $this->validate_jwt($oauth_client_data[$mode], $jwt[$mode]);
+                if (!$validate_jwt['result'] || empty($validate_jwt['token'])) {
+                    return '';
+                }
+                $token_validated = $validate_jwt['token'];
+                $token_validated['expires_date'] -= 30;
+                $jwt[$mode] = $token_validated;
+                if ($validate_jwt['need_update']) {
+                    $this->get_configuration()->update_option('jwt', json_encode($jwt));
+                }
+                $bearer_token = $jwt[$mode]['access_token'];
             }
-            $token_validated = $validate_jwt['token'];
-
-            $token_validated['expires_date'] -= 30;
-            $jwt[$mode] = $token_validated;
-
-            if ($validate_jwt['need_update']) {
-                $this->get_configuration()->update_option('jwt', json_encode($jwt));
-            }
-
-            $bearer_token = $jwt[$mode]['access_token'];
         }
 
         return (string) $bearer_token;
@@ -204,9 +219,22 @@ class Api
      */
     public function create_client_id_and_secret($access_token = '', $company_id = '', $mode = 'live')
     {
-        Payplug::init([
-            'secretKey' => $access_token,
-        ]);
+        try {
+            Payplug::init([
+                'secretKey' => $access_token,
+            ]);
+        } catch (\Exception $e) {
+            if (method_exists($e, 'getCode') && $e->getCode() == 401) {
+                \Payplug\PayplugWoocommerce\PayplugWoocommerceHelper::payplug_logout();
+
+                return [];
+            } elseif (strpos($e->getMessage(), '401') !== false) {
+                \Payplug\PayplugWoocommerce\PayplugWoocommerceHelper::payplug_logout();
+
+                return [];
+            }
+            throw $e;
+        }
         $request = $this->do_request_with_fallback('\Payplug\Authentication::createClientIdAndSecret', [$company_id, 'WooCommerce', $mode]);
         if (!$request['result']) {
             return [];
