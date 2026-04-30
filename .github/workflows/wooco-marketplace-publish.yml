@@ -43,16 +43,21 @@ jobs:
         uses: dawidd6/action-download-artifact@v6
         with:
           workflow: wooco-release.yml
-          tag: ${{ github.ref_name }}
+          commit: ${{ github.sha }}
           name_is_regexp: true
-          name: .*-PROD
+          name: .*-prod
           path: artifact/
 
-      - name: Find zip
-        id: zip
+      - name: Find plugin dir
+        id: plugin
         run: |
-          ZIP=$(find artifact/ -name '*.zip' | head -1)
-          echo "path=$ZIP" >> "$GITHUB_OUTPUT"
+          PLUGIN_DIR=$(find artifact/ -maxdepth 2 -type d -name 'payplug-woocommerce' | head -1)
+          if [ -z "$PLUGIN_DIR" ]; then
+            echo "::error::No payplug-woocommerce directory found in artifact/"
+            exit 1
+          fi
+          echo "==> Using plugin dir: $PLUGIN_DIR"
+          echo "path=$PLUGIN_DIR" >> "$GITHUB_OUTPUT"
 
       - name: Install SVN
         run: sudo apt-get install -y subversion
@@ -75,8 +80,7 @@ jobs:
       - name: Replace trunk content
         run: |
           svn delete --force svn-payplug/trunk/*
-          unzip -q "${{ steps.zip.outputs.path }}" -d tmp_extract/
-          cp -r tmp_extract/payplug-woocommerce/. svn-payplug/trunk/
+          cp -r "${{ steps.plugin.outputs.path }}/." svn-payplug/trunk/
 
       - name: Add new files to SVN
         run: svn add --force svn-payplug/trunk/*
