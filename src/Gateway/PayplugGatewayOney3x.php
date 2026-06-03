@@ -149,9 +149,25 @@ HTML;
     /**
      * Check if Oney is available
      *
-     * @return false
+     * @return bool|int true, false, or an ONEY_* status code
      */
     public function check_oney_is_available()
+    {
+        static $is_running = false;
+        if ($is_running) {
+            return false;
+        }
+        $is_running = true;
+        try {
+            $result = $this->do_check_oney_is_available();
+        } finally {
+            $is_running = false;
+        }
+
+        return $result;
+    }
+
+    private function do_check_oney_is_available()
     {
         $cart = WC()->cart;
 
