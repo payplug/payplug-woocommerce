@@ -91,7 +91,7 @@ class SetupCallback
         // Only handle the callback when we're on the PayPlug settings page — prevents
         // intercepting OAuth callbacks from other plugins (e.g. Google Site Kit) that
         // also use a ?code= parameter on wp-admin pages.
-        if (!$this->is_payplug_settings_page()) {
+        if (!$this->is_payplug_settings_page() || !current_user_can('manage_woocommerce')) {
             return;
         }
 
