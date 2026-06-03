@@ -27,9 +27,9 @@ const getPayment = (props, _settings, order_id) => {
       type: 'POST',
       data: data,
       url: settings.payplug_create_intent_payment
-    }).success(function (response) {
+    }).done(function (response) {
       resolve(response);
-    }).error(function (error) {
+    }).fail(function (error) {
       reject(error);
     });
   });
@@ -47,9 +47,9 @@ const check_payment = data => {
       type: 'POST',
       data: data,
       url: settings.payplug_integrated_payment_check_payment_url
-    }).success(function (response) {
+    }).done(function (response) {
       resolve(response);
-    }).error(function (error) {
+    }).fail(function (error) {
       reject(error); // NOT WORKING!!
     });
   });
