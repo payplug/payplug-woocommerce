@@ -1,6 +1,6 @@
 {
-  "version": "2.17.3",
+  "version": "2.17.4",
   "wc_tested_up_to": "10.6.1",
   "wp_tested_up_to": "6.9.4",
-  "changelog": "* Changing translations for Scalapay"
+  "changelog": "* Fix: OAuth collision with other plugins"
 }
