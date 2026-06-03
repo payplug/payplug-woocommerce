@@ -200,6 +200,8 @@ class ApplePay extends PayplugGateway
                 'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
                 'ajax_url_applepay_cancel_order' => \WC_AJAX::get_endpoint('applepay_cancel_order'),
                 'is_cart' => is_cart(),
+                'is_virtual' => !$this->is_shipping_required(),
+                'cart_shipping' => WC()->cart->get_shipping_total(),
                 'countryCode' => WC()->customer->get_billing_country(),
                 'currencyCode' => get_woocommerce_currency(),
                 'apple_pay_domain' => $_SERVER['HTTP_HOST'],

@@ -113,6 +113,9 @@
 			apple_pay.BeginSession(response)
 		},
 		CreateSession: function () {
+			var isVirtual = !!apple_pay_params.is_virtual;
+			var cartShipping = parseFloat(apple_pay_params.cart_shipping) || 0;
+
 			const request = {
 				"countryCode": apple_pay_params.countryCode,
 				"currencyCode": apple_pay_params.currencyCode,
@@ -131,9 +134,8 @@
 				"total": {
 					"label": "Apple Pay",
 					"type": "final",
-					"amount": parseFloat(apple_pay_params.total) + parseFloat(apple_pay_params.cart_shipping)
+					"amount": parseFloat(apple_pay_params.total) + cartShipping
 				},
-				'shippingMethods': apple_pay_params.carriers,
 				'applicationData': btoa(JSON.stringify({
 					'apple_pay_domain': apple_pay_params.apple_pay_domain
 				})),
@@ -141,12 +143,13 @@
 					'postalAddress',
 					'name',
 				],
-				'requiredShippingContactFields' : [
-					"postalAddress",
-					"name",
-					"phone",
-					"email"
-				],
+				'requiredShippingContactFields' : isVirtual
+					? ['name', 'phone', 'email']
+					: ['postalAddress', 'name', 'phone', 'email'],
+			};
+
+			if (!isVirtual) {
+				request['shippingMethods'] = apple_pay_params.carriers;
 			}
 
 			session = new ApplePaySession(4, request);
