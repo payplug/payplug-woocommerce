@@ -88,8 +88,20 @@ class SetupCallback
      */
     public function handle_oauth_callback()
     {
+        // Only handle the callback when we're on the PayPlug settings page — prevents
+        // intercepting OAuth callbacks from other plugins (e.g. Google Site Kit) that
+        // also use a ?code= parameter on wp-admin pages.
+        if (!$this->is_payplug_settings_page() || !current_user_can('manage_woocommerce')) {
+            return;
+        }
+
         $account_gateway = $this->get_gateway('account');
         if (!isset($_GET['code'])) {
+            return;
+        }
+
+        // Bail if no OAuth flow was initiated by PayPlug (missing stored verifier).
+        if (empty($this->get_configuration()->get_option('oauth_code_verifier'))) {
             return;
         }
         $register_jwt = false;
