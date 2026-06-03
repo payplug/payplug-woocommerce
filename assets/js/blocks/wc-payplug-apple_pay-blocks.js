@@ -32,9 +32,9 @@ const getPayment = (props, order_id) => {
       type: 'POST',
       data: data,
       url: settings.payplug_create_intent_payment
-    }).success(function (response) {
+    }).done(function (response) {
       resolve(response);
-    }).error(function (error) {
+    }).fail(function (error) {
       reject(error);
     });
   });
@@ -52,9 +52,9 @@ const apple_pay_get_shippings = data => {
       type: 'POST',
       data: data,
       url: settings.ajax_url_applepay_get_shippings
-    }).success(function (response) {
+    }).done(function (response) {
       resolve(response);
-    }).error(function (xhr, status, error) {
+    }).fail(function (xhr, status, error) {
       reject(error); // NOT WORKING!!
     });
   });
@@ -65,9 +65,9 @@ const apple_pay_update_payment = data => {
       type: 'POST',
       data: data,
       url: settings.ajax_url_applepay_update_payment
-    }).success(function (response) {
+    }).done(function (response) {
       resolve(response);
-    }).error(function (xhr, status, error) {
+    }).fail(function (xhr, status, error) {
       reject(error); // NOT WORKING!!
     });
   });
@@ -78,9 +78,9 @@ const apple_pay_UpdateOrder = data => {
       type: 'POST',
       data: data,
       url: settings.ajax_url_update_applepay_order
-    }).success(function (response) {
+    }).done(function (response) {
       resolve(response);
-    }).error(function (xhr, status, error) {
+    }).fail(function (xhr, status, error) {
       reject(error); // NOT WORKING!!
     });
   });
@@ -91,9 +91,9 @@ const apple_pay_Payment = data => {
       type: 'POST',
       data: data,
       url: settings.ajax_url_update_applepay_payment
-    }).success(function (response) {
+    }).done(function (response) {
       resolve(response);
-    }).error(function (xhr, status, error) {
+    }).fail(function (xhr, status, error) {
       reject(error); // NOT WORKING!!
     });
   });
@@ -104,9 +104,9 @@ const apple_pay_PlaceOrderWithDummyData = data => {
       type: 'POST',
       data: data,
       url: settings.ajax_url_place_order_with_dummy_data
-    }).success(function (response) {
+    }).done(function (response) {
       resolve(response);
-    }).error(function (xhr, status, error) {
+    }).fail(function (xhr, status, error) {
       reject(error); // NOT WORKING!!
     });
   });
@@ -117,9 +117,9 @@ const apple_pay_CancelOrder = data => {
       type: 'POST',
       data: data,
       url: settings.ajax_url_applepay_cancel_order
-    }).success(function (response) {
+    }).done(function (response) {
       resolve(response);
-    }).error(function (xhr, status, error) {
+    }).fail(function (xhr, status, error) {
       reject(error); // NOT WORKING!!
     });
   });
