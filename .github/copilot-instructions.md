@@ -45,7 +45,7 @@ This is PayPlug's official WooCommerce plugin. PayPlug is a Payment Service Prov
 - Race conditions and concurrency issues (IPN and order status updates)
 - Error handling and propagation
 - Off-by-one errors, type safety
-- `declare(strict_types=1)` must be present in every PHP file
+- `declare(strict_types=1)` is not currently used in this codebase; do not require it on existing files (consider adding it only as part of a dedicated, repo-wide change).
 - For new payment gateways: verify the full implementation checklist is covered (gateway class extending `WC_Payment_Gateway`, `init_form_fields`, `process_payment`, IPN handler, refund support via `process_refund`, settings registration in `woocommerce_payment_gateways`, translations)
 - Amount unit: PayPlug API works in the smallest currency unit (cents). WooCommerce amounts are in major units (euros). Any conversion must be explicit — silently mixing units is a payment amount bug
 - Currency enforcement (EUR-only or allowed-currency list) must happen before the API call, not after
