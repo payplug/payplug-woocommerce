@@ -200,15 +200,17 @@ class PayplugWoocommerceRequest
                     ]);
                 } catch (\Exception $e) {
                     PayplugWoocommerceHelper::payplug_logout();
-                    wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
+                    wp_send_json_error(__('You have been disconnected from the Payplug module (error 401)', 'payplug'));
 
                     return;
                 }
             } else {
                 if ($is_401) {
                     PayplugWoocommerceHelper::payplug_logout();
+                    wp_send_json_error(__('You have been disconnected from the Payplug module (error 401)', 'payplug'));
+                } else {
+                    wp_send_json_error($e->getMessage());
                 }
-                wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
 
                 return;
             }
@@ -313,13 +315,13 @@ class PayplugWoocommerceRequest
                         $payment = \Payplug\Payment::retrieve($payment_id);
                     } catch (\Exception $e) {
                         PayplugWoocommerceHelper::payplug_logout();
-                        wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
+                        wp_send_json_error(__('You have been disconnected from the Payplug module (error 401)', 'payplug'));
 
                         return;
                     }
                 } else {
                     PayplugWoocommerceHelper::payplug_logout();
-                    wp_send_json_error(__('You have been disconected from the Payplug module (error 401)', 'payplug'));
+                    wp_send_json_error(__('You have been disconnected from the Payplug module (error 401)', 'payplug'));
 
                     return;
                 }
