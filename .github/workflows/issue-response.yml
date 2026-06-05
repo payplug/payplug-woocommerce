@@ -21,7 +21,10 @@ jobs:
       - name: Notify Slack
         env:
           SLACK_PLUGINS_WEBHOOK_URL: ${{ secrets.SLACK_PLUGINS_WEBHOOK_URL }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          REPO: ${{ github.repository }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data "{
-            \"text\": \"New GitHub Issue opened in *${{ github.repository }}*:\n${{ github.event.issue.title }}\n${{ github.event.issue.html_url }}\"
-          }" $SLACK_PLUGINS_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' \
+            --data-raw "{\"text\": \"New GitHub Issue opened in *${REPO}*:\n${ISSUE_TITLE}\n${ISSUE_URL}\"}" \
+            "$SLACK_PLUGINS_WEBHOOK_URL"
