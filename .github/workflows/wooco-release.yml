@@ -45,10 +45,12 @@ jobs:
           path: artifact/
 
       - name: Flatten artifact directory
+        id: sanitize
         run: |
           subdir=$(ls artifact/ | head -1)
           mv "artifact/$subdir"/* artifact/
           rm -rf "artifact/$subdir"
+          echo "artifact_name=${subdir}" >> "$GITHUB_OUTPUT"
 
       - name: Re-upload artifact on develop push
         uses: actions/upload-artifact@v4
