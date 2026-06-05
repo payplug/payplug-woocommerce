@@ -4,7 +4,7 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 4.4
 Tested up to: 6.9.4
 Requires PHP: 5.6
-Stable tag: 2.17.3
+Stable tag: 2.18.0
 VueJs Payplug UI lib tag: 1.7.12
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -81,6 +81,13 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 2.18.0 =
+* Fix: OAuth collision with other plugins
+ * Fix: Apple Pay with virtual products
+ * Fix: Oney infinite loop on cart recalculation
+ * Fix: Apple Pay undefined HTTP_HOST warning in WP-Cron context
+ * Fix : deprecated Jquery callbacks
+
 = 2.17.3 =
 * Changing translations for Scalapay
 
