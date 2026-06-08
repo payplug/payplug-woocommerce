@@ -47,8 +47,9 @@ class ApplePay
                 }
 
                 $rates = $shipping_method->get_rates_for_package($package);
-                if ($this->checkApplePayShipping($shipping_method)) {
-                    $shipping_rate = $rates[$shipping_method->get_rate_id()];
+				$rate_id = $shipping_method->get_rate_id();
+				if (isset($rates[$rate_id]) && $this->checkApplePayShipping($shipping_method)) {
+					$shipping_rate = $rates[$rate_id];
 
                     array_push($shippings, [
                         'identifier' => $shipping_method->id . '_' . $shipping_method->instance_id,
