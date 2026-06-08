@@ -11,6 +11,7 @@ jobs:
   # -----------------------------------------------------------------------
   verify-svn:
     name: Verify SVN connection
+    if: ${{ !contains(github.ref_name, '-rc') }}
     runs-on: ubuntu-latest
     steps:
       - name: Install SVN
