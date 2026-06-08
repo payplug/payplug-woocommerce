@@ -111,8 +111,7 @@ class PayplugApi
             );
         } catch (ConfigurationException $e) {
             if ($this->try_refresh_jwt($current_mode)) {
-                $bearer_token = $this->get_api()->get_bearer_token($current_mode);
-                if (empty($bearer_token)) {
+                if (!is_string($bearer_token) || empty($bearer_token)) {
                     PayplugWoocommerceHelper::payplug_logout();
                     throw $e;
                 }
