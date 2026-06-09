@@ -17,10 +17,10 @@ class PaymentGateway extends TestCase
         $this->payment_gateways = $payplug->register_payplug_gateway([]);
     }
 
-    public function test_standard_gateway_properties()
+    public function test_standard_gateway_properties(): void
     {
         foreach ($this->payment_gateways as $class) {
-            $gateway = new $class;
+            $gateway = new $class();
             $gateway_mock = $this->mock_payment_gateways[$gateway->id];
 
             self::assertTrue(!empty($this->mock_payment_gateways[$gateway->id]));

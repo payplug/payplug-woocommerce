@@ -4,6 +4,7 @@ namespace Payplug\PayplugWoocommerce\Controller;
 
 use function is_cart;
 use function is_product;
+
 use Payplug\Exception\HttpException;
 use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
@@ -23,7 +24,7 @@ class ApplePay extends PayplugGateway
 
     protected $carriers = [];
 
-    const ENABLE_ON_TEST_MODE = false;
+    public const ENABLE_ON_TEST_MODE = false;
 
     public $image = 'apple-pay-checkout.svg';
 
@@ -161,7 +162,7 @@ class ApplePay extends PayplugGateway
      *
      * @return void
      */
-    public function payment_fields()
+    public function payment_fields(): void
     {
         $description = $this->get_description();
 
@@ -185,7 +186,7 @@ class ApplePay extends PayplugGateway
      *
      * @return void
      */
-    public function add_apple_pay_cart_js()
+    public function add_apple_pay_cart_js(): void
     {
         wp_enqueue_script('apple-pay-sdk', 'https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js', [], false, true);
         wp_enqueue_script('payplug-apple-pay-cart', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-apple-pay-cart.js', ['jquery', 'apple-pay-sdk'], PAYPLUG_GATEWAY_VERSION, true);
@@ -218,7 +219,7 @@ class ApplePay extends PayplugGateway
      *
      * @return void
      */
-    public function add_apple_pay_product_js()
+    public function add_apple_pay_product_js(): void
     {
         global $product;
         // Only dispay ApplePay on product page for simple and variable products
@@ -317,7 +318,7 @@ class ApplePay extends PayplugGateway
      *
      * @return void
      */
-    public static function display_notice()
+    public static function display_notice(): void
     {
         ?>
 		<div class="notice notice-error is-dismissible">
@@ -353,7 +354,7 @@ class ApplePay extends PayplugGateway
      *
      * @return void
      */
-    public function add_apple_pay_css()
+    public function add_apple_pay_css(): void
     {
         wp_enqueue_style('payplug-apple-pay', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-apple-pay.css', [], PAYPLUG_GATEWAY_VERSION);
     }
@@ -363,7 +364,7 @@ class ApplePay extends PayplugGateway
      *
      * @return void
      */
-    public function add_apple_pay_js()
+    public function add_apple_pay_js(): void
     {
         wp_enqueue_script('apple-pay-sdk', 'https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js', [], false, true);
         wp_enqueue_script(
@@ -595,7 +596,7 @@ class ApplePay extends PayplugGateway
      *
      * @return void
      */
-    private function set_button_checkout($status)
+    private function set_button_checkout($status): void
     {
         $this->checkout = $status;
     }
@@ -607,7 +608,7 @@ class ApplePay extends PayplugGateway
      *
      * @return void
      */
-    private function set_button_cart($status)
+    private function set_button_cart($status): void
     {
         $this->cart = $status;
     }
@@ -619,7 +620,7 @@ class ApplePay extends PayplugGateway
      *
      * @return void
      */
-    private function set_button_product($status)
+    private function set_button_product($status): void
     {
         $this->product = $status;
     }
@@ -671,7 +672,7 @@ class ApplePay extends PayplugGateway
      *
      * @return void
      */
-    private function set_carriers($carriers)
+    private function set_carriers($carriers): void
     {
         $this->carriers = $carriers;
     }

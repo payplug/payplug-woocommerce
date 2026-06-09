@@ -34,7 +34,7 @@ class SetupCallback
     /**
      * Handle the setup callback from PayPlug Portal
      */
-    public function handle_setup_callback()
+    public function handle_setup_callback(): void
     {
         // Check if we're on the PayPlug settings page
         if (!$this->is_payplug_settings_page()) {
@@ -52,7 +52,7 @@ class SetupCallback
 
         // Display success message if setup was successful
         if (isset($_GET['setup_success']) && $_GET['setup_success'] == '1') {
-            add_action('admin_notices', function () {
+            add_action('admin_notices', function (): void {
                 echo '<div class="notice notice-success is-dismissible">' .
                     '<p>' . esc_html__('PayPlug account successfully connected!', 'payplug') . '</p>' .
                     '</div>';
@@ -61,7 +61,7 @@ class SetupCallback
 
         // Display error message if setup failed
         if (isset($_GET['setup_error'])) {
-            add_action('admin_notices', function () {
+            add_action('admin_notices', function (): void {
                 $error_type = sanitize_text_field($_GET['setup_error']);
                 $error_message = '';
 
@@ -86,7 +86,7 @@ class SetupCallback
     /**
      * Handle the OAuth callback
      */
-    public function handle_oauth_callback()
+    public function handle_oauth_callback(): void
     {
         // Only handle the callback when we're on the PayPlug settings page — prevents
         // intercepting OAuth callbacks from other plugins (e.g. Google Site Kit) that

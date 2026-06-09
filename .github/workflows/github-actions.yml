@@ -27,7 +27,7 @@ jobs:
     if: always() && !failure() && !cancelled()
     uses: payplug/template-ci/.github/workflows/wooco-php-quality.yml@main
     with:
-      php-version: '7.2'
+      php-version: '7.4'
       ref: ${{ github.head_ref }}
 
   # -----------------------------------------------------------------------
@@ -38,8 +38,8 @@ jobs:
     needs: quality
     uses: payplug/template-ci/.github/workflows/check-php-compatibility.yml@main
     with:
-      php-version: '7.2'
-      test-version-range: '5.6-8.1'
+      php-version: '7.4'
+      test-version-range: '7.4-8.1'
       src-folder: './src/'
 
   # -----------------------------------------------------------------------
@@ -50,7 +50,7 @@ jobs:
     needs: [quality, check-php-compatibility]
     uses: payplug/template-ci/.github/workflows/wooco-zip-generation.yml@main
     with:
-      php-version: '7.2'
+      php-version: '7.4'
       node-version: '20'
       ref: ${{ github.head_ref }}
     secrets:

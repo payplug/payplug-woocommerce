@@ -9,7 +9,7 @@ class AccountGateway
 {
     use ServiceGetter;
 
-    public function _construct()
+    public function _construct(): void
     {
         $this->configuration = $this->get_service('configuration');
     }
@@ -60,7 +60,7 @@ class AccountGateway
      *
      * @return void
      */
-    public function initialize_jwt($client_id = '', $company_id = '')
+    public function initialize_jwt($client_id = '', $company_id = ''): void
     {
         // Clean previous configuration to avoid any conflict with
         $this->get_configuration()->clean_option();
@@ -175,7 +175,7 @@ class AccountGateway
     /**
      * @return void
      */
-    public function logout()
+    public function logout(): void
     {
     }
 
@@ -204,7 +204,7 @@ class AccountGateway
     /**
      * @return void
      */
-    public function initialize_permisssion()
+    public function initialize_permisssion(): void
     {
         // get the permissions
         $permissions = $this->get_permissions();

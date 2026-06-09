@@ -37,7 +37,7 @@ class PayplugResponse
      *
      * @return void
      */
-    public function process_payment($resource, $is_payment_with_token = false, $source = '')
+    public function process_payment($resource, $is_payment_with_token = false, $source = ''): void
     {
         $order_id = wc_clean($resource->metadata['order_id']);
 
@@ -151,7 +151,7 @@ class PayplugResponse
      *
      * @return void
      */
-    public function handle_pending_oney($order, $resource, $source)
+    public function handle_pending_oney($order, $resource, $source): void
     {
         $order->add_order_note(sprintf(__('PayPlug %s OK | Transaction %s | Payment PENDING to be checked by an Oney agent', 'payplug'), strtoupper($source), wc_clean($resource->id)));
         wc_reduce_stock_levels($order);
@@ -162,7 +162,7 @@ class PayplugResponse
      *
      * @param $resource
      */
-    public function payplug_ipn($resource, $source)
+    public function payplug_ipn($resource, $source): void
     {
         $order_id = wc_clean($resource->metadata['order_id']);
         PayplugGateway::log(sprintf('Order #%s : Begin processing Payplug payment %s %s', $order_id, strtoupper($source), $resource->id));
@@ -173,7 +173,7 @@ class PayplugResponse
      *
      * @param $resource
      */
-    public function bancontact_ipn($resource, $source)
+    public function bancontact_ipn($resource, $source): void
     {
         $order_id = wc_clean($resource->metadata['order_id']);
         PayplugGateway::log(sprintf('Order #%s : Begin processing Bancontact payment %s %s', $order_id, strtoupper($source), $resource->id));
@@ -184,7 +184,7 @@ class PayplugResponse
      *
      * @param $resource
      */
-    public function apple_pay_ipn($resource, $source)
+    public function apple_pay_ipn($resource, $source): void
     {
         $order_id = wc_clean($resource->metadata['order_id']);
         PayplugGateway::log(sprintf('Order #%s : Begin processing Apple Pay payment %s %s', $order_id, strtoupper($source), $resource->id));
@@ -195,7 +195,7 @@ class PayplugResponse
      *
      * @param $resource
      */
-    public function amex_ipn($resource, $source)
+    public function amex_ipn($resource, $source): void
     {
         $order_id = wc_clean($resource->metadata['order_id']);
         PayplugGateway::log(sprintf('Order #%s : Begin processing Amex payment %s %s', $order_id, strtoupper($source), $resource->id));
@@ -206,7 +206,7 @@ class PayplugResponse
      *
      * @param $resource
      */
-    public function oney_ipn($resource)
+    public function oney_ipn($resource): void
     {
         $gateway_id = $resource->payment_method['type'];
         $order_id = wc_clean($resource->metadata['order_id']);
@@ -243,7 +243,7 @@ class PayplugResponse
      *
      * @throws \Exception
      */
-    public function process_refund($resource, $ignore_woocommerce_refund = true)
+    public function process_refund($resource, $ignore_woocommerce_refund = true): void
     {
         $refund_id = wc_clean($resource->id);
         $transaction_id = wc_clean($resource->payment_id);

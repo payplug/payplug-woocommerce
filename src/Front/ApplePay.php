@@ -28,7 +28,7 @@ class ApplePay
         add_action('wc_ajax_applepay_add_to_cart', [$this, 'applepay_add_to_cart']);
     }
 
-    public function applepay_get_shippings()
+    public function applepay_get_shippings(): void
     {
         WC()->customer->set_shipping_country('FR');
         WC()->customer->set_shipping_city('Paris');
@@ -94,7 +94,7 @@ class ApplePay
         return $shipping_zone->get_shipping_methods(true);
     }
 
-    public function place_order_with_dummy_data()
+    public function place_order_with_dummy_data(): void
     {
         $apple_pay = new ApplePayGateway();
         if (is_admin()) {
@@ -156,7 +156,7 @@ class ApplePay
         }
     }
 
-    public function process_cart_payment($order, $gateway)
+    public function process_cart_payment($order, $gateway): void
     {
         $order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
         $customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
@@ -169,7 +169,7 @@ class ApplePay
         ]);
     }
 
-    public function update_applepay_order()
+    public function update_applepay_order(): void
     {
         $order_id = $_POST['order_id'];
         $order = wc_get_order($order_id);
@@ -317,7 +317,7 @@ class ApplePay
      *
      * @return void
      */
-    public function update_applepay_payment()
+    public function update_applepay_payment(): void
     {
         $applepay = new ApplePayGateway();
 
@@ -355,7 +355,7 @@ class ApplePay
         ]);
     }
 
-    public function applepay_cancel_order()
+    public function applepay_cancel_order(): void
     {
         $payment_id = !empty($_POST['payment_id']) ? $_POST['payment_id'] : null;
         $order_id = $_POST['order_id'];
@@ -409,7 +409,7 @@ class ApplePay
         }
     }
 
-    public function applepay_empty_cart()
+    public function applepay_empty_cart(): void
     {
         try {
             WC()->cart->empty_cart();
@@ -421,7 +421,7 @@ class ApplePay
         }
     }
 
-    public function applepay_add_to_cart()
+    public function applepay_add_to_cart(): void
     {
         try {
             if (!empty($_POST['product_id'])) {

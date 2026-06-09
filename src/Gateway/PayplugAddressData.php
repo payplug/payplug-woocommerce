@@ -14,13 +14,13 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 class PayplugAddressData
 {
-    const DELIVERY_TYPE_BILLING = 'BILLING';
-    const DELIVERY_TYPE_VERIFIED = 'VERIFIED';
-    const DELIVERY_TYPE_NEW = 'NEW';
-    const DELIVERY_TYPE_SHIP_TO_STORE = 'SHIP_TO_STORE';
-    const DELIVERY_TYPE_DIGITAL_GOODS = 'DIGITAL_GOODS';
-    const DELIVERY_TYPE_TRAVEL_OR_EVENT = 'TRAVEL_OR_EVENT';
-    const DELIVERY_TYPE_OTHER = 'OTHER';
+    public const DELIVERY_TYPE_BILLING = 'BILLING';
+    public const DELIVERY_TYPE_VERIFIED = 'VERIFIED';
+    public const DELIVERY_TYPE_NEW = 'NEW';
+    public const DELIVERY_TYPE_SHIP_TO_STORE = 'SHIP_TO_STORE';
+    public const DELIVERY_TYPE_DIGITAL_GOODS = 'DIGITAL_GOODS';
+    public const DELIVERY_TYPE_TRAVEL_OR_EVENT = 'TRAVEL_OR_EVENT';
+    public const DELIVERY_TYPE_OTHER = 'OTHER';
 
     public static $address_fields = [
         'address1',
@@ -154,7 +154,7 @@ class PayplugAddressData
      *
      * @param \WC_Order $order
      */
-    protected function prepare_address_data($order)
+    protected function prepare_address_data($order): void
     {
         $customer = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
 

@@ -14,7 +14,7 @@ abstract class OneyBase implements InterfaceOneyResources
     /**
      * @global WP_Scripts $wp_scripts The WP_Scripts object for printing scripts.
      */
-    public static function addOneyScript()
+    public static function addOneyScript(): void
     {
         wp_localize_script('payplug-oney', 'payplug_config', [
             'ajax_url' => admin_url('admin-ajax.php'),
@@ -25,7 +25,7 @@ abstract class OneyBase implements InterfaceOneyResources
     /**
      * Add CSS
      */
-    public static function addOneyCSS()
+    public static function addOneyCSS(): void
     {
         wp_enqueue_style('payplug-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-oney.css', [], PAYPLUG_GATEWAY_VERSION);
     }
@@ -33,7 +33,7 @@ abstract class OneyBase implements InterfaceOneyResources
     /**
      * Add JS
      */
-    public static function addOneyJs()
+    public static function addOneyJs(): void
     {
         wp_enqueue_script('payplug-oney-mobile', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-detect-mobile.js', [], PAYPLUG_GATEWAY_VERSION, true);
         wp_enqueue_script('payplug-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-oney.js', [

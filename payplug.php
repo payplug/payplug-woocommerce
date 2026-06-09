@@ -9,6 +9,7 @@
  * Domain Path:     /languages
  * Version:         2.18.0
  * WC tested up to: 10.6.1
+ * Requires PHP:     7.4
  * Requires plugins: woocommerce
  * License:         GPLv3 or later
  * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
@@ -39,7 +40,7 @@ define('PAYPLUG_GATEWAY_PLUGIN_BASENAME', plugin_basename(__FILE__));
 global $mo;
 $mo = new \MO();
 
-function init()
+function init(): void
 {
     if (file_exists(plugin_dir_path(__FILE__) . '/vendor/autoload.php')) {
         require_once plugin_dir_path(__FILE__) . '/vendor/autoload.php';
@@ -57,7 +58,7 @@ function init()
     $GLOBALS['mo']->import_from_file($path);
 }
 
-function create_lock_table()
+function create_lock_table(): void
 {
     init();
     \Payplug\PayplugWoocommerce\Model\Lock::create_lock_table();
@@ -67,7 +68,7 @@ add_action('upgrader_process_complete', __NAMESPACE__ . '\\create_lock_table', 1
 add_action('activated_plugin', __NAMESPACE__ . '\\create_lock_table', 10, 2);
 add_action('plugins_loaded', __NAMESPACE__ . '\\init');
 
-add_action('before_woocommerce_init', function () {
+add_action('before_woocommerce_init', function (): void {
     if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
         \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
     }

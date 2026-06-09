@@ -14,7 +14,7 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
 
     protected $allowed_country_codes;
 
-    public function initialize()
+    public function initialize(): void
     {
         if (class_exists('WC_Blocks_Utils')) {
             if (\WC_Blocks_Utils::has_block_in_page(wc_get_page_id('checkout'), 'woocommerce/checkout') ||

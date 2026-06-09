@@ -91,7 +91,7 @@ class PayplugCreditCard extends PayplugGenericBlock
         return parent::get_payment_method_script_handles();
     }
 
-    private function ip_scripts()
+    private function ip_scripts(): void
     {
         wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
         wp_register_script(
@@ -108,7 +108,7 @@ class PayplugCreditCard extends PayplugGenericBlock
         wp_enqueue_script('payplug-integrated-payments-api');
     }
 
-    private function popup_scripts()
+    private function popup_scripts(): void
     {
         wp_register_script('payplug-popup', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
         if (isset($_GET['pay_for_order'])) {

@@ -10,7 +10,7 @@ class Upgrade
     use ServiceGetter;
     use GatewayGetter;
 
-    public function run_upgrade()
+    public function run_upgrade(): void
     {
         // Check if new options need to be setted
         $configuration = $this->get_service('configuration');

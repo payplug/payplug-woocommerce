@@ -104,7 +104,7 @@ class PayplugWoocommerce
     /**
      * Singleton instance can't be serialized.
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
     }
 
@@ -115,7 +115,7 @@ class PayplugWoocommerce
     {
         // Bail early if WooCommerce is not activated
         if (!defined('WC_VERSION')) {
-            add_action('admin_notices', function () {
+            add_action('admin_notices', function (): void {
                 ?>
 				<div id="message" class="notice notice-error">
 					<p><?php _e('PayPlug requires an active version of WooCommerce', 'payplug'); ?></p>
@@ -197,7 +197,7 @@ class PayplugWoocommerce
         return array_merge($plugin_links, $links);
     }
 
-    public function animationHandlers()
+    public function animationHandlers(): void
     {
         $options = get_option('woocommerce_payplug_settings', []);
 
@@ -234,12 +234,12 @@ class PayplugWoocommerce
     /**
      * Registers WooCommerce Blocks integration.
      */
-    public function woocommerce_gateways_block_support()
+    public function woocommerce_gateways_block_support(): void
     {
         if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
             add_action(
                 'woocommerce_blocks_payment_method_type_registration',
-                function (\Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
+                function (\Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry): void {
                     $payment_method_registry->register(new PayplugCreditCard());
                     $payment_method_registry->register(new PayplugBancontact());
                     $payment_method_registry->register(new PayplugSatispay());

@@ -15,7 +15,7 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
  */
 class WoocommerceActions
 {
-    const WC_PAYPLUG_RETRIEVE_ACTION = 'retrieve_payplug_transaction';
+    public const WC_PAYPLUG_RETRIEVE_ACTION = 'retrieve_payplug_transaction';
 
     public function __construct()
     {
@@ -59,7 +59,7 @@ class WoocommerceActions
      *
      * @return void
      */
-    public function handle_payment_retrieve_action($order)
+    public function handle_payment_retrieve_action($order): void
     {
         $order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
         $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();

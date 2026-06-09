@@ -6,7 +6,7 @@ use Payplug\PayplugWoocommerce\Controller\PayplugGenericGateway;
 
 class AmericanExpress extends PayplugGenericGateway
 {
-    const ENABLE_ON_TEST_MODE = false;
+    public const ENABLE_ON_TEST_MODE = false;
 
     public function __construct()
     {

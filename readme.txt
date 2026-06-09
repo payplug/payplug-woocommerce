@@ -1,9 +1,9 @@
 === PayPlug for WooCommerce (Official) ===
 Contributors: PayPlug
 Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, carte bancaire, paiement, one click, paiement en ligne, AmEx, Apple Pay, Bancontact, Satispay, MyBank, iDEAL, Wero, Bizum, Oney, Scalapay
-Requires at least: 4.4
+Requires at least: 5.0
 Tested up to: 6.9.4
-Requires PHP: 5.6
+Requires PHP: 7.4
 Stable tag: 2.18.0
 VueJs Payplug UI lib tag: 1.7.12
 License: GPLv3 or later

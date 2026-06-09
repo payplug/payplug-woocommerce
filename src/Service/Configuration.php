@@ -585,7 +585,7 @@ class Configuration
      *
      * @return void
      */
-    public function clean_option()
+    public function clean_option(): void
     {
         $this->current_configuration = null;
         delete_option('woocommerce_payplug_settings');

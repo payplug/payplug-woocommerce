@@ -7,7 +7,7 @@ use Payplug\PayplugWoocommerce\Controller\PayplugGenericGateway;
 class Bancontact extends PayplugGenericGateway
 {
     protected $enable_refund = true;
-    const ENABLE_ON_TEST_MODE = false;
+    public const ENABLE_ON_TEST_MODE = false;
 
     public function __construct()
     {

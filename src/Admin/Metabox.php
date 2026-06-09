@@ -29,7 +29,7 @@ class Metabox
      *
      * This metabox is only register if the current order has been paid via PayPlug.
      */
-    public function register_payplug_metabox()
+    public function register_payplug_metabox(): void
     {
         global $post;
 
@@ -51,7 +51,7 @@ class Metabox
      *
      * @param WP_Post $post
      */
-    public function render($post)
+    public function render($post): void
     {
         $order = ($post instanceof WP_Post) ? wc_get_order($post->ID) : $post;
 

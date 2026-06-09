@@ -54,7 +54,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
     /**
      * @return void
      */
-    public function display_notice()
+    public function display_notice(): void
     {
         $error_message = 'payplug_' . $this->id . '_unauthorized_message'; ?>
 		<div class="notice notice-error is-dismissible">
@@ -507,7 +507,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
      *
      * @return void
      */
-    public function refund_not_available($order)
+    public function refund_not_available($order): void
     {
         if ($this->id === $order->get_payment_method() && isset($this->enable_refund) && $this->enable_refund === false) {
             echo "<p style='color: red;'>" . __('payplug_refund_disabled_error', 'payplug') . '</p>';
@@ -522,7 +522,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
      *
      * @return void
      */
-    private function order_items_to_cart($cart, $items)
+    private function order_items_to_cart($cart, $items): void
     {
         $cart->empty_cart();
         foreach ($items as $item) {
