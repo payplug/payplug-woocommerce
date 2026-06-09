@@ -60,7 +60,7 @@ class PayplugWoocommerceRequest
      * Sets the WC customer session if one is not set.
      * This is needed so nonces can be verified by AJAX Request.
      */
-    public function set_session()
+    public function set_session(): void
     {
         if (!is_product() || (isset(WC()->session) && WC()->session->has_session())) {
             return;
@@ -79,7 +79,7 @@ class PayplugWoocommerceRequest
     /**
      * Create the woocommerce order in the BO
      */
-    public function ajax_create_order()
+    public function ajax_create_order(): void
     {
         if (WC()->cart->is_empty()) {
             wp_send_json_error(__('Empty cart', 'payplug'));
@@ -97,7 +97,7 @@ class PayplugWoocommerceRequest
     /**
      * Create the woocommerce order in the BO
      */
-    public function ajax_create_payment()
+    public function ajax_create_payment(): void
     {
         global $wp;
 
@@ -145,7 +145,7 @@ class PayplugWoocommerceRequest
      * @param int $order_id Order ID.
      * @param string $payment_method Payment method.
      */
-    protected function process_order_payment($order_id, $payment_method)
+    protected function process_order_payment($order_id, $payment_method): void
     {
         $available_gateways = WC()->payment_gateways->get_available_payment_gateways();
 
@@ -178,7 +178,7 @@ class PayplugWoocommerceRequest
     /**
      * Update Payplug API Payment for Apple Pay
      */
-    public function applepay_update_payment()
+    public function applepay_update_payment(): void
     {
         $payment_id = $_POST['payment_id'];
         $apiService = new \Payplug\PayplugWoocommerce\Service\Api();
@@ -223,7 +223,7 @@ class PayplugWoocommerceRequest
         wp_send_json_success(['result' => $update->is_paid]);
     }
 
-    public function applepay_get_order_totals()
+    public function applepay_get_order_totals(): void
     {
         try {
             wp_send_json_success(WC()->cart->total);
@@ -236,7 +236,7 @@ class PayplugWoocommerceRequest
     /**
      * Empty cart for Apple Pay on product page
      */
-    public function applepay_empty_cart()
+    public function applepay_empty_cart(): void
     {
         try {
             WC()->cart->empty_cart();
@@ -251,7 +251,7 @@ class PayplugWoocommerceRequest
     /**
      * Add the product on the current page to the cart for Apple Pay on product page
      */
-    public function applepay_add_to_cart()
+    public function applepay_add_to_cart(): void
     {
         try {
             if (!empty($_POST['product_id'])) {
@@ -286,7 +286,7 @@ class PayplugWoocommerceRequest
         return (strlen($value) > $maxlength) ? substr($value, 0, $maxlength) : $value;
     }
 
-    public function check_payment()
+    public function check_payment(): void
     {
         global $wpdb;
         $payment_id = $_POST['payment_id'];
@@ -431,7 +431,7 @@ class PayplugWoocommerceRequest
         return $order_id;
     }
 
-    public function create_payment_intent()
+    public function create_payment_intent(): void
     {
         $order_id = $_POST['order_id'];
         $this->gateway = $this->get_payplug_gateway($_POST['gateway']);

@@ -3,6 +3,7 @@
 namespace Payplug\PayplugWoocommerce\Gateway;
 
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+
 // Exit if accessed directly
 use const PHP_VERSION;
 
@@ -12,9 +13,9 @@ if (!defined('ABSPATH')) {
 
 class PayplugGatewayRequirements
 {
-    const PHP_MIN = '5.6';
-    const OPENSSL_MIN = 268439567;
-    const OPENSSL_MIN_TEXT = 'OpenSSL 1.0.1 14 Mar 2012';
+    public const PHP_MIN = '5.6';
+    public const OPENSSL_MIN = 268439567;
+    public const OPENSSL_MIN_TEXT = 'OpenSSL 1.0.1 14 Mar 2012';
 
     /**
      * @var PayplugGateway

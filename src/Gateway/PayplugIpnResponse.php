@@ -27,7 +27,7 @@ class PayplugIpnResponse
         add_action('woocommerce_api_paypluggateway', [$this, 'handle_ipn_response']);
     }
 
-    public function handle_ipn_response()
+    public function handle_ipn_response(): void
     {
         $input = file_get_contents('php://input');
 
@@ -73,7 +73,7 @@ class PayplugIpnResponse
      *
      * @return void
      */
-    public function process_payment_resource($resource, $save_request = true)
+    public function process_payment_resource($resource, $save_request = true): void
     {
         $lock_id = \Payplug\PayplugWoocommerce\Helper\Lock::handle_insert($save_request, $resource->id);
         if (!$lock_id) {
@@ -95,7 +95,7 @@ class PayplugIpnResponse
      *
      * @param $resource
      */
-    public function process_refund_resource($resource)
+    public function process_refund_resource($resource): void
     {
         $this->gateway->response->process_refund($resource);
     }

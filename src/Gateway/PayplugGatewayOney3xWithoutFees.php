@@ -41,9 +41,7 @@ class PayplugGatewayOney3xWithoutFees extends PayplugGatewayOney3x
             }
 
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
-            $f = function ($fn) {
-                return $fn;
-            };
+            $f = fn ($fn) => $fn;
 
             if (is_array($this->oney_response)) {
                 $total_price_oney = floatval($this->oney_response['x3_without_fees']['down_payment_amount']);

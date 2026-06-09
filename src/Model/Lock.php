@@ -7,7 +7,7 @@ class Lock
     /**
      * create Lock table
      */
-    public static function create_lock_table()
+    public static function create_lock_table(): void
     {
         global $wpdb;
 
@@ -35,7 +35,7 @@ class Lock
     /**
      * update table
      */
-    public static function update_lock_table()
+    public static function update_lock_table(): void
     {
         global $wpdb;
 
@@ -134,7 +134,7 @@ class Lock
         return $result;
     }
 
-    public static function delete_lock_table()
+    public static function delete_lock_table(): void
     {
         global $wpdb;
 

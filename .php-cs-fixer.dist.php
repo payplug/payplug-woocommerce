@@ -18,10 +18,10 @@ $finder = PhpCsFixer\Finder::create()
 return (new PhpCsFixer\Config())
 	->setRiskyAllowed(true)
 	->setRules([
-		// PSR-2 base — safe for PHP 5.6+
-		'@PSR2' => true,
+		// PSR-12 base — PHP 7.4+
+		'@PSR12' => true,
 
-		// Syntax — PHP 5.4+, safe
+		// Syntax
 		'array_syntax'                            => ['syntax' => 'short'],
 		'trailing_comma_in_multiline'             => ['elements' => ['arrays']],
 		'no_whitespace_before_comma_in_array'     => true,
@@ -87,17 +87,15 @@ return (new PhpCsFixer\Config())
 		'phpdoc_var_without_name'                 => true,
 		'no_empty_phpdoc'                         => true,
 
-		// Explicitly OFF — PHP 7.0+ only
-		'declare_strict_types'                    => false,
-		'void_return'                             => false,
+		// PHP 7.1+ — now enabled
+		'void_return'                             => true,
+		'nullable_type_declaration_for_default_null_value' => true,
 
-		// Explicitly OFF — PHP 7.1+ only
-		'nullable_type_declaration_for_default_null_value' => false,
-
-		// Explicitly OFF — PHP 7.4+ only
-		'use_arrow_functions'                     => false,
+		// PHP 7.4+ — now enabled
+		'use_arrow_functions'                     => true,
 
 		// Explicitly OFF — PHP 8.0+ only
+		'declare_strict_types'                    => false,
 		'modernize_strpos'                        => false,
 	])
 	->setFinder($finder);
