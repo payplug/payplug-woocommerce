@@ -4,7 +4,9 @@ namespace phpunit;
 
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Country\OneyFR;
 use Payplug\PayplugWoocommerce\PayplugWoocommerce;
+
 use function PHPUnit\Framework\assertTrue;
+
 use PHPUnit\Framework\TestCase;
 
 class PayplugWoocommerce_test extends TestCase
@@ -20,7 +22,7 @@ class PayplugWoocommerce_test extends TestCase
     /**
      * test if there's an active woocommerce version
      */
-    public function test_woocommerce_version()
+    public function test_woocommerce_version(): void
     {
         $wc = function_exists('WC') ? WC() : $GLOBALS['woocommerce'];
         self::assertNotEmpty($wc->version);
@@ -31,7 +33,7 @@ class PayplugWoocommerce_test extends TestCase
     /**
      * test oney animation is disabled if empty options
      */
-    public function test_disable_empty_options_animation_handlers()
+    public function test_disable_empty_options_animation_handlers(): void
     {
         $mockPayplugWoocommerce = $this->createMock(PayplugWoocommerce::class);
         $mockPayplugWoocommerce
@@ -45,7 +47,7 @@ class PayplugWoocommerce_test extends TestCase
     /**
      * test oney animation is disabled without merchant country
      */
-    public function test_disable_empty_merchant_country_animation_handlers()
+    public function test_disable_empty_merchant_country_animation_handlers(): void
     {
         $mockPayplugWoocommerce = $this->createMock(PayplugWoocommerce::class);
         $mockPayplugWoocommerce
@@ -59,7 +61,7 @@ class PayplugWoocommerce_test extends TestCase
     /**
      * test oney animation is disabled without oney type
      */
-    public function test_disable_empty_oney_type_animation_handlers()
+    public function test_disable_empty_oney_type_animation_handlers(): void
     {
         $mockPayplugWoocommerce = $this->createMock(PayplugWoocommerce::class);
         $mockPayplugWoocommerce
@@ -75,7 +77,7 @@ class PayplugWoocommerce_test extends TestCase
      * OneyAnimation
      * OneyFR
      */
-    public function test_animation_handlers()
+    public function test_animation_handlers(): void
     {
         $mockPayplugWoocommerce = $this->createMock(PayplugWoocommerce::class);
         $mockPayplugWoocommerce
@@ -90,7 +92,7 @@ class PayplugWoocommerce_test extends TestCase
      * assert all classes we're loading exists
      * assert we're loading all gateways
      */
-    public function test_register_payplug_gateway_exists()
+    public function test_register_payplug_gateway_exists(): void
     {
         $results = $this->payplug_woocommerce->register_payplug_gateway([]);
         $gateways = 0;
@@ -105,7 +107,7 @@ class PayplugWoocommerce_test extends TestCase
     /**
      * tested on e2e side, this is simply to declare actions to load
      */
-    public function test_woocommerce_gateways_block_support()
+    public function test_woocommerce_gateways_block_support(): void
     {
         assertTrue(true);
     }
@@ -113,7 +115,7 @@ class PayplugWoocommerce_test extends TestCase
     /**
      * assert added plugin_action_links
      */
-    public function test_plugin_action_links()
+    public function test_plugin_action_links(): void
     {
         self::assertIsArray($this->payplug_woocommerce->plugin_action_links());
         self::assertNotEmpty($this->payplug_woocommerce->plugin_action_links());

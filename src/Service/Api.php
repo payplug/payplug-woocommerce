@@ -65,7 +65,7 @@ class Api
      *
      * @return void
      */
-    protected function initialize($mode = '')
+    protected function initialize($mode = ''): void
     {
         $bearer_token = $this->get_bearer_token($mode);
         $this->api_payplug = new Payplug($bearer_token, '2019-08-06');
@@ -305,11 +305,11 @@ class Api
     }
 
     // todo: this method bellow should be implemented, do no removed it for now
-    public function get_permissions()
+    public function get_permissions(): void
     {
     }
 
-    public function get_register_url()
+    public function get_register_url(): void
     {
     }
 }

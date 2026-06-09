@@ -3,7 +3,9 @@
 namespace Payplug\PayplugWoocommerce\Front\PayplugOney\Country;
 
 use function is_cart;
+
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+
 use function WC;
 
 // Exit if accessed directly
@@ -92,7 +94,7 @@ abstract class OneyBase implements InterfaceOney
     /**
      * SUM totalproducts that are in the cart
      */
-    public function handleTotalProducts()
+    public function handleTotalProducts(): void
     {
         $this->addTotalProducts(1);
         if (is_cart()) {
@@ -108,7 +110,7 @@ abstract class OneyBase implements InterfaceOney
      *
      * @param $amount
      */
-    public function set_min_amount($amount)
+    public function set_min_amount($amount): void
     {
         $this->min_amount = (int) $amount;
     }
@@ -118,7 +120,7 @@ abstract class OneyBase implements InterfaceOney
      *
      * @param $amount
      */
-    public function set_max_amount($amount)
+    public function set_max_amount($amount): void
     {
         $this->max_amount = (int) $amount;
     }
@@ -150,7 +152,7 @@ abstract class OneyBase implements InterfaceOney
     /**
      * @param string $icon
      */
-    public function setIcon($icon)
+    public function setIcon($icon): void
     {
         $this->icon = $icon;
     }
@@ -170,7 +172,7 @@ abstract class OneyBase implements InterfaceOney
     /**
      * @param bool $disable
      */
-    public function setDisable($disable)
+    public function setDisable($disable): void
     {
         $this->disable = $disable;
     }
@@ -180,7 +182,7 @@ abstract class OneyBase implements InterfaceOney
      *
      * @return void
      */
-    public function addTotalProducts($qty)
+    public function addTotalProducts($qty): void
     {
         $this->total_products += $qty;
     }
@@ -188,7 +190,7 @@ abstract class OneyBase implements InterfaceOney
     /**
      * @set total_products to 0
      */
-    public function resetTotalProducts()
+    public function resetTotalProducts(): void
     {
         $this->total_products = 0;
     }
@@ -212,7 +214,7 @@ abstract class OneyBase implements InterfaceOney
     /**
      * @param int $total_price
      */
-    public function setTotalPrice($total_price)
+    public function setTotalPrice($total_price): void
     {
         $this->total_price = $total_price;
     }
@@ -228,7 +230,7 @@ abstract class OneyBase implements InterfaceOney
     /**
      * @param string $simulatedClass
      */
-    public function setSimulatedClass($simulatedClass)
+    public function setSimulatedClass($simulatedClass): void
     {
         $this->simulatedClass = $simulatedClass;
     }
@@ -244,7 +246,7 @@ abstract class OneyBase implements InterfaceOney
     /**
      * @param string $oney_type
      */
-    public function setOneyType($oney_type)
+    public function setOneyType($oney_type): void
     {
         $this->oney_type = $oney_type;
     }
@@ -260,7 +262,7 @@ abstract class OneyBase implements InterfaceOney
     /**
      * @param array $payplugOptions
      */
-    public function setPayplugOptions($payplugOptions)
+    public function setPayplugOptions($payplugOptions): void
     {
         $this->payplugOptions = $payplugOptions;
     }

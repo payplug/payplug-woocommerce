@@ -37,155 +37,119 @@ class Ajax
     {
         $permission = (current_user_can('editor') || current_user_can('administrator'));
 
-        add_action('rest_api_init', function () use ($permission) {
+        add_action('rest_api_init', function () use ($permission): void {
             //Path to REST route and the callback function
             register_rest_route('payplug_api', '/save/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'save_action'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/init/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'payplug_init'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/login/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'login_action'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/logout/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'payplug_logout'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/refresh_keys/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'refresh_keys'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/check_requirements/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'payplug_check_requirements'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/bancontact_permissions/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'api_check_bancontact_permissions'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/applepay_permissions/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'api_check_applepay_permissions'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/american_express_permissions/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'api_check_american_express_permissions'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/oney_permissions/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'api_check_oney_permissions'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/one_click_permissions/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'api_check_one_click_permission'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/satispay_permissions/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'api_check_satispay_permissions'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/mybank_permissions/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'api_check_mybank_permissions'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/ideal_permissions/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'api_check_ideal_permissions'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/integrated_permissions/', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'api_check_integrated_payment'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
             ]);
             register_rest_route('payplug_api', '/wero_permissions/', [
                 'methods' => 'POST',
                 'callback' => [$this, 'api_check_wero_permissions'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/bizum_permissions/', [
                 'methods' => 'POST',
                 'callback' => [$this, 'api_check_bizum_permissions'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/scalapay_permissions/', [
                 'methods' => 'POST',
                 'callback' => [$this, 'api_check_scalapay_permissions'],
-                'permission_callback' => function () use ($permission) {
-                    return $permission;
-                },
+                'permission_callback' => fn () => $permission,
                 'show_in_index' => false,
             ]);
         });
     }
 
-    public function refresh_keys(WP_REST_Request $request)
+    public function refresh_keys(WP_REST_Request $request): void
     {
         $data = $request->get_params();
         $email = sanitize_text_field(wp_unslash($data['payplug_email']));
@@ -253,12 +217,12 @@ class Ajax
         );
     }
 
-    public function api_check_one_click_permission(WP_REST_Request $request)
+    public function api_check_one_click_permission(WP_REST_Request $request): void
     {
         wp_send_json_success(true);
     }
 
-    public function api_check_bancontact_permissions(WP_REST_Request $request)
+    public function api_check_bancontact_permissions(WP_REST_Request $request): void
     {
         $account = $this->generic_get_account($request, Bancontact::ENABLE_ON_TEST_MODE);
 
@@ -273,7 +237,7 @@ class Ajax
         ]);
     }
 
-    public function api_check_applepay_permissions(WP_REST_Request $request)
+    public function api_check_applepay_permissions(WP_REST_Request $request): void
     {
         $account = $this->generic_get_account($request, ApplePay::ENABLE_ON_TEST_MODE);
 
@@ -290,7 +254,7 @@ class Ajax
         ]);
     }
 
-    public function api_check_american_express_permissions(WP_REST_Request $request)
+    public function api_check_american_express_permissions(WP_REST_Request $request): void
     {
         $account = $this->generic_get_account($request, AmericanExpress::ENABLE_ON_TEST_MODE);
 
@@ -305,7 +269,7 @@ class Ajax
         ]);
     }
 
-    public function api_check_oney_permissions(WP_REST_Request $request)
+    public function api_check_oney_permissions(WP_REST_Request $request): void
     {
         $account = $this->generic_get_account($request, PayplugGatewayOney3x::ENABLE_ON_TEST_MODE);
 
@@ -330,7 +294,7 @@ class Ajax
         wp_send_json_success(true);
     }
 
-    public function api_check_satispay_permissions(WP_REST_Request $request)
+    public function api_check_satispay_permissions(WP_REST_Request $request): void
     {
         $account = $this->generic_get_account($request, Satispay::ENABLE_ON_TEST_MODE);
 
@@ -346,7 +310,7 @@ class Ajax
         wp_send_json_success($enabled);
     }
 
-    public function api_check_mybank_permissions(WP_REST_Request $request)
+    public function api_check_mybank_permissions(WP_REST_Request $request): void
     {
         $account = $this->generic_get_account($request, Mybank::ENABLE_ON_TEST_MODE);
 
@@ -362,7 +326,7 @@ class Ajax
         wp_send_json_success($enabled);
     }
 
-    public function api_check_ideal_permissions(WP_REST_Request $request)
+    public function api_check_ideal_permissions(WP_REST_Request $request): void
     {
         $account = $this->generic_get_account($request, Ideal::ENABLE_ON_TEST_MODE);
 
@@ -378,7 +342,7 @@ class Ajax
         wp_send_json_success($enabled);
     }
 
-    public function api_check_wero_permissions(WP_REST_Request $request)
+    public function api_check_wero_permissions(WP_REST_Request $request): void
     {
         $account = $this->generic_get_account($request, Wero::ENABLE_ON_TEST_MODE);
 
@@ -394,7 +358,7 @@ class Ajax
         wp_send_json_success($enabled);
     }
 
-    public function api_check_bizum_permissions(WP_REST_Request $request)
+    public function api_check_bizum_permissions(WP_REST_Request $request): void
     {
         $account = $this->generic_get_account($request, Bizum::ENABLE_ON_TEST_MODE);
 
@@ -410,7 +374,7 @@ class Ajax
         wp_send_json_success($enabled);
     }
 
-    public function api_check_scalapay_permissions(WP_REST_Request $request)
+    public function api_check_scalapay_permissions(WP_REST_Request $request): void
     {
         $account = $this->generic_get_account($request, Scalapay::ENABLE_ON_TEST_MODE);
 
@@ -493,7 +457,7 @@ class Ajax
      *
      * @return void
      */
-    private function login_wrong_credentials_error()
+    private function login_wrong_credentials_error(): void
     {
         wp_send_json_error(['message' => __('payplug_error_wrong_credentials', 'payplug')]);
     }
@@ -517,7 +481,7 @@ class Ajax
 
         return wp_send_json_success([
                 'settings' => $wp,
-            ] + (new Vue)->init());
+            ] + (new Vue())->init());
     }
 
     /**
@@ -534,13 +498,13 @@ class Ajax
         http_response_code(200);
         wp_send_json_success([
             'message' => __('Successfully logged out.', 'payplug'),
-            'status' => (new Vue)->payplug_section_status(),
+            'status' => (new Vue())->payplug_section_status(),
             'settings' => $wp,
-            'subscribe' => (new Vue)->payplug_section_subscribe(), // When Logging out the Status Block needs to be updated
+            'subscribe' => (new Vue())->payplug_section_subscribe(), // When Logging out the Status Block needs to be updated
         ]);
     }
 
-    private function accountIsNotValid()
+    private function accountIsNotValid(): void
     {
         $live_key = PayplugWoocommerceHelper::get_live_key();
         if (empty($live_key)) {
@@ -552,7 +516,7 @@ class Ajax
         }
     }
 
-    private function optionUnnavailableInTestMode()
+    private function optionUnnavailableInTestMode(): void
     {
         wp_send_json_error([
             'title' => __('payplug_enable_feature', 'payplug'),
@@ -560,10 +524,10 @@ class Ajax
         ]);
     }
 
-    public function payplug_check_requirements()
+    public function payplug_check_requirements(): void
     {
         wp_send_json_success([
-            'status' => (new Vue)->payplug_section_status(),
+            'status' => (new Vue())->payplug_section_status(),
         ]);
     }
 
@@ -585,7 +549,7 @@ class Ajax
         return true;
     }
 
-    public function login_action()
+    public function login_action(): void
     {
         $data = json_decode(file_get_contents('php://input'), true);
         $email = sanitize_email($data['payplug_email']);
@@ -610,7 +574,7 @@ class Ajax
                     '_wpnonce' => $wp_nonce,
                 ],
             ];
-            $vue = (new Vue)->init();
+            $vue = (new Vue())->init();
 
             wp_send_json_success(['settings' => $user + $wp] + $vue);
         } catch (HttpException $e) {
@@ -618,7 +582,7 @@ class Ajax
         }
     }
 
-    public function save_action(WP_REST_Request $request)
+    public function save_action(WP_REST_Request $request): void
     {
         if (!$this->get_gateway('account')->is_logged()) {
             http_response_code(403);

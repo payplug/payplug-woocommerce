@@ -16,9 +16,7 @@ class IntegratedPayment
         $logo = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/logo-payplug.png';
         $lock = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
         $privacy_policy_url = __('payplug_integrated_payment_privacy_policy_url', 'payplug');
-        $f = function ($fn) {
-            return $fn;
-        };
+        $f = fn ($fn) => $fn;
 
         if ($save_card) {
             $saved = <<<HTML

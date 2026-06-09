@@ -115,7 +115,7 @@ class PayplugCreditCard extends PayplugGateway
      * Register scripts and additionnal data needed for the
      * embedded payment form.
      */
-    public function scripts()
+    public function scripts(): void
     {
         if (!is_cart() && !is_checkout() && !isset($_GET['pay_for_order']) && !is_add_payment_method_page() && !isset($_GET['change_payment_method'])) {
             return;
@@ -155,7 +155,7 @@ class PayplugCreditCard extends PayplugGateway
      * Register scripts and additionnal data needed for the
      * embedded payment form.
      */
-    public function integrated_payments_scripts()
+    public function integrated_payments_scripts(): void
     {
         $translations = [
             'cardholder' => __('payplug_integrated_payment_cardholder', 'payplug'),
@@ -196,7 +196,7 @@ class PayplugCreditCard extends PayplugGateway
      * Register scripts and additionnal data needed for the
      * embedded payment form.
      */
-    public function popup_payments_scripts()
+    public function popup_payments_scripts(): void
     {
         //load popup features
         wp_register_script('payplug', 'https://api.payplug.com/js/1/form.latest.js', [], null, true);
@@ -216,7 +216,7 @@ class PayplugCreditCard extends PayplugGateway
     /**
      * extra payment fields
      */
-    public function payment_fields()
+    public function payment_fields(): void
     {
         $description = $this->get_description();
 

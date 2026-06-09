@@ -12,7 +12,7 @@ class PayplugGenericGatewayTest extends TestCase
     /**
      * Test that refund is not available when disabled for all available gateways
      */
-    public function testRefundNotAvailable()
+    public function testRefundNotAvailable(): void
     {
         // Get all available gateways from our mock
         $available_gateways = PaymentGateways::$gateways;

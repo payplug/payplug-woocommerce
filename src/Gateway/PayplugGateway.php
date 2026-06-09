@@ -26,7 +26,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
 {
     use ServiceGetter;
 
-    const OPTION_NAME = 'payplug_config';
+    public const OPTION_NAME = 'payplug_config';
 
     /**
      * @var string
@@ -92,12 +92,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     /**
      * @var float
      */
-    const MIN_AMOUNT = 0.99;
+    public const MIN_AMOUNT = 0.99;
 
     /**
      * @var float
      */
-    const MAX_AMOUNT = 20000;
+    public const MAX_AMOUNT = 20000;
 
     /**
      * @var string
@@ -110,7 +110,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public $max_oney_price;
     public $oney_thresholds_max;
 
-    const ENABLE_ON_TEST_MODE = true;
+    public const ENABLE_ON_TEST_MODE = true;
 
     /**
      * Logging method.
@@ -119,7 +119,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      * @param string $level Optional. Default 'info'.
      *                      emergency|alert|critical|error|warning|notice|info|debug
      */
-    public static function log($message, $level = 'info')
+    public static function log($message, $level = 'info'): void
     {
         if (!self::$log_enabled) {
             return;
@@ -240,7 +240,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      *
      * @throws \WC_Data_Exception
      */
-    public function validate_payment($id = null, $save_request = true, $ipn = false)
+    public function validate_payment($id = null, $save_request = true, $ipn = false): void
     {
         global $wp;
 
@@ -338,7 +338,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     /**
      * Load gateway settings.
      */
-    public function init_settings()
+    public function init_settings(): void
     {
         parent::init_settings();
         $enabled = !empty($this->settings['enabled']) && (bool) $this->settings['enabled'];
@@ -348,7 +348,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     /**
      * Register gateway settings.
      */
-    public function init_form_fields()
+    public function init_form_fields(): void
     {
         $anchor = esc_html_x(__('More informations', 'payplug'), 'modal', 'payplug');
         $domain = __('support.payplug.com/hc/fr/articles/4408142346002', 'payplug');
@@ -545,7 +545,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     /**
      * Set global configuration for PayPlug instance.
      */
-    public function init_payplug()
+    public function init_payplug(): void
     {
         $this->payplug_api = new PayplugApi($this);
         $this->payplug_api->init();
@@ -629,7 +629,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     /**
      * extra payment fields
      */
-    public function payment_fields()
+    public function payment_fields(): void
     {
         $description = $this->get_description();
 
@@ -646,7 +646,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     /**
      * Handle admin display.
      */
-    public function admin_options()
+    public function admin_options(): void
     {
         /************ VUE Code *************/
         wp_enqueue_script('chunk-vendors.js', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/js/chunk-vendors-' . PAYPLUG_GATEWAY_VERSION . '.js', [], PAYPLUG_GATEWAY_VERSION);

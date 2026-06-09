@@ -36,9 +36,7 @@ class PayplugGatewayOney4xWithoutFees extends PayplugGatewayOney3x
             $total_price = floatval(WC()->cart->total);
             $this->oney_response = $this->payplug_api->simulate_oney_payment($total_price, 'without_fees');
             $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
-            $f = function ($fn) {
-                return $fn;
-            };
+            $f = fn ($fn) => $fn;
 
             $total_price_oney = floatval($this->oney_response['x4_without_fees']['down_payment_amount']);
             foreach ($this->oney_response['x4_without_fees']['installments'] as $installment) {

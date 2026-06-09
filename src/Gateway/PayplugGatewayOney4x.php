@@ -40,9 +40,7 @@ class PayplugGatewayOney4x extends PayplugGatewayOney3x
 
             $tax_cost = floatval($this->oney_response['x4_with_fees']['total_cost']) / 100;
             $disable = '';
-            $f = function ($fn) {
-                return $fn;
-            };
+            $f = fn ($fn) => $fn;
             if (is_array($this->oney_response)) {
                 $this->description = <<<HTML
                 <p>

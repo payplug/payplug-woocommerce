@@ -19,11 +19,13 @@ class OneyIT extends OneyBase
         parent::__construct();
     }
 
-    public function setIcon($icon = '')
+    public function setIcon($icon = ''): void
     {
         switch ($this->getOneyType()) {
-            case 'without_fees': parent::setIcon($this->icon_withoutfees); break;
-            default: parent::setIcon($this->icon_withfees); break;
+            case 'without_fees': parent::setIcon($this->icon_withoutfees);
+                break;
+            default: parent::setIcon($this->icon_withfees);
+                break;
         }
     }
 }

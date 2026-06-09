@@ -439,7 +439,7 @@ class PayplugWoocommerceHelper
      *
      * @return void
      */
-    public static function save_transaction_metadata($order, $metadata)
+    public static function save_transaction_metadata($order, $metadata): void
     {
         if (self::is_pre_30()) {
             update_post_meta($order->id, '_payplug_metadata', $metadata);
@@ -458,7 +458,7 @@ class PayplugWoocommerceHelper
      *
      * @return void
      */
-    public static function set_flag_ipn_order($order, $metadata, $flag)
+    public static function set_flag_ipn_order($order, $metadata, $flag): void
     {
         $metadata['transaction_in_progress'] = $flag;
         self::save_transaction_metadata($order, $metadata);
@@ -684,7 +684,7 @@ class PayplugWoocommerceHelper
      *
      * @return void
      */
-    public static function oney_simulation_values($keys_array, &$array)
+    public static function oney_simulation_values($keys_array, &$array): void
     {
         foreach ($keys_array as $key) {
             if (array_key_exists($key, $array)) {
@@ -803,14 +803,14 @@ class PayplugWoocommerceHelper
         return self::get_payplug_options()['mode'];
     }
 
-    public static function payplug_logout()
+    public static function payplug_logout(): void
     {
         $helper = new self();
         $helper->get_service('configuration')->clean_option();
         set_transient(self::get_transient_key(self::get_payplug_options()), null);
     }
 
-    public static function plugin_deactivation()
+    public static function plugin_deactivation(): void
     {
         $option_name = 'woocommerce_payplug_settings';
         delete_option($option_name);

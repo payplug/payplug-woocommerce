@@ -14,10 +14,10 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 class PayplugPermissions
 {
-    const OPTION_NAME = 'payplug_permission';
-    const LIVE_MODE = 'use_live_mode';
-    const SAVE_CARD = 'can_save_cards';
-    const USE_ONEY = 'can_use_oney';
+    public const OPTION_NAME = 'payplug_permission';
+    public const LIVE_MODE = 'use_live_mode';
+    public const SAVE_CARD = 'can_save_cards';
+    public const USE_ONEY = 'can_use_oney';
 
     /**
      * The current mode for the gateway.

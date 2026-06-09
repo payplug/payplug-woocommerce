@@ -3,6 +3,7 @@
 namespace Payplug\PayplugWoocommerce\Front\Layout;
 
 use function is_cart;
+
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithFees;
 use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyWithoutFees;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
@@ -29,9 +30,7 @@ class OneyFR extends OneyBase implements InterfaceOneyLayout
         $financing_cost_3x = intval($x3['total_cost']) / 100;
         $financing_cost_4x = intval($x4['total_cost']) / 100;
 
-        $f = function ($fn) {
-            return $fn;
-        };
+        $f = fn ($fn) => $fn;
 
         return <<<HTML
                 <div id='oney-popup-close'>
@@ -81,9 +80,7 @@ HTML;
         $financing_cost_3x = intval($x3['total_cost']) / 100;
         $financing_cost_4x = intval($x4['total_cost']) / 100;
 
-        $f = function ($fn) {
-            return $fn;
-        };
+        $f = fn ($fn) => $fn;
 
         return <<<HTML
                 <div id='oney-popup-close'>
@@ -126,9 +123,7 @@ HTML;
      */
     public static function footerOneyWithoutFees($min, $max)
     {
-        $f = function ($fn) {
-            return $fn;
-        };
+        $f = fn ($fn) => $fn;
 
         $footer = <<<HTML
  			<div class='oney-cgv-content oney-cgv-footer'>
@@ -153,9 +148,7 @@ HTML;
      */
     public static function footerOneyWithFees($min, $max)
     {
-        $f = function ($fn) {
-            return $fn;
-        };
+        $f = fn ($fn) => $fn;
 
         return <<<HTML
  			<div class='oney-cgv-content oney-cgv-footer'>

@@ -32,7 +32,7 @@ class Notices
      *
      * @return void
      */
-    public function admin_enqueue_scripts()
+    public function admin_enqueue_scripts(): void
     {
         $api_key = json_decode($this->options, true);
         $test_key = !empty($api_key['test']) ? $api_key['test'] : '';
@@ -52,7 +52,7 @@ class Notices
      *
      * @return void
      */
-    public function admin_notices()
+    public function admin_notices(): void
     {
         if (!current_user_can('manage_woocommerce')) {
             return;
@@ -84,7 +84,7 @@ class Notices
         $this->display_notice();
     }
 
-    public function display_notice()
+    public function display_notice(): void
     {
         $testmode = isset($this->options['mode']) && !(bool) $this->options['mode'];
         $api_key = json_decode($this->options, true);

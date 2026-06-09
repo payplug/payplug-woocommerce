@@ -95,7 +95,7 @@ class PayplugApi
     /**
      * Configure PayPlug client.
      */
-    public function init()
+    public function init(): void
     {
         $current_mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
         $bearer_token = $this->get_api()->get_bearer_token($current_mode);
@@ -309,7 +309,7 @@ class PayplugApi
      *
      * @throws \Payplug\Exception\ConfigurationException
      */
-    protected function switch_mode()
+    protected function switch_mode(): void
     {
         $switched_mode = 'test' === $this->gateway->get_current_mode() ? 'live' : 'test';
         $new_key = $this->gateway->get_api_key($switched_mode);
@@ -328,7 +328,7 @@ class PayplugApi
      *
      * @throws \Payplug\Exception\ConfigurationException
      */
-    protected function restore_mode()
+    protected function restore_mode(): void
     {
         $key = $this->gateway->get_api_key($this->gateway->get_current_mode());
         if (empty($key)) {

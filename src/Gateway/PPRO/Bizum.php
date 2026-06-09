@@ -8,7 +8,7 @@ class Bizum extends PayplugGenericGateway
 {
     protected $allowed_country_codes = [];
     protected $enable_refund = true;
-    const ENABLE_ON_TEST_MODE = false;
+    public const ENABLE_ON_TEST_MODE = false;
 
     public function __construct()
     {

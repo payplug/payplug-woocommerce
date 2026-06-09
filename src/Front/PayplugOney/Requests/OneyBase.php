@@ -4,6 +4,7 @@ namespace Payplug\PayplugWoocommerce\Front\PayplugOney\Requests;
 
 use function is_cart;
 use function is_product;
+
 use Payplug\PayplugWoocommerce\Front\PayplugOney\OneySimulation;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
@@ -44,7 +45,7 @@ abstract class OneyBase
      * request simulation
      * print results
      */
-    public function simulateOneyPayment()
+    public function simulateOneyPayment(): void
     {
         $simulation = new OneySimulation($this->oney);
         $this->simulation = $simulation->OneySimulation();
@@ -155,7 +156,7 @@ HTML;
     /**
      * get Html for Oney
      */
-    public function oneyGeneratePopup()
+    public function oneyGeneratePopup(): void
     {
         $class = 'Payplug\\PayplugWoocommerce\\Front\\Layout\\Oney' . $this->getCountry();
         $class = new $class();
@@ -192,7 +193,7 @@ HTML;
     /**
      * @param $oney
      */
-    public function setOney($oney)
+    public function setOney($oney): void
     {
         $this->oney = $oney;
     }
