@@ -394,6 +394,10 @@ class PayplugWoocommerceHelper
      */
     public static function extract_transaction_metadata($resource)
     {
+        // For non-card payment methods (e.g. Oney), the API returns "card": null.
+        // Accessing null->property throws \Error in PHP 8+, which is not caught by catch(\Exception).
+        $card = (isset($resource->card) && $resource->card !== null) ? $resource->card : null;
+
         return [
             'transaction_id' => sanitize_text_field($resource->id),
             'paid' => (bool) $resource->is_paid,
@@ -403,11 +407,11 @@ class PayplugWoocommerceHelper
             '3ds' => (bool) $resource->is_3ds,
             'live' => (bool) $resource->is_live,
             'paid_at' => isset($resource->hosted_payment->paid_at) ? sanitize_text_field($resource->hosted_payment->paid_at) : sanitize_text_field($resource->created_at),
-            'card_last4' => sanitize_text_field($resource->card->last4),
-            'card_exp_month' => sanitize_text_field($resource->card->exp_month),
-            'card_exp_year' => sanitize_text_field($resource->card->exp_year),
-            'card_brand' => sanitize_text_field($resource->card->brand),
-            'card_country' => sanitize_text_field($resource->card->country),
+            'card_last4' => $card !== null ? sanitize_text_field($card->last4) : '',
+            'card_exp_month' => $card !== null ? sanitize_text_field($card->exp_month) : '',
+            'card_exp_year' => $card !== null ? sanitize_text_field($card->exp_year) : '',
+            'card_brand' => $card !== null ? sanitize_text_field($card->brand) : '',
+            'card_country' => $card !== null ? sanitize_text_field($card->country) : '',
         ];
     }
 
