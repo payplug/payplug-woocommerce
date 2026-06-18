@@ -85,8 +85,9 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
             return false;
         }
 
-        if (!is_admin() && !PayplugWoocommerceHelper::is_checkout_block()) {
-            if (empty(WC()->cart) && !is_admin()) {
+        $is_order_pay = is_wc_endpoint_url('order-pay');
+        if (!is_admin() && (!PayplugWoocommerceHelper::is_checkout_block() || $is_order_pay)) {
+            if (empty(WC()->cart) && !is_admin() && !$is_order_pay) {
                 return false;
             }
 
@@ -96,6 +97,9 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
                 $items = $order->get_items();
                 $country_code_shipping = $order->get_shipping_country();
                 $country_code_billing = $order->get_billing_country();
+                if (is_null(WC()->cart)) {
+                    wc_load_cart();
+                }
                 $this->order_items_to_cart(WC()->cart, $items);
             }
 
