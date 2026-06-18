@@ -2,7 +2,6 @@
 
 namespace Payplug\PayplugWoocommerce\Controller;
 
-use Automattic\WooCommerce\Utilities\OrderUtil;
 use Payplug\Exception\HttpException;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
@@ -27,7 +26,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
     public function __construct()
     {
         parent::__construct();
-        add_action('woocommerce_after_order_itemmeta', [$this, 'hide_wc_refund_button']);
+        add_action('woocommerce_after_order_itemmeta', [$this, 'hide_wc_refund_button'], 10, 3);
     }
 
     /**
@@ -378,7 +377,6 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
          * PPRO gateways feature!
          */
         if (isset($this->enable_refund) && $this->enable_refund === false) {
-            add_action('admin_head', [$this, 'hide_wc_refund_button']);
             PayplugGateway::log(__('payplug_refund_disabled_error', 'payplug'), 'error');
 
             return new \WP_Error('process_refund_error', __('payplug_refund_disabled_error', 'payplug'));
@@ -466,32 +464,24 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
     /**
      * Avoid usage of button refund on the BO
      *
+     * @param int $item_id
+     * @param \WC_Order_Item|null $item
+     * @param mixed $product
+     *
      * @return false|void
      */
-    public function hide_wc_refund_button()
+    public function hide_wc_refund_button($item_id, $item = null, $product = null)
     {
-        global $post;
-
-        $payment_methods = [];
-
-        if (class_exists('OrderUtil') && OrderUtil::custom_orders_table_usage_is_enabled()) {
-            $order_id = !empty($_GET['id']) ? $_GET['id'] : null;
-        } else {
-            if (!empty($post->ID)) {
-                $order_id = $post->ID;
-            } elseif (!empty($_GET['id'])) {
-                $order_id = $_GET['id'];
-            } else {
-                $order_id = null;
-            }
-        }
-
-        if (empty($order_id)) {
+        if (!$item instanceof \WC_Order_Item) {
             return false;
         }
 
-        $order = new \WC_Order($order_id);
-        if (in_array($order->get_payment_method(), $payment_methods)) {
+        $order = $item->get_order();
+        if (!$order instanceof \WC_Order) {
+            return false;
+        }
+
+        if ($order->get_payment_method() === $this->id && isset($this->enable_refund) && $this->enable_refund === false) {
             ?>
 			<script>
 				jQuery(function () {

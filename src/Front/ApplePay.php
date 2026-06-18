@@ -304,7 +304,7 @@ class ApplePay
             }
         }
 
-        $order->calculate_totals($use_taxes);
+        $order->calculate_totals(wc_tax_enabled());
         $order->save();
 
         wp_send_json($order);

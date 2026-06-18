@@ -2,5 +2,5 @@
   "version": "3.0.0",
   "wc_tested_up_to": "10.6.1",
   "wp_tested_up_to": "6.9.4",
-  "changelog": "* UPGRADE: Upgrading module with minimal PHP 7.4 version"
+  "changelog": "* UPGRADE: Upgrading module with minimal PHP 7.4 version\n* Fix: Fix order not available on admin order page"
 }
