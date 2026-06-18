@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Payplug 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplug-woocommerce\n"
 "POT-Creation-Date: 2021-02-26 14:03+0000\n"
-"PO-Revision-Date: 2026-04-23 14:40+0200\n"
+"PO-Revision-Date: 2026-06-18 17:27+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -804,6 +804,9 @@ msgstr " Más información."
 
 msgid "payplug_error_wrong_credentials"
 msgstr "El correo electrónico o la contraseña introducidos son incorrectos."
+
+msgid "payplug_error_multiple_users"
+msgstr "Tu cuenta está asociada a varias tiendas en el portal. La conexión mediante clave API no es compatible con una configuración multi-tienda. Por favor, autentícate a través de OAuth2."
 
 msgid "payplug_section_login_forgot_password"
 msgstr "¿Contraseña olvidada?"
