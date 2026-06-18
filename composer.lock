@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "717dec616aceeca6cc0468d0ede7ee70",
+    "content-hash": "9ceb1bd450dea4d476d5b66c10ed9d09",
     "packages": [
         {
             "name": "composer/installers",
@@ -159,16 +159,16 @@
         },
         {
             "name": "payplug/payplug-php",
-            "version": "4.0.0",
+            "version": "4.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "ad19dee72100668e14c8c4974a6791ca2d1c8482"
+                "reference": "fddb60a9d0afe3b06d7fac7bec2df33cd0164009"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/ad19dee72100668e14c8c4974a6791ca2d1c8482",
-                "reference": "ad19dee72100668e14c8c4974a6791ca2d1c8482",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/fddb60a9d0afe3b06d7fac7bec2df33cd0164009",
+                "reference": "fddb60a9d0afe3b06d7fac7bec2df33cd0164009",
                 "shasum": ""
             },
             "require": {
@@ -198,15 +198,65 @@
                 {
                     "name": "PayPlug",
                     "email": "support@payplug.com"
+                },
+                {
+                    "name": "Daniel FLOREZ MURILLO",
+                    "email": "dmurillo@payplug.com"
                 }
             ],
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
             "support": {
                 "issues": "https://github.com/payplug/payplug-php/issues",
-                "source": "https://github.com/payplug/payplug-php/tree/4.0.0"
+                "source": "https://github.com/payplug/payplug-php/tree/4.1.0"
             },
             "time": "2015-05-06T00:00:00+00:00"
+        },
+        {
+            "name": "payplug/payplug-plugin-core",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/payplug/payplug-plugin-core.git",
+                "reference": "d7232e2acac33f10a958daf07947e83db8dcfe57"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/payplug/payplug-plugin-core/zipball/d7232e2acac33f10a958daf07947e83db8dcfe57",
+                "reference": "d7232e2acac33f10a958daf07947e83db8dcfe57",
+                "shasum": ""
+            },
+            "require": {
+                "payplug/payplug-php": "^4.0",
+                "php": "^7.2"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.3",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PayplugPluginCore\\": "src/",
+                    "PayplugPluginCore\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Payplug",
+                    "email": "support@payplug.com"
+                }
+            ],
+            "description": "Module core pour l'intégration Payplug.",
+            "support": {
+                "issues": "https://github.com/payplug/payplug-plugin-core/issues",
+                "source": "https://github.com/payplug/payplug-plugin-core/tree/1.0.0"
+            },
+            "time": "2026-06-04T15:28:13+00:00"
         }
     ],
     "packages-dev": [
