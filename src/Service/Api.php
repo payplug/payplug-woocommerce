@@ -3,6 +3,7 @@
 namespace Payplug\PayplugWoocommerce\Service;
 
 use Payplug\Core\HttpClient;
+use Payplug\Exception\HttpException;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
@@ -46,14 +47,34 @@ class Api
      */
     public function get_keys_by_login($email = '', $password = '')
     {
-        $keys = $this->do_request_with_fallback('\Payplug\Authentication::getKeysByLogin', [$email, $password]);
+        try {
+            $response = $this->do_request('\Payplug\Authentication::getKeysByLogin', [$email, $password]);
+            $http_response = isset($response['httpResponse']) && !empty($response['httpResponse'])
+                ? $response['httpResponse']
+                : null;
 
-        return [
-            'result' => $keys['result'],
-            'response' => isset($keys['response']['httpResponse']) && !empty($keys['response']['httpResponse'])
-                ? $keys['response']['httpResponse']
-                : null,
-        ];
+            if (is_null($http_response)) {
+                return ['result' => false, 'response' => null];
+            }
+
+            return [
+                'result' => true,
+                'response' => $http_response,
+            ];
+        } catch (HttpException $e) {
+            $error = $e->getErrorObject();
+
+            return [
+                'result' => false,
+                'response' => null,
+                'multiple_users' => isset($error['message']) && $error['message'] === 'Multiple users found.',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'result' => false,
+                'response' => null,
+            ];
+        }
     }
 
     /**

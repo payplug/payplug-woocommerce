@@ -31,6 +31,10 @@ class AccountGateway
         // get admin keys
         $keys = $this->get_api()->get_keys_by_login($email, $password);
         if (!$keys['result']) {
+            if (!empty($keys['multiple_users'])) {
+                return ['multiple_users' => true];
+            }
+
             return [];
         }
 

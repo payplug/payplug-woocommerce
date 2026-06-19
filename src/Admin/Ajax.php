@@ -560,6 +560,9 @@ class Ajax
         try {
             $account_gateway = $this->get_gateway('account');
             $register = $account_gateway->register((string) $email, (string) $password);
+            if (!empty($register['multiple_users'])) {
+                wp_send_json_error(['message' => __('payplug_error_multiple_users', 'payplug')]);
+            }
             if (empty($register)) {
                 $this->login_wrong_credentials_error();
             }
