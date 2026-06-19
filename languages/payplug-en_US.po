@@ -223,6 +223,9 @@ msgstr " Find out more."
 msgid "payplug_error_wrong_credentials"
 msgstr "The email and/or password is incorrect."
 
+msgid "payplug_error_multiple_users"
+msgstr "Your account is linked to multiple companies. API key authentication is not compatible with a multi-company setup. Please authenticate via OAuth2."
+
 msgid "payplug_section_paylater_title"
 msgstr "PayLater"
 

@@ -804,6 +804,9 @@ msgstr " Per saperne di più."
 msgid "payplug_error_wrong_credentials"
 msgstr "L'indirizzo mail e/o la password sono errati."
 
+msgid "payplug_error_multiple_users"
+msgstr "Il tuo account è associato a più negozi nel portale. La connessione tramite chiave API non è compatibile con una configurazione multi-negozio. Effettua l'autenticazione tramite OAuth2."
+
 msgid "payplug_section_login_forgot_password"
 msgstr "Hai dimenticato la password?"
 
