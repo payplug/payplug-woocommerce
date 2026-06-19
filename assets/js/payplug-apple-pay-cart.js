@@ -5,7 +5,6 @@
 	var session = null;
 	var is_cart = apple_pay_params.is_cart;
 	var apple_pay = {
-		load_order_total: false,
 		init: function () {
 
 			if(!is_cart){
@@ -22,13 +21,10 @@
 			).done(function(results){
 				if(results.success){
 					apple_pay_params.total = results.data;
-
+					apple_pay.getShippings();
 				} else {
 					$apple_pay_button.remove();
 				}
-
-			}).done(function(){
-				apple_pay.getShippings();
 
 			}).fail( function() {
 				$apple_pay_button.remove();
@@ -201,7 +197,7 @@
 						},
 						dataType: 'json',
 						success:function(res) {
-							jQuery('woocommerce').unblock();
+							jQuery('.woocommerce').unblock();
 							var apple_pay_Session_status = ApplePaySession.STATUS_SUCCESS;
 
 							if (res.success !== true) {
@@ -265,11 +261,11 @@
 		}
 	}
 
-	$apple_pay_button.on("click", apple_pay.init());
+	apple_pay.init();
 
 	jQuery( 'body' ).on( 'updated_cart_totals', function() {
-		apple_pay.updateOrderTotal()
-		$apple_pay_button.on("click", apple_pay.init());
+		apple_pay.updateOrderTotal();
+		jQuery('apple-pay-button').off('click', apple_pay.ProcessCheckout).on('click', apple_pay.ProcessCheckout);
 	})
 
 })(jQuery)
