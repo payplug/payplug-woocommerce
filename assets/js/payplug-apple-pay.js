@@ -8,7 +8,7 @@
 		load_order_total: false,
 		init: function () {
 			$apple_pay_button = $('apple-pay-button')
-			$apple_pay_button.on(
+			$apple_pay_button.off('click', apple_pay.ProcessCheckout).on(
 				'click',
 				apple_pay.ProcessCheckout
 			)
@@ -96,7 +96,7 @@
 				try {
 					session.completeMerchantValidation(merchant_session)
 				} catch (err) {
-					alert(err)
+					apple_pay.CancelOrder();
 				}
 			}
 		},
