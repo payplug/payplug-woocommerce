@@ -97,10 +97,15 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
                 $items = $order->get_items();
                 $country_code_shipping = $order->get_shipping_country();
                 $country_code_billing = $order->get_billing_country();
-                if (is_null(WC()->cart)) {
-                    wc_load_cart();
+                // Skip cart population for subscription renewals: WC Subscriptions manages the cart
+                // itself and adding items here would cause a double entry in the order summary.
+                $is_renewal = function_exists('wcs_order_contains_renewal') && wcs_order_contains_renewal($order);
+                if (!$is_renewal) {
+                    if (is_null(WC()->cart)) {
+                        wc_load_cart();
+                    }
+                    $this->order_items_to_cart(WC()->cart, $items);
                 }
-                $this->order_items_to_cart(WC()->cart, $items);
             }
 
             if (empty($country_code_billing) || empty($country_code_shipping)) {
