@@ -11,17 +11,19 @@
 				return;
 			}
 
-			apple_pay.updateOrderTotal();
+			apple_pay.updateOrderTotal(true);
 			$('apple-pay-button').on('click', apple_pay.ProcessCheckout)
 		},
-		updateOrderTotal: function(){
+		updateOrderTotal: function(fetchShippings){
 			jQuery.post(
 				apple_pay_params.ajax_url_applepay_get_order_totals
 
 			).done(function(results){
 				if(results.success){
 					apple_pay_params.total = results.data;
-					apple_pay.getShippings();
+					if(fetchShippings){
+						apple_pay.getShippings();
+					}
 				} else {
 					$apple_pay_button.remove();
 				}
@@ -239,7 +241,7 @@
 				}
 			}).done(function (response) {
 				apple_pay.showError(response.data.message, "info");
-				apple_pay.updateOrderTotal();
+				apple_pay.updateOrderTotal(true);
 			})
 		},
 		showError: function (message="", type = "info") {
@@ -264,7 +266,7 @@
 	apple_pay.init();
 
 	jQuery( 'body' ).on( 'updated_cart_totals', function() {
-		apple_pay.updateOrderTotal();
+		apple_pay.updateOrderTotal(false);
 		jQuery('apple-pay-button').off('click', apple_pay.ProcessCheckout).on('click', apple_pay.ProcessCheckout);
 	})
 
