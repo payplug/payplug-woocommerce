@@ -183,7 +183,12 @@ HTML;
             $country_code_shipping = $order->get_shipping_country();
             $country_code_billing = $order->get_billing_country();
 
-            $this->order_items_to_cart($cart, $items);
+            // Skip cart population for subscription renewals: WC Subscriptions manages the cart
+            // itself and adding items here would cause a double entry in the order summary.
+            $is_renewal = function_exists('wcs_order_contains_renewal') && wcs_order_contains_renewal($order);
+            if (!$is_renewal) {
+                $this->order_items_to_cart($cart, $items);
+            }
         }
 
         if (empty($cart->total)) {
