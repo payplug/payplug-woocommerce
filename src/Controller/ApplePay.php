@@ -276,8 +276,11 @@ class ApplePay extends PayplugGateway
             if (!empty($available_rates)) {
                 foreach ($available_rates as $method) {
                     if (in_array($method->get_method_id(), $apple_carriers)) {
-                        if ($chosen_method === $method->get_method_id() . ':' . $method->get_instance_id()) {
-                            $allowed = true;
+                        // On cart page, show the button if any eligible carrier is available —
+                        // the actual shipping selection happens inside the Apple Pay modal.
+                        // On checkout, restrict to the currently chosen shipping method.
+                        if (is_cart() || $chosen_method === $method->get_method_id() . ':' . $method->get_instance_id()) {
+                            return true;
                         }
                     }
                 }

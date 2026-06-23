@@ -2,5 +2,5 @@
   "version": "3.0.0",
   "wc_tested_up_to": "10.6.1",
   "wp_tested_up_to": "6.9.4",
-  "changelog": "* UPGRADE: Upgrading module with minimal PHP 7.4 version\n* Fix: Fix order not available on admin order page\n* Fix: Fix display of all PPRO payment methods on reorder page\n* Fix: Fix multiple calls on same request using Apple Pay\n* Feat: Display clear message when attempting to log in legacy with a multi-company account"
+  "changelog": "* UPGRADE: Upgrading module with minimal PHP 7.4 version\n* Fix: Fix order not available on admin order page\n* Fix: Fix display of all PPRO payment methods on reorder page\n* Fix: Fix multiple calls on same request using Apple Pay\n* Feat: Display clear message when attempting to log in legacy with a multi-company account\n* Fix: Disappearance of the Apple Pay payment method from the cart page"
 }
