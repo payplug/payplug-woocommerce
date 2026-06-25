@@ -166,7 +166,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
             }
         }
 
-        return true;
+        return false;
     }
 
     /**
