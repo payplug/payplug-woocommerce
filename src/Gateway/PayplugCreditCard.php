@@ -76,11 +76,11 @@ class PayplugCreditCard extends PayplugGateway
      */
     private function handle_cc_enabled()
     {
-        if (!empty($this->settings['enabled']) && $this->settings['enabled']) {
-            $enabled = !empty($this->settings[$this->id]) ? $this->settings[$this->id] : $this->settings['enabled'];
-            $this->enabled = $enabled ? 'yes' : 'no';
+        if (!empty($this->settings['enabled']) && (bool) $this->settings['enabled']) {
+            $active = $this->get_configuration()->get_option('payment_methods.configuration.payplug.active');
+            $this->enabled = ($active === null || (bool) $active) ? 'yes' : 'no';
         } else {
-            $this->enabled = 'yes';
+            $this->enabled = 'no';
         }
 
         return $this->enabled;
