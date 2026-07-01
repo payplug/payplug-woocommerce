@@ -1,0 +1,80 @@
+name: WooCommerce — Auto RC
+
+on:
+  create:
+
+jobs:
+  # -----------------------------------------------------------------------
+  # 1. APPLY RELEASE — update version files from release.json
+  # -----------------------------------------------------------------------
+  apply-release:
+    if: startsWith(github.ref, 'refs/heads/release/')
+    uses: payplug/template-ci/.github/workflows/wooco-apply-release.yml@main
+    with:
+      ref: ${{ github.ref_name }}
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  # -----------------------------------------------------------------------
+  # 2. CREATE RC0 TAG + PRE-RELEASE — from version/changelog in release.json
+  # -----------------------------------------------------------------------
+  create-rc0-prerelease:
+    name: Create RC0 tag and pre-release
+    needs: apply-release
+    if: startsWith(github.ref, 'refs/heads/release/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Read version and changelog from release.json
+        id: meta
+        run: |
+          VERSION=$(php -r "echo json_decode(file_get_contents('release.json'))->version;")
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          php -r "echo json_decode(file_get_contents('release.json'))->changelog;" > /tmp/changelog.txt
+
+      - name: Create and push RC0 tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.meta.outputs.version }}-rc0"
+          git push origin "${{ steps.meta.outputs.version }}-rc0"
+
+      - name: Create GitHub Pre-Release
+        run: |
+          gh release create "${{ steps.meta.outputs.version }}-rc0" \
+            --title "${{ steps.meta.outputs.version }}-rc0" \
+            --notes-file /tmp/changelog.txt \
+            --prerelease
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # -----------------------------------------------------------------------
+  # 3. BUILD QA ZIP + ATTACH — bot-created release won't trigger release: [published]
+  #    so we attach the zip directly here
+  # -----------------------------------------------------------------------
+  build-qa-zip:
+    name: Build QA zip (rc0)
+    needs: create-rc0-prerelease
+    if: startsWith(github.ref, 'refs/heads/release/')
+    uses: payplug/template-ci/.github/workflows/wooco-zip-generation.yml@main
+    with:
+      php-version: '7.4'
+      node-version: '20'
+      env: qa
+      ref: ${{ needs.create-rc0-prerelease.outputs.version }}-rc0
+      upload-to-release: true
+    secrets:
+      cdn-payplug: ${{ secrets.CDN_PAYPLUG_QA }}
+      api-payplug: ${{ secrets.PAYPLUG_API_QA }}
+      api-payplug-retail: ${{ secrets.API_RETAIL_QA }}
+      github-token: ${{ secrets.GITHUB_TOKEN }}

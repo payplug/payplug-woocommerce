@@ -9,21 +9,9 @@ on:
 
 jobs:
   # -----------------------------------------------------------------------
-  # 0. APPLY RELEASE — update version files from release.json (release/* → master only)
-  # -----------------------------------------------------------------------
-  apply-release:
-    if: startsWith(github.head_ref, 'release/') && github.base_ref == 'master' && github.event.action == 'opened'
-    uses: payplug/template-ci/.github/workflows/wooco-apply-release.yml@main
-    with:
-      ref: ${{ github.head_ref }}
-    secrets:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
-
-  # -----------------------------------------------------------------------
   # 1. QUALITY — static analysis & code style
   # -----------------------------------------------------------------------
   quality:
-    needs: [apply-release]
     if: always() && !failure() && !cancelled()
     uses: payplug/template-ci/.github/workflows/wooco-php-quality.yml@main
     with:
