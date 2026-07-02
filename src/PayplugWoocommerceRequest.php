@@ -52,6 +52,7 @@ class PayplugWoocommerceRequest
         add_action('wc_ajax_applepay_update_payment', [$this, 'applepay_update_payment']);
         add_action('wc_ajax_applepay_get_order_totals', [$this, 'applepay_get_order_totals']);
         add_action('wc_ajax_payplug_order_review_url', [$this, 'ajax_create_payment']);
+        add_action('wc_ajax_payplug_apple_pay_create_order_pay', [$this, 'ajax_apple_pay_create_order_pay']);
         add_action('wc_ajax_payplug_check_payment', [$this, 'check_payment']);
         add_action('wc_ajax_payplug_create_intent', [$this, 'create_payment_intent']);
     }
@@ -92,6 +93,45 @@ class PayplugWoocommerceRequest
         WC()->checkout()->process_checkout();
 
         die(0);
+    }
+
+    /**
+     * Process Apple Pay payment for an existing order on the order-pay page.
+     */
+    public function ajax_apple_pay_create_order_pay(): void
+    {
+        $order_id = isset($_POST['order_id']) ? (int) $_POST['order_id'] : 0;
+        $order_key = isset($_POST['order_key']) ? wc_clean($_POST['order_key']) : '';
+
+        $order = $order_id ? wc_get_order($order_id) : null;
+        if (!$order || !hash_equals($order->get_order_key(), $order_key)) {
+            wp_send_json([
+                'result' => 'failure',
+                'messages' => '<ul class="woocommerce-error"><li>' . __('Invalid order.', 'payplug') . '</li></ul>',
+            ]);
+
+            return;
+        }
+
+        $available_gateways = WC()->payment_gateways->get_available_payment_gateways();
+        if (!isset($available_gateways['apple_pay'])) {
+            wp_send_json([
+                'result' => 'failure',
+                'messages' => '<ul class="woocommerce-error"><li>' . __('Apple Pay not available.', 'payplug') . '</li></ul>',
+            ]);
+
+            return;
+        }
+
+        try {
+            $result = $available_gateways['apple_pay']->process_payment($order_id);
+            wp_send_json($result);
+        } catch (\Exception $e) {
+            wp_send_json([
+                'result' => 'failure',
+                'messages' => '<ul class="woocommerce-error"><li>' . esc_html($e->getMessage()) . '</li></ul>',
+            ]);
+        }
     }
 
     /**
