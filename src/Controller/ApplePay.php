@@ -387,10 +387,14 @@ class ApplePay extends PayplugGateway
                 'ajax_url_payplug_create_order' => \WC_AJAX::get_endpoint('payplug_create_order'),
                 'ajax_url_applepay_update_payment' => \WC_AJAX::get_endpoint('applepay_update_payment'),
                 'ajax_url_applepay_get_order_totals' => \WC_AJAX::get_endpoint('applepay_get_order_totals'),
+                'ajax_url_payplug_apple_pay_create_order_pay' => \WC_AJAX::get_endpoint('payplug_apple_pay_create_order_pay'),
                 'countryCode' => WC()->customer->get_billing_country(),
                 'currencyCode' => get_woocommerce_currency(),
                 'total' => WC()->cart->total,
                 'is_checkout' => is_checkout(),
+                'is_order_pay' => is_wc_endpoint_url('order-pay'),
+                'order_pay_id' => is_wc_endpoint_url('order-pay') ? (int) get_query_var('order-pay') : 0,
+                'order_pay_key' => is_wc_endpoint_url('order-pay') ? wc_clean(wp_unslash($_GET['key'] ?? '')) : '',
                 'apple_pay_domain' => $this->domain_name,
             ]
         );
