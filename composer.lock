@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "717dec616aceeca6cc0468d0ede7ee70",
+    "content-hash": "da8d3a697b8327877b6ddbfc65e61825",
     "packages": [
         {
             "name": "composer/installers",
@@ -159,16 +159,16 @@
         },
         {
             "name": "payplug/payplug-php",
-            "version": "4.0.0",
+            "version": "4.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/payplug-php.git",
-                "reference": "ad19dee72100668e14c8c4974a6791ca2d1c8482"
+                "reference": "fddb60a9d0afe3b06d7fac7bec2df33cd0164009"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/ad19dee72100668e14c8c4974a6791ca2d1c8482",
-                "reference": "ad19dee72100668e14c8c4974a6791ca2d1c8482",
+                "url": "https://api.github.com/repos/payplug/payplug-php/zipball/fddb60a9d0afe3b06d7fac7bec2df33cd0164009",
+                "reference": "fddb60a9d0afe3b06d7fac7bec2df33cd0164009",
                 "shasum": ""
             },
             "require": {
@@ -198,15 +198,69 @@
                 {
                     "name": "PayPlug",
                     "email": "support@payplug.com"
+                },
+                {
+                    "name": "Daniel FLOREZ MURILLO",
+                    "email": "dmurillo@payplug.com"
                 }
             ],
             "description": "A simple PHP library for PayPlug public API.",
             "homepage": "https://www.payplug.com",
             "support": {
                 "issues": "https://github.com/payplug/payplug-php/issues",
-                "source": "https://github.com/payplug/payplug-php/tree/4.0.0"
+                "source": "https://github.com/payplug/payplug-php/tree/4.1.0"
             },
             "time": "2015-05-06T00:00:00+00:00"
+        },
+        {
+            "name": "payplug/payplug-plugin-mcp",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/payplug/payplug-plugin-mcp.git",
+                "reference": "eaea71e45af471c35745073cd809201d43ee6775"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/payplug/payplug-plugin-mcp/zipball/eaea71e45af471c35745073cd809201d43ee6775",
+                "reference": "eaea71e45af471c35745073cd809201d43ee6775",
+                "shasum": ""
+            },
+            "require": {
+                "payplug/payplug-php": "^4.0",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "captainhook/captainhook": "^5.0",
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "mockery/mockery": "^1.3",
+                "phpstan/phpstan": "^2.2.0",
+                "phpstan/phpstan-mockery": "*",
+                "phpstan/phpstan-phpunit": "*",
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PayPlugPluginMcp\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Payplug",
+                    "email": "support@payplug.com"
+                }
+            ],
+            "description": "Module pour l'intégration MCP Payplug.",
+            "support": {
+                "issues": "https://github.com/payplug/payplug-plugin-mcp/issues",
+                "source": "https://github.com/payplug/payplug-plugin-mcp/tree/2.1.0"
+            },
+            "time": "2026-07-06T09:48:04+00:00"
         }
     ],
     "packages-dev": [
@@ -1358,16 +1412,16 @@
         },
         {
             "name": "php-stubs/woocommerce-stubs",
-            "version": "v10.8.0",
+            "version": "v10.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-stubs/woocommerce-stubs.git",
-                "reference": "9d59e65dcabc18153c243cb9acd85fc88ef40589"
+                "reference": "8e52e5bfbcd0f5cb65a8bec696761867e3096ab7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-stubs/woocommerce-stubs/zipball/9d59e65dcabc18153c243cb9acd85fc88ef40589",
-                "reference": "9d59e65dcabc18153c243cb9acd85fc88ef40589",
+                "url": "https://api.github.com/repos/php-stubs/woocommerce-stubs/zipball/8e52e5bfbcd0f5cb65a8bec696761867e3096ab7",
+                "reference": "8e52e5bfbcd0f5cb65a8bec696761867e3096ab7",
                 "shasum": ""
             },
             "require": {
@@ -1375,7 +1429,7 @@
             },
             "require-dev": {
                 "php": "~7.1 || ~8.0",
-                "php-stubs/generator": "^0.8.0"
+                "php-stubs/generator": "^0.9.0"
             },
             "suggest": {
                 "symfony/polyfill-php73": "Symfony polyfill backporting some PHP 7.3+ features to lower PHP versions",
@@ -1396,9 +1450,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-stubs/woocommerce-stubs/issues",
-                "source": "https://github.com/php-stubs/woocommerce-stubs/tree/v10.8.0"
+                "source": "https://github.com/php-stubs/woocommerce-stubs/tree/v10.9.2"
             },
-            "time": "2026-05-27T11:46:50+00:00"
+            "time": "2026-07-02T23:18:25+00:00"
         },
         {
             "name": "php-stubs/wordpress-stubs",
