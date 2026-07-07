@@ -60,26 +60,7 @@ jobs:
           retention-days: 7
 
   # -----------------------------------------------------------------------
-  # 3. BUILD QA ZIP + ATTACH — triggered on pre-release published
-  # -----------------------------------------------------------------------
-  build-qa-zip-prerelease:
-    name: Build QA zip (pre-release)
-    if: github.event_name == 'release' && github.event.release.prerelease == true
-    uses: payplug/template-ci/.github/workflows/wooco-zip-generation.yml@main
-    with:
-      php-version: '7.4'
-      node-version: '20'
-      env: qa
-      ref: ${{ github.ref }}
-      upload-to-release: true
-    secrets:
-      cdn-payplug: ${{ secrets.CDN_PAYPLUG_QA }}
-      api-payplug: ${{ secrets.PAYPLUG_API_QA }}
-      api-payplug-retail: ${{ secrets.API_RETAIL_QA }}
-      github-token: ${{ secrets.GITHUB_TOKEN }}
-
-  # -----------------------------------------------------------------------
-  # 4. BUILD PROD ZIP + ATTACH — triggered on release published
+  # 3. BUILD PROD ZIP + ATTACH — triggered on release published
   # -----------------------------------------------------------------------
   build-prod-zip:
     name: Build prod zip
