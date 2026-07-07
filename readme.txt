@@ -93,6 +93,18 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 * Fix: Fix repay an order with Apple Pay is KO
 * Adding MCP tool to create a paymentLink
 
+= 3.0.0 =
+* UPGRADE: Upgrading module with minimal PHP 7.4 version
+* Fix: Fix order not available on admin order page
+* Fix: Fix display of all PPRO payment methods on reorder page
+* Fix: Fix multiple calls on same request using Apple Pay
+* Feat: Display clear message when attempting to log in legacy with a multi-company account
+* Fix: Disappearance of the Apple Pay payment method from the cart page
+* Fix: Fix product duplication at the time of payment during a WC Subscription renewal
+* Fix: Fix payment method CB remains active on the checkout even after disabling the PayPlug module
+* Fix: Fix repay an order with Apple Pay is KO
+* Adding MCP tool to create a paymentLink
+
 = 2.18.0 =
 * Fix: OAuth collision with other plugins
  * Fix: Apple Pay with virtual products
