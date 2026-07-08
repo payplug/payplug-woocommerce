@@ -100,8 +100,17 @@ class PayplugWoocommerceRequest
      */
     public function ajax_apple_pay_create_order_pay(): void
     {
-        $order_id = isset($_POST['order_id']) ? (int) $_POST['order_id'] : 0;
-        $order_key = isset($_POST['order_key']) ? wc_clean($_POST['order_key']) : '';
+        if (!check_ajax_referer('woocommerce-process_checkout', 'woocommerce-process-checkout-nonce', false)) {
+            wp_send_json([
+                'result' => 'failure',
+                'messages' => '<ul class="woocommerce-error"><li>' . __('Invalid order.', 'payplug') . '</li></ul>',
+            ]);
+
+            return;
+        }
+
+        $order_id = isset($_POST['order_id']) ? absint(wp_unslash($_POST['order_id'])) : 0;
+        $order_key = isset($_POST['order_key']) ? wc_clean(wp_unslash($_POST['order_key'])) : '';
 
         $order = $order_id ? wc_get_order($order_id) : null;
         if (!$order || !hash_equals($order->get_order_key(), $order_key)) {
@@ -473,9 +482,40 @@ class PayplugWoocommerceRequest
 
     public function create_payment_intent(): void
     {
-        $order_id = $_POST['order_id'];
-        $this->gateway = $this->get_payplug_gateway($_POST['gateway']);
+        if (!check_ajax_referer('woocommerce-process_checkout', 'woocommerce-process-checkout-nonce', false)) {
+            wp_send_json_error(__('Invalid order.', 'payplug'), 403);
+
+            return;
+        }
+
+        $order_id = isset($_POST['order_id']) ? absint(wp_unslash($_POST['order_id'])) : 0;
+        $this->gateway = $this->get_payplug_gateway(isset($_POST['gateway']) ? wc_clean(wp_unslash($_POST['gateway'])) : '');
         $order = wc_get_order($order_id);
+
+        if (!$order instanceof \WC_Order || !$this->gateway) {
+            wp_send_json_error(__('Invalid order.', 'payplug'));
+
+            return;
+        }
+
+        // On order-pay, closing the payment sheet should keep the customer on the order-pay
+        // page, not cancel the order and send them to the cart like a fresh checkout attempt
+        // would.
+        $is_order_pay = is_wc_endpoint_url('order-pay') || !empty($_POST['order_pay_key']);
+
+        if (!empty($_POST['order_pay_key'])) {
+            $order_pay_key = wc_clean(wp_unslash($_POST['order_pay_key']));
+            if (!hash_equals($order->get_order_key(), $order_pay_key)) {
+                wp_send_json_error(__('Invalid order.', 'payplug'));
+
+                return;
+            }
+        }
+
+        $cancel_url = $is_order_pay
+            ? esc_url_raw($order->get_checkout_payment_url())
+            : esc_url_raw($order->get_cancel_order_url_raw());
+
         $customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
         $return_url = esc_url_raw($order->get_checkout_order_received_url());
         $address_data = PayplugAddressData::from_order($order);
@@ -517,7 +557,7 @@ class PayplugWoocommerceRequest
                     ])),
                 ],
             ];
-            $payment_data['hosted_payment']['cancel_url'] = esc_url_raw($order->get_cancel_order_url_raw());
+            $payment_data['hosted_payment']['cancel_url'] = $cancel_url;
             $payment_data['metadata']['applepay_workflow'] = 'checkout';
         }
 
@@ -559,7 +599,7 @@ class PayplugWoocommerceRequest
             'payment_id' => $payment->id,
             'merchant_session' => isset($payment->payment_method['merchant_session']) ? $payment->payment_method['merchant_session'] : null,
             'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
-            'cancel' => esc_url_raw($order->get_cancel_order_url_raw()),
+            'cancel' => $cancel_url,
         ]);
     }
 
