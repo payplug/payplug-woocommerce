@@ -329,7 +329,15 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     public function is_available()
     {
         if ('yes' == $this->enabled) {
-            return $this->requirements->satisfy_requirements() && !empty($this->get_api_key($this->get_current_mode()));
+            $available = $this->requirements->satisfy_requirements() && !empty($this->get_api_key($this->get_current_mode()));
+
+            // $this->enabled only reflects the country/context check as it was at gateway construction time,
+            // so re-run it here to catch context that only becomes known later in the request (e.g. order-pay).
+            if ($available && method_exists($this, 'checkGateway')) {
+                $available = $this->checkGateway();
+            }
+
+            return $available;
         }
 
         return parent::is_available();

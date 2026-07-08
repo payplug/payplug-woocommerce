@@ -95,7 +95,6 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
             if (!empty(get_query_var('order-pay'))) {
                 $order = wc_get_order((int) get_query_var('order-pay'));
                 $items = $order->get_items();
-                $country_code_shipping = $order->get_shipping_country();
                 $country_code_billing = $order->get_billing_country();
                 // Skip cart population for subscription renewals: WC Subscriptions manages the cart
                 // itself and adding items here would cause a double entry in the order summary.
@@ -108,12 +107,14 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
                 }
             }
 
-            if (empty($country_code_billing) || empty($country_code_shipping)) {
-                $country_code_shipping = method_exists(WC()->customer, 'get_shipping_country') ? WC()->customer->get_shipping_country() : null;
+            $source_before_fallback = $country_code_billing;
+            if (empty($country_code_billing)) {
                 $country_code_billing = method_exists(WC()->customer, 'get_billing_country') ? WC()->customer->get_billing_country() : null;
             }
 
-            if (!$this->check_billing_country_permissions($account, $country_code_billing)) {
+            $permission_result = $this->check_billing_country_permissions($account, $country_code_billing);
+
+            if (!$permission_result) {
                 return false;
             }
         }
