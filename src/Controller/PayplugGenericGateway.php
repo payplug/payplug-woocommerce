@@ -151,7 +151,11 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
      */
     public function check_billing_country_permissions($account, $billing_code)
     {
-        $this->allowed_country_codes = !empty($account['payment_methods'][$this->id]['allowed_countries']) ? $account['payment_methods'][$this->id]['allowed_countries'] : null;
+        if (!isset($account['payment_methods'][$this->id]['allowed_countries'])) {
+            return true;
+        }
+
+        $this->allowed_country_codes = $account['payment_methods'][$this->id]['allowed_countries'];
 
         if (is_array($this->allowed_country_codes)) {
             if (in_array('ALL', $this->allowed_country_codes) || empty($this->allowed_country_codes)) {
