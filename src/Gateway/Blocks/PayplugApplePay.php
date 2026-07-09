@@ -29,7 +29,11 @@ class PayplugApplePay extends PayplugGenericBlock
         $data['payplug_locale'] = get_locale();
         $data['payplug_countryCode'] = WC()->customer !== null ? WC()->customer->get_billing_country() : 'FR';
         $data['payplug_currencyCode'] = get_woocommerce_currency();
-        $data['payplug_apple_pay_domain'] = $_SERVER['HTTP_HOST'];
+        $data['payplug_apple_pay_domain'] = wp_parse_url(home_url(), PHP_URL_HOST);
+        $data['is_order_pay'] = is_wc_endpoint_url('order-pay');
+        $data['order_pay_id'] = $data['is_order_pay'] ? (int) get_query_var('order-pay') : 0;
+        $data['order_pay_key'] = $data['is_order_pay'] ? wc_clean(wp_unslash($_GET['key'] ?? '')) : '';
+        $data['wp_nonce'] = wp_create_nonce('woocommerce-process_checkout');
         $data['ajax_url_applepay_update_payment'] = \WC_AJAX::get_endpoint('applepay_update_payment');
         $data['payplug_create_intent_payment'] = \WC_AJAX::get_endpoint('payplug_create_intent');
         $data['is_cart'] = is_cart() && $this->gateway->get_button_cart() && !PayplugWoocommerceHelper::is_subscription();
@@ -46,7 +50,7 @@ class PayplugApplePay extends PayplugGenericBlock
 
         $data['countryCode'] = WC()->customer !== null ? WC()->customer->get_billing_country() : 'FR';
         $data['currencyCode'] = get_woocommerce_currency();
-        $data['apple_pay_domain'] = $_SERVER['HTTP_HOST'];
+        $data['apple_pay_domain'] = wp_parse_url(home_url(), PHP_URL_HOST);
         $data['payplug_authorized_carriers'] = $this->gateway->get_carriers();
         $data['payplug_carriers'] = $this->get_carriers();
 

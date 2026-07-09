@@ -26,7 +26,11 @@
 				? apple_pay_params.ajax_url_payplug_apple_pay_create_order_pay
 				: apple_pay_params.ajax_url_payplug_create_order;
 			var postData = is_order_pay
-				? { order_id: apple_pay_params.order_pay_id, order_key: apple_pay_params.order_pay_key }
+				? {
+					order_id: apple_pay_params.order_pay_id,
+					order_key: apple_pay_params.order_pay_key,
+					'woocommerce-process-checkout-nonce': apple_pay_params.wp_nonce
+				}
 				: $form.serialize();
 			$.post(ajaxUrl, postData).done(apple_pay.OrdernPaymentCreated)
 		},
@@ -161,13 +165,16 @@
 	}
 
 	var applePaycontroller = function(){
+		// On the order-pay page, the submit button only has id="place_order" (no
+		// name="woocommerce_checkout_place_order"), so both selectors are needed to
+		// disable it on both the regular checkout and the order-pay page.
 		if(jQuery("[name=payment_method]:checked").val() === "apple_pay"){
-			jQuery("[name=woocommerce_checkout_place_order]").prop("disabled", true);
+			jQuery("#place_order, [name=woocommerce_checkout_place_order]").prop("disabled", true);
 
 			//enable buttons
 			apple_pay.init();
 		}else{
-			jQuery("[name=woocommerce_checkout_place_order]").prop("disabled", false);
+			jQuery("#place_order, [name=woocommerce_checkout_place_order]").prop("disabled", false);
 		}
 	}
 

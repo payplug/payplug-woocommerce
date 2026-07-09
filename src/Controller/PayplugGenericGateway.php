@@ -186,7 +186,13 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
     private function process_standard_intent_payment($order)
     {
         $embedded_mode = $this->settings['payment_methods']['configuration']['payplug']['embedded_mode'];
-        if (!is_wc_endpoint_url('order-pay') &&
+
+        // This can run from AJAX endpoints whose own request URL never carries the order-pay
+        // query var, so is_wc_endpoint_url() alone can't detect that context here: fall back
+        // to the order_key/order_pay_key sent by the order-pay AJAX flows.
+        $is_order_pay = $this->is_order_pay_request($order);
+
+        if (!$is_order_pay &&
             empty($_POST['payplug_non_blocks']) &&
             PayplugWoocommerceHelper::is_checkout_block() &&
             (
