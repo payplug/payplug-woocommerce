@@ -2,334 +2,11 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./resources/js/frontend/helper/wc-payplug-apple_pay-requests.js":
-/*!***********************************************************************!*\
-  !*** ./resources/js/frontend/helper/wc-payplug-apple_pay-requests.js ***!
-  \***********************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   apple_pay_CancelOrder: () => (/* binding */ apple_pay_CancelOrder),
-/* harmony export */   apple_pay_Payment: () => (/* binding */ apple_pay_Payment),
-/* harmony export */   apple_pay_PlaceOrderWithDummyData: () => (/* binding */ apple_pay_PlaceOrderWithDummyData),
-/* harmony export */   apple_pay_UpdateOrder: () => (/* binding */ apple_pay_UpdateOrder),
-/* harmony export */   apple_pay_get_shippings: () => (/* binding */ apple_pay_get_shippings),
-/* harmony export */   apple_pay_update_payment: () => (/* binding */ apple_pay_update_payment),
-/* harmony export */   getPayment: () => (/* binding */ getPayment)
-/* harmony export */ });
-/* harmony import */ var _woocommerce_settings__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @woocommerce/settings */ "@woocommerce/settings");
-/* harmony import */ var _woocommerce_settings__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_woocommerce_settings__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! jquery */ "jquery");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_1__);
-
-
-const settings = (0,_woocommerce_settings__WEBPACK_IMPORTED_MODULE_0__.getSetting)('apple_pay_data', {});
-const getPayment = (props, order_id) => {
-  const data = getPaymentData(props);
-  return new Promise((resolve, reject) => {
-    return jquery__WEBPACK_IMPORTED_MODULE_1___default().ajax({
-      type: 'POST',
-      data: data,
-      url: settings.payplug_create_intent_payment
-    }).done(function (response) {
-      resolve(response);
-    }).fail(function (error) {
-      reject(error);
-    });
-  });
-  function getPaymentData(props) {
-    return {
-      "order_id": order_id,
-      "woocommerce-process-checkout-nonce": settings.wp_nonce,
-      "gateway": "apple_pay"
-    };
-  }
-};
-const apple_pay_get_shippings = data => {
-  return new Promise((resolve, reject) => {
-    jquery__WEBPACK_IMPORTED_MODULE_1___default().ajax({
-      type: 'POST',
-      data: data,
-      url: settings.ajax_url_applepay_get_shippings
-    }).done(function (response) {
-      resolve(response);
-    }).fail(function (xhr, status, error) {
-      reject(error); // NOT WORKING!!
-    });
-  });
-};
-const apple_pay_update_payment = data => {
-  return new Promise((resolve, reject) => {
-    jquery__WEBPACK_IMPORTED_MODULE_1___default().ajax({
-      type: 'POST',
-      data: data,
-      url: settings.ajax_url_applepay_update_payment
-    }).done(function (response) {
-      resolve(response);
-    }).fail(function (xhr, status, error) {
-      reject(error); // NOT WORKING!!
-    });
-  });
-};
-const apple_pay_UpdateOrder = data => {
-  return new Promise((resolve, reject) => {
-    jquery__WEBPACK_IMPORTED_MODULE_1___default().ajax({
-      type: 'POST',
-      data: data,
-      url: settings.ajax_url_update_applepay_order
-    }).done(function (response) {
-      resolve(response);
-    }).fail(function (xhr, status, error) {
-      reject(error); // NOT WORKING!!
-    });
-  });
-};
-const apple_pay_Payment = data => {
-  return new Promise((resolve, reject) => {
-    jquery__WEBPACK_IMPORTED_MODULE_1___default().ajax({
-      type: 'POST',
-      data: data,
-      url: settings.ajax_url_update_applepay_payment
-    }).done(function (response) {
-      resolve(response);
-    }).fail(function (xhr, status, error) {
-      reject(error); // NOT WORKING!!
-    });
-  });
-};
-const apple_pay_PlaceOrderWithDummyData = data => {
-  return new Promise((resolve, reject) => {
-    jquery__WEBPACK_IMPORTED_MODULE_1___default().ajax({
-      type: 'POST',
-      data: data,
-      url: settings.ajax_url_place_order_with_dummy_data
-    }).done(function (response) {
-      resolve(response);
-    }).fail(function (xhr, status, error) {
-      reject(error); // NOT WORKING!!
-    });
-  });
-};
-const apple_pay_CancelOrder = data => {
-  return new Promise((resolve, reject) => {
-    jquery__WEBPACK_IMPORTED_MODULE_1___default().ajax({
-      type: 'POST',
-      data: data,
-      url: settings.ajax_url_applepay_cancel_order
-    }).done(function (response) {
-      resolve(response);
-    }).fail(function (xhr, status, error) {
-      reject(error); // NOT WORKING!!
-    });
-  });
-};
-
-/***/ }),
-
-/***/ "./resources/js/frontend/wc-payplug-apple_pay_cart-blocks.js":
-/*!*******************************************************************!*\
-  !*** ./resources/js/frontend/wc-payplug-apple_pay_cart-blocks.js ***!
-  \*******************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _woocommerce_settings__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @woocommerce/settings */ "@woocommerce/settings");
-/* harmony import */ var _woocommerce_settings__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_woocommerce_settings__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _helper_wc_payplug_apple_pay_requests__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./helper/wc-payplug-apple_pay-requests */ "./resources/js/frontend/helper/wc-payplug-apple_pay-requests.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-
-
-
-
-const settings = (0,_woocommerce_settings__WEBPACK_IMPORTED_MODULE_1__.getSetting)('apple_pay_data', {});
-const ApplePayCart = props => {
-  let session = null;
-  let apple_pay_Session_status = null;
-  let apple_pay_carriers = [];
-  const apple_pay_wrapper = jQuery("#apple-pay-button-wrapper");
-  const apple_pay = {
-    load_order_total: false,
-    OrderPaymentCreated: function (response) {
-      if ('success' !== response.payment_data.result) {
-        apple_pay.CancelOrder();
-      }
-      apple_pay.BeginSession(response);
-    },
-    CreateSession: function () {
-      const request = {
-        "countryCode": settings.countryCode,
-        "currencyCode": settings.currencyCode,
-        "merchantCapabilities": ["supports3DS"],
-        "supportedNetworks": ["visa", "masterCard"],
-        "total": {
-          "label": "Apple Pay",
-          "type": "final",
-          "amount": parseFloat(settings.total_amount / 100)
-        },
-        'applicationData': btoa(JSON.stringify({
-          'apple_pay_domain': settings.apple_pay_domain
-        })),
-        'requiredBillingContactFields': ['postalAddress', 'name']
-      };
-      request.requiredShippingContactFields = ["postalAddress", "name", "phone", "email"];
-      if (settings.payplug_apple_pay_shipping_required) {
-        request.shippingMethods = apple_pay_carriers;
-      }
-      session = new ApplePaySession(4, request);
-    },
-    CancelOrder: function () {
-      session.oncancel = event => {
-        (0,_helper_wc_payplug_apple_pay_requests__WEBPACK_IMPORTED_MODULE_2__.apple_pay_CancelOrder)({
-          'order_id': session.order_id,
-          'payment_id': session.payment_id
-        }).then(() => {
-          enabled_button();
-        });
-      };
-    },
-    BeginSession: function (response) {
-      session.payment_id = response.payment_data.payment_id;
-      session.order_id = response.order_id;
-      session.cancel_url = response.payment_data.cancel_url;
-      session.return_url = response.payment_data.return_url;
-      apple_pay.MerchantValidated(session, response.payment_data.merchant_session);
-      session.amount = parseFloat(settings.total / 100) * 100;
-      session.onshippingmethodselected = event => {
-        const shippingMethod = event.shippingMethod;
-        session.shippingMethod = shippingMethod.identifier;
-        const baseTotal = settings.total / 100;
-        let currentShippingCost = shippingMethod.amount;
-        const newTotalAmount = parseFloat(baseTotal) + parseFloat(currentShippingCost);
-        session.amount = newTotalAmount * 100;
-        const update = {
-          newTotal: {
-            label: 'Apple Pay',
-            amount: newTotalAmount
-          },
-          newLineItems: [{
-            label: shippingMethod.label,
-            type: 'final',
-            amount: currentShippingCost
-          }]
-        };
-        session.completeShippingMethodSelection(update);
-      };
-      session.begin();
-    },
-    MerchantValidated: function (session, merchant_session) {
-      session.onvalidatemerchant = event => {
-        try {
-          session.completeMerchantValidation(merchant_session);
-        } catch (err) {
-          apple_pay.CancelOrder();
-        }
-      };
-    },
-    AddErrorMessage: function (message) {
-      apple_pay_wrapper.append(jQuery('<div class="apple-pay-cart-notice"></div>').append("<span>" + message + "</span>"));
-    },
-    DeleteErrorMessage: function () {
-      setTimeout(function () {
-        jQuery('.apple-pay-cart-notice').contents().first().remove();
-      }, 4000);
-    }
-  };
-  function CheckPaymentOnPaymentAuthorized() {
-    return new Promise((resolve, reject) => {
-      session.onpaymentauthorized = event => {
-        let event_data = event.payment;
-        let data = {
-          'order_id': session.order_id,
-          'shipping': event_data.shippingContact,
-          'billing': event_data.billingContact,
-          'shipping_method': session.shippingMethod
-        };
-        (0,_helper_wc_payplug_apple_pay_requests__WEBPACK_IMPORTED_MODULE_2__.apple_pay_UpdateOrder)(data).then(result_order => {
-          data = {
-            'action': 'applepay_update_payment',
-            'post_type': 'POST',
-            'payment_id': session.payment_id,
-            'payment_token': event.payment.token,
-            'order_id': session.order_id,
-            'amount': session.amount / 100
-          };
-          (0,_helper_wc_payplug_apple_pay_requests__WEBPACK_IMPORTED_MODULE_2__.apple_pay_Payment)(data).then(result_payment => {
-            apple_pay_Session_status = ApplePaySession.STATUS_SUCCESS;
-            if (result_payment.success !== true) {
-              apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
-              apple_pay.AddErrorMessage(result_payment.data.message);
-              apple_pay.DeleteErrorMessage();
-              apple_pay.CancelOrder();
-            }
-            session.completePayment({
-              "status": apple_pay_Session_status
-            });
-            resolve();
-          });
-        });
-      };
-    });
-  }
-  jQuery(document).ready(function ($) {
-    (0,_helper_wc_payplug_apple_pay_requests__WEBPACK_IMPORTED_MODULE_2__.apple_pay_get_shippings)().then(result_shippings => {
-      apple_pay_carriers = result_shippings.data;
-    });
-  });
-  function disabled_button() {
-    jQuery('apple-pay-button').addClass("isDisabled");
-  }
-  function enabled_button() {
-    jQuery('apple-pay-button').removeClass("isDisabled");
-  }
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    const btn = document.getElementById('apple-pay-button');
-    if (btn) {
-      btn.addEventListener('click', e => {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        disabled_button();
-        apple_pay.CreateSession();
-        apple_pay.CancelOrder();
-        (0,_helper_wc_payplug_apple_pay_requests__WEBPACK_IMPORTED_MODULE_2__.apple_pay_PlaceOrderWithDummyData)().then(async response => {
-          if (response.success === false) {
-            apple_pay.AddErrorMessage(response.data.message);
-            apple_pay.DeleteErrorMessage();
-            enabled_button();
-            return;
-          }
-          settings.total = response.total;
-          apple_pay.OrderPaymentCreated(response);
-          await CheckPaymentOnPaymentAuthorized().then(res => {
-            window.location = session.return_url;
-          });
-        });
-      });
-    }
-    return () => {
-      if (btn) {
-        btn.removeEventListener('click', () => {});
-      }
-    };
-  }, []);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
-    children: " "
-  });
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ApplePayCart);
-
-/***/ }),
-
-/***/ "./node_modules/react/cjs/react-jsx-runtime.development.js":
+/***/ "./node_modules/react/cjs/react-jsx-runtime.development.js"
 /*!*****************************************************************!*\
   !*** ./node_modules/react/cjs/react-jsx-runtime.development.js ***!
   \*****************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 /**
  * @license React
@@ -1666,98 +1343,39 @@ exports.jsxs = jsxs;
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/react/jsx-runtime.js":
+/***/ "./node_modules/react/jsx-runtime.js"
 /*!*******************************************!*\
   !*** ./node_modules/react/jsx-runtime.js ***!
   \*******************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 
 
-if (false) {} else {
+if (false) // removed by dead control flow
+{} else {
   module.exports = __webpack_require__(/*! ./cjs/react-jsx-runtime.development.js */ "./node_modules/react/cjs/react-jsx-runtime.development.js");
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "react":
+/***/ "react"
 /*!************************!*\
   !*** external "React" ***!
   \************************/
-/***/ ((module) => {
+(module) {
 
 module.exports = window["React"];
 
-/***/ }),
-
-/***/ "jquery":
-/*!*************************!*\
-  !*** external "jQuery" ***!
-  \*************************/
-/***/ ((module) => {
-
-module.exports = window["jQuery"];
-
-/***/ }),
-
-/***/ "@woocommerce/blocks-registry":
-/*!******************************************!*\
-  !*** external ["wc","wcBlocksRegistry"] ***!
-  \******************************************/
-/***/ ((module) => {
-
-module.exports = window["wc"]["wcBlocksRegistry"];
-
-/***/ }),
-
-/***/ "@woocommerce/settings":
-/*!************************************!*\
-  !*** external ["wc","wcSettings"] ***!
-  \************************************/
-/***/ ((module) => {
-
-module.exports = window["wc"]["wcSettings"];
-
-/***/ }),
-
-/***/ "@wordpress/data":
-/*!******************************!*\
-  !*** external ["wp","data"] ***!
-  \******************************/
-/***/ ((module) => {
-
-module.exports = window["wp"]["data"];
-
-/***/ }),
-
-/***/ "@wordpress/html-entities":
-/*!**************************************!*\
-  !*** external ["wp","htmlEntities"] ***!
-  \**************************************/
-/***/ ((module) => {
-
-module.exports = window["wp"]["htmlEntities"];
-
-/***/ }),
-
-/***/ "@wordpress/i18n":
-/*!******************************!*\
-  !*** external ["wp","i18n"] ***!
-  \******************************/
-/***/ ((module) => {
-
-module.exports = window["wp"]["i18n"];
-
-/***/ })
+/***/ }
 
 /******/ 	});
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/
+/******/ 	
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -1771,14 +1389,20 @@ module.exports = window["wp"]["i18n"];
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/
+/******/ 	
 /******/ 		// Execute the module function
+/******/ 		if (!(moduleId in __webpack_modules__)) {
+/******/ 			delete __webpack_module_cache__[moduleId];
+/******/ 			var e = new Error("Cannot find module '" + moduleId + "'");
+/******/ 			e.code = 'MODULE_NOT_FOUND';
+/******/ 			throw e;
+/******/ 		}
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/
+/******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
+/******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
 /******/ 	(() => {
@@ -1791,7 +1415,7 @@ module.exports = window["wp"]["i18n"];
 /******/ 			return getter;
 /******/ 		};
 /******/ 	})();
-/******/
+/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -1803,46 +1427,331 @@ module.exports = window["wp"]["i18n"];
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
-/*!**************************************************************!*\
-  !*** ./resources/js/frontend/wc-payplug-apple_pay-blocks.js ***!
-  \**************************************************************/
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _wordpress_html_entities__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/html-entities */ "@wordpress/html-entities");
-/* harmony import */ var _wordpress_html_entities__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_html_entities__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _woocommerce_settings__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @woocommerce/settings */ "@woocommerce/settings");
-/* harmony import */ var _woocommerce_settings__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_woocommerce_settings__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @woocommerce/blocks-registry */ "@woocommerce/blocks-registry");
-/* harmony import */ var _woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _helper_wc_payplug_apple_pay_requests__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./helper/wc-payplug-apple_pay-requests */ "./resources/js/frontend/helper/wc-payplug-apple_pay-requests.js");
-/* harmony import */ var _wc_payplug_apple_pay_cart_blocks__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./wc-payplug-apple_pay_cart-blocks */ "./resources/js/frontend/wc-payplug-apple_pay_cart-blocks.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/*!**************************************************************************!*\
+  !*** ./resources/js/frontend/wc-payplug-apple_pay-blocks.js + 8 modules ***!
+  \**************************************************************************/
+
+;// external ["wp","i18n"]
+const external_wp_i18n_namespaceObject = window["wp"]["i18n"];
+;// external ["wp","htmlEntities"]
+const external_wp_htmlEntities_namespaceObject = window["wp"]["htmlEntities"];
+;// external ["wp","data"]
+const external_wp_data_namespaceObject = window["wp"]["data"];
+;// external ["wc","wcSettings"]
+const external_wc_wcSettings_namespaceObject = window["wc"]["wcSettings"];
+;// external ["wc","wcBlocksRegistry"]
+const external_wc_wcBlocksRegistry_namespaceObject = window["wc"]["wcBlocksRegistry"];
+// EXTERNAL MODULE: external "React"
+var external_React_ = __webpack_require__("react");
+;// external "jQuery"
+const external_jQuery_namespaceObject = window["jQuery"];
+var external_jQuery_default = /*#__PURE__*/__webpack_require__.n(external_jQuery_namespaceObject);
+;// ./resources/js/frontend/helper/wc-payplug-apple_pay-requests.js
+
+
+const settings = (0,external_wc_wcSettings_namespaceObject.getSetting)('apple_pay_data', {});
+const getPayment = (props, order_id) => {
+  const data = getPaymentData(props);
+  return new Promise((resolve, reject) => {
+    return external_jQuery_default().ajax({
+      type: 'POST',
+      data: data,
+      url: settings.payplug_create_intent_payment
+    }).done(function (response) {
+      resolve(response);
+    }).fail(function (error) {
+      reject(error);
+    });
+  });
+  function getPaymentData(props) {
+    const data = {
+      "order_id": order_id,
+      "woocommerce-process-checkout-nonce": settings.wp_nonce,
+      "gateway": "apple_pay"
+    };
+    if (settings.is_order_pay) {
+      data.order_pay_key = settings.order_pay_key;
+    }
+    return data;
+  }
+};
+const apple_pay_get_shippings = data => {
+  return new Promise((resolve, reject) => {
+    external_jQuery_default().ajax({
+      type: 'POST',
+      data: data,
+      url: settings.ajax_url_applepay_get_shippings
+    }).done(function (response) {
+      resolve(response);
+    }).fail(function (xhr, status, error) {
+      reject(error);
+    });
+  });
+};
+const apple_pay_update_payment = data => {
+  return new Promise((resolve, reject) => {
+    external_jQuery_default().ajax({
+      type: 'POST',
+      data: data,
+      url: settings.ajax_url_applepay_update_payment
+    }).done(function (response) {
+      resolve(response);
+    }).fail(function (xhr, status, error) {
+      reject(error);
+    });
+  });
+};
+const apple_pay_UpdateOrder = data => {
+  return new Promise((resolve, reject) => {
+    external_jQuery_default().ajax({
+      type: 'POST',
+      data: data,
+      url: settings.ajax_url_update_applepay_order
+    }).done(function (response) {
+      resolve(response);
+    }).fail(function (xhr, status, error) {
+      reject(error);
+    });
+  });
+};
+const apple_pay_Payment = data => {
+  return new Promise((resolve, reject) => {
+    external_jQuery_default().ajax({
+      type: 'POST',
+      data: data,
+      url: settings.ajax_url_update_applepay_payment
+    }).done(function (response) {
+      resolve(response);
+    }).fail(function (xhr, status, error) {
+      reject(error);
+    });
+  });
+};
+const apple_pay_PlaceOrderWithDummyData = data => {
+  return new Promise((resolve, reject) => {
+    external_jQuery_default().ajax({
+      type: 'POST',
+      data: data,
+      url: settings.ajax_url_place_order_with_dummy_data
+    }).done(function (response) {
+      resolve(response);
+    }).fail(function (xhr, status, error) {
+      reject(error);
+    });
+  });
+};
+const apple_pay_CancelOrder = data => {
+  return new Promise((resolve, reject) => {
+    external_jQuery_default().ajax({
+      type: 'POST',
+      data: data,
+      url: settings.ajax_url_applepay_cancel_order
+    }).done(function (response) {
+      resolve(response);
+    }).fail(function (xhr, status, error) {
+      reject(error);
+    });
+  });
+};
+// EXTERNAL MODULE: ./node_modules/react/jsx-runtime.js
+var jsx_runtime = __webpack_require__("./node_modules/react/jsx-runtime.js");
+;// ./resources/js/frontend/wc-payplug-apple_pay_cart-blocks.js
+
+
+
+
+const wc_payplug_apple_pay_cart_blocks_settings = (0,external_wc_wcSettings_namespaceObject.getSetting)('apple_pay_data', {});
+const ApplePayCart = props => {
+  // A plain local variable would be reset on every re-render, but it's read from
+  // async callbacks/DOM handlers that can fire well after a re-render has happened.
+  const sessionRef = (0,external_React_.useRef)(null);
+  let apple_pay_Session_status = null;
+  // Same reasoning as sessionRef: fetched asynchronously in an effect below, then read
+  // later from CreateSession(), which can run after a re-render has reset a plain variable.
+  const carriersRef = (0,external_React_.useRef)([]);
+  const apple_pay_wrapper = jQuery("#apple-pay-button-wrapper");
+  const apple_pay = {
+    load_order_total: false,
+    OrderPaymentCreated: function (response) {
+      if ('success' !== response.payment_data.result) {
+        apple_pay.CancelOrder();
+      }
+      apple_pay.BeginSession(response);
+    },
+    CreateSession: function () {
+      const request = {
+        "countryCode": wc_payplug_apple_pay_cart_blocks_settings.countryCode,
+        "currencyCode": wc_payplug_apple_pay_cart_blocks_settings.currencyCode,
+        "merchantCapabilities": ["supports3DS"],
+        "supportedNetworks": ["visa", "masterCard"],
+        "total": {
+          "label": "Apple Pay",
+          "type": "final",
+          "amount": parseFloat(wc_payplug_apple_pay_cart_blocks_settings.total_amount / 100)
+        },
+        'applicationData': btoa(JSON.stringify({
+          'apple_pay_domain': wc_payplug_apple_pay_cart_blocks_settings.apple_pay_domain
+        })),
+        'requiredBillingContactFields': ['postalAddress', 'name']
+      };
+      request.requiredShippingContactFields = ["postalAddress", "name", "phone", "email"];
+      if (wc_payplug_apple_pay_cart_blocks_settings.payplug_apple_pay_shipping_required) {
+        request.shippingMethods = carriersRef.current;
+      }
+      sessionRef.current = new ApplePaySession(4, request);
+    },
+    CancelOrder: function () {
+      sessionRef.current.oncancel = event => {
+        apple_pay_CancelOrder({
+          'order_id': sessionRef.current.order_id,
+          'payment_id': sessionRef.current.payment_id
+        }).then(() => {
+          enabled_button();
+        });
+      };
+    },
+    BeginSession: function (response) {
+      const session = sessionRef.current;
+      session.payment_id = response.payment_data.payment_id;
+      session.order_id = response.order_id;
+      session.cancel_url = response.payment_data.cancel_url;
+      session.return_url = response.payment_data.return_url;
+      apple_pay.MerchantValidated(session, response.payment_data.merchant_session);
+      session.amount = parseFloat(wc_payplug_apple_pay_cart_blocks_settings.total / 100) * 100;
+      session.onshippingmethodselected = event => {
+        const shippingMethod = event.shippingMethod;
+        session.shippingMethod = shippingMethod.identifier;
+        const baseTotal = wc_payplug_apple_pay_cart_blocks_settings.total / 100;
+        let currentShippingCost = shippingMethod.amount;
+        const newTotalAmount = parseFloat(baseTotal) + parseFloat(currentShippingCost);
+        session.amount = newTotalAmount * 100;
+        const update = {
+          newTotal: {
+            label: 'Apple Pay',
+            amount: newTotalAmount
+          },
+          newLineItems: [{
+            label: shippingMethod.label,
+            type: 'final',
+            amount: currentShippingCost
+          }]
+        };
+        session.completeShippingMethodSelection(update);
+      };
+      session.begin();
+    },
+    MerchantValidated: function (session, merchant_session) {
+      session.onvalidatemerchant = event => {
+        try {
+          session.completeMerchantValidation(merchant_session);
+        } catch (err) {
+          apple_pay.CancelOrder();
+        }
+      };
+    },
+    AddErrorMessage: function (message) {
+      apple_pay_wrapper.append(jQuery('<div class="apple-pay-cart-notice"></div>').append(jQuery('<span></span>').text(message)));
+    },
+    DeleteErrorMessage: function () {
+      setTimeout(function () {
+        jQuery('.apple-pay-cart-notice').remove();
+      }, 4000);
+    }
+  };
+  function CheckPaymentOnPaymentAuthorized() {
+    return new Promise((resolve, reject) => {
+      sessionRef.current.onpaymentauthorized = event => {
+        let event_data = event.payment;
+        let data = {
+          'order_id': sessionRef.current.order_id,
+          'shipping': event_data.shippingContact,
+          'billing': event_data.billingContact,
+          'shipping_method': sessionRef.current.shippingMethod
+        };
+        apple_pay_UpdateOrder(data).then(result_order => {
+          data = {
+            'action': 'applepay_update_payment',
+            'post_type': 'POST',
+            'payment_id': sessionRef.current.payment_id,
+            'payment_token': event.payment.token,
+            'order_id': sessionRef.current.order_id,
+            'amount': sessionRef.current.amount / 100
+          };
+          apple_pay_Payment(data).then(result_payment => {
+            apple_pay_Session_status = ApplePaySession.STATUS_SUCCESS;
+            if (result_payment.success !== true) {
+              apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
+              apple_pay.AddErrorMessage(result_payment.data.message);
+              apple_pay.DeleteErrorMessage();
+              apple_pay.CancelOrder();
+            }
+            sessionRef.current.completePayment({
+              "status": apple_pay_Session_status
+            });
+            resolve();
+          });
+        });
+      };
+    });
+  }
+  (0,external_React_.useEffect)(() => {
+    apple_pay_get_shippings().then(result_shippings => {
+      carriersRef.current = result_shippings.data;
+    });
+  }, []);
+  function disabled_button() {
+    jQuery('apple-pay-button').addClass("isDisabled");
+  }
+  function enabled_button() {
+    jQuery('apple-pay-button').removeClass("isDisabled");
+  }
+  (0,external_React_.useEffect)(() => {
+    const btn = document.getElementById('apple-pay-button');
+    const onApplePayButtonClick = e => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      disabled_button();
+      apple_pay.CreateSession();
+      apple_pay.CancelOrder();
+      apple_pay_PlaceOrderWithDummyData().then(async response => {
+        if (response.success === false) {
+          apple_pay.AddErrorMessage(response.data.message);
+          apple_pay.DeleteErrorMessage();
+          enabled_button();
+          return;
+        }
+        wc_payplug_apple_pay_cart_blocks_settings.total = response.total;
+        apple_pay.OrderPaymentCreated(response);
+        await CheckPaymentOnPaymentAuthorized().then(res => {
+          window.location = sessionRef.current.return_url;
+        });
+      });
+    };
+    if (btn) {
+      btn.addEventListener('click', onApplePayButtonClick);
+    }
+    return () => {
+      if (btn) {
+        btn.removeEventListener('click', onApplePayButtonClick);
+      }
+    };
+  }, []);
+  return /*#__PURE__*/(0,jsx_runtime.jsx)(jsx_runtime.Fragment, {
+    children: " "
+  });
+};
+/* harmony default export */ const wc_payplug_apple_pay_cart_blocks = (ApplePayCart);
+;// ./resources/js/frontend/wc-payplug-apple_pay-blocks.js
 
 
 
@@ -1852,9 +1761,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const settings = (0,_woocommerce_settings__WEBPACK_IMPORTED_MODULE_3__.getSetting)('apple_pay_data', {});
-const defaultLabel = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Gateway method title', 'payplug');
-const label = (0,_wordpress_html_entities__WEBPACK_IMPORTED_MODULE_1__.decodeEntities)(settings?.title) || defaultLabel;
+const wc_payplug_apple_pay_blocks_settings = (0,external_wc_wcSettings_namespaceObject.getSetting)('apple_pay_data', {});
+const defaultLabel = (0,external_wp_i18n_namespaceObject.__)('Gateway method title', 'payplug');
+const label = (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(wc_payplug_apple_pay_blocks_settings?.title) || defaultLabel;
 const Content = props => {
   const {
     eventRegistration,
@@ -1867,34 +1776,60 @@ const Content = props => {
   const {
     CHECKOUT_STORE_KEY
   } = window.wc.wcBlocksData;
-  const order_id = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useSelect)(select => select(CHECKOUT_STORE_KEY).getOrderId());
-  let session = null;
-  (0,react__WEBPACK_IMPORTED_MODULE_5__.useEffect)(() => {
-    jQuery(function ($) {
-      let element = $("form .wp-block-woocommerce-checkout-actions-block .wc-block-components-button");
-      element.on("click", async e => {
-        e.preventDefault();
-        apple_pay.CreateSession();
-        apple_pay.CancelOrder();
-      });
-    });
-  }, []);
-  (0,react__WEBPACK_IMPORTED_MODULE_5__.useEffect)(() => {
+
+  // On the order-pay page there is no checkout draft order to read the id from,
+  // so use the id/key of the order actually being repaid instead.
+  const checkout_order_id = (0,external_wp_data_namespaceObject.useSelect)(select => select(CHECKOUT_STORE_KEY).getOrderId());
+  const order_id = wc_payplug_apple_pay_blocks_settings.is_order_pay ? wc_payplug_apple_pay_blocks_settings.order_pay_id : checkout_order_id;
+  // A plain local variable would be reset on every re-render, but it's read from
+  // async callbacks/DOM handlers that can fire well after a re-render has happened.
+  const sessionRef = (0,external_React_.useRef)(null);
+  (0,external_React_.useEffect)(() => {
+    const element = jQuery("form .wp-block-woocommerce-checkout-actions-block .wc-block-components-button");
+    const onPlaceOrderClick = async e => {
+      e.preventDefault();
+      apple_pay.CreateSession();
+      apple_pay.CancelOrder();
+    };
+    element.on("click", onPlaceOrderClick);
+    return () => {
+      element.off("click", onPlaceOrderClick);
+    };
+    // CreateSession() reads props.billing.cartTotal and order_id, so the handler must be
+    // re-bound whenever those change to avoid using stale values from the first render.
+  }, [order_id, props.billing.cartTotal.value]);
+  (0,external_React_.useEffect)(() => {
     const handlePaymentProcessing = async () => {
-      await (0,_helper_wc_payplug_apple_pay_requests__WEBPACK_IMPORTED_MODULE_6__.getPayment)(props, order_id).then(async response => {
+      try {
+        const response = await getPayment(props, order_id);
+        if (!response || response.success === false) {
+          const errorMessage = response && response.data && response.data.message || (response && typeof response.data === 'string' ? response.data : null) || (0,external_wp_i18n_namespaceObject.__)('Payment processing failed. Please retry.', 'payplug');
+          return {
+            type: emitResponse.responseTypes.ERROR,
+            message: errorMessage,
+            messageContext: emitResponse.noticeContexts.PAYMENTS
+          };
+        }
         await apple_pay.BeginSession(response);
-      }).then(async response => {
         return {
-          type: "success"
+          type: emitResponse.responseTypes.SUCCESS
         };
-      });
+      } catch (error) {
+        const serverData = error && error.responseJSON && error.responseJSON.data;
+        const serverMessage = serverData && serverData.message || (typeof serverData === 'string' ? serverData : null);
+        return {
+          type: emitResponse.responseTypes.ERROR,
+          message: serverMessage || (0,external_wp_i18n_namespaceObject.__)('Payment processing failed. Please retry.', 'payplug'),
+          messageContext: emitResponse.noticeContexts.PAYMENTS
+        };
+      }
     };
     const unsubscribeAfterProcessing = onPaymentSetup(handlePaymentProcessing);
     return () => {
       unsubscribeAfterProcessing();
     };
-  }, [onPaymentSetup, emitResponse.noticeContexts.PAYMENTS, emitResponse.responseTypes.ERROR, emitResponse.responseTypes.SUCCESS]);
-  (0,react__WEBPACK_IMPORTED_MODULE_5__.useEffect)(() => {
+  }, [onPaymentSetup, order_id, emitResponse.noticeContexts.PAYMENTS, emitResponse.responseTypes.ERROR, emitResponse.responseTypes.SUCCESS]);
+  (0,external_React_.useEffect)(() => {
     const handlePaymentProcessing = async ({
       processingResponse: {
         paymentDetails
@@ -1904,27 +1839,27 @@ const Content = props => {
       let result = {};
       await CheckPaymentOnPaymentAuthorized().then(() => {
         result = {
-          type: "success",
-          "redirectUrl": session.return_url
+          type: emitResponse.responseTypes.SUCCESS,
+          "redirectUrl": sessionRef.current.return_url
         };
       });
       return result;
       function CheckPaymentOnPaymentAuthorized() {
         return new Promise((resolve, reject) => {
-          session.onpaymentauthorized = async event => {
+          sessionRef.current.onpaymentauthorized = async event => {
             let data = {
               'action': 'applepay_update_payment',
               'post_type': 'POST',
-              'payment_id': session.payment_id,
+              'payment_id': sessionRef.current.payment_id,
               'payment_token': event.payment.token,
-              'order_id': session.order_id
+              'order_id': sessionRef.current.order_id
             };
-            await (0,_helper_wc_payplug_apple_pay_requests__WEBPACK_IMPORTED_MODULE_6__.apple_pay_update_payment)(data).then(res => {
+            await apple_pay_update_payment(data).then(res => {
               apple_pay_Session_status = ApplePaySession.STATUS_SUCCESS;
               if (res.success !== true) {
                 apple_pay_Session_status = ApplePaySession.STATUS_FAILURE;
               }
-              session.completePayment({
+              sessionRef.current.completePayment({
                 "status": apple_pay_Session_status
               });
               resolve();
@@ -1941,8 +1876,8 @@ const Content = props => {
   let apple_pay = {
     CreateSession: function () {
       const request = {
-        "countryCode": settings.payplug_countryCode,
-        "currencyCode": settings.payplug_currencyCode,
+        "countryCode": wc_payplug_apple_pay_blocks_settings.payplug_countryCode,
+        "currencyCode": wc_payplug_apple_pay_blocks_settings.payplug_currencyCode,
         "merchantCapabilities": ["supports3DS"],
         "supportedNetworks": ["visa", "masterCard"],
         "supportedTypes": ["debit", "credit"],
@@ -1952,17 +1887,18 @@ const Content = props => {
           "amount": props.billing.cartTotal.value / 100
         },
         'applicationData': btoa(JSON.stringify({
-          'apple_pay_domain': settings.payplug_apple_pay_domain
+          'apple_pay_domain': wc_payplug_apple_pay_blocks_settings.payplug_apple_pay_domain
         }))
       };
-      session = new ApplePaySession(3, request);
+      sessionRef.current = new ApplePaySession(3, request);
     },
     CancelOrder: function () {
-      session.oncancel = event => {
-        window.location = session.cancel_url;
+      sessionRef.current.oncancel = event => {
+        window.location = sessionRef.current.cancel_url;
       };
     },
     BeginSession: function (response) {
+      const session = sessionRef.current;
       session.payment_id = response.data.payment_id;
       session.order_id = order_id;
       session.cancel_url = response.data.cancel;
@@ -1975,29 +1911,29 @@ const Content = props => {
         try {
           session.completeMerchantValidation(merchant_session);
         } catch (err) {
-          alert(err);
+          apple_pay.CancelOrder();
         }
       };
     }
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {});
+  return /*#__PURE__*/(0,jsx_runtime.jsx)(jsx_runtime.Fragment, {});
 };
 /**
  * Label component
  *
  */
 const Label = () => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("span", {
+  return /*#__PURE__*/(0,jsx_runtime.jsxs)("span", {
     style: {
       width: '100%'
     },
-    children: [label, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(Icon, {})]
+    children: [label, /*#__PURE__*/(0,jsx_runtime.jsx)(Icon, {})]
   });
 };
 const Icon = () => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("img", {
-    src: settings?.icon.src,
-    alt: settings?.icon.icon_alt,
+  return /*#__PURE__*/(0,jsx_runtime.jsx)("img", {
+    src: wc_payplug_apple_pay_blocks_settings?.icon.src,
+    alt: wc_payplug_apple_pay_blocks_settings?.icon.icon_alt,
     className: "payplug-payment-icon",
     style: {
       float: 'right'
@@ -2010,15 +1946,15 @@ const Icon = () => {
  */
 const ApplePay = {
   name: "apple_pay",
-  label: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(Label, {}),
-  content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(Content, {}),
-  edit: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(Content, {}),
+  label: /*#__PURE__*/(0,jsx_runtime.jsx)(Label, {}),
+  content: /*#__PURE__*/(0,jsx_runtime.jsx)(Content, {}),
+  edit: /*#__PURE__*/(0,jsx_runtime.jsx)(Content, {}),
   canMakePayment: () => {
     return true;
   },
   ariaLabel: label,
   supports: {
-    features: settings.supports
+    features: wc_payplug_apple_pay_blocks_settings.supports
   }
 };
 
@@ -2029,40 +1965,40 @@ const ApplePay = {
  * @Content for express payment method
  */
 const ExpressContent = props => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
+  return /*#__PURE__*/(0,jsx_runtime.jsxs)(jsx_runtime.Fragment, {
+    children: [/*#__PURE__*/(0,jsx_runtime.jsx)("div", {
       id: "apple-pay-button-wrapper",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("apple-pay-button", {
+      children: /*#__PURE__*/(0,jsx_runtime.jsx)("apple-pay-button", {
         id: "apple-pay-button",
         buttonstyle: "black",
         type: "pay",
-        locale: settings?.payplug_locale
+        locale: wc_payplug_apple_pay_blocks_settings?.payplug_locale
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_wc_payplug_apple_pay_cart_blocks__WEBPACK_IMPORTED_MODULE_7__["default"], {
+    }), /*#__PURE__*/(0,jsx_runtime.jsx)(wc_payplug_apple_pay_cart_blocks, {
       ...props
     })]
   });
 };
 const ExpressApplePay = {
   name: "apple_pay",
-  content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(ExpressContent, {}),
-  edit: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(ExpressContent, {}),
+  content: /*#__PURE__*/(0,jsx_runtime.jsx)(ExpressContent, {}),
+  edit: /*#__PURE__*/(0,jsx_runtime.jsx)(ExpressContent, {}),
   canMakePayment: data => {
-    if (!settings?.is_cart) {
+    if (!wc_payplug_apple_pay_blocks_settings?.is_cart) {
       return false;
     }
-    settings.payplug_apple_pay_shipping_required = data.cartNeedsShipping;
-    settings.total_amount = data.cartTotals.total_price;
+    wc_payplug_apple_pay_blocks_settings.payplug_apple_pay_shipping_required = data.cartNeedsShipping;
+    wc_payplug_apple_pay_blocks_settings.total_amount = data.cartTotals.total_price;
     if (!data.cartNeedsShipping) {
       return true;
     }
-    let selectedShippingMethods = data.selectedShippingMethods[0].split(":");
-    settings.payplug_carriers.forEach(function (item) {
-      if (item.identifier === selectedShippingMethods) {
+    let selectedShippingMethod = data.selectedShippingMethods[0];
+    wc_payplug_apple_pay_blocks_settings.payplug_carriers.forEach(function (item) {
+      if (item.identifier === selectedShippingMethod) {
         item.selected = true;
       }
     });
-    let payplug_authorized_carriers = settings?.payplug_authorized_carriers;
+    let payplug_authorized_carriers = wc_payplug_apple_pay_blocks_settings?.payplug_authorized_carriers;
     let selected_shipping = data.selectedShippingMethods[0].split(":");
     let authorized = false;
     payplug_authorized_carriers.forEach(function (item) {
@@ -2074,10 +2010,9 @@ const ExpressApplePay = {
   },
   paymentMethodId: "apple_pay"
 };
-(0,_woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_4__.registerExpressPaymentMethod)(ExpressApplePay);
-(0,_woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_4__.registerPaymentMethod)(ApplePay);
+(0,external_wc_wcBlocksRegistry_namespaceObject.registerExpressPaymentMethod)(ExpressApplePay);
+(0,external_wc_wcBlocksRegistry_namespaceObject.registerPaymentMethod)(ApplePay);
 })();
 
 /******/ })()
 ;
-//# sourceMappingURL=wc-payplug-apple_pay-blocks.js.map

@@ -44,7 +44,7 @@ class ApplePay extends PayplugGateway
 
         $this->title = __('payplug_apple_pay_title', 'payplug');
         $this->description = '<div id="apple-pay-button-wrapper"><apple-pay-button buttonstyle="black" type="pay" locale="' . get_locale() . '"></apple-pay-button></div>';
-        $this->domain_name = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : parse_url(home_url(), PHP_URL_HOST);
+        $this->domain_name = wp_parse_url(home_url(), PHP_URL_HOST);
         $this->enabled = 'no';
 
         if ($this->checkApplePay() && is_admin()) {
@@ -55,9 +55,11 @@ class ApplePay extends PayplugGateway
             }
 
             if (!is_admin()) {
-                if (!PayplugWoocommerceHelper::is_checkout_block() && $this->get_button_checkout()) {
-                    $this->add_apple_pay_css();
-                    add_action('wp_enqueue_scripts', [$this, 'add_apple_pay_js']);
+                // Gateways are constructed before WordPress finishes parsing the request, so
+                // is_wc_endpoint_url('order-pay') can't be trusted yet here: defer that check
+                // to wp_enqueue_scripts, once routing has completed.
+                if ($this->get_button_checkout()) {
+                    add_action('wp_enqueue_scripts', [$this, 'maybe_add_apple_pay_checkout_assets']);
                 }
 
                 if ($this->get_button_cart() && !PayplugWoocommerceHelper::is_cart_block() && !PayplugWoocommerceHelper::is_subscription()) {
@@ -240,7 +242,7 @@ class ApplePay extends PayplugGateway
             'cart_shipping' => WC()->cart->get_shipping_total(),
             'countryCode' => WC()->customer->get_billing_country(),
             'currencyCode' => get_woocommerce_currency(),
-            'apple_pay_domain' => $_SERVER['HTTP_HOST'],
+            'apple_pay_domain' => $this->domain_name,
         ];
         wp_enqueue_script('apple-pay-sdk', 'https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js', [], false, true);
         wp_enqueue_script('payplug-apple-pay-product', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-apple-pay-product.js', ['jquery', 'apple-pay-sdk'], PAYPLUG_GATEWAY_VERSION, true);
@@ -363,6 +365,23 @@ class ApplePay extends PayplugGateway
     }
 
     /**
+     * Enqueues the classic Apple Pay checkout assets, unless the checkout page uses the
+     * Cart & Checkout blocks (the order-pay page always renders the classic payment form,
+     * even then, so it still needs the classic assets).
+     *
+     * @return void
+     */
+    public function maybe_add_apple_pay_checkout_assets(): void
+    {
+        if (PayplugWoocommerceHelper::is_checkout_block() && !is_wc_endpoint_url('order-pay')) {
+            return;
+        }
+
+        $this->add_apple_pay_css();
+        $this->add_apple_pay_js();
+    }
+
+    /**
      * Enqueues Apple Pay JavaScript for the checkout page.
      *
      * @return void
@@ -395,6 +414,7 @@ class ApplePay extends PayplugGateway
                 'is_order_pay' => is_wc_endpoint_url('order-pay'),
                 'order_pay_id' => is_wc_endpoint_url('order-pay') ? (int) get_query_var('order-pay') : 0,
                 'order_pay_key' => is_wc_endpoint_url('order-pay') ? wc_clean(wp_unslash($_GET['key'] ?? '')) : '',
+                'wp_nonce' => wp_create_nonce('woocommerce-process_checkout'),
                 'apple_pay_domain' => $this->domain_name,
             ]
         );
@@ -430,7 +450,13 @@ class ApplePay extends PayplugGateway
      */
     private function process_standard_intent_payment($order)
     {
-        if (!is_wc_endpoint_url('order-pay') &&
+        // This runs from the payplug_apple_pay_create_order_pay AJAX endpoint too, whose own
+        // request URL never carries the order-pay query var, so is_wc_endpoint_url() alone
+        // can't detect that context here: fall back to the order_key/order_pay_key sent by
+        // that endpoint and by the checkout-block create_payment_intent endpoint.
+        $is_order_pay = $this->is_order_pay_request($order);
+
+        if (!$is_order_pay &&
             PayplugWoocommerceHelper::is_checkout_block() &&
             !empty($order->get_transaction_id())) {
             $order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
@@ -483,6 +509,10 @@ class ApplePay extends PayplugGateway
         if (!empty($intent)) {
             return $intent;
         }
+
+        // Same detection as process_standard_intent_payment(): this can run from AJAX
+        // endpoints whose own request URL never carries the order-pay query var.
+        $is_order_pay = $this->is_order_pay_request($order);
 
         $order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
         try {
@@ -566,11 +596,18 @@ class ApplePay extends PayplugGateway
 
             PayplugGateway::log(sprintf('Payment creation complete for order #%s', $order_id));
 
+            // On order-pay, closing the Apple Pay sheet should keep the customer on the
+            // order-pay page, not cancel the order and send them to the cart like a fresh
+            // checkout attempt would.
+            $cancel_url = $is_order_pay
+                ? esc_url_raw($order->get_checkout_payment_url())
+                : esc_url_raw($order->get_cancel_order_url_raw());
+
             return [
                 'result' => 'success',
                 'merchant_session' => $payment->payment_method['merchant_session'],
                 'payment_id' => $payment->id,
-                'cancel_url' => esc_url_raw($order->get_cancel_order_url_raw()),
+                'cancel_url' => $cancel_url,
                 'return_url' => $return_url,
             ];
         } catch (HttpException $e) {
