@@ -2,11 +2,11 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./resources/js/frontend/helper/wc-payplug-oney-simulation.js":
+/***/ "./resources/js/frontend/helper/wc-payplug-oney-simulation.js"
 /*!********************************************************************!*\
   !*** ./resources/js/frontend/helper/wc-payplug-oney-simulation.js ***!
   \********************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -82,18 +82,19 @@ const Oney_Simulation = ({
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Oney_Simulation);
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/react-dom/client.js":
+/***/ "./node_modules/react-dom/client.js"
 /*!******************************************!*\
   !*** ./node_modules/react-dom/client.js ***!
   \******************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 
 var m = __webpack_require__(/*! react-dom */ "react-dom");
-if (false) {} else {
+if (false) // removed by dead control flow
+{} else {
   var i = m.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
   exports.createRoot = function(c, o) {
     i.usingClientEntryPoint = true;
@@ -114,13 +115,13 @@ if (false) {} else {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/react/cjs/react-jsx-runtime.development.js":
+/***/ "./node_modules/react/cjs/react-jsx-runtime.development.js"
 /*!*****************************************************************!*\
   !*** ./node_modules/react/cjs/react-jsx-runtime.development.js ***!
   \*****************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 /**
  * @license React
@@ -1457,88 +1458,89 @@ exports.jsxs = jsxs;
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/react/jsx-runtime.js":
+/***/ "./node_modules/react/jsx-runtime.js"
 /*!*******************************************!*\
   !*** ./node_modules/react/jsx-runtime.js ***!
   \*******************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 
 
-if (false) {} else {
+if (false) // removed by dead control flow
+{} else {
   module.exports = __webpack_require__(/*! ./cjs/react-jsx-runtime.development.js */ "./node_modules/react/cjs/react-jsx-runtime.development.js");
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "react":
+/***/ "react"
 /*!************************!*\
   !*** external "React" ***!
   \************************/
-/***/ ((module) => {
+(module) {
 
 module.exports = window["React"];
 
-/***/ }),
+/***/ },
 
-/***/ "react-dom":
+/***/ "react-dom"
 /*!***************************!*\
   !*** external "ReactDOM" ***!
   \***************************/
-/***/ ((module) => {
+(module) {
 
 module.exports = window["ReactDOM"];
 
-/***/ }),
+/***/ },
 
-/***/ "@woocommerce/blocks-registry":
+/***/ "@woocommerce/blocks-registry"
 /*!******************************************!*\
   !*** external ["wc","wcBlocksRegistry"] ***!
   \******************************************/
-/***/ ((module) => {
+(module) {
 
 module.exports = window["wc"]["wcBlocksRegistry"];
 
-/***/ }),
+/***/ },
 
-/***/ "@woocommerce/settings":
+/***/ "@woocommerce/settings"
 /*!************************************!*\
   !*** external ["wc","wcSettings"] ***!
   \************************************/
-/***/ ((module) => {
+(module) {
 
 module.exports = window["wc"]["wcSettings"];
 
-/***/ }),
+/***/ },
 
-/***/ "@wordpress/html-entities":
+/***/ "@wordpress/html-entities"
 /*!**************************************!*\
   !*** external ["wp","htmlEntities"] ***!
   \**************************************/
-/***/ ((module) => {
+(module) {
 
 module.exports = window["wp"]["htmlEntities"];
 
-/***/ }),
+/***/ },
 
-/***/ "@wordpress/i18n":
+/***/ "@wordpress/i18n"
 /*!******************************!*\
   !*** external ["wp","i18n"] ***!
   \******************************/
-/***/ ((module) => {
+(module) {
 
 module.exports = window["wp"]["i18n"];
 
-/***/ })
+/***/ }
 
 /******/ 	});
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/
+/******/ 	
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -1552,14 +1554,20 @@ module.exports = window["wp"]["i18n"];
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/
+/******/ 	
 /******/ 		// Execute the module function
+/******/ 		if (!(moduleId in __webpack_modules__)) {
+/******/ 			delete __webpack_module_cache__[moduleId];
+/******/ 			var e = new Error("Cannot find module '" + moduleId + "'");
+/******/ 			e.code = 'MODULE_NOT_FOUND';
+/******/ 			throw e;
+/******/ 		}
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/
+/******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
+/******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
 /******/ 	(() => {
@@ -1572,7 +1580,7 @@ module.exports = window["wp"]["i18n"];
 /******/ 			return getter;
 /******/ 		};
 /******/ 	})();
-/******/
+/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -1584,12 +1592,12 @@ module.exports = window["wp"]["i18n"];
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/
+/******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -1600,10 +1608,10 @@ module.exports = window["wp"]["i18n"];
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
 /*!**********************************************************************!*\
   !*** ./resources/js/frontend/wc-payplug-oney_x3_with_fees-blocks.js ***!
@@ -1738,6 +1746,7 @@ let oney_x3_with_fees = {
           alignItems: 'center'
         }
       }, [createElement('div', {
+        key: 'oney-message',
         className: 'oney-message',
         style: {
           display: 'flex',
@@ -1745,6 +1754,7 @@ let oney_x3_with_fees = {
           gap: '8px'
         }
       }, settings.oney_cart_label), createElement('img', {
+        key: 'oney-logo',
         src: settings?.oney_cart_logo,
         alt: 'Oney Payplug',
         className: 'oney-3x4x',
