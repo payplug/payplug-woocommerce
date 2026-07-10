@@ -86,6 +86,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
         }
 
         $is_order_pay = is_wc_endpoint_url('order-pay');
+        $country_code_billing = null;
         if (!is_admin() && (!PayplugWoocommerceHelper::is_checkout_block() || $is_order_pay)) {
             if (empty(WC()->cart) && !is_admin() && !$is_order_pay) {
                 return false;
