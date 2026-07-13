@@ -468,17 +468,41 @@ class ApplePay extends PayplugGateway
                 }
 
                 $return_url = esc_url_raw($order->get_checkout_order_received_url());
+                $cancel_url = !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : esc_url_raw(wc_get_checkout_url());
 
-                wp_send_json_success(
-                    [
-                        'payment_id' => $payment->id,
-                        'result' => 'success',
-                        'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
-                        'cancel' => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null,
-                    ]
-                );
+                // Same payload shape as process_standard_payment(): the frontend's
+                // BeginSessionFromPaymentDetails() reads merchant_session/cancel_url/return_url
+                // off of it regardless of which of the two methods produced it.
+                // payment_method is a write-once attribute (merchant_session is tied to the
+                // ApplePaySession that created the payment): a retrieved payment may not carry
+                // it at all, and $payment->payment_method would throw UndefinedAttributeException
+                // rather than just being null/missing, unlike a plain array access.
+                $merchant_session = null;
+                if (isset($payment->payment_method) && is_array($payment->payment_method)) {
+                    $merchant_session = $payment->payment_method['merchant_session'] ?? null;
+                }
 
-                return ['stt' => 'OK'];
+                if (defined('REST_REQUEST') && REST_REQUEST) {
+                    $merchant_session = wp_json_encode($merchant_session);
+                }
+
+                $result = [
+                    'result' => 'success',
+                    'merchant_session' => $merchant_session,
+                    'payment_id' => $payment->id,
+                    'cancel_url' => $cancel_url,
+                    'return_url' => $return_url,
+                ];
+
+                // wp_send_json_success() calls die(), which is only safe for the classic
+                // wc-ajax request this was written for: the Store API checkout flow (used by
+                // the checkout block) calls process_payment() through the REST framework,
+                // and killing the process mid-request there produces a broken response.
+                if (wp_doing_ajax()) {
+                    wp_send_json_success($result);
+                }
+
+                return $result;
             } catch (HttpException $e) {
                 PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
                 throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
@@ -597,15 +621,32 @@ class ApplePay extends PayplugGateway
             PayplugGateway::log(sprintf('Payment creation complete for order #%s', $order_id));
 
             // On order-pay, closing the Apple Pay sheet should keep the customer on the
-            // order-pay page, not cancel the order and send them to the cart like a fresh
-            // checkout attempt would.
-            $cancel_url = $is_order_pay
-                ? esc_url_raw($order->get_checkout_payment_url())
-                : esc_url_raw($order->get_cancel_order_url_raw());
+            // order-pay page. On a regular checkout submission (classic or Blocks), it should
+            // keep them on checkout too, so they can pick another payment method - only the
+            // classic cart/product page flows (workflow 'cart'/'product') actually want the
+            // order-cancelled/cart redirect, since that's where those customers started.
+            if ($is_order_pay) {
+                $cancel_url = esc_url_raw($order->get_checkout_payment_url());
+            } elseif ('checkout' === $workflow) {
+                $cancel_url = esc_url_raw(wc_get_checkout_url());
+            } else {
+                $cancel_url = esc_url_raw($order->get_cancel_order_url_raw());
+            }
+
+            // When process_payment() is invoked through WooCommerce Blocks' Store API (a REST
+            // request), this array is forwarded to the client as `payment_details`, which
+            // coerces every value to a string - an array value would become the literal,
+            // useless string "Array". The classic AJAX flows that call this method directly
+            // (order-pay, cart/product Apple Pay) JSON-encode/decode the whole response
+            // transparently instead, so they need the raw merchant session object.
+            $merchant_session = $payment->payment_method['merchant_session'];
+            if (defined('REST_REQUEST') && REST_REQUEST) {
+                $merchant_session = wp_json_encode($merchant_session);
+            }
 
             return [
                 'result' => 'success',
-                'merchant_session' => $payment->payment_method['merchant_session'],
+                'merchant_session' => $merchant_session,
                 'payment_id' => $payment->id,
                 'cancel_url' => $cancel_url,
                 'return_url' => $return_url,
