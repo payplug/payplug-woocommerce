@@ -169,6 +169,9 @@ class PayplugCreditCard extends PayplugGateway
             'nonce' => wp_create_nonce('woocommerce-process_checkout'),
             'mode' => PayplugWoocommerceHelper::check_mode(), // true for TEST, false for LIVE
             'check_payment_url' => \WC_AJAX::get_endpoint('payplug_check_payment'),
+            // The Integrated Payment SDK defaults to its production domain when none is given,
+            // which 404s for a test/QA merchant account - point it at the matching QA domain.
+            'secureDomain' => PayplugWoocommerceHelper::check_mode() ? 'https://secure-qa.payplug.com' : 'https://secure.payplug.com',
         ];
 
         /**x

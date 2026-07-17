@@ -4,6 +4,7 @@ namespace Payplug\PayplugWoocommerce;
 
 // Exit if accessed directly
 use Automattic\WooCommerce\Utilities\OrderUtil;
+use Payplug\Exception\HttpException;
 use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
@@ -583,7 +584,19 @@ class PayplugWoocommerceRequest
          */
         $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
 
-        $payment = $this->gateway->payplug_api->payment_create($payment_data);
+        try {
+            $payment = $this->gateway->payplug_api->payment_create($payment_data);
+        } catch (HttpException $e) {
+            PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
+            wp_send_json_error(__('Payment processing failed. Please retry.', 'payplug'));
+
+            return;
+        } catch (\Exception $e) {
+            PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, $e->getMessage()), 'error');
+            wp_send_json_error(__('Payment processing failed. Please retry.', 'payplug'));
+
+            return;
+        }
 
         // Save transaction id on the order
         PayplugWoocommerceHelper::is_pre_30() ? update_post_meta($order_id, '_transaction_id', $payment->id) : $order->set_transaction_id($payment->id);

@@ -33,7 +33,6 @@ class PayplugApplePay extends PayplugGenericBlock
         $data['is_order_pay'] = is_wc_endpoint_url('order-pay');
         $data['order_pay_id'] = $data['is_order_pay'] ? (int) get_query_var('order-pay') : 0;
         $data['order_pay_key'] = $data['is_order_pay'] ? wc_clean(wp_unslash($_GET['key'] ?? '')) : '';
-        $data['wp_nonce'] = wp_create_nonce('woocommerce-process_checkout');
         $data['ajax_url_applepay_update_payment'] = \WC_AJAX::get_endpoint('applepay_update_payment');
         $data['payplug_create_intent_payment'] = \WC_AJAX::get_endpoint('payplug_create_intent');
         $data['is_cart'] = is_cart() && $this->gateway->get_button_cart() && !PayplugWoocommerceHelper::is_subscription();

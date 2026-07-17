@@ -233,16 +233,22 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
                 $return_url = esc_url_raw($order->get_checkout_order_received_url());
 
-                wp_send_json_success(
-                    [
-                        'payment_id' => $payment->id,
-                        'result' => 'success',
-                        'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
-                        'cancel' => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null,
-                    ]
-                );
+                $result = [
+                    'payment_id' => $payment->id,
+                    'result' => 'success',
+                    'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
+                    'cancel' => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null,
+                ];
 
-                return ['stt' => 'OK'];
+                // wp_send_json_success() calls die(), which is only safe for the classic
+                // wc-ajax request this was written for: the Store API checkout flow (used by
+                // the checkout block) calls process_payment() through the REST framework,
+                // and killing the process mid-request there produces a broken response.
+                if (wp_doing_ajax()) {
+                    wp_send_json_success($result);
+                }
+
+                return $result;
             } catch (HttpException $e) {
                 PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
                 throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
