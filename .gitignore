@@ -46,3 +46,5 @@ var/
 RELEASE.md
 .act-artifacts
 
+# assets
+assets/js/payplug-domain.js

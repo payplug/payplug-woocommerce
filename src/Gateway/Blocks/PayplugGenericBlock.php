@@ -85,7 +85,11 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
             $features = array_diff($features, ['tokenization']);
         }
 
-        return $features;
+        // array_diff() preserves original keys, leaving gaps; a PHP array with non-sequential
+        // keys is JSON-encoded as an object, but WC Blocks' registerPaymentMethod() requires
+        // supports.features to be a plain array (or undefined), or it throws and the whole
+        // checkout payment-methods list fails to render.
+        return array_values($features);
     }
 
     /**
@@ -113,6 +117,7 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
             'description' => $this->gateway->description,
             'allowed_country_codes' => $this->allowed_country_codes,
             'save_card' => $save_card,
+            'wp_nonce' => wp_create_nonce('woocommerce-process_checkout'),
         ];
     }
 }
