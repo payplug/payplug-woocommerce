@@ -32,6 +32,13 @@ class PayplugCreditCard extends PayplugGenericBlock
         $data['showSaveOption'] = !empty($this->gateway->save_card) ? $this->gateway->save_card : false;
         $configuration = $this->get_service('configuration');
         $embedded_mode = $configuration->get_option('payment_methods.configuration.payplug.embedded_mode');
+        // Order-pay always has a real, existing order (the one being repaid) - a regular
+        // checkout's order isn't created until the place-order submission itself (see
+        // wc-payplug-integratedPayment-blocks.js / wc-payplug-popup-blocks.js for why that
+        // matters here). Used by both the 'integrated' and 'popup' embedded modes below.
+        $data['is_order_pay'] = is_wc_endpoint_url('order-pay');
+        $data['order_pay_id'] = $data['is_order_pay'] ? (int) get_query_var('order-pay') : 0;
+        $data['order_pay_key'] = $data['is_order_pay'] ? wc_clean(wp_unslash($_GET['key'] ?? '')) : '';
         switch ($embedded_mode) {
             case 'integrated':
                 $data['payplug_integrated_payment_cardHolder_error'] = __('payplug_integrated_payment_cardHolder_error', 'payplug');
@@ -56,6 +63,7 @@ class PayplugCreditCard extends PayplugGenericBlock
                 $data['payplug_integrated_payment_nonce_field'] = wp_nonce_field('woocommerce-process_checkout', 'woocommerce-process-checkout-nonce');
                 $data['wp_nonce'] = wp_create_nonce('woocommerce-process_checkout');
                 $data['mode'] = PayplugWoocommerceHelper::check_mode();
+                $data['secureDomain'] = PayplugWoocommerceHelper::get_secure_domain();
                 $data['IP'] = true;
                 break;
             case 'popup':

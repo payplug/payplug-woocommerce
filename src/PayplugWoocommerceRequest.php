@@ -123,6 +123,17 @@ class PayplugWoocommerceRequest
             return;
         }
 
+        // This AJAX request's own URL never carries the order-pay query var (only the page
+        // that triggered it does), but WC_Payment_Gateway::get_order_total() - used by this
+        // plugin's own check_gateway() filter on woocommerce_available_payment_gateways to
+        // enforce per-method amount permissions - reads that query var to know whether to use
+        // the order's total or the (here empty, on order-pay) cart's. Left unset, it falls
+        // back to a cart total of 0, which the amount-permission check then rejects, making
+        // Apple Pay appear unavailable below. Setting it restores the normal, fully validated
+        // availability check (API key, requirements, amount permissions, etc.).
+        global $wp_query;
+        $wp_query->set('order-pay', $order_id);
+
         $available_gateways = WC()->payment_gateways->get_available_payment_gateways();
         if (!isset($available_gateways['apple_pay'])) {
             wp_send_json([
@@ -151,7 +162,33 @@ class PayplugWoocommerceRequest
     {
         global $wp;
 
-        if (WC()->cart->is_empty()) {
+        $https_referer = wc_clean(wp_unslash($_POST['_wp_http_referer'] ?? ''));
+        $path = wp_parse_url($https_referer) ?: [];
+        $output = [];
+        if (!empty($path['query'])) {
+            wp_parse_str($path['query'], $output);
+        }
+
+        if (isset($output['order-pay'])) {
+            $order_id = absint($output['order-pay']);
+        } else {
+            preg_match('/(?<=order-pay\/)\d*/', $path['path'] ?? '', $matches);
+            $order_id = !empty($matches[0]) ? absint($matches[0]) : 0;
+        }
+
+        // The referer is client-supplied and can be spoofed: only trust it as an order-pay
+        // request once the order it names is confirmed real and the key matches, exactly
+        // like the order-pay AJAX flows below already require (create_payment_intent,
+        // ajax_apple_pay_create_order_pay). Otherwise fall through as a regular checkout.
+        $order = $order_id ? wc_get_order($order_id) : false;
+        if (!$order instanceof \WC_Order || !hash_equals($order->get_order_key(), wc_clean(wp_unslash($output['key'] ?? '')))) {
+            $order_id = 0;
+        }
+
+        // Order-pay repays an existing order, whose line items live on the order itself,
+        // not the session cart - which is legitimately empty here (the customer already
+        // completed checkout for it), so only require a non-empty cart on a fresh checkout.
+        if (empty($order_id) && WC()->cart->is_empty()) {
             wp_send_json_error(__('Empty cart', 'payplug'));
         }
 
@@ -170,17 +207,6 @@ class PayplugWoocommerceRequest
             $this->ajax_create_order();
         }
 
-        $https_referer = $_POST['_wp_http_referer'];
-        $path = parse_url($https_referer);
-        wp_parse_str($path['query'], $output);
-
-        if (isset($output['order-pay'])) {
-            $order_id = $output['order-pay'];
-        } else {
-            preg_match('/(?<=order-pay\/)\d*/', $path['path'], $matches);
-            $order_id = $matches[0];
-        }
-
         $this->process_order_payment($order_id, $payment_method);
     }
 
@@ -197,6 +223,17 @@ class PayplugWoocommerceRequest
      */
     protected function process_order_payment($order_id, $payment_method): void
     {
+        // This AJAX request's own URL never carries the order-pay query var (only the page
+        // that triggered it does), but WC_Payment_Gateway::get_order_total() - used by this
+        // plugin's own check_gateway() filter on woocommerce_available_payment_gateways to
+        // enforce per-method amount permissions - reads that query var to know whether to use
+        // the order's total or the (here empty, on order-pay) cart's. Left unset, it falls
+        // back to a cart total of 0, which the amount-permission check then rejects, making
+        // every gateway appear unavailable below. Setting it restores the normal, fully
+        // validated availability check (API key, requirements, amount permissions, etc.).
+        global $wp_query;
+        $wp_query->set('order-pay', $order_id);
+
         $available_gateways = WC()->payment_gateways->get_available_payment_gateways();
 
         if (!isset($available_gateways[$payment_method])) {

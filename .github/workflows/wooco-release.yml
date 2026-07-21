@@ -73,6 +73,7 @@ jobs:
       ref: ${{ github.ref }}
       upload-to-release: true
     secrets:
+      payplug-domain: ${{ secrets.PAYPLUG_DOMAIN_PROD }}
       cdn-payplug: ${{ secrets.CDN_PAYPLUG_PROD }}
       api-payplug: ${{ secrets.PAYPLUG_API_PROD }}
       api-payplug-retail: ${{ secrets.API_RETAIL_PROD }}
