@@ -803,6 +803,19 @@ class PayplugWoocommerceHelper
         return self::get_payplug_options()['mode'];
     }
 
+    /**
+     * Domain the Integrated Payment SDK should submit card-tokenization requests to. Depends
+     * on whether the connected merchant account is QA or production, which is a build-time
+     * distinction (see SECURE_DOMAIN in payplug-config.php), not something this can derive
+     * from the Test/Live mode toggle at runtime.
+     *
+     * @return string
+     */
+    public static function get_secure_domain(): string
+    {
+        return SECURE_DOMAIN;
+    }
+
     public static function payplug_logout(): void
     {
         $helper = new self();
