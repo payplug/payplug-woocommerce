@@ -22,6 +22,7 @@ jobs:
       env: qa
       ref: refs/heads/master
     secrets:
+      payplug-domain: ${{ secrets.PAYPLUG_DOMAIN_QA }}
       cdn-payplug: ${{ secrets.CDN_PAYPLUG_QA }}
       api-payplug: ${{ secrets.PAYPLUG_API_QA }}
       api-payplug-retail: ${{ secrets.API_RETAIL_QA }}
@@ -73,6 +74,7 @@ jobs:
       ref: ${{ github.ref }}
       upload-to-release: true
     secrets:
+      payplug-domain: ${{ secrets.PAYPLUG_DOMAIN_PROD }}
       cdn-payplug: ${{ secrets.CDN_PAYPLUG_PROD }}
       api-payplug: ${{ secrets.PAYPLUG_API_PROD }}
       api-payplug-retail: ${{ secrets.API_RETAIL_PROD }}
