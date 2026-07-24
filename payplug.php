@@ -142,13 +142,13 @@ add_action('wp_abilities_api_init', function (): void {
                 'type' => 'object',
                 'properties' => [
                     'result' => ['type' => 'boolean'],
-                    'code' => ['type' => 'integer'],
-                    'message' => ['type' => 'string'],
-                    'order_id' => ['type' => 'integer'],
-                    'resource_id' => ['type' => 'string'],
-                    'payment_url' => ['type' => 'string'],
-
+                    'code' => ['type' => ['integer', 'null']],
+                    'message' => ['type' => ['string', 'null']],
+                    'order_id' => ['type' => ['integer', 'null']],
+                    'resource_id' => ['type' => ['string', 'null']],
+                    'payment_url' => ['type' => ['string', 'null']],
                 ],
+                'required' => ['result'],
             ],
             'execute_callback' => function ($input) {
                 $mcp = new \Payplug\PayplugWoocommerce\Service\Mcp();
