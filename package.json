@@ -27,7 +27,7 @@
     "@woocommerce/dependency-extraction-webpack-plugin": "2.2.0",
     "@wordpress/scripts": "^30.0.2",
     "cross-env": "7.0.3",
-    "cypress": "^13.2.0",
+    "cypress": "^15.19.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.2"
   },
