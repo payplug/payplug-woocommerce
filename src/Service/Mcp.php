@@ -2,6 +2,9 @@
 
 namespace Payplug\PayplugWoocommerce\Service;
 
+use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
@@ -89,6 +92,87 @@ class Mcp
     }
 
     /**
+     * Validates customer and cart data that don't require a WooCommerce order to exist.
+     *
+     * @param array $customer Customer information
+     * @param array $cart Cart with products
+     *
+     * @return array|null Error response array if invalid, null if valid.
+     */
+    protected function validateCreateByLinkParams(array $customer, array $cart)
+    {
+        if (!empty($customer['customer_address_email']) && !is_email($customer['customer_address_email'])) {
+            return $this->invalidParamError(400, "Invalid email address: '{$customer['customer_address_email']}'.");
+        }
+
+        foreach (!empty($cart['products']) ? $cart['products'] : [] as $product) {
+            $product_id = (int) $product['product_id'];
+            $wc_product = wc_get_product($product_id);
+
+            if (!$wc_product) {
+                return $this->invalidParamError(404, "Product with ID $product_id not found.");
+            }
+
+            $variation_id = isset($product['variation_id']) ? (int) $product['variation_id'] : 0;
+            if ($wc_product->is_type('variable') && empty($variation_id)) {
+                return $this->invalidParamError(
+                    400,
+                    "Product '$product_id' is a variable product but no variation_id was provided. Please select a variation."
+                );
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Normalizes a phone number to E.164 format, using the same libphonenumber-based
+     * logic as the classic checkout flow (see PayplugAddressData::prepare_address_data()).
+     *
+     * @param mixed $phone_number
+     * @param mixed $country ISO country code (e.g. "FR"), used to interpret local formats.
+     *
+     * @return string|null The normalized E.164 phone number, or null if it can't be validated.
+     */
+    protected function normalizePhoneNumber($phone_number, $country)
+    {
+        if (!is_string($phone_number) || !is_string($country) || '' === $country) {
+            return null;
+        }
+
+        try {
+            $phone_number_util = PhoneNumberUtil::getInstance();
+            $parsed_number = $phone_number_util->parse($phone_number, $country);
+
+            if (!$phone_number_util->isValidNumber($parsed_number)) {
+                return null;
+            }
+
+            return $phone_number_util->format($parsed_number, PhoneNumberFormat::E164);
+        } catch (NumberParseException $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param int $code
+     * @param string $message
+     *
+     * @return array
+     */
+    protected function invalidParamError($code, $message)
+    {
+        return [
+            'result' => false,
+            'code' => $code,
+            'message' => $message,
+            'order_id' => null,
+            'resource_id' => null,
+            'payment_url' => null,
+        ];
+    }
+
+    /**
      * Creates a payment link for a customer.
      *
      * @param array $customer Customer information
@@ -98,6 +182,27 @@ class Mcp
      */
     public function createByLink(array $customer, array $cart)
     {
+        if (!empty($customer['customer_address_mobile_phone_number'])) {
+            $normalized_phone = $this->normalizePhoneNumber(
+                $customer['customer_address_mobile_phone_number'],
+                isset($customer['customer_address_country']) ? $customer['customer_address_country'] : ''
+            );
+
+            if (null === $normalized_phone) {
+                return $this->invalidParamError(
+                    400,
+                    "Invalid phone number '{$customer['customer_address_mobile_phone_number']}' for country '{$customer['customer_address_country']}'."
+                );
+            }
+
+            $customer['customer_address_mobile_phone_number'] = $normalized_phone;
+        }
+
+        $validation_error = $this->validateCreateByLinkParams($customer, $cart);
+        if (null !== $validation_error) {
+            return $validation_error;
+        }
+
         // Create a new WooCommerce order
         $order = wc_create_order([
                      'customer_id' => isset($customer['customer_id']) ? (int) $customer['customer_id'] : 0,
@@ -109,37 +214,20 @@ class Mcp
                 'result' => false,
                 'code' => 500,
                 'message' => 'Failed to create order: ' . $order->get_error_message(),
+                'order_id' => null,
+                'resource_id' => null,
+                'payment_url' => null,
             ];
         }
 
-        // Add products to the order
+        // Add products to the order (already validated in validateCreateByLinkParams)
         if (!empty($cart['products'])) {
             foreach ($cart['products'] as $product) {
-                $product_id = (int) $product['product_id'];
                 $qty = (int) $product['qty'];
                 $variation_id = isset($product['variation_id']) ? (int) $product['variation_id'] : 0;
                 $variation = isset($product['variation']) ? $product['variation'] : [];
 
-                $wc_product = wc_get_product($product_id);
-
-                if (!$wc_product) {
-                    return [
-                        'result' => false,
-                        'code' => 404,
-                        'message' => "Product with ID $product_id not found.",
-                    ];
-                }
-
-                // Check if product is variable and needs variation
-                if ($wc_product->is_type('variable') && empty($variation_id)) {
-                    return [
-                        'result' => false,
-                        'code' => 400,
-                        'message' => "Product '$product_id' is a variable product but no variation_id was provided. Please select a variation.",
-                    ];
-                }
-
-                $order->add_product($wc_product, $qty, [
+                $order->add_product(wc_get_product((int) $product['product_id']), $qty, [
                     'variation_id' => $variation_id,
                     'variation' => $variation,
                 ]);
@@ -220,6 +308,9 @@ class Mcp
                 'result' => false,
                 'code' => $dtoResult['code'],
                 'message' => $dtoResult['message'],
+                'order_id' => null,
+                'resource_id' => null,
+                'payment_url' => null,
             ];
         }
 
@@ -232,6 +323,9 @@ class Mcp
                 'result' => false,
                 'code' => 401,
                 'message' => 'PayPlug API key is not configured. Please configure the PayPlug plugin settings in WooCommerce.',
+                'order_id' => null,
+                'resource_id' => null,
+                'payment_url' => null,
             ];
         }
 
@@ -240,6 +334,19 @@ class Mcp
             $payment_object = $payment_action->createAction($dto);
 
             $resource = $payment_object->getResource();
+
+            if (!$payment_object->getResult() || !$resource || empty($resource->id)) {
+                $order->update_status('failed', __('Payplug payment link creation failed.', 'payplug'));
+
+                return [
+                    'result' => false,
+                    'code' => $payment_object->getCode() ? (int) $payment_object->getCode() : 500,
+                    'message' => $payment_object->getMessage() ?: __('Payment processing failed. Please retry.', 'payplug'),
+                    'order_id' => $order->get_id(),
+                    'resource_id' => null,
+                    'payment_url' => null,
+                ];
+            }
 
             // Save transaction id for the order
             $order->set_transaction_id($resource->id);
@@ -270,10 +377,15 @@ class Mcp
                 'error'
             );
 
+            $order->update_status('failed', __('Payplug payment link creation failed.', 'payplug'));
+
             return [
                 'result' => false,
                 'code' => 500,
                 'message' => __('Payment processing failed. Please retry.', 'payplug'),
+                'order_id' => $order->get_id(),
+                'resource_id' => null,
+                'payment_url' => null,
             ];
         }
     }
