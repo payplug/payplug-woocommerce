@@ -45,15 +45,10 @@ class PayplugPermissions
      */
     public function __construct(PayplugGateway $gateway)
     {
-        $this->gateway_mode = $gateway->get_configuration()->get_option('mode');
-        $api_key = json_decode($gateway->get_configuration()->get_option('api_key'), true);
+        $this->gateway_mode = $gateway->get_configuration()->get_option('mode') ? 'live' : 'test';
 
-        // todo: check if we should get the jwt instead api key
-        if (!isset($api_key['live']) || !isset($api_key['test'])) {
-            $this->current_key = '';
-        } else {
-            $this->current_key = 'live' === $this->gateway_mode ? $api_key['live'] : $api_key['test'];
-        }
+        // get_bearer_token() refreshes the JWT if it's close to expiry (OAuth2 accounts).
+        $this->current_key = (string) $gateway->get_api()->get_bearer_token($this->gateway_mode);
         $this->load_permissions();
     }
 

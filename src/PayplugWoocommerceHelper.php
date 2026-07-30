@@ -559,32 +559,16 @@ class PayplugWoocommerceHelper
             return [];
         }
 
-        $api_key = json_decode($options['api_key'], true);
-        $jwt = json_decode($options['jwt'], true);
+        // get_bearer_token() refreshes the JWT if it's close to expiry (OAuth2 accounts).
+        $mode = (bool) $options['mode'] ? 'live' : 'test';
+        $key = (string) $helper->get_api()->get_bearer_token($mode);
 
-        $test_key = !empty($api_key['test']) ? $api_key['test'] : '';
-        $live_key = !empty($api_key['live']) ? $api_key['live'] : '';
-
-        if (empty($test_key) && isset($jwt['test']['access_token'])) {
-            $test_key = $jwt['test']['access_token'];
-        }
-        if (empty($live_key) && isset($jwt['live']['access_token'])) {
-            $live_key = $jwt['live']['access_token'];
-        }
-        if (empty($test_key) && empty($live_key)) {
-            return [];
-        }
-
-        if ((bool) $options['mode'] && empty($live_key)) {
-            return [];
-        }
-
-        if (!(bool) $options['mode'] && empty($test_key)) {
+        if (empty($key)) {
             return [];
         }
 
         try {
-            $parameters_account = Authentication::getAccount(new Payplug((bool) $options['mode'] ? $live_key : $test_key));
+            $parameters_account = Authentication::getAccount(new Payplug($key));
             self::set_transient_data($parameters_account, $options);
         } catch (\Payplug\Exception\UnauthorizedException $e) {
             self::exception_handler_400_logout($e->getCode(), __('payplug_enable_feature', 'payplug'), sprintf('Account request error from PayPlug API : %s <br><b> ' . __('Successfully logged out.', 'payplug') . '</b>', wc_print_r($e->getMessage(), true)));
@@ -778,24 +762,13 @@ class PayplugWoocommerceHelper
 
     public static function get_live_key()
     {
-        $options = self::get_payplug_options();
-        $jwt = json_decode($options['jwt'], true);
-        $api_key = json_decode($options['api_key'], true);
-
-        return isset($jwt['live']) && isset($jwt['live']['access_token'])
-            ? $jwt['live']['access_token']
-            : $api_key['live'];
+        // get_bearer_token() refreshes the JWT if it's close to expiry (OAuth2 accounts).
+        return (new self())->get_api()->get_bearer_token('live');
     }
 
     public static function get_test_key()
     {
-        $options = self::get_payplug_options();
-        $jwt = json_decode($options['jwt'], true);
-        $api_key = json_decode($options['api_key'], true);
-
-        return isset($jwt['test']) && isset($jwt['test']['access_token'])
-            ? $jwt['test']['access_token']
-            : $api_key['test'];
+        return (new self())->get_api()->get_bearer_token('test');
     }
 
     public static function check_mode()
