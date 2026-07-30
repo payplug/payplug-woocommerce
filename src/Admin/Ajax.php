@@ -655,6 +655,30 @@ class Ajax
         ]);
         $options['payment_methods']['configuration']['oney']['with_fees'] = 'with_fees' == (string) $data['payplug_oney'];
 
+        // Force-disable methods unavailable in test mode: submitted 'active' flags are
+        // trusted as-is, so one enabled while in live mode stays active after just
+        // switching to test unless we re-check it here.
+        if (!$options['mode']) {
+            $enable_on_test_mode = [
+                'oney' => PayplugGatewayOney3x::ENABLE_ON_TEST_MODE,
+                'apple_pay' => ApplePay::ENABLE_ON_TEST_MODE,
+                'payplug' => PayplugGateway::ENABLE_ON_TEST_MODE,
+                'american_express' => AmericanExpress::ENABLE_ON_TEST_MODE,
+                'bancontact' => Bancontact::ENABLE_ON_TEST_MODE,
+                'satispay' => Satispay::ENABLE_ON_TEST_MODE,
+                'mybank' => Mybank::ENABLE_ON_TEST_MODE,
+                'ideal' => Ideal::ENABLE_ON_TEST_MODE,
+                'wero' => Wero::ENABLE_ON_TEST_MODE,
+                'bizum' => Bizum::ENABLE_ON_TEST_MODE,
+                'scalapay' => Scalapay::ENABLE_ON_TEST_MODE,
+            ];
+            foreach ($enable_on_test_mode as $name => $allowed) {
+                if (!$allowed && isset($options['payment_methods']['configuration'][$name]['active'])) {
+                    $options['payment_methods']['configuration'][$name]['active'] = false;
+                }
+            }
+        }
+
         //
         $update = $payplug->get_service('configuration')->update_options($options);
 
