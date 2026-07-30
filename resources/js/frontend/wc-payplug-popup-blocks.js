@@ -76,7 +76,13 @@ const Popup = ({props: props, settings:_settings}) => {
 					try {
 						window.redirection_url = paymentDetails.cancel || false;
 						await Payplug.showPayment(paymentDetails.redirect);
-						resolve();
+						// Deliberately no resolve() here: Payplug's widget navigates window.top
+						// to hosted_payment.return_url itself once the payment finishes inside
+						// the lightbox. Resolving as soon as showPayment() opens the lightbox
+						// would mark checkout "complete" and let WooCommerce Blocks navigate
+						// away on its own (to payment_result.redirect_url) before the widget
+						// gets the chance to - tearing the lightbox down before the customer
+						// can pay. Only the error path settles this promise.
 					} catch (e) {
 						reject(e);
 					}
