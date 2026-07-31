@@ -42,13 +42,16 @@ class PayplugPermissions
      * PayplugPermissions constructor.
      *
      * @param PayplugGateway $gateway
+     * @param string|null $bearer_token Already-resolved bearer token for the gateway's
+     *                                  current mode (see PayplugGateway::init_payplug()).
+     *                                  Resolved here if not given.
      */
-    public function __construct(PayplugGateway $gateway)
+    public function __construct(PayplugGateway $gateway, ?string $bearer_token = null)
     {
         $this->gateway_mode = $gateway->get_configuration()->get_option('mode') ? 'live' : 'test';
 
         // get_bearer_token() refreshes the JWT if it's close to expiry (OAuth2 accounts).
-        $this->current_key = (string) $gateway->get_api()->get_bearer_token($this->gateway_mode);
+        $this->current_key = $bearer_token ?? (string) $gateway->get_api()->get_bearer_token($this->gateway_mode);
         $this->load_permissions();
     }
 
