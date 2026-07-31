@@ -33,6 +33,11 @@ class PayplugApi
     private $api_payplug;
 
     /**
+     * @var string
+     */
+    private $bearer_token = '';
+
+    /**
      * PayplugApi constructor.
      *
      * @param PayplugGateway $gateway
@@ -99,6 +104,7 @@ class PayplugApi
     {
         $current_mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
         $bearer_token = $this->get_api()->get_bearer_token($current_mode);
+        $this->bearer_token = (string) $bearer_token;
         try {
             $this->api_payplug = Payplug::init([
                 'secretKey' => (string) $bearer_token,
@@ -129,6 +135,18 @@ class PayplugApi
                 throw $e;
             }
         }
+    }
+
+    /**
+     * The bearer token resolved by init(), so callers built right after it (see
+     * PayplugGateway::init_payplug()) can reuse it instead of calling
+     * Api::get_bearer_token() again for the same mode.
+     *
+     * @return string
+     */
+    public function get_current_bearer_token(): string
+    {
+        return $this->bearer_token;
     }
 
     /**
