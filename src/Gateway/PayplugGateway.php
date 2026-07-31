@@ -558,7 +558,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $this->payplug_api = new PayplugApi($this);
         $this->payplug_api->init();
 
-        $this->permissions = new PayplugPermissions($this);
+        // init() just resolved this for the same mode - reuse it instead of asking
+        // Service\Api::get_bearer_token() to do so again right after.
+        $this->permissions = new PayplugPermissions($this, $this->payplug_api->get_current_bearer_token());
         $this->response = new PayplugResponse($this);
 
         // Register IPN handler
