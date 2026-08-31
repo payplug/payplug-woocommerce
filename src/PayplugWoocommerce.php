@@ -12,7 +12,7 @@ use Payplug\PayplugWoocommerce\Admin\Metabox;
 use Payplug\PayplugWoocommerce\Admin\Notices;
 use Payplug\PayplugWoocommerce\Admin\SetupCallback;
 use Payplug\PayplugWoocommerce\Admin\WoocommerceActions;
-use Payplug\PayplugWoocommerce\Front\PayplugOney\Requests\OneyAnimation;
+use Payplug\PayplugWoocommerce\Front\Oney\OneyDisplay;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugAmex;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugApplePay;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugBancontact;
@@ -199,36 +199,7 @@ class PayplugWoocommerce
 
     public function animationHandlers(): void
     {
-        $options = get_option('woocommerce_payplug_settings', []);
-
-        //if live and don't have country setted on the option
-        if (!isset($options['company_iso'])) {
-            $options['company_iso'] = PayplugWoocommerceHelper::UpdateCountryOption($options);
-        }
-
-        //failsafe
-        if (empty($options['company_iso']) || !isset($options['payment_methods']['configuration']['oney']['with_fees'])) {
-            return;
-        }
-
-        if (!class_exists('\\Payplug\\PayplugWoocommerce\\Front\\PayplugOney\\Country\\Oney' . $options['company_iso'])) {
-            return;
-        }
-
-        $oney_type = $options['payment_methods']['configuration']['oney']['with_fees']
-            ? 'with_fees'
-            : 'without_fees';
-
-        switch ($oney_type) {
-            case 'without_fees' :
-                $class = 'PayplugGatewayOney3xWithoutFees';
-                break;
-            default:
-                $class = 'PayplugGatewayOney3x';
-                break;
-        }
-
-        new OneyAnimation($oney_type, $class);
+        new OneyDisplay();
     }
 
     /**

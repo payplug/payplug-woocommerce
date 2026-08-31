@@ -580,24 +580,6 @@ class PayplugWoocommerceHelper
     }
 
     /**
-     * Get min and max for oney payment
-     *
-     * @return array
-     */
-    public static function get_min_max_oney()
-    {
-        $account = self::get_account_data_from_options();
-        if (!$account) {
-            return [];
-        }
-
-        return [
-            'min' => floatval($account['configuration']['oney']['min_amounts']['EUR']) / 100,
-            'max' => floatval($account['configuration']['oney']['max_amounts']['EUR']) / 100,
-        ];
-    }
-
-    /**
      * Check if oney is available with current settings
      *
      * @return bool
@@ -661,23 +643,6 @@ class PayplugWoocommerceHelper
         $path = WP_PLUGIN_DIR . '/' . trim($plugin_rel_path, '/');
 
         return load_textdomain($domain, $path . '/' . $mofile);
-    }
-
-    /**
-     * Check and update value for oney simulation
-     *
-     * @return void
-     */
-    public static function oney_simulation_values($keys_array, &$array): void
-    {
-        foreach ($keys_array as $key) {
-            if (array_key_exists($key, $array)) {
-                $array[$key]['down_payment_amount'] = floatval($array[$key]['down_payment_amount']) / 100;
-                foreach ($array[$key]['installments'] as $k => $value) {
-                    $array[$key]['installments'][$k]['amount'] = floatval($value['amount']) / 100;
-                }
-            }
-        }
     }
 
     public static function getISOCountryCode()
@@ -787,6 +752,19 @@ class PayplugWoocommerceHelper
     public static function get_secure_domain(): string
     {
         return SECURE_DOMAIN;
+    }
+
+    /**
+     * URL of the official Oney widget loader script. Depends on whether the connected
+     * merchant account is QA or production, which is a build-time distinction (see
+     * ONEY_LOADER_URL in payplug-config.php), not something this can derive from the
+     * Test/Live mode toggle at runtime.
+     *
+     * @return string
+     */
+    public static function get_oney_loader_url(): string
+    {
+        return ONEY_LOADER_URL;
     }
 
     public static function payplug_logout(): void

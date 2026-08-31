@@ -8,11 +8,8 @@ if (!defined('ABSPATH')) {
 }
 
 use Payplug\Core\HttpClient;
-use Payplug\Exception\BadRequestException;
 use Payplug\Exception\ConfigurationException;
-use Payplug\Exception\ForbiddenException;
 use Payplug\Exception\NotFoundException;
-use Payplug\Exception\PayplugServerException;
 use Payplug\Exception\UnauthorizedException;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
@@ -219,42 +216,6 @@ class PayplugApi
     public function refund_create($transaction_id, $data)
     {
         return $this->do_request_with_fallback('\Payplug\Refund::create', [$transaction_id, $data]);
-    }
-
-    /**
-     * Simulate a oney payment
-     *
-     * @return array
-     */
-    public function simulate_oney_payment($price, $oney_type = 'with_fees')
-    {
-        $country = PayplugWoocommerceHelper::get_payplug_merchant_country();
-        $oney_fees = ['x3_' . $oney_type, 'x4_' . $oney_type];
-
-        try {
-            try {
-                try {
-                    try {
-                        $response = $this->do_request('\Payplug\OneySimulation::getSimulations', [[
-                            'amount' => intval(floatval($price) * 100),
-                            'country' => $country,
-                            'operations' => $oney_fees,
-                        ]]);
-                        PayplugWoocommerceHelper::oney_simulation_values($oney_fees, $response);
-                    } catch (PayplugServerException $e) {
-                        $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
-                    }
-                } catch (BadRequestException $e) {
-                    $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
-                }
-            } catch (UnauthorizedException $e) {
-                $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
-            }
-        } catch (ForbiddenException $e) {
-            $response = __('Your payment schedule simulation is temporarily unavailable. You will find this information at the payment stage.', 'payplug');
-        }
-
-        return $response;
     }
 
     public function validate_jwt($client_data, $jwt)

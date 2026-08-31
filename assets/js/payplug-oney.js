@@ -1,161 +1,132 @@
 (function ($) {
-    var is_cart = false
-    var popupLoaded = false
-    var _initevent = function () {
-        var showpopup = $("#oney-show-popup")
-        var oneyData = $("#oney-show-popup").closest('.payplug-oney')
-        var showpopuponey = $("#oney-show-popup").closest('.payplug-oney-popup')
-        var qtyInput = $('input[name=quantity]')
-        var popup = $("#oney-popup")
-        var loading = popup.find('.payplug-lds-roller')
-        var oneyError = popup.find('#oney-popup-error')
-        var totalsProduct = oneyData.data('total-products')
-        var maxOneyQty = oneyData.data('max-oney-qty')
-        is_cart = oneyData.data('is-cart')
+    function calculTotals(container) {
+        var price = parseFloat(container.data('price'));
+        var qtyInput = $('input[name=quantity]');
 
-        function _showPopup(show) {
-            if (!oneyData.hasClass('disabled') && !popupLoaded && !show) {
-                return
+        if (qtyInput.length) {
+            return parseFloat(qtyInput.val()) * price;
+        }
+
+        return price;
+    }
+
+    function refreshEligibility(container) {
+        if (container.data('min-oney') === undefined || container.data('max-oney') === undefined) {
+            // No thresholds means the badge is disabled for a reason quantity can't change
+            // (e.g. country not allowed) - never re-enable it client-side.
+            return;
+        }
+
+        var total = calculTotals(container);
+        var min = parseFloat(container.data('min-oney'));
+        var max = parseFloat(container.data('max-oney'));
+
+        if (total >= min && total <= max) {
+            container.removeClass('disabled');
+        } else {
+            container.addClass('disabled');
+        }
+    }
+
+    function showSimulationPopin(container) {
+        if (container.hasClass('disabled') || typeof loadOneyWidget !== 'function') {
+            return;
+        }
+
+        var options = $.extend({}, window.payplug_oney_config, {
+            payment_amount: calculTotals(container),
+            filter_by: 'business_transaction_codes',
+            errorCallback: function (status, response) {
+                console.warn('Oney widget unavailable', status, response);
+            },
+        });
+
+        loadOneyWidget(function () {
+            if (typeof oneyMerchantApp === 'undefined') {
+                return;
             }
-            popup.show(0, function () {
-                if (!$.browser.mobile) {
-                    _checkOneyError()
-                    var top = oneyData.hasClass('disabled') ? 50 : 110
+            oneyMerchantApp.loadSimulationPopin({options: options});
+        });
+    }
 
-                }
-            })
+    var checkoutSectionsLoaded = {};
+
+    function loadCheckoutSection(gatewayId) {
+        // The memo must reflect the placeholder currently in the DOM: WooCommerce replaces the
+        // whole payment fragment on updated_checkout, so a previously mounted widget is gone.
+        var placeholder = document.getElementById('oney-checkout-' + gatewayId);
+        if (!placeholder) {
+            delete checkoutSectionsLoaded[gatewayId];
+
+            return;
         }
 
-        function _hidePopup() {
-            popup.hide();
+        if (checkoutSectionsLoaded[gatewayId] === placeholder || typeof loadOneyWidget !== 'function') {
+            return;
         }
 
-        function _calculTotals() {
-            var price = oneyData.data('price')
-            return qtyInput.length ? totalsProduct * price : price
+        var configEl = document.getElementById('oney-checkout-config-' + gatewayId);
+        if (!configEl) {
+            return;
         }
 
-        function _isInOneyRange() {
-            var totalPrice = _calculTotals();
-            var minOney = oneyData.data('min-oney');
-            var maxOney = oneyData.data('max-oney');
-            return (totalPrice >= minOney && totalPrice <= maxOney);
+        var loading = document.getElementById('oney-checkout-loading-' + gatewayId);
+        var hideLoading = function () {
+            if (loading) {
+                loading.style.display = 'none';
+            }
         };
 
-        function _checkOneyError() {
-            if (oneyData.hasClass('disabled')) {
-                popupLoaded = true
-                popup.html('').append($(oneyError))
-                popup.addClass('loaded')
-                popup.find('.payplug-lds-roller').hide()
-                popup.find('#oney-popup-error .oney-error').hide()
-                totalsProduct >= maxOneyQty ?
-                    popup.find('#oney-popup-error .oney-error.qty').show() :
-                    popup.find('#oney-popup-error .oney-error.range').show()
+        var config = JSON.parse(configEl.textContent);
+        var options = $.extend({}, config, {
+            filter_by: 'business_transaction_code',
+            checkout_placeholder: '#oney-checkout-' + gatewayId,
+            successCallback: hideLoading,
+            errorCallback: function (status, response) {
+                hideLoading();
+                console.warn('Oney checkout widget unavailable', status, response);
+            },
+        });
+
+        loadOneyWidget(function () {
+            if (typeof oneyMerchantApp === 'undefined') {
+                hideLoading();
+
+                return;
             }
-        };
+            oneyMerchantApp.loadCheckoutSection({options: options});
+            checkoutSectionsLoaded[gatewayId] = placeholder;
+        });
+    }
 
-        function _bindCloseOneyPopup() {
-            $(document).unbind('mouseup')
-            $(document).mouseup(function (e) {
-                // if the target of the click isn't the container nor a descendant of the container
-                if (!popup.is(e.target) && popup.has(e.target).length === 0) {
-                    _hidePopup();
-                }
-            });
-
-            $('#oney-popup-close').unbind();
-            $('#oney-popup-close').on('click', function () {
-                _hidePopup();
-            });
+    function maybeLoadSelectedCheckoutSection() {
+        var selected = $('input[name="payment_method"]:checked').val();
+        if (selected && selected.indexOf('oney_') === 0) {
+            loadCheckoutSection(selected);
         }
+    }
 
-        _bindCloseOneyPopup();
-        qtyInput.unbind();
-        qtyInput.on('change', function () {
-            totalsProduct = $(this).val()
-            popupLoaded = false
-            if (_isInOneyRange() && totalsProduct < maxOneyQty) {
-                oneyData.removeClass('disabled')
-                popup.removeClass('disabled').removeClass('loaded')
-                popup.html('')
-            } else {
-                _checkOneyError()
-                oneyData.addClass('disabled')
-                popup.addClass('disabled')
-            }
-        });
-        showpopuponey.unbind();
-        showpopuponey.on('click', function () {
-            _showPopup(true);
-            if (_isInOneyRange() && totalsProduct < maxOneyQty) {
-                if (popupLoaded) {
-                    return
-                }
-                popup.html('').append($(loading))
-                $.post(
-                    payplug_config.ajax_url,
-                    {
-                        'action': payplug_config.ajax_action,
-                        'price': _calculTotals()
-                    }, function (response) {
-                        if (response.data.popup) {
-                            popupLoaded = true;
-                            popup.addClass('loaded');
-                            popup.html(response.data.popup);
-                            _showPopup();
-                            _bindCloseOneyPopup()
-                        }
-                    }
-                );
-            } else {
-                _checkOneyError()
-            }
-        });
-
-        $(window).on('scroll', function () {
-            if(popup.is(':visible')) {
-                _showPopup()
-            }
-        });
-
-		$(document).ready(function () {
-			if (!(is_cart)) {
-				totalsProduct = qtyInput.val()
-				popupLoaded = false
-				if (_isInOneyRange() && totalsProduct < maxOneyQty) {
-					oneyData.removeClass('disabled')
-					popup.removeClass('disabled').removeClass('loaded')
-					popup.html('')
-				} else {
-					_checkOneyError()
-					oneyData.addClass('disabled')
-					popup.addClass('disabled')
-				}
-			}
-		});
-
-		$(".variation_id").on('change', function(){
-			if( typeof $(".variation_id").val() != "undefined" && $(".variation_id").val() != 0){
-				$("#oney-show-popup").closest('.payplug-oney').data('price', parseFloat($("[name=variation_" + $(".variation_id").val() + "]").val()) );
-			}
-		})
-
-    };
-
-	$(function() {
-		_initevent();
-        if (is_cart) {
-            $(document).ajaxSuccess(function (event, request, settings) {
-                if (settings.data.includes(payplug_config.ajax_action)) {
-                    return;
-                }
-                _initevent();
-                popupLoaded = false;
-            });
-        }
-
+    // Bound to the whole popup wrapper (logo + "?"), not just #oney-show-popup itself: the
+    // pre-migration implementation made the entire wrapper clickable (see the old
+    // showpopuponey = $('#oney-show-popup').closest('.payplug-oney-popup') pattern), and users
+    // click the Oney logo as often as the small "?" icon next to it.
+    $(document).on('click', '.payplug-oney-popup', function () {
+        showSimulationPopin($(this).closest('.payplug-oney'));
     });
 
+    $(document).on('change', 'input[name=quantity]', function () {
+        $('.payplug-oney').each(function () {
+            refreshEligibility($(this));
+        });
+    });
 
+    $(function () {
+        $('.payplug-oney').each(function () {
+            refreshEligibility($(this));
+        });
+    });
+
+    $(document).on('change', 'input[name="payment_method"]', maybeLoadSelectedCheckoutSection);
+    $(document.body).on('updated_checkout', maybeLoadSelectedCheckoutSection);
+    $(maybeLoadSelectedCheckoutSection);
 })(jQuery);

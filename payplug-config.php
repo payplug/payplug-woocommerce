@@ -18,3 +18,11 @@ define('IP_API', '');
  *  plugin settings at runtime.
  */
 define('SECURE_DOMAIN', '');
+
+/**
+ *  URL of the official Oney widget loader script (assets.oney.io in production,
+ *  assets-uat.oney.io in staging). Depends on whether the connected merchant account is QA
+ *  or production - not on the Test/Live mode toggle - so, like SECURE_DOMAIN above, this is a
+ *  build-time value, not something computed from plugin settings at runtime.
+ */
+define('ONEY_LOADER_URL', '');

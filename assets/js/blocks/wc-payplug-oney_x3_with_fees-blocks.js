@@ -2,85 +2,90 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./resources/js/frontend/helper/wc-payplug-oney-simulation.js"
-/*!********************************************************************!*\
-  !*** ./resources/js/frontend/helper/wc-payplug-oney-simulation.js ***!
-  \********************************************************************/
+/***/ "./resources/js/frontend/helper/wc-payplug-oney-checkout-widget.js"
+/*!*************************************************************************!*\
+  !*** ./resources/js/frontend/helper/wc-payplug-oney-checkout-widget.js ***!
+  \*************************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 
-const Oney_Simulation = ({
-  settings,
-  name,
-  props
+
+
+/**
+ * Renders the placeholder the official Oney widget mounts its inline payment-schedule
+ * section into (oneyMerchantApp.loadCheckoutSection), for one specific Oney gateway variant.
+ */
+
+const OneyCheckoutWidget = ({
+  settings
 }) => {
-  const translations = settings?.translations;
-  var down_payment_amount = parseFloat(settings?.oney_response[name]['down_payment_amount']);
-  var total_price_oney = down_payment_amount;
-  settings?.oney_response[name]['installments'].forEach(amount => {
-    total_price_oney += parseFloat(amount['amount']);
-  });
-  let has_3rd_payment = typeof translations['3rd_monthly_payment'] != "undefined";
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-        className: "payplug-oney-flex",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [translations['bring'], " :"]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [down_payment_amount, " ", props.billing.currency.symbol]
-        })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-        className: "payplug-oney-flex",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("small", {
-          children: ["( ", translations['oney_financing_cost'], /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("b", {
-            children: [settings?.oney_response[name]['total_cost'], " ", props.billing.currency.symbol]
-          }), " TAEG : ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("b", {
-            children: [settings?.oney_response[name]['effective_annual_percentage_rate'], " %"]
-          }), " )"]
-        })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-        className: "payplug-oney-flex",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [translations['1st_monthly_payment'], ":"]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [settings?.oney_response[name]['installments'][0]['amount'], " ", props.billing.currency.symbol]
-        })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-        className: "payplug-oney-flex",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [translations['2nd_monthly_payment'], ":"]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [settings?.oney_response[name]['installments'][1]['amount'], " ", props.billing.currency.symbol]
-        })]
-      }), has_3rd_payment ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-        className: "payplug-oney-flex",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [translations['3rd_monthly_payment'], ":"]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [settings?.oney_response[name]['installments'][2]['amount'], " ", props.billing.currency.symbol]
-        })]
-      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-        className: "payplug-oney-flex",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("b", {
-            children: translations['oney_total']
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("b", {
-            children: [total_price_oney.toFixed(2), " ", props.billing.currency.symbol]
-          })
-        })]
-      })]
-    })
+  const placeholderId = 'oney-checkout-' + settings?.name;
+  const widget = settings?.oney_widget;
+  const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
+
+  // settings comes from getSetting(), a one-time snapshot taken at page load, so
+  // widget.payment_amount is frozen. Read the live total from the Store API instead, so
+  // shipping / coupon / address changes are reflected in the displayed schedule.
+  const liveAmount = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_1__.useSelect)(select => {
+    const totals = select('wc/store/cart')?.getCartTotals();
+    if (!totals || totals.total_price === undefined || totals.total_price === null) {
+      return null;
+    }
+    const total = parseInt(totals.total_price, 10);
+    if (isNaN(total)) {
+      return null;
+    }
+
+    // Store API totals are expressed in minor units.
+    const minorUnit = typeof totals.currency_minor_unit === 'number' ? totals.currency_minor_unit : 2;
+    return total / Math.pow(10, minorUnit);
+  }, []);
+  const paymentAmount = liveAmount !== null ? liveAmount : widget?.payment_amount;
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (typeof window.loadOneyWidget !== 'function' || !widget?.business_transaction_code) {
+      return;
+    }
+    setIsLoading(true);
+    const options = {
+      ...widget,
+      payment_amount: paymentAmount,
+      filter_by: 'business_transaction_code',
+      checkout_placeholder: '#' + placeholderId,
+      successCallback: () => setIsLoading(false),
+      errorCallback: (status, response) => {
+        setIsLoading(false);
+        console.warn('Oney checkout widget unavailable', status, response);
+      }
+    };
+    window.loadOneyWidget(() => {
+      if (typeof window.oneyMerchantApp === 'undefined') {
+        setIsLoading(false);
+        return;
+      }
+      window.oneyMerchantApp.loadCheckoutSection({
+        options
+      });
+    });
+  }, [widget?.business_transaction_code, paymentAmount]);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+    children: [isLoading && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+      className: "payplug-lds-roller",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {})]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+      id: placeholderId
+    })]
   });
 };
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Oney_Simulation);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (OneyCheckoutWidget);
 
 /***/ },
 
@@ -1516,6 +1521,26 @@ module.exports = window["wc"]["wcSettings"];
 
 /***/ },
 
+/***/ "@wordpress/data"
+/*!******************************!*\
+  !*** external ["wp","data"] ***!
+  \******************************/
+(module) {
+
+module.exports = window["wp"]["data"];
+
+/***/ },
+
+/***/ "@wordpress/element"
+/*!*********************************!*\
+  !*** external ["wp","element"] ***!
+  \*********************************/
+(module) {
+
+module.exports = window["wp"]["element"];
+
+/***/ },
+
 /***/ "@wordpress/html-entities"
 /*!**************************************!*\
   !*** external ["wp","htmlEntities"] ***!
@@ -1625,10 +1650,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_html_entities__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_html_entities__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _woocommerce_settings__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @woocommerce/settings */ "@woocommerce/settings");
 /* harmony import */ var _woocommerce_settings__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_woocommerce_settings__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _helper_wc_payplug_oney_simulation__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./helper/wc-payplug-oney-simulation */ "./resources/js/frontend/helper/wc-payplug-oney-simulation.js");
-/* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-
+/* harmony import */ var _helper_wc_payplug_oney_checkout_widget__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./helper/wc-payplug-oney-checkout-widget */ "./resources/js/frontend/helper/wc-payplug-oney-checkout-widget.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 
 
 
@@ -1638,11 +1661,9 @@ __webpack_require__.r(__webpack_exports__);
 const settings = (0,_woocommerce_settings__WEBPACK_IMPORTED_MODULE_3__.getSetting)('oney_x3_with_fees_data', {});
 const defaultLabel = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Gateway method title', 'payplug');
 const label = (0,_wordpress_html_entities__WEBPACK_IMPORTED_MODULE_2__.decodeEntities)(settings?.title) || defaultLabel;
-const Content = props => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_helper_wc_payplug_oney_simulation__WEBPACK_IMPORTED_MODULE_4__["default"], {
-    settings: settings,
-    name: "x3_with_fees",
-    props: props
+const Content = () => {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_helper_wc_payplug_oney_checkout_widget__WEBPACK_IMPORTED_MODULE_4__["default"], {
+    settings: settings
   });
 };
 
@@ -1651,15 +1672,15 @@ const Content = props => {
  *
  */
 const Label = () => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("span", {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("span", {
     style: {
       width: '100%'
     },
-    children: [label, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(Icon, {})]
+    children: [label, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(Icon, {})]
   });
 };
 const Icon = () => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("img", {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("img", {
     src: settings?.icon.src,
     alt: settings?.icon.alt,
     className: settings.icon.class,
@@ -1674,9 +1695,9 @@ const Icon = () => {
  */
 let oney_x3_with_fees = {
   name: "oney_x3_with_fees",
-  label: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(Label, {}),
-  content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(Content, {}),
-  edit: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(Content, {}),
+  label: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(Label, {}),
+  content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(Content, {}),
+  edit: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(Content, {}),
   canMakePayment: props => {
     if (props.cart.cartItemsCount > settings?.requirements.max_quantity) {
       return false;
@@ -1738,13 +1759,36 @@ let oney_x3_with_fees = {
       if (!oney_available) {
         return null;
       }
+      const openSimulation = () => {
+        if (typeof window.loadOneyWidget !== 'function' || !settings?.oney_widget?.business_transaction_codes) {
+          return;
+        }
+        const options = {
+          ...settings.oney_widget,
+          payment_amount: cartTotal / 100,
+          filter_by: 'business_transaction_codes',
+          errorCallback: (status, response) => {
+            console.warn('Oney widget unavailable', status, response);
+          }
+        };
+        window.loadOneyWidget(() => {
+          if (typeof window.oneyMerchantApp === 'undefined') {
+            return;
+          }
+          window.oneyMerchantApp.loadSimulationPopin({
+            options
+          });
+        });
+      };
       return createElement('div', {
         className: 'wc-block-components-totals-item payplug-oney',
         style: {
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
-        }
+          alignItems: 'center',
+          cursor: 'pointer'
+        },
+        onClick: openSimulation
       }, [createElement('div', {
         key: 'oney-message',
         className: 'oney-message',
@@ -1757,7 +1801,10 @@ let oney_x3_with_fees = {
         key: 'oney-logo',
         src: settings?.oney_cart_logo,
         alt: 'Oney Payplug',
-        className: 'oney-3x4x',
+        // Not "oney-3x4x": that class also drives a CSS background-image on the
+        // classic (non-block) badge's empty <div>, which collides with this plain
+        // <img src> and renders two overlapping, differently-sized logos.
+        className: 'oney-cart-logo-img',
         style: {
           maxWidth: '50%',
           height: 'auto',

@@ -32,11 +32,7 @@ class PaymentGateway extends TestCase
             self::assertTrue($gateway_mock['has_fields'] === $gateway->has_fields());
             self::assertTrue($gateway_mock['enable'] === $gateway->enabled);
             self::assertTrue($gateway_mock['enable_on_test_mode'] === $gateway::ENABLE_ON_TEST_MODE);
-
-            //TODO:: untestable method on oney refact
-            if (!in_array($gateway->id, ['oney_x3_with_fees', 'oney_x3_without_fees', 'oney_x4_with_fees', 'oney_x4_without_fees'])) {
-                self::assertTrue($gateway_mock['image'] === $gateway->get_icon());
-            }
+            self::assertTrue($gateway_mock['image'] === $gateway->get_icon());
         }
     }
 }
