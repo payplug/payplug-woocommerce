@@ -27,16 +27,18 @@ class PayplugGatewayOney3x_test extends TestCase
     protected function tearDown(): void
     {
         delete_option('woocommerce_payplug_settings');
-        delete_option('woocommerce_oney_x3_with_fees_settings');
         parent::tearDown();
     }
 
     public function test_gateway_disabled_on_wc_payments_page_when_oney_inactive(): void
     {
-        // Merchant previously toggled Oney on natively; the raw WC gateway option stays 'yes'
-        // until something re-checks it against the Payplug config.
-        update_option('woocommerce_oney_x3_with_fees_settings', ['enabled' => 'yes']);
-
+        // PayplugGateway::__construct() (the top of this class's parent chain) sets
+        // $this->id = 'payplug' and calls init_settings() - which reads
+        // woocommerce_payplug_settings - before PayplugGatewayOney3x::__construct() reassigns
+        // $this->id to 'oney_x3_with_fees'. So $this->enabled is never sourced from a
+        // per-gateway woocommerce_oney_x3_with_fees_settings option; only checkGateway()'s
+        // read of payment_methods.configuration.oney.active (from woocommerce_payplug_settings)
+        // controls it here - that's what this asserts (PRE-3597 review).
         $settings = $this->base_settings;
         $settings['payment_methods']['configuration']['oney']['active'] = false;
         update_option('woocommerce_payplug_settings', $settings);
@@ -48,7 +50,6 @@ class PayplugGatewayOney3x_test extends TestCase
 
     public function test_gateway_enabled_when_oney_active(): void
     {
-        update_option('woocommerce_oney_x3_with_fees_settings', ['enabled' => 'yes']);
         update_option('woocommerce_payplug_settings', $this->base_settings);
 
         $gateway = new PayplugGatewayOney3x();

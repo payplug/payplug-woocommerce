@@ -47,6 +47,7 @@ jobs:
       cdn-payplug: ${{ secrets.CDN_PAYPLUG_QA }}
       api-payplug: ${{ secrets.PAYPLUG_API_QA }}
       api-payplug-retail: ${{ secrets.API_RETAIL_QA }}
+      oney-loader-url: ${{ secrets.ONEY_LOADER_URL_QA }}
 
   # -----------------------------------------------------------------------
   # 4. SONARCLOUD — code quality analysis (develop PRs only)

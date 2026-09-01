@@ -2,5 +2,5 @@
   "version": "3.1.0",
   "wc_tested_up_to": "10.6.1",
   "wp_tested_up_to": "6.9.4",
-  "changelog": "* Fix Oney Availability in BO Payments section"
+  "changelog": "* Feat: Replace internal Oney simulator with the official Oney widget on product page, cart and checkout\n* Fix Oney Availability in BO Payments section"
 }

@@ -2,93 +2,98 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./resources/js/frontend/helper/wc-payplug-oney-simulation.js":
-/*!********************************************************************!*\
-  !*** ./resources/js/frontend/helper/wc-payplug-oney-simulation.js ***!
-  \********************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ "./resources/js/frontend/helper/wc-payplug-oney-checkout-widget.js"
+/*!*************************************************************************!*\
+  !*** ./resources/js/frontend/helper/wc-payplug-oney-checkout-widget.js ***!
+  \*************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 
-const Oney_Simulation = ({
-  settings,
-  name,
-  props
+
+
+/**
+ * Renders the placeholder the official Oney widget mounts its inline payment-schedule
+ * section into (oneyMerchantApp.loadCheckoutSection), for one specific Oney gateway variant.
+ */
+
+const OneyCheckoutWidget = ({
+  settings
 }) => {
-  const translations = settings?.translations;
-  var down_payment_amount = parseFloat(settings?.oney_response[name]['down_payment_amount']);
-  var total_price_oney = down_payment_amount;
-  settings?.oney_response[name]['installments'].forEach(amount => {
-    total_price_oney += parseFloat(amount['amount']);
-  });
-  let has_3rd_payment = typeof translations['3rd_monthly_payment'] != "undefined";
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-        className: "payplug-oney-flex",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [translations['bring'], " :"]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [down_payment_amount, " ", props.billing.currency.symbol]
-        })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-        className: "payplug-oney-flex",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("small", {
-          children: ["( ", translations['oney_financing_cost'], /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("b", {
-            children: [settings?.oney_response[name]['total_cost'], " ", props.billing.currency.symbol]
-          }), " TAEG : ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("b", {
-            children: [settings?.oney_response[name]['effective_annual_percentage_rate'], " %"]
-          }), " )"]
-        })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-        className: "payplug-oney-flex",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [translations['1st_monthly_payment'], ":"]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [settings?.oney_response[name]['installments'][0]['amount'], " ", props.billing.currency.symbol]
-        })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-        className: "payplug-oney-flex",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [translations['2nd_monthly_payment'], ":"]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [settings?.oney_response[name]['installments'][1]['amount'], " ", props.billing.currency.symbol]
-        })]
-      }), has_3rd_payment ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-        className: "payplug-oney-flex",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [translations['3rd_monthly_payment'], ":"]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-          children: [settings?.oney_response[name]['installments'][2]['amount'], " ", props.billing.currency.symbol]
-        })]
-      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-        className: "payplug-oney-flex",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("b", {
-            children: translations['oney_total']
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("b", {
-            children: [total_price_oney.toFixed(2), " ", props.billing.currency.symbol]
-          })
-        })]
-      })]
-    })
+  const placeholderId = 'oney-checkout-' + settings?.name;
+  const widget = settings?.oney_widget;
+  const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
+
+  // settings comes from getSetting(), a one-time snapshot taken at page load, so
+  // widget.payment_amount is frozen. Read the live total from the Store API instead, so
+  // shipping / coupon / address changes are reflected in the displayed schedule.
+  const liveAmount = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_1__.useSelect)(select => {
+    const totals = select('wc/store/cart')?.getCartTotals();
+    if (!totals || totals.total_price === undefined || totals.total_price === null) {
+      return null;
+    }
+    const total = parseInt(totals.total_price, 10);
+    if (isNaN(total)) {
+      return null;
+    }
+
+    // Store API totals are expressed in minor units.
+    const minorUnit = typeof totals.currency_minor_unit === 'number' ? totals.currency_minor_unit : 2;
+    return total / Math.pow(10, minorUnit);
+  }, []);
+  const paymentAmount = liveAmount !== null ? liveAmount : widget?.payment_amount;
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (typeof window.loadOneyWidget !== 'function' || !widget?.business_transaction_code) {
+      return;
+    }
+    setIsLoading(true);
+    const options = {
+      ...widget,
+      payment_amount: paymentAmount,
+      filter_by: 'business_transaction_code',
+      checkout_placeholder: '#' + placeholderId,
+      successCallback: () => setIsLoading(false),
+      errorCallback: (status, response) => {
+        setIsLoading(false);
+        console.warn('Oney checkout widget unavailable', status, response);
+      }
+    };
+    window.loadOneyWidget(() => {
+      if (typeof window.oneyMerchantApp === 'undefined') {
+        setIsLoading(false);
+        return;
+      }
+      window.oneyMerchantApp.loadCheckoutSection({
+        options
+      });
+    });
+  }, [widget?.business_transaction_code, paymentAmount]);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+    children: [isLoading && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+      className: "payplug-lds-roller",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {})]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+      id: placeholderId
+    })]
   });
 };
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Oney_Simulation);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (OneyCheckoutWidget);
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/react/cjs/react-jsx-runtime.development.js":
+/***/ "./node_modules/react/cjs/react-jsx-runtime.development.js"
 /*!*****************************************************************!*\
   !*** ./node_modules/react/cjs/react-jsx-runtime.development.js ***!
   \*****************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 /**
  * @license React
@@ -1425,72 +1430,93 @@ exports.jsxs = jsxs;
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/react/jsx-runtime.js":
+/***/ "./node_modules/react/jsx-runtime.js"
 /*!*******************************************!*\
   !*** ./node_modules/react/jsx-runtime.js ***!
   \*******************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 
 
-if (false) {} else {
+if (false) // removed by dead control flow
+{} else {
   module.exports = __webpack_require__(/*! ./cjs/react-jsx-runtime.development.js */ "./node_modules/react/cjs/react-jsx-runtime.development.js");
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "react":
+/***/ "react"
 /*!************************!*\
   !*** external "React" ***!
   \************************/
-/***/ ((module) => {
+(module) {
 
 module.exports = window["React"];
 
-/***/ }),
+/***/ },
 
-/***/ "@woocommerce/blocks-registry":
+/***/ "@woocommerce/blocks-registry"
 /*!******************************************!*\
   !*** external ["wc","wcBlocksRegistry"] ***!
   \******************************************/
-/***/ ((module) => {
+(module) {
 
 module.exports = window["wc"]["wcBlocksRegistry"];
 
-/***/ }),
+/***/ },
 
-/***/ "@woocommerce/settings":
+/***/ "@woocommerce/settings"
 /*!************************************!*\
   !*** external ["wc","wcSettings"] ***!
   \************************************/
-/***/ ((module) => {
+(module) {
 
 module.exports = window["wc"]["wcSettings"];
 
-/***/ }),
+/***/ },
 
-/***/ "@wordpress/html-entities":
+/***/ "@wordpress/data"
+/*!******************************!*\
+  !*** external ["wp","data"] ***!
+  \******************************/
+(module) {
+
+module.exports = window["wp"]["data"];
+
+/***/ },
+
+/***/ "@wordpress/element"
+/*!*********************************!*\
+  !*** external ["wp","element"] ***!
+  \*********************************/
+(module) {
+
+module.exports = window["wp"]["element"];
+
+/***/ },
+
+/***/ "@wordpress/html-entities"
 /*!**************************************!*\
   !*** external ["wp","htmlEntities"] ***!
   \**************************************/
-/***/ ((module) => {
+(module) {
 
 module.exports = window["wp"]["htmlEntities"];
 
-/***/ }),
+/***/ },
 
-/***/ "@wordpress/i18n":
+/***/ "@wordpress/i18n"
 /*!******************************!*\
   !*** external ["wp","i18n"] ***!
   \******************************/
-/***/ ((module) => {
+(module) {
 
 module.exports = window["wp"]["i18n"];
 
-/***/ })
+/***/ }
 
 /******/ 	});
 /************************************************************************/
@@ -1512,6 +1538,12 @@ module.exports = window["wp"]["i18n"];
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
+/******/ 		if (!(moduleId in __webpack_modules__)) {
+/******/ 			delete __webpack_module_cache__[moduleId];
+/******/ 			var e = new Error("Cannot find module '" + moduleId + "'");
+/******/ 			e.code = 'MODULE_NOT_FOUND';
+/******/ 			throw e;
+/******/ 		}
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Return the exports of the module
@@ -1561,7 +1593,7 @@ module.exports = window["wp"]["i18n"];
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
 /*!*************************************************************************!*\
   !*** ./resources/js/frontend/wc-payplug-oney_x3_without_fees-blocks.js ***!
@@ -1575,7 +1607,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_html_entities__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_html_entities__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _woocommerce_settings__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @woocommerce/settings */ "@woocommerce/settings");
 /* harmony import */ var _woocommerce_settings__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_woocommerce_settings__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _helper_wc_payplug_oney_simulation__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./helper/wc-payplug-oney-simulation */ "./resources/js/frontend/helper/wc-payplug-oney-simulation.js");
+/* harmony import */ var _helper_wc_payplug_oney_checkout_widget__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./helper/wc-payplug-oney-checkout-widget */ "./resources/js/frontend/helper/wc-payplug-oney-checkout-widget.js");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 
 
@@ -1586,18 +1618,11 @@ __webpack_require__.r(__webpack_exports__);
 const settings = (0,_woocommerce_settings__WEBPACK_IMPORTED_MODULE_3__.getSetting)('oney_x3_without_fees_data', {});
 const defaultLabel = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Gateway method title', 'payplug');
 const label = (0,_wordpress_html_entities__WEBPACK_IMPORTED_MODULE_2__.decodeEntities)(settings?.title) || defaultLabel;
-const Content = props => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_helper_wc_payplug_oney_simulation__WEBPACK_IMPORTED_MODULE_4__["default"], {
-    settings: settings,
-    name: "x3_without_fees",
-    props: props
+const Content = () => {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_helper_wc_payplug_oney_checkout_widget__WEBPACK_IMPORTED_MODULE_4__["default"], {
+    settings: settings
   });
 };
-
-/**
- * Label component
- *
- */
 const Label = () => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("span", {
     style: {
@@ -1616,10 +1641,6 @@ const Icon = () => {
     }
   });
 };
-
-/**
- * Payplug payment method config object.
- */
 let oney_x3_without_fees = {
   name: "oney_x3_without_fees",
   label: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(Label, {}),
