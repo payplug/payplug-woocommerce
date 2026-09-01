@@ -42,6 +42,13 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
 
         self::set_oney_configuration();
 
+        // Unlike the other sub-gateways (Bancontact, AmericanExpress, PPRO methods...), Oney never
+        // synced $this->enabled with the plugin's own "active" toggle, so disabling Oney from the
+        // Payplug config left it shown as enabled on WooCommerce's native Payments settings page.
+        if (!$this->checkGateway()) {
+            $this->enabled = 'no';
+        }
+
         if (is_checkout()) {
             if ($this->check_oney_is_available() === self::ONEY_DISALBE_CHECKOUT_OPTIONS) {
                 $this->enabled = 'no';
