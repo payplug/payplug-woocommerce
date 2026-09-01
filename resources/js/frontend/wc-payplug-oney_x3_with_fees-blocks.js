@@ -1,18 +1,15 @@
 import {__} from '@wordpress/i18n';
-import {registerPaymentMethod, registerExpressPaymentMethod} from '@woocommerce/blocks-registry';
+import {registerPaymentMethod} from '@woocommerce/blocks-registry';
 import {decodeEntities} from '@wordpress/html-entities';
 import {getSetting} from '@woocommerce/settings';
-import Oney_Simulation from './helper/wc-payplug-oney-simulation';
-import {createRoot} from "react-dom/client";
+import OneyCheckoutWidget from './helper/wc-payplug-oney-checkout-widget';
 
 const settings = getSetting('oney_x3_with_fees_data', {});
 const defaultLabel = __('Gateway method title', 'payplug');
 const label = decodeEntities(settings?.title) || defaultLabel;
 
-const Content = (props) => {
-	return (
-		<Oney_Simulation settings={settings} name={"x3_with_fees"} props={props} />
-	);
+const Content = () => {
+	return <OneyCheckoutWidget settings={settings} />;
 };
 
 /**
@@ -112,14 +109,38 @@ registerPaymentMethod(oney_x3_with_fees);
 				return null;
 			}
 
+			const openSimulation = () => {
+				if (typeof window.loadOneyWidget !== 'function' || !settings?.oney_widget?.business_transaction_codes) {
+					return;
+				}
+
+				const options = {
+					...settings.oney_widget,
+					payment_amount: cartTotal / 100,
+					filter_by: 'business_transaction_codes',
+					errorCallback: (status, response) => {
+						console.warn('Oney widget unavailable', status, response);
+					},
+				};
+
+				window.loadOneyWidget(() => {
+					if (typeof window.oneyMerchantApp === 'undefined') {
+						return;
+					}
+					window.oneyMerchantApp.loadSimulationPopin({options});
+				});
+			};
+
 			return createElement('div',
 				{
 					className: 'wc-block-components-totals-item payplug-oney',
 					style: {
 						display: 'flex',
 						justifyContent: 'space-between',
-						alignItems: 'center'
-					}
+						alignItems: 'center',
+						cursor: 'pointer',
+					},
+					onClick: openSimulation,
 				},
 				[
 					createElement('div',
@@ -138,7 +159,10 @@ registerPaymentMethod(oney_x3_with_fees);
 						key: 'oney-logo',
 						src: settings?.oney_cart_logo,
 						alt: 'Oney Payplug',
-						className: 'oney-3x4x',
+						// Not "oney-3x4x": that class also drives a CSS background-image on the
+						// classic (non-block) badge's empty <div>, which collides with this plain
+						// <img src> and renders two overlapping, differently-sized logos.
+						className: 'oney-cart-logo-img',
 						style: {
 							maxWidth: '50%',
 							height: 'auto',
