@@ -2,13 +2,12 @@
 
 namespace Payplug\PayplugWoocommerce\Service;
 
-use libphonenumber\NumberParseException;
-use libphonenumber\PhoneNumberFormat;
-use libphonenumber\PhoneNumberUtil;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 use PayPlugPluginMcp\Models\Entities\PaymentInputDTO;
+use PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException;
+use PayplugUnifiedCore\Utilities\Helpers\PhoneHelper;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -126,7 +125,7 @@ class Mcp
     }
 
     /**
-     * Normalizes a phone number to E.164 format, using the same libphonenumber-based
+     * Normalizes a phone number to E.164 format, using the same UPC PhoneHelper-based
      * logic as the classic checkout flow (see PayplugAddressData::prepare_address_data()).
      *
      * @param mixed $phone_number
@@ -141,15 +140,8 @@ class Mcp
         }
 
         try {
-            $phone_number_util = PhoneNumberUtil::getInstance();
-            $parsed_number = $phone_number_util->parse($phone_number, $country);
-
-            if (!$phone_number_util->isValidNumber($parsed_number)) {
-                return null;
-            }
-
-            return $phone_number_util->format($parsed_number, PhoneNumberFormat::E164);
-        } catch (NumberParseException $e) {
+            return PhoneHelper::toE164($phone_number, $country);
+        } catch (InvalidPhoneNumberException $e) {
             return null;
         }
     }
