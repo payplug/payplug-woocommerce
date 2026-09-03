@@ -7,10 +7,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-use libphonenumber\PhoneNumberFormat;
-use libphonenumber\PhoneNumberType;
-use libphonenumber\PhoneNumberUtil;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException;
+use PayplugUnifiedCore\Utilities\Helpers\PhoneHelper;
 
 class PayplugAddressData
 {
@@ -273,20 +272,18 @@ class PayplugAddressData
         $phone = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_phone : $order->get_billing_phone();
         if (!empty($phone) && !empty($country)) {
             try {
-                $phone_number_util = PhoneNumberUtil::getInstance();
-                $phone_number = $phone_number_util->parse($phone, $country);
+                // toE164() and isMobile() each parse/validate $phone independently - PhoneHelper
+                // doesn't expose the parsed number, so there's no cheaper way to get both the
+                // formatted number and its type without UPC adding that API.
+                $e164_phone = PhoneHelper::toE164($phone, $country);
 
-                if (!$phone_number_util->isValidNumber($phone_number)) {
-                    throw new \Exception('Invalid phone number');
-                }
-
-                if (PhoneNumberType::MOBILE === $phone_number_util->getNumberType($phone_number)) {
-                    $this->billing['mobile_phone_number'] = $phone_number_util->format($phone_number, PhoneNumberFormat::E164);
-                    $this->shipping['mobile_phone_number'] = $phone_number_util->format($phone_number, PhoneNumberFormat::E164);
+                if (PhoneHelper::isMobile($phone, $country)) {
+                    $this->billing['mobile_phone_number'] = $e164_phone;
+                    $this->shipping['mobile_phone_number'] = $e164_phone;
                 } else {
-                    $this->billing['landline_phone_number'] = $phone_number_util->format($phone_number, PhoneNumberFormat::E164);
+                    $this->billing['landline_phone_number'] = $e164_phone;
                 }
-            } catch (\Exception $e) {
+            } catch (InvalidPhoneNumberException $e) {
                 // Fail to parse phone number.
                 // Could be an incorrect number or the number doesn't belong to the billing country.
             }

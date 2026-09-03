@@ -10,6 +10,7 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayRequirements;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
 /**
  * PayPlug admin Vue.js dashboard handler.
@@ -469,10 +470,10 @@ class Vue
         $default_amounts = json_decode($this->options['payment_methods']['configuration']['oney']['default_amounts'], true);
 
         // Convert cents
-        $min = $min / 100;
-        $max = $max / 100;
-        $default_amounts['min'] = $default_amounts['min'] / 100;
-        $default_amounts['max'] = $default_amounts['max'] / 100;
+        $min = AmountHelper::fromCents((int) $min);
+        $max = AmountHelper::fromCents((int) $max);
+        $default_amounts['min'] = AmountHelper::fromCents((int) $default_amounts['min']);
+        $default_amounts['max'] = AmountHelper::fromCents((int) $default_amounts['max']);
         //
 
         $thresholds = [

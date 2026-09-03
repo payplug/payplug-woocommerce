@@ -10,6 +10,7 @@ use Payplug\PayplugWoocommerce\Interfaces\PayplugGatewayBuilder;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
 class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuilder
 {
@@ -461,7 +462,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
                 $order->save();
             }
 
-            $note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($refund->id), wc_price(((int) $refund->amount) / 100));
+            $note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($refund->id), wc_price(AmountHelper::fromCents((int) $refund->amount)));
             if (!empty($refund->metadata['reason'])) {
                 $note .= sprintf(' (%s)', esc_html($refund->metadata['reason']));
             }
