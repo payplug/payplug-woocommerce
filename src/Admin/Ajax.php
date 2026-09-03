@@ -20,6 +20,7 @@ use Payplug\PayplugWoocommerce\Gateway\PPRO\Scalapay;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Wero;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 use WP_REST_Request;
 
 if (!defined('ABSPATH')) {
@@ -650,8 +651,8 @@ class Ajax
         $options['payment_methods']['configuration']['oney']['active'] = (bool) $data['enable_oney'];
         $options['payment_methods']['configuration']['oney']['cta_product'] = (bool) $data['enable_oney_product_animation'];
         $options['payment_methods']['configuration']['oney']['custom_amounts'] = json_encode([
-            'min' => (int) $data['oney_min_amounts'] * 100,
-            'max' => (int) $data['oney_max_amounts'] * 100,
+            'min' => AmountHelper::toCents((float) $data['oney_min_amounts']),
+            'max' => AmountHelper::toCents((float) $data['oney_max_amounts']),
         ]);
         $options['payment_methods']['configuration']['oney']['with_fees'] = 'with_fees' == (string) $data['payplug_oney'];
 

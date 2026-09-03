@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 
 use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 use WP_Post;
 
 /**
@@ -85,7 +86,7 @@ class Metabox
 					<li><span><?php _e('payment_method', 'payplug'); ?>:</span> <?php echo str_replace('_', ' ', ucfirst($order->get_payment_method())); ?></li>
 				<?php } ?>
 				<li><span><?php _e('Amount', 'payplug'); ?>
-						:</span> <?php echo wc_price((int) $metadata['amount'] / 100); ?></li>
+						:</span> <?php echo wc_price(AmountHelper::fromCents((int) $metadata['amount'])); ?></li>
 				<li><span><?php _e('Paid at', 'payplug'); ?>
 						:</span> <?php echo !empty($metadata['paid_at']) ? esc_html(date_i18n(sprintf('%s %s', $date_format, $time_format), $metadata['paid_at'])) : ''; ?>
 				</li>
