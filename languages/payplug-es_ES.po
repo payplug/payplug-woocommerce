@@ -1314,3 +1314,27 @@ msgstr "Nuevo modo de conexión disponible progresivamente. La conexión vía OA
 
 msgid "payplug_section_oauth_login_title"
 msgstr "Conexión vía OAuth2 (nuevo) "
+
+msgid "payplug_section_standard_payment_option_hosted_fields_label"
+msgstr "Advanced (beta) Hosted Fields"
+
+msgid "payplug_section_standard_payment_hosted_fields_description"
+msgstr "Sus clientes verán aparecer el formulario de pago directamente en la página de checkout de su tienda, mediante campos alojados y protegidos por Payplug (función en versión beta)."
+
+msgid "payplug_section_advanced_configuration_title"
+msgstr "Configuración avanzada"
+
+msgid "payplug_hosted_fields_title"
+msgstr "Advanced (beta) Hosted Fields"
+
+msgid "payplug_hosted_fields_description"
+msgstr "Ponte en contacto con tu Account Manager para obtener tu Account ID."
+
+msgid "payplug_hosted_fields_identifier_label"
+msgstr "Account ID"
+
+msgid "hosted_fields_option_validation_title"
+msgstr "Imposible guardar la configuración."
+
+msgid "hosted_fields_identifier_required"
+msgstr "Por favor, introduce el Account ID para activar el modo Advanced (beta) Hosted Fields."
