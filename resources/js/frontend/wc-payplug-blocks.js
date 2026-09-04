@@ -5,6 +5,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
 import IntegratedPayment from "./wc-payplug-integratedPayment-blocks";
 import Popup from "./wc-payplug-popup-blocks";
+import HostedFields from "./wc-payplug-hostedFields-blocks";
 const settings = getSetting( 'payplug_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
 const label = decodeEntities( settings?.title ) || defaultLabel;
@@ -23,6 +24,12 @@ const Content = (props) => {
 	if(settings?.popup === true){
 		return (
 			<Popup settings={settings} props={props} />
+		)
+	}
+
+	if(settings?.hostedFields === true){
+		return (
+			<HostedFields settings={settings} props={props} />
 		)
 	}
 
