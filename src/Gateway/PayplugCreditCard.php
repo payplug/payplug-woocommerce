@@ -2,6 +2,7 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway;
 
+use Payplug\PayplugWoocommerce\Controller\HostedFields;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
@@ -52,7 +53,7 @@ class PayplugCreditCard extends PayplugGateway
         }
 
         //add fields of IP to the description
-        if ('integrated' == $this->embedded_mode) {
+        if ('integrated' == $this->embedded_mode || 'hosted_fields' == $this->embedded_mode) {
             $this->has_fields = true;
         }
 
@@ -147,6 +148,10 @@ class PayplugCreditCard extends PayplugGateway
         if (('popup' == $this->embedded_mode) && ('payplug' == $this->id || 'american_express' == $this->id) && !PayplugWoocommerceHelper::is_checkout_block()) {
             $this->popup_payments_scripts();
         }
+
+        if ('hosted_fields' == $this->embedded_mode && !PayplugWoocommerceHelper::is_checkout_block()) {
+            $this->hosted_fields_scripts();
+        }
     }
 
     /**
@@ -215,6 +220,30 @@ class PayplugCreditCard extends PayplugGateway
     }
 
     /**
+     * Hosted Fields payment form scripts.
+     *
+     * Register scripts and additionnal data needed for the
+     * hosted fields payment form.
+     */
+    public function hosted_fields_scripts(): void
+    {
+        $translations = [
+            'ajax_url' => \WC_AJAX::get_endpoint('payplug_hosted_fields_token'),
+            'nonce' => wp_create_nonce('woocommerce-process_checkout'),
+            'key_id' => $this->get_configuration()->get_option('payment_methods.configuration.payplug.hosted_fields.public_key_id'),
+            'key_value' => $this->get_configuration()->get_option('payment_methods.configuration.payplug.hosted_fields.public_key_value'),
+        ];
+
+        wp_register_script('payplug-hosted-fields-sdk', HOSTED_FIELDS_SDK_URL, [], null, true);
+        wp_enqueue_script('payplug-hosted-fields-sdk');
+
+        wp_register_script('payplug-hosted-fields', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-hosted-fields.js', ['jquery', 'payplug-hosted-fields-sdk'], PAYPLUG_GATEWAY_VERSION, true);
+        wp_enqueue_script('payplug-hosted-fields');
+
+        wp_localize_script('payplug-hosted-fields', 'payplug_hosted_fields_params', $translations);
+    }
+
+    /**
      * extra payment fields
      */
     public function payment_fields(): void
@@ -227,6 +256,10 @@ class PayplugCreditCard extends PayplugGateway
 
         if ('integrated' == $this->embedded_mode) {
             echo IntegratedPayment::template_form($this->save_card);
+        }
+
+        if ('hosted_fields' == $this->embedded_mode) {
+            echo HostedFields::template_form($this->save_card);
         }
 
         if ($this->save_card_available()) {

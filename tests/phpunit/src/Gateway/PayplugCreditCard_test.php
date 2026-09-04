@@ -73,4 +73,13 @@ class PayplugCreditCard_test extends TestCase
         $gateway = new PayplugCreditCard();
         self::assertSame('yes', $gateway->enabled);
     }
+
+    public function test_has_fields_enabled_for_hosted_fields_mode(): void
+    {
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['embedded_mode'] = 'hosted_fields';
+        update_option('woocommerce_payplug_settings', $settings);
+        $gateway = new PayplugCreditCard();
+        self::assertTrue($gateway->has_fields);
+    }
 }
