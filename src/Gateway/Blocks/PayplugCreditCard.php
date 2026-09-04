@@ -27,6 +27,7 @@ class PayplugCreditCard extends PayplugGenericBlock
         ];
         $data['IP'] = false;
         $data['popup'] = false;
+        $data['hostedFields'] = false;
         $data['payment_method'] = $this->get_name();
         $data['supports'] = $this->get_supported_features();
         $data['showSaveOption'] = !empty($this->gateway->save_card) ? $this->gateway->save_card : false;
@@ -72,6 +73,15 @@ class PayplugCreditCard extends PayplugGenericBlock
                 $data['payplug_create_order'] = \WC_AJAX::get_endpoint('payplug_create_order');
                 $data['wp_nonce'] = wp_create_nonce('woocommerce-process_checkout');
                 break;
+            case 'hosted_fields':
+                $data['hostedFields'] = true;
+                $data['hostedFieldsKeyId'] = $configuration->get_option('payment_methods.configuration.payplug.hosted_fields.public_key_id');
+                $data['hostedFieldsKeyValue'] = $configuration->get_option('payment_methods.configuration.payplug.hosted_fields.public_key_value');
+                $data['hostedFieldsAjaxUrl'] = \WC_AJAX::get_endpoint('payplug_hosted_fields_token');
+                $data['hostedFieldsNonce'] = wp_create_nonce('woocommerce-process_checkout');
+                $data['hostedFieldsTokenizationError'] = __('payplug_hosted_fields_tokenization_error', 'payplug');
+                $data['hostedFieldsUnsupportedBrandError'] = __('payplug_hosted_fields_unsupported_brand_error', 'payplug');
+                break;
             default:
                 break;
         }
@@ -94,6 +104,10 @@ class PayplugCreditCard extends PayplugGenericBlock
 
         if ('popup' == $embedded_mode) {
             $this->popup_scripts();
+        }
+
+        if ('hosted_fields' == $embedded_mode) {
+            $this->hosted_fields_scripts();
         }
 
         return parent::get_payment_method_script_handles();
@@ -137,5 +151,11 @@ class PayplugCreditCard extends PayplugGenericBlock
 
         wp_enqueue_script('payplug-popup');
         wp_enqueue_script('payplug-checkout');
+    }
+
+    private function hosted_fields_scripts(): void
+    {
+        wp_register_script('payplug-hosted-fields-sdk', HOSTED_FIELDS_SDK_URL, [], null, true);
+        wp_enqueue_script('payplug-hosted-fields-sdk');
     }
 }
