@@ -963,3 +963,21 @@ msgstr "Unable to save the configuration"
 
 msgid "hosted_fields_identifier_required"
 msgstr "Please fill in the Account ID to enable Advanced (beta) Hosted Fields."
+
+msgid "payplug_hosted_fields_card_error"
+msgstr "Invalid card number."
+
+msgid "payplug_hosted_fields_expiry_error"
+msgstr "Invalid expiration date."
+
+msgid "payplug_hosted_fields_cryptogram_error"
+msgstr "Invalid security code."
+
+msgid "payplug_hosted_fields_tokenization_error"
+msgstr "An error occurred while verifying your card. Please try again."
+
+msgid "payplug_hosted_fields_unsupported_brand_error"
+msgstr "This card type is not accepted with this payment mode. Please use a CB, Visa or Mastercard card."
+
+msgid "payplug_hosted_fields_missing_token"
+msgstr "An error occurred while verifying your card. Please try again."

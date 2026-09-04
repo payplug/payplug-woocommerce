@@ -1332,3 +1332,21 @@ msgstr "Impossible d'enregistrer la configuration."
 
 msgid "hosted_fields_identifier_required"
 msgstr "Merci de renseigner l'Account ID pour activer le mode Advanced (beta) Hosted Fields."
+
+msgid "payplug_hosted_fields_card_error"
+msgstr "Numéro de carte invalide."
+
+msgid "payplug_hosted_fields_expiry_error"
+msgstr "Date d'expiration invalide."
+
+msgid "payplug_hosted_fields_cryptogram_error"
+msgstr "Code de sécurité invalide."
+
+msgid "payplug_hosted_fields_tokenization_error"
+msgstr "Une erreur est survenue lors de la vérification de votre carte. Merci de réessayer."
+
+msgid "payplug_hosted_fields_unsupported_brand_error"
+msgstr "Ce type de carte n'est pas accepté avec ce mode de paiement. Merci d'utiliser une carte CB, Visa ou Mastercard."
+
+msgid "payplug_hosted_fields_missing_token"
+msgstr "Une erreur est survenue lors de la vérification de votre carte. Merci de réessayer."
