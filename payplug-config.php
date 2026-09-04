@@ -28,10 +28,14 @@ define('SECURE_DOMAIN', '');
 define('ONEY_LOADER_URL', '');
 
 /**
- *  URL of the Payplug (Dalenys) hosted-fields SDK script. Depends on
- *  whether the connected merchant account is QA or production - not on
- *  the Test/Live mode toggle - so, like the constants above, this is a
- *  build-time value, not something computed from plugin settings at
- *  runtime.
+ *  URL of the Payplug (Dalenys) hosted-fields SDK script. Per the UHF spec
+ *  (§3.6, flagged there as blocking for production), the official Sylius
+ *  PayPlug plugin currently hardcodes a STAGING url
+ *  (staging-internal-payment.gcp.dlns.io) directly in its shop template -
+ *  the production URL, and whether it should be pinned to a version or a
+ *  "latest" channel, are not yet defined anywhere. This constant ships
+ *  empty until that production value exists; an empty value here degrades
+ *  to not offering the hosted_fields mode's card form rather than
+ *  registering a script with no src (see PayplugCreditCard::hosted_fields_scripts()).
  */
 define('HOSTED_FIELDS_SDK_URL', '');

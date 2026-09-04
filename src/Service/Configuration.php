@@ -370,14 +370,6 @@ class Configuration
                             'type' => 'string',
                             'default' => '',
                         ],
-                        'public_key_id' => [
-                            'type' => 'string',
-                            'default' => '',
-                        ],
-                        'public_key_value' => [
-                            'type' => 'string',
-                            'default' => '',
-                        ],
                     ],
                 ],
                 'installments' => [

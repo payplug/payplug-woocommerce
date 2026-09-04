@@ -9,11 +9,14 @@ class HostedFields_test extends \WP_Ajax_UnitTestCase
     protected function tearDown(): void
     {
         $_POST = [];
+        $_REQUEST = [];
         parent::tearDown();
     }
 
     public function testReceiveTokenSucceedsWithHfToken(): void
     {
+        $_POST['nonce'] = wp_create_nonce('woocommerce-process_checkout');
+        $_REQUEST['nonce'] = $_POST['nonce'];
         $_POST['hfToken'] = 'hf_token_123';
         $_POST['selectedBrand'] = 'visa';
         $_POST['save_card'] = '1';
@@ -37,6 +40,9 @@ class HostedFields_test extends \WP_Ajax_UnitTestCase
 
     public function testReceiveTokenFailsWithoutHfToken(): void
     {
+        $_POST['nonce'] = wp_create_nonce('woocommerce-process_checkout');
+        $_REQUEST['nonce'] = $_POST['nonce'];
+
         $controller = new HostedFields();
 
         ob_start();

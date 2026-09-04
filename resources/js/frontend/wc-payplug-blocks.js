@@ -67,7 +67,7 @@ const Payplug = {
 	ariaLabel: label,
 	supports: {
 		features: settings.supports,
-		showSaveOption: settings?.showSaveOption && settings?.IP,
+		showSaveOption: settings?.showSaveOption && (settings?.IP || settings?.hostedFields),
 		showSavedCards: settings.showSaveOption ?? false
 	},
 };

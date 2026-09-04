@@ -1324,15 +1324,6 @@ msgstr "Impossibile salvare la configurazione"
 msgid "hosted_fields_identifier_required"
 msgstr "Inserisci l'Account ID per attivare la modalità Advanced (beta) Hosted Fields."
 
-msgid "payplug_hosted_fields_card_error"
-msgstr "Numero di carta non valido."
-
-msgid "payplug_hosted_fields_expiry_error"
-msgstr "Data di scadenza non valida."
-
-msgid "payplug_hosted_fields_cryptogram_error"
-msgstr "Codice di sicurezza non valido."
-
 msgid "payplug_hosted_fields_tokenization_error"
 msgstr "Si è verificato un errore durante la verifica della tua carta. Riprova."
 
