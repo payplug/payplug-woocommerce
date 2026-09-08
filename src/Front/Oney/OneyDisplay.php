@@ -9,18 +9,23 @@ class OneyDisplay
 {
     public function __construct()
     {
-        // Registered here rather than on wp_enqueue_scripts: on WooCommerce block-theme
+        // Registered on init rather than on wp_enqueue_scripts: on WooCommerce block-theme
         // product templates, content hooks like woocommerce_before_add_to_cart_form can fire
         // BEFORE wp_enqueue_scripts (block rendering doesn't follow the classic head-then-body
         // template lifecycle). wp_localize_script() only needs the handle to be *registered*,
-        // not enqueued, so registering immediately here guarantees it's available by the time
+        // not enqueued, so registering on init guarantees it's available by the time
         // show_on_product()/show_on_cart() call wp_localize_script() on it, regardless of which
         // hook happens to fire first on a given request.
-        wp_register_script('payplug-oney-loader', PayplugWoocommerceHelper::get_oney_loader_url(), [], PAYPLUG_GATEWAY_VERSION, true);
-        wp_register_script('payplug-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-oney.js', [
-            'jquery',
-            'payplug-oney-loader',
-        ], PAYPLUG_GATEWAY_VERSION, true);
+        //
+        // It must not happen any earlier: this class is built on plugins_loaded, and
+        // wp_register_script() before init trips WP's _doing_it_wrong() notice, which prints
+        // output before any header() call - breaking redirects and corrupting the JSON of AJAX
+        // endpoints such as WooCommerce's update_order_review.
+        if (did_action('init')) {
+            $this->register_assets();
+        } else {
+            add_action('init', [$this, 'register_assets']);
+        }
 
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('woocommerce_cart_totals_after_order_total', [$this, 'show_on_cart']);
@@ -29,6 +34,15 @@ class OneyDisplay
         if (!empty($options['payment_methods']['configuration']['oney']['cta_product'])) {
             add_action('woocommerce_before_add_to_cart_form', [$this, 'show_on_product']);
         }
+    }
+
+    public function register_assets(): void
+    {
+        wp_register_script('payplug-oney-loader', PayplugWoocommerceHelper::get_oney_loader_url(), [], PAYPLUG_GATEWAY_VERSION, true);
+        wp_register_script('payplug-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-oney.js', [
+            'jquery',
+            'payplug-oney-loader',
+        ], PAYPLUG_GATEWAY_VERSION, true);
     }
 
     public function enqueue_assets(): void

@@ -1317,3 +1317,8 @@ msgstr "Attenzione, l'importo minimo inserito è superiore all'importo massimo i
 
 msgid "payplug_thresholds_scalapay_error_title"
 msgstr "Limiti di importo Scalapay non validi"
+
+#: src/Gateway/PPRO/Scalapay.php:78
+#, php-format
+msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
+msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ e %s€ per pagare tramite Scalapay."

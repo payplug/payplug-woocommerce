@@ -957,3 +957,8 @@ msgstr ""
 
 msgid "payplug_thresholds_scalapay_error_title"
 msgstr ""
+
+#: src/Gateway/PPRO/Scalapay.php:78
+#, php-format
+msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
+msgstr ""

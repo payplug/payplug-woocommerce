@@ -563,14 +563,7 @@ class PaymentMethods
         // The widget's client-side validation ceiling is always the account's raw
         // authorized range (matching the save-time validator), not the merchant's own
         // possibly-narrower custom choice.
-        $authorized = json_decode($api_amounts, true);
-        $authorized_min = $authorized['min']['EUR'] ?? null;
-        $authorized_max = $authorized['max']['EUR'] ?? null;
-        if (null === $authorized_min || null === $authorized_max) {
-            $fallback = json_decode($config['default_amounts'] ?? '{"min":500, "max":400000}', true);
-            $authorized_min = $authorized_min ?? $fallback['min'];
-            $authorized_max = $authorized_max ?? $fallback['max'];
-        }
+        [$authorized_min, $authorized_max] = Scalapay::authorized_bounds($config, $api_amounts);
 
         // Convert cents to euros for display
         $min = $min / 100;

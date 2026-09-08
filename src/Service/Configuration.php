@@ -487,6 +487,10 @@ class Configuration
                         'type' => 'string',
                         // Last-resort fallback only, used when the account's live API bounds
                         // (payment_methods.permissions.scalapay.amounts) aren't available yet.
+                        // Kept in sync with Scalapay::DEFAULT_MIN_AMOUNT/DEFAULT_MAX_AMOUNT,
+                        // which cover the case where this key itself is missing from a stored
+                        // options array. This schema is intentionally dependency-free, so the
+                        // values are repeated here as a literal rather than referenced.
                         'default' => '{"min":500, "max":400000}',
                     ],
                     'custom_amounts' => [
