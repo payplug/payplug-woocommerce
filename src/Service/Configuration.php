@@ -483,6 +483,19 @@ class Configuration
                         'type' => 'bool',
                         'default' => false,
                     ],
+                    'default_amounts' => [
+                        'type' => 'string',
+                        // Last-resort fallback only, used when the account's live API bounds
+                        // (payment_methods.permissions.scalapay.amounts) aren't available yet.
+                        'default' => '{"min":500, "max":400000}',
+                    ],
+                    'custom_amounts' => [
+                        'type' => 'string',
+                        // Empty means "not customized yet" - the merchant's actual choice, if
+                        // any. Must NOT default to a concrete value, or that value would be
+                        // read as an explicit override of the account's live API bounds.
+                        'default' => '{}',
+                    ],
                 ],
             ],
         ],

@@ -167,6 +167,43 @@ class Validator
         return ['min' => $rmin, 'max' => $rmax];
     }
 
+    /**
+     * Reject Scalapay min/max amounts (cents) that are inconsistent, or that widen beyond
+     * what the PayPlug account currently authorizes (also in cents). The merchant can only
+     * narrow the account's range, never widen it.
+     *
+     * @param $min
+     * @param $max
+     * @param $account_min
+     * @param $account_max
+     *
+     * @return array{min: int, max: int}
+     */
+    public static function scalapay_thresholds($min, $max, $account_min, $account_max)
+    {
+        if ($min > $max) {
+            http_response_code(200);
+            wp_send_json_error([
+                'msg' => __('payplug_thresholds_scalapay_error_mintext_msg', 'payplug'),
+                'class' => 'error',
+                'title' => __('payplug_thresholds_scalapay_error_title', 'payplug'),
+                'close' => __('payplug_ok', 'payplug'),
+            ]);
+        }
+
+        if ($min < $account_min || $max > $account_max) {
+            http_response_code(200);
+            wp_send_json_error([
+                'msg' => __('payplug_thresholds_scalapay_error_msg', 'payplug'),
+                'class' => 'error',
+                'title' => __('payplug_thresholds_scalapay_error_title', 'payplug'),
+                'close' => __('payplug_ok', 'payplug'),
+            ]);
+        }
+
+        return ['min' => $min, 'max' => $max];
+    }
+
     public static function oney_product_animation($status)
     {
         if ($status) {

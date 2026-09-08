@@ -655,6 +655,16 @@ class Ajax
         ]);
         $options['payment_methods']['configuration']['oney']['with_fees'] = 'with_fees' == (string) $data['payplug_oney'];
 
+        // scalapay payment
+        $scalapay_authorized = json_decode($options['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}', true);
+        $scalapay_thresholds = Validator::scalapay_thresholds(
+            (int) $data['scalapay_min_amounts'] * 100,
+            (int) $data['scalapay_max_amounts'] * 100,
+            $scalapay_authorized['min']['EUR'] ?? 500,
+            $scalapay_authorized['max']['EUR'] ?? 400000
+        );
+        $options['payment_methods']['configuration']['scalapay']['custom_amounts'] = json_encode($scalapay_thresholds);
+
         // Force-disable methods unavailable in test mode: submitted 'active' flags are
         // trusted as-is, so one enabled while in live mode stays active after just
         // switching to test unless we re-check it here.

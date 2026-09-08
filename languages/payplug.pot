@@ -939,3 +939,21 @@ msgstr "Pay with Bizum"
 
 msgid "pay_with_scalapay"
 msgstr "Pay with Scalapay"
+
+msgid "payplug_thresholds_scalapay_title"
+msgstr ""
+
+msgid "payplug_thresholds_scalapay_description"
+msgstr ""
+
+msgid "payplug_thresholds_scalapay_error_msg"
+msgstr ""
+
+msgid "payplug_thresholds_scalapay_error_maxtext_msg"
+msgstr ""
+
+msgid "payplug_thresholds_scalapay_error_mintext_msg"
+msgstr ""
+
+msgid "payplug_thresholds_scalapay_error_title"
+msgstr ""

@@ -37,6 +37,87 @@ class Scalapay extends PayplugGenericGateway
         }
 
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'refund_not_available']);
+        add_action('woocommerce_after_checkout_validation', [$this, 'validate_checkout'], 10);
+    }
+
+    /**
+     * Server-side guard mirroring check_gateway(): a stale/bypassed client could still submit
+     * an order outside the merchant's configured (or account-authorized) amount range.
+     *
+     * @throws \Exception
+     */
+    public function validate_checkout(): void
+    {
+        $posted_data = $this->get_post_data();
+
+        if (($posted_data['payment_method'] ?? '') !== $this->id) {
+            return;
+        }
+
+        [$min_cents, $max_cents] = self::effective_bounds(
+            $this->settings['payment_methods']['configuration']['scalapay'] ?? [],
+            $this->settings['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
+        );
+
+        if ($this->get_order_total() * 100 < $min_cents || $this->get_order_total() * 100 > $max_cents) {
+            throw new \Exception(sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Scalapay.', 'payplug'), $min_cents / 100, $max_cents / 100));
+        }
+    }
+
+    /**
+     * Remove Scalapay from the available gateways if the order/cart amount is outside the
+     * merchant's configured bounds (or the account's authorized range, if unconfigured).
+     *
+     * @param array $gateways
+     *
+     * @return array
+     */
+    public function check_gateway($gateways)
+    {
+        if (isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id) {
+            [$min_cents, $max_cents] = self::effective_bounds(
+                $this->settings['payment_methods']['configuration']['scalapay'] ?? [],
+                $this->settings['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
+            );
+
+            $order_amount = $this->get_order_total() * 100;
+            if ($order_amount < $min_cents || $order_amount > $max_cents) {
+                unset($gateways[$this->id]);
+            }
+        }
+
+        return parent::check_gateway($gateways);
+    }
+
+    /**
+     * The merchant's configured min/max (when set) narrowed against the account's live
+     * PayPlug-authorized range - shared with the BO settings display (PaymentMethods.php)
+     * so both stay in sync by construction.
+     *
+     * @param array $config payment_methods.configuration.scalapay (custom_amounts/default_amounts)
+     * @param string $api_amounts payment_methods.permissions.scalapay.amounts, JSON-encoded
+     *                            {"min":{"EUR":n},"max":{"EUR":n}}
+     *
+     * @return array{0: int, 1: int} [min_cents, max_cents]
+     */
+    public static function effective_bounds($config, $api_amounts)
+    {
+        $custom_amounts = json_decode($config['custom_amounts'] ?? '{}', true);
+
+        $authorized = json_decode($api_amounts ?? '{}', true);
+        $authorized_min = $authorized['min']['EUR'] ?? null;
+        $authorized_max = $authorized['max']['EUR'] ?? null;
+
+        if (null === $authorized_min || null === $authorized_max) {
+            $fallback = json_decode($config['default_amounts'] ?? '{"min":500, "max":400000}', true);
+            $authorized_min = $authorized_min ?? $fallback['min'];
+            $authorized_max = $authorized_max ?? $fallback['max'];
+        }
+
+        $min = !empty($custom_amounts['min']) ? $custom_amounts['min'] : $authorized_min;
+        $max = !empty($custom_amounts['max']) ? $custom_amounts['max'] : $authorized_max;
+
+        return [$min, $max];
     }
 
     /**
