@@ -15,6 +15,16 @@ class Scalapay extends PayplugGenericGateway
     protected $enable_refund = true;
     public const ENABLE_ON_TEST_MODE = false;
 
+    /**
+     * Last-resort fallback bounds, in cents. Used only when neither the account's live API
+     * amounts nor the stored scalapay.default_amounts are available - e.g. an options array
+     * that predates that key, since Configuration loads the raw stored options without
+     * merging the schema defaults. Mirrors Configuration::$expected_fields'
+     * payment_methods.configuration.scalapay.default_amounts.
+     */
+    public const DEFAULT_MIN_AMOUNT = 500;
+    public const DEFAULT_MAX_AMOUNT = 400000;
+
     public function __construct()
     {
         parent::__construct();
@@ -59,7 +69,12 @@ class Scalapay extends PayplugGenericGateway
             $this->settings['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
         );
 
-        if ($this->get_order_total() * 100 < $min_cents || $this->get_order_total() * 100 > $max_cents) {
+        // Compared in euros rather than multiplying the total by 100: a float cents value
+        // such as 19.99 * 100 => 1998.9999999999998 can fall the wrong side of an exact
+        // boundary, whereas dividing the (integer) bound by 100 yields the same double as
+        // the parsed total. Same direction as PayplugGatewayOney3x's amount checks.
+        $order_total = (float) $this->get_order_total();
+        if ($order_total < $min_cents / 100 || $order_total > $max_cents / 100) {
             throw new \Exception(sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Scalapay.', 'payplug'), $min_cents / 100, $max_cents / 100));
         }
     }
@@ -80,13 +95,42 @@ class Scalapay extends PayplugGenericGateway
                 $this->settings['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
             );
 
-            $order_amount = $this->get_order_total() * 100;
-            if ($order_amount < $min_cents || $order_amount > $max_cents) {
+            // Euro comparison, for the float-precision reason spelled out in validate_checkout().
+            $order_total = (float) $this->get_order_total();
+            if ($order_total < $min_cents / 100 || $order_total > $max_cents / 100) {
                 unset($gateways[$this->id]);
             }
         }
 
         return parent::check_gateway($gateways);
+    }
+
+    /**
+     * The account's PayPlug-authorized range, in cents: the live API amounts when available,
+     * otherwise the stored default_amounts fallback. This is the ceiling the merchant may
+     * only narrow, never widen - shared with the BO display (PaymentMethods.php) and the
+     * save-time validator's bounds (Ajax.php) so the three can't silently drift apart.
+     *
+     * @param array $config payment_methods.configuration.scalapay (default_amounts)
+     * @param string $api_amounts payment_methods.permissions.scalapay.amounts, JSON-encoded
+     *                            {"min":{"EUR":n},"max":{"EUR":n}}
+     *
+     * @return array{0: int, 1: int} [min_cents, max_cents]
+     */
+    public static function authorized_bounds($config, $api_amounts)
+    {
+        $authorized = json_decode($api_amounts ?? '{}', true);
+        $min = is_array($authorized) ? ($authorized['min']['EUR'] ?? null) : null;
+        $max = is_array($authorized) ? ($authorized['max']['EUR'] ?? null) : null;
+
+        if (null === $min || null === $max) {
+            $fallback = json_decode($config['default_amounts'] ?? '', true);
+            $fallback = is_array($fallback) ? $fallback : [];
+            $min = $min ?? ($fallback['min'] ?? self::DEFAULT_MIN_AMOUNT);
+            $max = $max ?? ($fallback['max'] ?? self::DEFAULT_MAX_AMOUNT);
+        }
+
+        return [(int) $min, (int) $max];
     }
 
     /**
@@ -103,19 +147,14 @@ class Scalapay extends PayplugGenericGateway
     public static function effective_bounds($config, $api_amounts)
     {
         $custom_amounts = json_decode($config['custom_amounts'] ?? '{}', true);
+        $custom_amounts = is_array($custom_amounts) ? $custom_amounts : [];
 
-        $authorized = json_decode($api_amounts ?? '{}', true);
-        $authorized_min = $authorized['min']['EUR'] ?? null;
-        $authorized_max = $authorized['max']['EUR'] ?? null;
+        [$authorized_min, $authorized_max] = self::authorized_bounds($config, $api_amounts);
 
-        if (null === $authorized_min || null === $authorized_max) {
-            $fallback = json_decode($config['default_amounts'] ?? '{"min":500, "max":400000}', true);
-            $authorized_min = $authorized_min ?? $fallback['min'];
-            $authorized_max = $authorized_max ?? $fallback['max'];
-        }
-
-        $min = !empty($custom_amounts['min']) ? $custom_amounts['min'] : $authorized_min;
-        $max = !empty($custom_amounts['max']) ? $custom_amounts['max'] : $authorized_max;
+        // !empty() rather than isset(): a stored 0 is not a meaningful Scalapay threshold,
+        // so it falls back to the account bound instead of being read as an override.
+        $min = !empty($custom_amounts['min']) ? (int) $custom_amounts['min'] : $authorized_min;
+        $max = !empty($custom_amounts['max']) ? (int) $custom_amounts['max'] : $authorized_max;
 
         return [$min, $max];
     }
