@@ -2,5 +2,5 @@
   "version": "3.1.0",
   "wc_tested_up_to": "10.6.1",
   "wp_tested_up_to": "6.9.4",
-  "changelog": "* Feat: Replace internal Oney simulator with the official Oney widget on product page, cart and checkout\n* Fix: Fix Oney Availability in BO Payments section\n* Feat: Connect module to unified-plugin-core (UPC) and replace internal amount/phone-number conversion with UPC's AmountHelper/PhoneHelper"
+  "changelog": "* Feat: Replace internal Oney simulator with the official Oney widget on product page, cart and checkout\n* Fix: Fix Oney Availability in BO Payments section\n* Feat: Connect module to unified-plugin-core (UPC) and replace internal amount/phone-number conversion with UPC's AmountHelper/PhoneHelper\n* Feat: Add UHF BO configuration"
 }

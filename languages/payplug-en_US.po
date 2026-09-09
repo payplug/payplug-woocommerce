@@ -688,3 +688,27 @@ msgstr "New login method being rolled out gradually OAuth2 login is only availab
 
 msgid "payplug_section_oauth_login_title"
 msgstr "OAuth2 Login (new)"
+
+msgid "payplug_section_standard_payment_option_hosted_fields_label"
+msgstr "Advanced (beta) Hosted Fields"
+
+msgid "payplug_section_standard_payment_hosted_fields_description"
+msgstr "Your customers will see the payment form appear directly on the checkout page of your store, using fields hosted and secured by Payplug (beta feature)."
+
+msgid "payplug_section_advanced_configuration_title"
+msgstr "Advanced configuration"
+
+msgid "payplug_hosted_fields_title"
+msgstr "Advanced (beta) Hosted Fields"
+
+msgid "payplug_hosted_fields_description"
+msgstr "Contact your Account Manager to get your Account ID."
+
+msgid "payplug_hosted_fields_identifier_label"
+msgstr "Account ID"
+
+msgid "hosted_fields_option_validation_title"
+msgstr "Unable to save the configuration"
+
+msgid "hosted_fields_identifier_required"
+msgstr "Please fill in the Account ID to enable Advanced (beta) Hosted Fields."

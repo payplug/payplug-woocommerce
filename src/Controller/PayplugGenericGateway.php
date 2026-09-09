@@ -70,6 +70,16 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
             return false;
         }
 
+        // Every gateway built on PayplugGenericGateway (AmEx, Bancontact, Oney, and the
+        // PPRO methods) is Euro-only, unlike the standard card gateway (Retail API /
+        // Hosted Fields) which now supports any currency. This used to be covered by
+        // PayplugGatewayRequirements::satisfy_requirements()'s currency check, which was
+        // removed so non-EUR shops could use Hosted Fields - that removal otherwise left
+        // these Euro-only gateways offered at checkout with no currency guard at all.
+        if (!PayplugWoocommerceHelper::is_eur_shop()) {
+            return false;
+        }
+
         // todo: delete this usage to avoid call to getAccount resource each checkout loading
         $account = PayplugWoocommerceHelper::generic_get_account_data_from_options($this->id);
         $options = PayplugWoocommerceHelper::get_payplug_options();
