@@ -27,6 +27,16 @@ class PayplugWoocommerceHelper
     use ServiceGetter;
 
     /**
+     * Check if the shop's payment currency is Euro.
+     *
+     * @return bool
+     */
+    public static function is_eur_shop()
+    {
+        return 'EUR' === get_woocommerce_currency();
+    }
+
+    /**
      * Check if current WooCommerce version is below 3.0.0
      *
      * @return bool

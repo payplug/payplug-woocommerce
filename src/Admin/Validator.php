@@ -101,32 +101,64 @@ class Validator
         }
 
         if ($cart === false && $product === false && $checkout === false) {
-            http_response_code(200);
-
-            $arr = [
-                'msg' => __('applepay_cart_checkout_option_validation', 'payplug'),
-                'class' => 'error',
-                'title' => __('applepay_cart_checkout_option_validation_title', 'payplug'),
-                'close' => __('payplug_ok', 'payplug'),
-            ];
-
-            wp_send_json_error($arr);
+            self::sendValidationError(
+                __('applepay_cart_checkout_option_validation', 'payplug'),
+                __('applepay_cart_checkout_option_validation_title', 'payplug')
+            );
         }
 
         if (($cart === true || $product === true) && empty($carriers)) {
-            http_response_code(200);
-
-            $arr = [
-                'msg' => __('applepay_cart_carrier_enabled', 'payplug'),
-                'class' => 'error',
-                'title' => __('applepay_cart_checkout_option_validation_title', 'payplug'),
-                'close' => __('payplug_ok', 'payplug'),
-            ];
-
-            wp_send_json_error($arr);
+            self::sendValidationError(
+                __('applepay_cart_carrier_enabled', 'payplug'),
+                __('applepay_cart_checkout_option_validation_title', 'payplug')
+            );
         }
 
         return true;
+    }
+
+    /**
+     * prevent saving when Hosted Fields mode is selected without its required identifier
+     *
+     * @param string $embedded_mode
+     * @param string $identifier
+     *
+     * @return bool
+     */
+    public static function hostedFieldsPaymentGatewayOptions(string $embedded_mode, string $identifier): bool
+    {
+        if ($embedded_mode !== 'hosted_fields') {
+            return true;
+        }
+
+        if (trim($identifier) === '') {
+            self::sendValidationError(
+                __('hosted_fields_identifier_required', 'payplug'),
+                __('hosted_fields_option_validation_title', 'payplug')
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * halts the request with a translated validation error, mirroring wp_send_json_error()'s wp_die()
+     *
+     * @param string $msg
+     * @param string $title
+     *
+     * @return void
+     */
+    private static function sendValidationError(string $msg, string $title): void
+    {
+        http_response_code(200);
+
+        wp_send_json_error([
+            'msg' => $msg,
+            'class' => 'error',
+            'title' => $title,
+            'close' => __('payplug_ok', 'payplug'),
+        ]);
     }
 
     public static function oney($value)
