@@ -621,6 +621,12 @@ class Ajax
             if (!isset($options['payment_methods']['configuration'][$name])) {
                 continue;
             }
+            // Euro-only methods aren't rendered (so their `enable_*` key is absent from
+            // $data) for a non-EUR shop - leave their stored value untouched rather than
+            // silently disabling them.
+            if (!array_key_exists('enable_' . $name, $data)) {
+                continue;
+            }
             $options['payment_methods']['configuration'][$name]['active'] = (bool) $data['enable_' . $name];
         }
 
@@ -630,31 +636,44 @@ class Ajax
         $options['payment_methods']['configuration']['payplug']['description'] = (string) $data['standard_payment_description'];
         $options['payment_methods']['configuration']['payplug']['embedded_mode'] = (string) $data['payplug_embeded'];
         $options['payment_methods']['configuration']['payplug']['save_card'] = (bool) $data['enable_one_click'];
+        $hosted_fields_identifier = sanitize_text_field((string) ($data['identifier'] ?? ''));
+        // halts the request via wp_send_json_error() when Hosted Fields is selected without an identifier
+        Validator::hostedFieldsPaymentGatewayOptions($options['payment_methods']['configuration']['payplug']['embedded_mode'], $hosted_fields_identifier);
+        // the field is absent from $data (EUR shop, or a non-EUR shop before the front-end
+        // package ships) - keep the stored value rather than overwriting it with ''
+        if (array_key_exists('identifier', $data)) {
+            $options['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] = $hosted_fields_identifier;
+        }
 
-        // applepay payment
-        $applepay_active = (bool) $data['enable_applepay'];
-        $applepay_carriers = $data['applepay_carriers'];
-        $applepay_cart = (bool) $data['enable_applepay_cart'];
-        $applepay_checkout = (bool) $data['enable_applepay_checkout'];
-        $applepay_product = (bool) $data['enable_applepay_product'];
-        // if product or cart options are checked but no carriers selected, return error
-        $applepay_active = $applepay_active && Validator::applePayPaymentGatewayOptions($applepay_active, $applepay_cart, $applepay_product, $applepay_checkout, $applepay_carriers);
-        $options['payment_methods']['configuration']['apple_pay']['active'] = $applepay_active;
-        $options['payment_methods']['configuration']['apple_pay']['carriers'] = json_encode($applepay_carriers);
-        $options['payment_methods']['configuration']['apple_pay']['display'] = json_encode([
-            'cart' => $applepay_cart,
-            'checkout' => $applepay_checkout,
-            'product' => $applepay_product,
-        ]);
+        // applepay payment - Euro-only, not rendered (so absent from $data) for a non-EUR
+        // shop; leave the stored config untouched rather than silently wiping it.
+        if (array_key_exists('enable_applepay', $data)) {
+            $applepay_active = (bool) $data['enable_applepay'];
+            $applepay_carriers = $data['applepay_carriers'];
+            $applepay_cart = (bool) $data['enable_applepay_cart'];
+            $applepay_checkout = (bool) $data['enable_applepay_checkout'];
+            $applepay_product = (bool) $data['enable_applepay_product'];
+            // if product or cart options are checked but no carriers selected, return error
+            $applepay_active = $applepay_active && Validator::applePayPaymentGatewayOptions($applepay_active, $applepay_cart, $applepay_product, $applepay_checkout, $applepay_carriers);
+            $options['payment_methods']['configuration']['apple_pay']['active'] = $applepay_active;
+            $options['payment_methods']['configuration']['apple_pay']['carriers'] = json_encode($applepay_carriers);
+            $options['payment_methods']['configuration']['apple_pay']['display'] = json_encode([
+                'cart' => $applepay_cart,
+                'checkout' => $applepay_checkout,
+                'product' => $applepay_product,
+            ]);
+        }
 
-        // oney payment
-        $options['payment_methods']['configuration']['oney']['active'] = (bool) $data['enable_oney'];
-        $options['payment_methods']['configuration']['oney']['cta_product'] = (bool) $data['enable_oney_product_animation'];
-        $options['payment_methods']['configuration']['oney']['custom_amounts'] = json_encode([
-            'min' => AmountHelper::toCents((float) $data['oney_min_amounts']),
-            'max' => AmountHelper::toCents((float) $data['oney_max_amounts']),
-        ]);
-        $options['payment_methods']['configuration']['oney']['with_fees'] = 'with_fees' == (string) $data['payplug_oney'];
+        // oney payment - same Euro-only guard as apple pay above.
+        if (array_key_exists('enable_oney', $data)) {
+            $options['payment_methods']['configuration']['oney']['active'] = (bool) $data['enable_oney'];
+            $options['payment_methods']['configuration']['oney']['cta_product'] = (bool) $data['enable_oney_product_animation'];
+            $options['payment_methods']['configuration']['oney']['custom_amounts'] = json_encode([
+                'min' => AmountHelper::toCents((float) $data['oney_min_amounts']),
+                'max' => AmountHelper::toCents((float) $data['oney_max_amounts']),
+            ]);
+            $options['payment_methods']['configuration']['oney']['with_fees'] = 'with_fees' == (string) $data['payplug_oney'];
+        }
 
         // scalapay payment - the thresholds widget isn't necessarily rendered (a stale admin
         // JS bundle right after a deploy, for instance). Its absence must not reach
