@@ -521,6 +521,13 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
 
     public function checkGateway()
     {
+        // Oney is Euro-only, like every other gateway built on PayplugGenericGateway - but
+        // this override replaces PayplugGenericGateway::checkGateway() entirely rather than
+        // calling it, so its currency guard never runs for Oney unless repeated here.
+        if (!PayplugWoocommerceHelper::is_eur_shop()) {
+            return false;
+        }
+
         $options = PayplugWoocommerceHelper::get_payplug_options();
 
         // Now called unconditionally from the constructor (not just at checkout via

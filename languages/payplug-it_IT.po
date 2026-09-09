@@ -1322,3 +1322,26 @@ msgstr "Limiti di importo Scalapay non validi"
 #, php-format
 msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
 msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ e %s€ per pagare tramite Scalapay."
+msgid "payplug_section_standard_payment_option_hosted_fields_label"
+msgstr "Advanced (beta) Hosted Fields"
+
+msgid "payplug_section_standard_payment_hosted_fields_description"
+msgstr "I tuoi clienti vedranno comparire il modulo di pagamento direttamente nella pagina di check-out del tuo negozio, tramite campi ospitati e protetti da Payplug (funzionalità in versione beta)."
+
+msgid "payplug_section_advanced_configuration_title"
+msgstr "Configurazione avanzata"
+
+msgid "payplug_hosted_fields_title"
+msgstr "Advanced (beta) Hosted Fields"
+
+msgid "payplug_hosted_fields_description"
+msgstr "Contatta il tuo Account Manager per ottenere il tuo Account ID."
+
+msgid "payplug_hosted_fields_identifier_label"
+msgstr "Account ID"
+
+msgid "hosted_fields_option_validation_title"
+msgstr "Impossibile salvare la configurazione"
+
+msgid "hosted_fields_identifier_required"
+msgstr "Inserisci l'Account ID per attivare la modalità Advanced (beta) Hosted Fields."
