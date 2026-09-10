@@ -7,7 +7,7 @@
  * Author URI:      https://www.payplug.com/
  * Text Domain:     payplug
  * Domain Path:     /languages
- * Version:         3.0.0
+ * Version:         3.1.0
  * WC tested up to: 10.6.1
  * Requires PHP:     7.4
  * Requires plugins: woocommerce
@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('PAYPLUG_GATEWAY_VERSION', '3.0.0');
+define('PAYPLUG_GATEWAY_VERSION', '3.1.0');
 define('PAYPLUG_MAX_VERSION_FOR_UPGRADE', '2.16.1');
 define('PAYPLUG_GATEWAY_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('PAYPLUG_GATEWAY_PLUGIN_URL', plugin_dir_url(__FILE__));

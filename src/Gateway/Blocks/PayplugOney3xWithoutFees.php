@@ -31,8 +31,6 @@ class PayplugOney3xWithoutFees extends PayplugOney
             'alt' => $this->gateway->title,
         ];
 
-        $data['oney_response'] = $this->gateway->payplug_api->simulate_oney_payment($this->total_price, 'without_fees');
-
         return $data;
     }
 }

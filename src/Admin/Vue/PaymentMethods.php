@@ -2,6 +2,7 @@
 
 namespace Payplug\PayplugWoocommerce\Admin\Vue;
 
+use Payplug\PayplugWoocommerce\Gateway\PPRO\Scalapay;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
@@ -516,10 +517,13 @@ class PaymentMethods
 
     /**
      * @param $active
+     * @param $config payment_methods.configuration.scalapay options (active/custom_amounts/default_amounts)
+     * @param $api_amounts payment_methods.permissions.scalapay.amounts - the account's live PayPlug-authorized
+     *                     bounds, JSON-encoded {"min":{"EUR":n},"max":{"EUR":n}} (see AccountGateway::map())
      *
      * @return array
      */
-    public static function payment_method_scalapay($active = false)
+    public static function payment_method_scalapay($active = false, $config = [], $api_amounts = '{}')
     {
         return [
             'type' => 'payment_method',
@@ -541,6 +545,58 @@ class PaymentMethods
             'options' => [
                 self::get_allowed_countries('scalapay'),
             ],
+            'advanced_options' => [
+                self::scalapay_thresholds_option($config, $api_amounts),
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private static function scalapay_thresholds_option($config, $api_amounts)
+    {
+        // Shared with Scalapay::check_gateway()'s checkout-time enforcement, so the BO
+        // display and the actual gating logic can't silently drift apart.
+        [$min, $max] = Scalapay::effective_bounds($config, $api_amounts);
+
+        // The widget's client-side validation ceiling is always the account's raw
+        // authorized range (matching the save-time validator), not the merchant's own
+        // possibly-narrower custom choice.
+        [$authorized_min, $authorized_max] = Scalapay::authorized_bounds($config, $api_amounts);
+
+        // Convert cents to euros for display
+        $min = $min / 100;
+        $max = $max / 100;
+        $authorized_min = $authorized_min / 100;
+        $authorized_max = $authorized_max / 100;
+
+        return [
+            'name' => 'thresholds',
+            'image_url' => esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.svg'),
+            'title' => __('payplug_thresholds_scalapay_title', 'payplug'),
+            'descriptions' => [
+                'description' => __('payplug_thresholds_scalapay_description', 'payplug'),
+                'min_amount' => [
+                    'name' => 'scalapay_min_amounts',
+                    'value' => $min,
+                    'placeholder' => $min,
+                    'default' => $authorized_min,
+                ],
+                'inter' => __('and', 'payplug'),
+                'max_amount' => [
+                    'name' => 'scalapay_max_amounts',
+                    'value' => $max,
+                    'placeholder' => $max,
+                    'default' => $authorized_max,
+                ],
+                'error' => [
+                    'text' => __('payplug_thresholds_scalapay_error_msg', 'payplug'),
+                    'maxtext' => __('payplug_thresholds_scalapay_error_maxtext_msg', 'payplug'),
+                    'mintext' => __('payplug_thresholds_scalapay_error_mintext_msg', 'payplug'),
+                ],
+            ],
+            'switch' => false,
         ];
     }
 

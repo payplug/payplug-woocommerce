@@ -79,3 +79,4 @@ jobs:
       api-payplug: ${{ secrets.PAYPLUG_API_PROD }}
       api-payplug-retail: ${{ secrets.API_RETAIL_PROD }}
       github-token: ${{ secrets.GITHUB_TOKEN }}
+      oney-loader-url: ${{ secrets.ONEY_LOADER_URL_PROD }}
