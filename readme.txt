@@ -4,7 +4,7 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 5.0
 Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 3.0.0
+Stable tag: 3.1.0
 VueJs Payplug UI lib tag: 1.7.12
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -80,6 +80,13 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 1. Settings
 2. Display on a WordPress website
 
+== Changelog ==
+= 3.1.0 =
+* Feat: Replace internal Oney simulator with the official Oney widget on product page, cart and checkout
+* Fix Oney Availability in BO Payments section
+* Feat: allow merchant to overload min/Max scalapay values
+
+== Changelog ==
 = 3.0.0 =
 * UPGRADE: Upgrading module with minimal PHP 7.4 version
 * Fix: Fix order not available on admin order page
@@ -92,6 +99,7 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 * Fix: Fix repay an order with Apple Pay is KO
 * Adding MCP tool to create a paymentLink
 
+== Changelog ==
 = 2.18.0 =
 * Fix: OAuth collision with other plugins
  * Fix: Apple Pay with virtual products
@@ -99,12 +107,15 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
  * Fix: Apple Pay undefined HTTP_HOST warning in WP-Cron context
  * Fix : deprecated Jquery callbacks
 
+== Changelog ==
 = 2.17.3 =
 * Changing translations for Scalapay
 
+== Changelog ==
 = 2.17.2 =
 * Various improvements
 
+== Changelog ==
 = 2.17.1 =
 * Patch: Fix for Payplug plugin upgrade disconnecting
 
