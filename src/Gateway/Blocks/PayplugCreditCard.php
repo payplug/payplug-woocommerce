@@ -2,6 +2,7 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway\Blocks;
 
+use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 class PayplugCreditCard extends PayplugGenericBlock
@@ -27,11 +28,16 @@ class PayplugCreditCard extends PayplugGenericBlock
         ];
         $data['IP'] = false;
         $data['popup'] = false;
+        $data['hostedFields'] = false;
         $data['payment_method'] = $this->get_name();
         $data['supports'] = $this->get_supported_features();
         $data['showSaveOption'] = !empty($this->gateway->save_card) ? $this->gateway->save_card : false;
-        $configuration = $this->get_service('configuration');
-        $embedded_mode = $configuration->get_option('payment_methods.configuration.payplug.embedded_mode');
+        // Reuse the registered gateway's already currency-normalized value (see
+        // PayplugCreditCard::__construct()) rather than re-reading the raw stored
+        // config, which could be stale for the shop's current currency. $this->gateway is
+        // only assigned inside initialize()'s block-page conditional (PayplugGenericBlock),
+        // so it's read defensively here rather than assumed non-null.
+        $embedded_mode = $this->gateway->embedded_mode ?? null;
         // Order-pay always has a real, existing order (the one being repaid) - a regular
         // checkout's order isn't created until the place-order submission itself (see
         // wc-payplug-integratedPayment-blocks.js / wc-payplug-popup-blocks.js for why that
@@ -72,6 +78,38 @@ class PayplugCreditCard extends PayplugGenericBlock
                 $data['payplug_create_order'] = \WC_AJAX::get_endpoint('payplug_create_order');
                 $data['wp_nonce'] = wp_create_nonce('woocommerce-process_checkout');
                 break;
+            case 'hosted_fields':
+                // Same guard as PayplugCreditCard::hosted_fields_available - an empty
+                // company_ref (failed GET /account) or empty HOSTED_FIELDS_SDK_URL means
+                // the SDK can never render a working form. Skip exposing hostedFields
+                // entirely rather than have wc-payplug-blocks.js mount a dead component.
+                if (!$this->gateway->hosted_fields_available) {
+                    PayplugGateway::log('Hosted Fields block not exposed: hosted_fields_available is false (see PayplugCreditCard constructor log for the specific cause).', 'error');
+
+                    break;
+                }
+
+                $data['hostedFields'] = true;
+                // The Dalenys SDK's companyId must be the account's UUID company_ref (from
+                // GET /account, mirroring the Sylius PayPlug plugin) - not the
+                // merchant-entered Account ID (hosted_fields.identifier), which is a
+                // different value reserved for a future server-side payment-capture call.
+                $data['hostedFieldsCompanyId'] = PayplugWoocommerceHelper::get_account_data_from_options()['company_ref'] ?? '';
+                // hostedFieldsAjaxUrl/hostedFieldsNonce for wc_ajax_payplug_hosted_fields_token
+                // were dropped here: the client no longer round-trips the token through that
+                // endpoint before resolving onPaymentSetup (see wc-payplug-hostedFields-blocks.js) -
+                // process_payment() reads hf_token straight from meta.paymentMethodData once
+                // the order exists.
+                $data['hostedFieldsTokenizationError'] = __('payplug_hosted_fields_tokenization_error', 'payplug');
+                $data['hostedFieldsUnsupportedBrandError'] = __('payplug_hosted_fields_unsupported_brand_error', 'payplug');
+                // The transaction-secured/privacy-policy footer is visually identical to
+                // Integrated Payment's, so it reuses the same settings keys and assets.
+                $data['logo'] = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/logo-payplug.png';
+                $data['lock'] = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
+                $data['payplug_integrated_payment_transaction_secure'] = __('payplug_integrated_payment_transaction_secure', 'payplug');
+                $data['payplug_integrated_payment_privacy_policy_url'] = __('payplug_integrated_payment_privacy_policy_url', 'payplug');
+                $data['payplug_integrated_payment_privacy_policy'] = __('payplug_integrated_payment_privacy_policy', 'payplug');
+                break;
             default:
                 break;
         }
@@ -86,8 +124,12 @@ class PayplugCreditCard extends PayplugGenericBlock
      */
     public function get_payment_method_script_handles()
     {
-        $configuration = $this->get_service('configuration');
-        $embedded_mode = $configuration->get_option('payment_methods.configuration.payplug.embedded_mode');
+        // See get_payment_method_data() above for why this reuses the gateway's value
+        // instead of re-reading the raw stored config. $this->gateway is only assigned
+        // inside initialize()'s block-page conditional, and this method can be invoked by
+        // the WC Blocks registry under different conditions than get_payment_method_data(),
+        // so it's read defensively here too.
+        $embedded_mode = $this->gateway->embedded_mode ?? null;
         if ('integrated' == $embedded_mode && !is_wc_endpoint_url('order-pay')) {
             $this->ip_scripts();
         }
@@ -96,7 +138,18 @@ class PayplugCreditCard extends PayplugGenericBlock
             $this->popup_scripts();
         }
 
-        return parent::get_payment_method_script_handles();
+        $extra_handles = [];
+        if ('hosted_fields' == $embedded_mode && $this->gateway->hosted_fields_available) {
+            $this->hosted_fields_scripts();
+            // payplug-hosted-fields-sdk has no declared dependency relationship with the
+            // block bundle registered by the parent below (webpack's asset.php can't know
+            // about an externally-loaded SDK it never imports) - returning both handles at
+            // least makes the block's dependency on it explicit to the WC Blocks registry,
+            // rather than relying on incidental print order.
+            $extra_handles[] = 'payplug-hosted-fields-sdk';
+        }
+
+        return array_merge(parent::get_payment_method_script_handles(), $extra_handles);
     }
 
     private function ip_scripts(): void
@@ -137,5 +190,12 @@ class PayplugCreditCard extends PayplugGenericBlock
 
         wp_enqueue_script('payplug-popup');
         wp_enqueue_script('payplug-checkout');
+    }
+
+    private function hosted_fields_scripts(): void
+    {
+        wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+        wp_register_script('payplug-hosted-fields-sdk', HOSTED_FIELDS_SDK_URL, [], null, true);
+        wp_enqueue_script('payplug-hosted-fields-sdk');
     }
 }
