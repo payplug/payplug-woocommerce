@@ -1360,3 +1360,12 @@ msgstr "Imposible guardar la configuración."
 
 msgid "hosted_fields_identifier_required"
 msgstr "Por favor, introduce el Account ID para activar el modo Advanced (beta) Hosted Fields."
+
+msgid "payplug_hosted_fields_tokenization_error"
+msgstr "Se ha producido un error al verificar tu tarjeta. Inténtalo de nuevo."
+
+msgid "payplug_hosted_fields_unsupported_brand_error"
+msgstr "Este tipo de tarjeta no se acepta con este modo de pago. Utiliza una tarjeta CB, Visa o Mastercard."
+
+msgid "payplug_hosted_fields_missing_token"
+msgstr "Se ha producido un error al verificar tu tarjeta. Inténtalo de nuevo."
