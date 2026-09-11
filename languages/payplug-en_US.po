@@ -706,3 +706,36 @@ msgstr "Please note that the minimum amount entered is greater than the maximum 
 
 msgid "payplug_thresholds_scalapay_error_title"
 msgstr "Invalid Scalapay amount limits"
+
+msgid "payplug_section_standard_payment_option_hosted_fields_label"
+msgstr "Advanced (beta) Hosted Fields"
+
+msgid "payplug_section_standard_payment_hosted_fields_description"
+msgstr "Your customers will see the payment form appear directly on the checkout page of your store, using fields hosted and secured by Payplug (beta feature)."
+
+msgid "payplug_section_advanced_configuration_title"
+msgstr "Advanced configuration"
+
+msgid "payplug_hosted_fields_title"
+msgstr "Advanced (beta) Hosted Fields"
+
+msgid "payplug_hosted_fields_description"
+msgstr "Contact your Account Manager to get your Account ID."
+
+msgid "payplug_hosted_fields_identifier_label"
+msgstr "Account ID"
+
+msgid "hosted_fields_option_validation_title"
+msgstr "Unable to save the configuration"
+
+msgid "hosted_fields_identifier_required"
+msgstr "Please fill in the Account ID to enable Advanced (beta) Hosted Fields."
+
+msgid "payplug_hosted_fields_tokenization_error"
+msgstr "An error occurred while verifying your card. Please try again."
+
+msgid "payplug_hosted_fields_unsupported_brand_error"
+msgstr "This card type is not accepted with this payment mode. Please use a CB, Visa or Mastercard card."
+
+msgid "payplug_hosted_fields_missing_token"
+msgstr "An error occurred while verifying your card. Please try again."

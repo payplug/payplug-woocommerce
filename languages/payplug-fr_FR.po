@@ -1331,3 +1331,35 @@ msgstr "Limites de montant Scalapay invalides"
 #, php-format
 msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
 msgstr "Le montant total de votre panier doit être compris entre %s€ et %s€ pour payer avec Scalapay."
+msgid "payplug_section_standard_payment_option_hosted_fields_label"
+msgstr "Advanced (beta) Hosted Fields"
+
+msgid "payplug_section_standard_payment_hosted_fields_description"
+msgstr "Vos clients verront apparaître le formulaire de paiement directement sur la page de checkout de votre boutique, via des champs hébergés et sécurisés par Payplug (fonctionnalité en version bêta)."
+
+msgid "payplug_section_advanced_configuration_title"
+msgstr "Configuration avancée"
+
+msgid "payplug_hosted_fields_title"
+msgstr "Advanced (beta) Hosted Fields"
+
+msgid "payplug_hosted_fields_description"
+msgstr "Contactez votre Account Manager pour obtenir votre Account ID."
+
+msgid "payplug_hosted_fields_identifier_label"
+msgstr "Account ID"
+
+msgid "hosted_fields_option_validation_title"
+msgstr "Impossible d'enregistrer la configuration."
+
+msgid "hosted_fields_identifier_required"
+msgstr "Merci de renseigner l'Account ID pour activer le mode Advanced (beta) Hosted Fields."
+
+msgid "payplug_hosted_fields_tokenization_error"
+msgstr "Une erreur est survenue lors de la vérification de votre carte. Merci de réessayer."
+
+msgid "payplug_hosted_fields_unsupported_brand_error"
+msgstr "Ce type de carte n'est pas accepté avec ce mode de paiement. Merci d'utiliser une carte CB, Visa ou Mastercard."
+
+msgid "payplug_hosted_fields_missing_token"
+msgstr "Une erreur est survenue lors de la vérification de votre carte. Merci de réessayer."

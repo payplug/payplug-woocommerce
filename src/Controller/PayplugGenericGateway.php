@@ -10,6 +10,7 @@ use Payplug\PayplugWoocommerce\Interfaces\PayplugGatewayBuilder;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
 class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuilder
 {
@@ -66,6 +67,16 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
     {
         //check if module is enabled
         if (!isset($this->settings['enabled']) || !$this->settings['enabled']) {
+            return false;
+        }
+
+        // Every gateway built on PayplugGenericGateway (AmEx, Bancontact, Oney, and the
+        // PPRO methods) is Euro-only, unlike the standard card gateway (Retail API /
+        // Hosted Fields) which now supports any currency. This used to be covered by
+        // PayplugGatewayRequirements::satisfy_requirements()'s currency check, which was
+        // removed so non-EUR shops could use Hosted Fields - that removal otherwise left
+        // these Euro-only gateways offered at checkout with no currency guard at all.
+        if (!PayplugWoocommerceHelper::is_eur_shop()) {
             return false;
         }
 
@@ -461,7 +472,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
                 $order->save();
             }
 
-            $note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($refund->id), wc_price(((int) $refund->amount) / 100));
+            $note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($refund->id), wc_price(AmountHelper::fromCents((int) $refund->amount)));
             if (!empty($refund->metadata['reason'])) {
                 $note .= sprintf(' (%s)', esc_html($refund->metadata['reason']));
             }
