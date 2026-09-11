@@ -5,9 +5,24 @@ namespace Payplug\PayplugWoocommerce\Gateway;
 use Payplug\PayplugWoocommerce\Controller\HostedFields;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
+use Payplug\PayplugWoocommerce\Upc\PaymentCaptureContextBuilder;
+use Payplug\PayplugWoocommerce\Upc\PaymentCaptureOutcomeApplier;
+use Payplug\PayplugWoocommerce\Upc\UnifiedApiPaymentServiceFactory;
+use PayplugUnifiedCore\Exceptions\ApiException;
+use PayplugUnifiedCore\Exceptions\InvalidHostedFieldException;
+use PayplugUnifiedCore\Exceptions\PayplugException;
 
 class PayplugCreditCard extends PayplugGateway
 {
+    /**
+     * Comfortably above the OAuth token fetch + payment-creation call's own combined worst case
+     * (10s timeout each, see Upc\Adapters\WpOAuthHttpClient/WpUnifiedApiHttpClient) - long enough
+     * to span one real attempt, short enough that a crashed request never locks an order out for
+     * long.
+     */
+    private const PROCESS_PAYMENT_LOCK_TTL_SECONDS = 30;
+
     public $save_card = false;
 
     /**
@@ -102,6 +117,107 @@ class PayplugCreditCard extends PayplugGateway
                 2
             );
         }
+    }
+
+    /**
+     * @param int $order_id
+     *
+     * @return array
+     */
+    public function process_payment($order_id)
+    {
+        if ('hosted_fields' !== $this->embedded_mode) {
+            return parent::process_payment($order_id);
+        }
+
+        $order = wc_get_order($order_id);
+
+        if (!$order instanceof \WC_Order) {
+            return ['result' => 'failure'];
+        }
+
+        // An order that already succeeded (payment_complete()'d) or was refunded must never get a
+        // second payment created against it - a double-click, or a resubmit after a slow-but-
+        // successful first response, would otherwise charge the customer twice. A pending/on-hold/
+        // failed order is deliberately NOT short-circuited here: telling "the same attempt,
+        // resubmitted" apart from "a genuinely new attempt with a fresh hf_token" isn't possible
+        // from this side alone without either an idempotency key the Unified API may not expose,
+        // or resolving the prior operation and guessing whether the shopper meant to retry it -
+        // both risk misapplying an outcome more than the rarer double-charge this guards against.
+        if (in_array($order->get_status(), ['processing', 'completed', 'refunded'], true)) {
+            return ['result' => 'success', 'redirect' => $order->get_checkout_order_received_url()];
+        }
+
+        $hf_token = isset($_POST['hf_token']) ? sanitize_text_field(wp_unslash($_POST['hf_token'])) : '';
+
+        if ('' === $hf_token) {
+            wc_add_notice(__('payplug_hosted_fields_missing_token', 'payplug'), 'error');
+
+            return ['result' => 'failure'];
+        }
+
+        $selected_brand = isset($_POST['hf_selected_brand']) ? sanitize_text_field(wp_unslash($_POST['hf_selected_brand'])) : '';
+        $save_card = !empty($_POST['savecard']);
+
+        // Guards only the truly unambiguous half of the double-payment risk: two requests for the
+        // *same* order genuinely in flight at once (a double-click, or two tabs) are always the
+        // same attempt - never a legitimate new one - so it's always correct to make the second
+        // wait rather than create a second payment. A *sequential* retry (this order's previous
+        // attempt already finished, successfully or not, before this request started) is
+        // deliberately left alone - see the comment on the terminal-status short-circuit above for
+        // why that case isn't resolved here.
+        $lock = new WooCommerceLock();
+        $lock_key = 'payplug_upc_process_payment_' . $order_id;
+
+        if (!$lock->acquire($lock_key, self::PROCESS_PAYMENT_LOCK_TTL_SECONDS)) {
+            wc_add_notice(__('payplug_hosted_fields_tokenization_error', 'payplug'), 'error');
+
+            return ['result' => 'failure'];
+        }
+
+        // Re-read and re-check now that the lock is actually held: the status read above happened
+        // before acquire(), so a request that was preempted for as long as another one's entire
+        // API round trip could otherwise still build and send a second payment against an order
+        // that has, by now, already succeeded.
+        $order = wc_get_order($order_id);
+
+        if (!$order instanceof \WC_Order) {
+            $lock->release($lock_key);
+
+            return ['result' => 'failure'];
+        }
+
+        if (in_array($order->get_status(), ['processing', 'completed', 'refunded'], true)) {
+            $lock->release($lock_key);
+
+            return ['result' => 'success', 'redirect' => $order->get_checkout_order_received_url()];
+        }
+
+        try {
+            $dto = (new PaymentCaptureContextBuilder())->build($order, $hf_token, $selected_brand, $save_card);
+            $output = (new UnifiedApiPaymentServiceFactory())->create()->createPayment($dto);
+
+            return (new PaymentCaptureOutcomeApplier())->apply($order, $output);
+        } catch (ApiException $e) {
+            self::log(sprintf('UPC payment creation failed for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } catch (InvalidHostedFieldException $e) {
+            self::log(sprintf('UPC payment creation rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } catch (PayplugException $e) {
+            // Catch-all for every other UPC exception (InvalidCommonFieldsException from a
+            // misconfigured/empty account id, InvalidPhoneNumberException, ...) - all of them
+            // share PayplugException as their base. Without this, one of their messages (internal,
+            // not written for a shopper) would escape to WC_Checkout::process_checkout()'s generic
+            // \Exception handler and get shown verbatim as a checkout error notice.
+            self::log(sprintf('UPC payment creation rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } catch (\LogicException $e) {
+            self::log(sprintf('UPC payment creation misconfigured for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } finally {
+            $lock->release($lock_key);
+        }
+
+        wc_add_notice(__('payplug_hosted_fields_tokenization_error', 'payplug'), 'error');
+
+        return ['result' => 'failure'];
     }
 
     /**
