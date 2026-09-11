@@ -137,6 +137,7 @@ class PayplugWoocommerce
         $this->actions = new WoocommerceActions();
         $this->requests = new PayplugWoocommerceRequest();
         new Front\ApplePay();
+        new Front\HostedFields();
         $this->ajax = new Ajax();
 
         $this->setup_callback = new SetupCallback();
