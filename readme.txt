@@ -86,7 +86,6 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 * Fix Oney Availability in BO Payments section
 * Feat: allow merchant to overload min/Max scalapay values
 
-== Changelog ==
 = 3.0.0 =
 * UPGRADE: Upgrading module with minimal PHP 7.4 version
 * Fix: Fix order not available on admin order page
@@ -99,7 +98,6 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 * Fix: Fix repay an order with Apple Pay is KO
 * Adding MCP tool to create a paymentLink
 
-== Changelog ==
 = 2.18.0 =
 * Fix: OAuth collision with other plugins
  * Fix: Apple Pay with virtual products
@@ -107,27 +105,21 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
  * Fix: Apple Pay undefined HTTP_HOST warning in WP-Cron context
  * Fix : deprecated Jquery callbacks
 
-== Changelog ==
 = 2.17.3 =
 * Changing translations for Scalapay
 
-== Changelog ==
 = 2.17.2 =
 * Various improvements
 
-== Changelog ==
 = 2.17.1 =
 * Patch: Fix for Payplug plugin upgrade disconnecting
 
-== Changelog ==
 = 2.17.0 =
 * New feature: Add Scalapay payment method
 
-== Changelog ==
 = 2.16.1 =
 * patch assets generation
 
-== Changelog ==
 = 2.16.0 =
 * New feature: Add Wero payment method
 * New feature: Add Bizum payment method
@@ -135,20 +127,17 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 * Tested up to WordPress 6.9.4
 * Tested up to WooCommerce 10.6.1
 
-== Changelog ==
 = 2.15.1 =
 * Bug Fixes
 * Tested up to WordPress 6.9
 * Tested up to WooCommerce 10.4.3
 
-== Changelog ==
 = 2.15.0 =
 * New feature: ApplePay on product page
 * Bug fix and improvements on ApplePay cart page
 * Tested up to WordPress 6.8.3
 * Tested up to WooCommerce 10.3.4
 
-== Changelog ==
 = 2.14.1 =
 * Bug Fixes and Improvements
 * Tested up to WordPress 6.8.2
