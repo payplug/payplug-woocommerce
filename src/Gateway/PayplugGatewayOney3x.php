@@ -5,6 +5,7 @@ namespace Payplug\PayplugWoocommerce\Gateway;
 use libphonenumber\PhoneNumberType;
 use libphonenumber\PhoneNumberUtil;
 use Payplug\PayplugWoocommerce\Controller\PayplugGenericGateway;
+use Payplug\PayplugWoocommerce\Gateway\Oney\OneyAccountMapper;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 // Exit if accessed directly
@@ -35,12 +36,19 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
         $this->method_title = _x('PayPlug Oney 3x', 'Gateway method title', 'payplug');
         $this->method_description = __('Enable PayPlug Oney 3x for your customers.', 'payplug');
         $this->title = __('Pay by card in 3x with Oney', 'payplug');
-        $this->has_fields = false;
+        $this->has_fields = true;
 
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'oney_refund_text']);
         add_action('woocommerce_after_checkout_validation', [$this, 'validate_checkout'], 10);
 
         self::set_oney_configuration();
+
+        // Unlike the other sub-gateways (Bancontact, AmericanExpress, PPRO methods...), Oney never
+        // synced $this->enabled with the plugin's own "active" toggle, so disabling Oney from the
+        // Payplug config left it shown as enabled on WooCommerce's native Payments settings page.
+        if (!$this->checkGateway()) {
+            $this->enabled = 'no';
+        }
 
         if (is_checkout()) {
             if ($this->check_oney_is_available() === self::ONEY_DISALBE_CHECKOUT_OPTIONS) {
@@ -53,7 +61,12 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
     {
         $posted_data = $this->get_post_data();
 
-        if (in_array($posted_data['payment_method'], ['oney_x3_with_fees","oney_x4_with_fees", "oney_x3_without_fees", "oney_x4_without_fees'])) {
+        // Was a single malformed string (missing quotes around each id) instead of a 4-element
+        // array, so this guard never matched and the whole method was a silent no-op (PRE-3457
+        // review / PRE-3457 follow-up fix).
+        $oney_gateway_ids = ['oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees'];
+
+        if (in_array($posted_data['payment_method'] ?? '', $oney_gateway_ids, true)) {
             if ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_COUNTRY_NOT_ALLOWED) {
                 throw new \Exception(__('Unavailable for the specified country.'));
             } elseif ($this->check_oney_is_available() === self::ONEY_UNAVAILABLE_CODE_CART_SIZE_TOO_HIGH) {
@@ -87,50 +100,7 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
      */
     public function get_icon()
     {
-        $disable = '';
-        if ($this->check_oney_is_available() === true) {
-            $total_price = floatval(WC()->cart->total);
-            $this->oney_response = $this->payplug_api->simulate_oney_payment($total_price, 'with_fees');
-            $currency = get_woocommerce_currency_symbol(get_option('woocommerce_currency'));
-            $total_price_oney = floatval($this->oney_response['x3_with_fees']['down_payment_amount']);
-            foreach ($this->oney_response['x3_with_fees']['installments'] as $installment) {
-                $total_price_oney = $total_price_oney + floatval($installment['amount']);
-            }
-            $f = fn ($fn) => $fn;
-
-            $tax_cost = floatval($this->oney_response['x3_with_fees']['total_cost']) / 100;
-
-            if (is_array($this->oney_response)) {
-                $this->description = <<<HTML
-                <p>
-                    <div class="payplug-oney-flex">
-                        <div>{$f(__('Bring', 'payplug'))}:</div>
-                        <div>{$this->oney_response['x3_with_fees']['down_payment_amount']} {$currency}</div>
-                    </div>
-                    <div class="payplug-oney-flex">
-					<small>( {$f(__('oney_financing_cost', 'payplug'))} <b>{$tax_cost} {$currency}</b> TAEG : <b>{$this->oney_response['x3_with_fees']['effective_annual_percentage_rate']} %</b> )</small>
-				</div>
-                    <div class="payplug-oney-flex">
-                        <div>{$f(__('1st monthly payment', 'payplug'))}:</div>
-                        <div>{$this->oney_response['x3_with_fees']['installments'][0]['amount']} {$currency}</div>
-                    </div>
-                    <div class="payplug-oney-flex">
-                        <div>{$f(__('2nd monthly payment', 'payplug'))}:</div>
-                        <div>{$this->oney_response['x3_with_fees']['installments'][1]['amount']} {$currency}</div>
-                    </div>
-                    <div class="payplug-oney-flex">
-                        <div><b>{$f(__('oney_total', 'payplug'))}</b></div>
-                        <div><b>{$total_price_oney} {$currency}</b></div>
-                    </div>
-                </p>
-HTML;
-            } else {
-                $this->description = $this->oney_response;
-            }
-        } else {
-            $disable = 'disable-checkout-icons';
-        }
-
+        $disable = $this->check_oney_is_available() === true ? '' : 'disable-checkout-icons';
         $available_img = 'x3_with_fees.svg';
 
         $icons = apply_filters('payplug_payment_icons', [
@@ -142,6 +112,46 @@ HTML;
         }
 
         return $icons_str;
+    }
+
+    /**
+     * Render the placeholder + config the official Oney widget uses to display the inline
+     * payment-schedule section for this specific gateway (checkout obligation).
+     */
+    public function payment_fields(): void
+    {
+        if ($this->check_oney_is_available() !== true) {
+            // check_oney_is_available() sets $this->description with the reason Oney can't be used.
+            $description = $this->get_description();
+
+            if (!empty($description)) {
+                echo wpautop(wptexturize($description));
+            }
+
+            return;
+        }
+
+        $account = PayplugWoocommerceHelper::get_account_data_from_options();
+        $oney_settings = $this->get_configuration()->get_option('payment_methods.configuration.oney');
+        $country = PayplugWoocommerceHelper::getISOCountryCode();
+        $mapper = OneyAccountMapper::map((array) $account, $oney_settings, $country);
+        $code = $mapper->business_transaction_code_for_gateway($this->id);
+
+        if (!$mapper->is_enabled() || !$code) {
+            return;
+        }
+
+        printf(
+            '<div id="oney-checkout-loading-%1$s" class="payplug-lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div id="oney-checkout-%1$s"></div><script type="application/json" id="oney-checkout-config-%1$s">%2$s</script>',
+            esc_attr($this->id),
+            wp_json_encode([
+                'merchant_guid' => $mapper->get_merchant_guid(),
+                'business_transaction_code' => $code,
+                'country' => $country,
+                'language' => strtoupper(substr(get_locale(), 0, 2)),
+                'payment_amount' => floatval(WC()->cart->total),
+            ])
+        );
     }
 
     /**
@@ -191,6 +201,21 @@ HTML;
             }
         }
 
+        $oney_cfg = $this->get_configuration()->get_option('payment_methods.configuration.oney');
+        $account = PayplugWoocommerceHelper::get_account_data_from_options();
+        $oney_account_cfg = ((array) $account)['configuration']['oney'] ?? [];
+        // Same clamping OneyAccountMapper::map() uses for the badge/widget display, so
+        // checkout validation and display never silently drift apart (PRE-3457 review).
+        [$min_cents, $max_cents] = OneyAccountMapper::effective_bounds($oney_account_cfg, $oney_cfg);
+        $oney_amount = [
+            'min' => $min_cents / 100,
+            'max' => $max_cents / 100,
+        ];
+        // validate_checkout() reads these to build its exception message - populate them
+        // unconditionally (before any early return below) so they're never stale/unset there.
+        $this->oney_thresholds_min = $oney_amount['min'];
+        $this->oney_thresholds_max = $oney_amount['max'];
+
         if (empty($cart->total)) {
             return false;
         }
@@ -201,11 +226,6 @@ HTML;
 
         $total_price = floatval($cart->total);
         $products_qty = (int) $cart->cart_contents_count;
-
-        $oney_cfg = $this->get_configuration()->get_option('payment_methods.configuration.oney');
-        $oney_amount = json_decode($oney_cfg['custom_amounts'], true);
-        $oney_amount['min'] = (float) $oney_amount['min'] / 100;
-        $oney_amount['max'] = (float) $oney_amount['max'] / 100;
 
         // Min and max
         if ($total_price < $oney_amount['min'] || $total_price > $oney_amount['max']) {
@@ -450,14 +470,6 @@ HTML;
         }
     }
 
-    public function payment_fields(): void
-    {
-        $description = $this->get_description();
-        if (!empty($description)) {
-            echo wpautop(wptexturize($description));
-        }
-    }
-
     /**
      * Billing and shipping addresses should have the same country and allowed by Oney
      * https://payplug-prod.atlassian.net/browse/WOOC-227
@@ -512,6 +524,10 @@ HTML;
     {
         $options = PayplugWoocommerceHelper::get_payplug_options();
 
-        return empty($options) || !isset($options['payment_methods']) ? false : $options['payment_methods']['configuration']['oney']['active'];
+        // Now called unconditionally from the constructor (not just at checkout via
+        // is_available()), so a legacy account whose stored config predates the oney block
+        // (never went through Upgrade::run_upgrade()) would otherwise throw "undefined array
+        // key" warnings on every admin page that builds the WC gateway list (PRE-3597 review).
+        return $options['payment_methods']['configuration']['oney']['active'] ?? false;
     }
 }

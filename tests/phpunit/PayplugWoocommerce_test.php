@@ -2,7 +2,6 @@
 
 namespace phpunit;
 
-use Payplug\PayplugWoocommerce\Front\PayplugOney\Country\OneyFR;
 use Payplug\PayplugWoocommerce\PayplugWoocommerce;
 
 use function PHPUnit\Framework\assertTrue;
@@ -31,61 +30,23 @@ class PayplugWoocommerce_test extends TestCase
     }
 
     /**
-     * test oney animation is disabled if empty options
+     * OneyDisplay's own constructor no-ops safely when Oney isn't configured - assert
+     * animationHandlers() doesn't throw regardless of options state, and actually registers
+     * the widget scripts (its main side effect) rather than just silently succeeding.
      */
-    public function test_disable_empty_options_animation_handlers(): void
+    public function test_animation_handlers_does_not_throw(): void
     {
-        $mockPayplugWoocommerce = $this->createMock(PayplugWoocommerce::class);
-        $mockPayplugWoocommerce
-            ->method('animationHandlers')
-            ->willReturn(false);
-
         update_option('woocommerce_payplug_settings', []);
-        self::assertFalse($mockPayplugWoocommerce->animationHandlers());
-    }
+        $this->payplug_woocommerce->animationHandlers();
 
-    /**
-     * test oney animation is disabled without merchant country
-     */
-    public function test_disable_empty_merchant_country_animation_handlers(): void
-    {
-        $mockPayplugWoocommerce = $this->createMock(PayplugWoocommerce::class);
-        $mockPayplugWoocommerce
-            ->method('animationHandlers')
-            ->willReturn(false);
+        self::assertTrue(wp_script_is('payplug-oney-loader', 'registered'));
+        self::assertTrue(wp_script_is('payplug-oney', 'registered'));
 
-        update_option('woocommerce_payplug_settings', ['payplug_merchant_country' => '', 'oney_type' => 'something']);
-        self::assertFalse($mockPayplugWoocommerce->animationHandlers());
-    }
+        update_option('woocommerce_payplug_settings', ['payment_methods' => ['configuration' => ['oney' => ['cta_product' => true]]]]);
+        $this->payplug_woocommerce->animationHandlers();
 
-    /**
-     * test oney animation is disabled without oney type
-     */
-    public function test_disable_empty_oney_type_animation_handlers(): void
-    {
-        $mockPayplugWoocommerce = $this->createMock(PayplugWoocommerce::class);
-        $mockPayplugWoocommerce
-            ->method('animationHandlers')
-            ->willReturn(false);
-
-        update_option('woocommerce_payplug_settings', ['payplug_merchant_country' => 'something', 'oney_type' => '']);
-        self::assertFalse($mockPayplugWoocommerce->animationHandlers());
-    }
-
-    /**
-     * test if oney animations are being instatiated
-     * OneyAnimation
-     * OneyFR
-     */
-    public function test_animation_handlers(): void
-    {
-        $mockPayplugWoocommerce = $this->createMock(PayplugWoocommerce::class);
-        $mockPayplugWoocommerce
-            ->method('animationHandlers')
-            ->willReturn(true);
-
-        update_option('woocommerce_payplug_settings', ['payplug_merchant_country' => 'FR', 'oney_type' => 'without_fees']);
-        self::assertTrue($mockPayplugWoocommerce->animationHandlers());
+        self::assertTrue(wp_script_is('payplug-oney-loader', 'registered'));
+        self::assertTrue(wp_script_is('payplug-oney', 'registered'));
     }
 
     /**

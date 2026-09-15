@@ -1308,3 +1308,26 @@ msgstr "Nouveau mode de connexion disponible progressivement. La connexion via O
 
 msgid "payplug_section_oauth_login_title"
 msgstr "Connexion via OAuth2 (nouveau) "
+
+msgid "payplug_thresholds_scalapay_title"
+msgstr "Personnalisez les limites de montant Scalapay"
+
+msgid "payplug_thresholds_scalapay_description"
+msgstr "N'afficher Scalapay au paiement que pour un panier compris entre"
+
+msgid "payplug_thresholds_scalapay_error_msg"
+msgstr "Le montant doit être compris dans les limites autorisées par PayPlug."
+
+msgid "payplug_thresholds_scalapay_error_maxtext_msg"
+msgstr "Attention, le montant maximum saisi est inférieur au montant minimum saisi."
+
+msgid "payplug_thresholds_scalapay_error_mintext_msg"
+msgstr "Attention, le montant minimum saisi est supérieur au montant maximum saisi."
+
+msgid "payplug_thresholds_scalapay_error_title"
+msgstr "Limites de montant Scalapay invalides"
+
+#: src/Gateway/PPRO/Scalapay.php:78
+#, php-format
+msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
+msgstr "Le montant total de votre panier doit être compris entre %s€ et %s€ pour payer avec Scalapay."

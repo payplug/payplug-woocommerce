@@ -1314,3 +1314,26 @@ msgstr "Nuevo modo de conexión disponible progresivamente. La conexión vía OA
 
 msgid "payplug_section_oauth_login_title"
 msgstr "Conexión vía OAuth2 (nuevo) "
+
+msgid "payplug_thresholds_scalapay_title"
+msgstr "Personalice los límites de importe de Scalapay"
+
+msgid "payplug_thresholds_scalapay_description"
+msgstr "Mostrar Scalapay en el pago solo para un carrito de entre"
+
+msgid "payplug_thresholds_scalapay_error_msg"
+msgstr "El importe debe estar dentro de los límites autorizados por PayPlug."
+
+msgid "payplug_thresholds_scalapay_error_maxtext_msg"
+msgstr "Atención, el importe máximo introducido es inferior al importe mínimo introducido."
+
+msgid "payplug_thresholds_scalapay_error_mintext_msg"
+msgstr "Atención, el importe mínimo introducido es superior al importe máximo introducido."
+
+msgid "payplug_thresholds_scalapay_error_title"
+msgstr "Límites de importe de Scalapay no válidos"
+
+#: src/Gateway/PPRO/Scalapay.php:78
+#, php-format
+msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
+msgstr "El importe total de su carrito debe estar entre %s€ y %s€ para pagar con Scalapay."

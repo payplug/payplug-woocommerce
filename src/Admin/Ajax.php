@@ -655,6 +655,28 @@ class Ajax
         ]);
         $options['payment_methods']['configuration']['oney']['with_fees'] = 'with_fees' == (string) $data['payplug_oney'];
 
+        // scalapay payment - the thresholds widget isn't necessarily rendered (a stale admin
+        // JS bundle right after a deploy, for instance). Its absence must not reach
+        // Validator::scalapay_thresholds(), which would read the missing values as 0, fail
+        // the "below the account minimum" check and abort the whole request via
+        // wp_send_json_error() - discarding every other setting in this save, since
+        // update_options() only runs at the end of this method.
+        if (array_key_exists('scalapay_min_amounts', $data) && array_key_exists('scalapay_max_amounts', $data)) {
+            [$scalapay_authorized_min, $scalapay_authorized_max] = Scalapay::authorized_bounds(
+                $options['payment_methods']['configuration']['scalapay'] ?? [],
+                $options['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
+            );
+            // round() before the cast: the submitted values are euros, so a bare (int) cast
+            // would bind tighter than the * 100 and truncate the cents (49.99 -> 4900).
+            $scalapay_thresholds = Validator::scalapay_thresholds(
+                (int) round((float) $data['scalapay_min_amounts'] * 100),
+                (int) round((float) $data['scalapay_max_amounts'] * 100),
+                $scalapay_authorized_min,
+                $scalapay_authorized_max
+            );
+            $options['payment_methods']['configuration']['scalapay']['custom_amounts'] = json_encode($scalapay_thresholds);
+        }
+
         // Force-disable methods unavailable in test mode: submitted 'active' flags are
         // trusted as-is, so one enabled while in live mode stays active after just
         // switching to test unless we re-check it here.
