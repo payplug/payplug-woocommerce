@@ -89,7 +89,12 @@ class Scalapay extends PayplugGenericGateway
      */
     public function check_gateway($gateways)
     {
-        if (isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id) {
+        // WC()->cart is only populated on frontend requests (WooCommerce::is_request('frontend')
+        // excludes wp-admin and REST requests) but this filter also fires outside that context -
+        // e.g. the WC Settings > Payments screen calling get_available_payment_gateways() via
+        // PaymentsController::store_has_enabled_gateways(). get_order_total() dereferences
+        // WC()->cart->total unconditionally, which would throw a PHP warning on a null cart.
+        if (isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id && null !== WC()->cart) {
             [$min_cents, $max_cents] = self::effective_bounds(
                 $this->settings['payment_methods']['configuration']['scalapay'] ?? [],
                 $this->settings['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
