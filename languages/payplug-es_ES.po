@@ -825,6 +825,11 @@ msgstr ""
 "Sus clientes podrán elegir pagar sus pedidos en 3 o 4 cuotas. Puede asumir\n"
 " (o no) todos los honorarios a su cargo."
 
+msgid "payplug_section_paylater_description_oney_sandbox"
+msgstr ""
+"El widget de Oney (simulación y pago en varios plazos) solo está disponible en modo Live.\n"
+" Cambie su cuenta a modo Live para activarlo en su tienda."
+
 msgid "payplug_label_with_fees"
 msgstr "Con honorarios"
 

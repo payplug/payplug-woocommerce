@@ -238,6 +238,9 @@ msgstr "3x 4x Oney payments"
 msgid "payplug_section_paylater_description_oney"
 msgstr "Your customers can choose to pay for their orders in 3 or 4 installments. Choose below whether or not you want to pay all the fees."
 
+msgid "payplug_section_paylater_description_oney_sandbox"
+msgstr "The Oney widget (simulation and payment in installments) is only available in Live mode. Switch your account to Live mode to enable it on your store."
+
 msgid "payplug_label_with_fees"
 msgstr "With fees"
 

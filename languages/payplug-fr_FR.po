@@ -822,6 +822,11 @@ msgstr ""
 "Vos clients pourront choisir de payer leurs commandes en 3 ou 4 échéances. Vous pouvez prendre\n"
 " (ou non) l'ensemble des frais à votre charge."
 
+msgid "payplug_section_paylater_description_oney_sandbox"
+msgstr ""
+"Le widget Oney (simulation et paiement en plusieurs fois) n'est disponible qu'en mode Live.\n"
+" Passez votre compte en mode Live pour l'activer sur votre boutique."
+
 msgid "payplug_label_with_fees"
 msgstr "Avec frais"
 

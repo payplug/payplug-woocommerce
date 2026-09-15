@@ -38,11 +38,20 @@ class OneyDisplay
 
     public function register_assets(): void
     {
-        wp_register_script('payplug-oney-loader', PayplugWoocommerceHelper::get_oney_loader_url(), [], PAYPLUG_GATEWAY_VERSION, true);
-        wp_register_script('payplug-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-oney.js', [
-            'jquery',
-            'payplug-oney-loader',
-        ], PAYPLUG_GATEWAY_VERSION, true);
+        // PayPlug's TEST-mode account data has no Oney merchant_guid/business codes at all (see
+        // PRE-3681), so the official widget can never actually be used - never even load it
+        // (third-party SDKs like this one commonly phone home / self-initialize as soon as
+        // they're loaded, regardless of whether any of their functions are called). Our own
+        // payplug-oney.js still loads without it: it needs window.loadOneyWidget only inside
+        // showSimulationPopin(), which already no-ops when that's undefined - the eligibility
+        // color-change (refreshEligibility()) doesn't depend on the official widget at all.
+        $deps = ['jquery'];
+        if (PayplugWoocommerceHelper::check_mode()) {
+            wp_register_script('payplug-oney-loader', PayplugWoocommerceHelper::get_oney_loader_url(), [], PAYPLUG_GATEWAY_VERSION, true);
+            $deps[] = 'payplug-oney-loader';
+        }
+
+        wp_register_script('payplug-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-oney.js', $deps, PAYPLUG_GATEWAY_VERSION, true);
     }
 
     public function enqueue_assets(): void
@@ -111,6 +120,11 @@ class OneyDisplay
             'business_transaction_codes' => $mapper->business_transaction_codes($fee_mode),
             'country' => $country,
             'language' => strtoupper(substr(get_locale(), 0, 2)),
+            // PayPlug's TEST-mode account data has no Oney merchant_guid/business codes at all,
+            // so the simulation can't actually be loaded - the badge still shows/reacts to
+            // eligibility (color change at the min amount), but payplug-oney.js must not try to
+            // open the popup while this is true (see PRE-3681).
+            'test_mode' => !PayplugWoocommerceHelper::check_mode(),
         ]);
 
         $logo_class = 'with_fees' === $fee_mode ? 'oney-3x4x' : 'oney-without-fees-3x4x';

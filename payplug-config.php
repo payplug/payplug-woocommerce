@@ -20,9 +20,12 @@ define('IP_API', '');
 define('SECURE_DOMAIN', '');
 
 /**
- *  URL of the official Oney widget loader script (assets.oney.io in production,
- *  assets-uat.oney.io in staging). Depends on whether the connected merchant account is QA
- *  or production - not on the Test/Live mode toggle - so, like SECURE_DOMAIN above, this is a
- *  build-time value, not something computed from plugin settings at runtime.
+ *  URL of the official Oney widget loader script. Depends on whether the connected
+ *  merchant account is QA or production, which is a build-time distinction (see
+ *  ONEY_LOADER_URL in payplug-config.php), not something this can derive from the
+ *  Test/Live mode toggle at runtime - the widget is never shown at all while the plugin
+ *  is in Test mode (see PRE-3681: PayPlug's TEST-mode account data has no Oney
+ *  merchant_guid/business codes to give it), so there is no "UAT vs prod" runtime choice
+ *  to make here in the first place.
  */
 define('ONEY_LOADER_URL', '');

@@ -131,6 +131,14 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
             return;
         }
 
+        // PayPlug's TEST-mode account data has no Oney merchant_guid/business codes at all, so
+        // the widget can't be simulated - never render it while the plugin is in Test mode,
+        // rather than calling Oney with null credentials (see PRE-3681). The payment method
+        // itself stays selectable; only the inline widget is skipped.
+        if (!PayplugWoocommerceHelper::check_mode()) {
+            return;
+        }
+
         $account = PayplugWoocommerceHelper::get_account_data_from_options();
         $oney_settings = $this->get_configuration()->get_option('payment_methods.configuration.oney');
         $country = PayplugWoocommerceHelper::getISOCountryCode();

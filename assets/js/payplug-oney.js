@@ -29,7 +29,10 @@
     }
 
     function showSimulationPopin(container) {
-        if (container.hasClass('disabled') || typeof loadOneyWidget !== 'function') {
+        // In Test mode, PayPlug's account data has no Oney merchant_guid/business codes at all
+        // (see PRE-3681), so the badge stays visible and still reacts to eligibility (color
+        // change at the min amount) but must never actually try to open the simulation.
+        if (container.hasClass('disabled') || (window.payplug_oney_config && window.payplug_oney_config.test_mode) || typeof loadOneyWidget !== 'function') {
             return;
         }
 

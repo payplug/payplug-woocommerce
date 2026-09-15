@@ -34,6 +34,15 @@ class PayplugOney extends PayplugGenericBlock
      */
     public function get_payment_method_script_handles()
     {
+        // PayPlug's TEST-mode account data has no Oney merchant_guid/business codes at all, so
+        // the widget can't be simulated - skip the official loader script while the plugin is
+        // in Test mode, rather than calling Oney with null credentials (see PRE-3681). The
+        // OneyCheckoutWidget component no-ops gracefully when window.loadOneyWidget is
+        // undefined. The payment method itself stays selectable.
+        if (!PayplugWoocommerceHelper::check_mode()) {
+            return parent::get_payment_method_script_handles();
+        }
+
         wp_register_script('payplug-oney-loader', PayplugWoocommerceHelper::get_oney_loader_url(), [], PAYPLUG_GATEWAY_VERSION, true);
 
         return array_merge(['payplug-oney-loader'], parent::get_payment_method_script_handles());

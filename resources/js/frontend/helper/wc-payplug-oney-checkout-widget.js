@@ -8,7 +8,10 @@ import {useSelect} from '@wordpress/data';
 const OneyCheckoutWidget = ({settings}) => {
 	const placeholderId = 'oney-checkout-' + settings?.name;
 	const widget = settings?.oney_widget;
-	const [isLoading, setIsLoading] = useState(true);
+	// No business_transaction_code (e.g. Test mode - see PRE-3681) means the effect below will
+	// never call the official widget at all - start already resolved instead of flashing the
+	// spinner on and immediately back off.
+	const [isLoading, setIsLoading] = useState(() => !!widget?.business_transaction_code);
 
 	// settings comes from getSetting(), a one-time snapshot taken at page load, so
 	// widget.payment_amount is frozen. Read the live total from the Store API instead, so
