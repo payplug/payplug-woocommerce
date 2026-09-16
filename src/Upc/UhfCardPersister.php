@@ -10,7 +10,7 @@ class UhfCardPersister
 
     /**
      * @param array{brand?: string, last4?: string, exp_month?: int, exp_year?: int} $fallback client-submitted values, sanitized here again defensively
-     * @param array{brand?: string, last4?: string, exp_month?: int, exp_year?: int} $fetched   values read back from the Unified API (operation fetch or webhook body) - authoritative when present
+     * @param array{brand?: string, last4?: string, exp_month?: int, exp_year?: int} $fetched values read back from the Unified API (operation fetch or webhook body) - authoritative when present
      */
     public function persist(int $customer_id, string $alias_id, string $mode, array $fallback, array $fetched): bool
     {

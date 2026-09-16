@@ -491,6 +491,12 @@ class PayplugCreditCard extends PayplugGateway
             echo IntegratedPayment::template_form($this->save_card);
         }
 
+        // Deliberately elseif, not two independent ifs: a UHF alias is never a WC_Payment_Token
+        // (see Controller/HostedFields.php), so WooCommerce's native saved_payment_methods()
+        // list would show the merchant's Retail-tokenized cards even though hosted_fields mode
+        // can never charge them - worse than not showing them at all. A merchant switching to
+        // hosted_fields therefore does lose the Retail card list from checkout with no
+        // migration; that's the intended trade-off, not an oversight.
         if ('hosted_fields' == $this->embedded_mode && $this->hosted_fields_available) {
             $cards = ($this->save_card && is_user_logged_in())
                 ? UhfCard::get_customer_cards(get_current_user_id(), $this->mode)

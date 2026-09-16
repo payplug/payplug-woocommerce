@@ -262,7 +262,7 @@ class PaymentCaptureOutcomeApplier
      * submitted. Never fails the payment itself - a fetch failure only means the card metadata
      * falls back further, or the card isn't saved at all.
      *
-     * @param array<string, mixed> $data          the json_decode()'d payment-creation response body
+     * @param array<string, mixed> $data the json_decode()'d payment-creation response body
      * @param array<string, mixed> $card_fallback client-submitted brand/last4/exp_month/exp_year
      */
     private function maybe_persist_uhf_card(\WC_Order $order, string $alias_id, array $data, array $card_fallback): void
@@ -271,7 +271,12 @@ class PaymentCaptureOutcomeApplier
             return;
         }
 
-        $operation_id = isset($data['id']) && is_scalar($data['id']) ? (string) $data['id'] : '';
+        // Same "id" then "operationIds[0]" fallback as persist_operation() - without it, a
+        // response that only carries operationIds skips this fetch entirely and falls straight
+        // back to the client-submitted values, which are exactly the ones least trusted.
+        $operation_id = isset($data['id']) && is_scalar($data['id'])
+            ? (string) $data['id']
+            : (isset($data['operationIds'][0]) && is_scalar($data['operationIds'][0]) ? (string) $data['operationIds'][0] : '');
         $fetched = [];
 
         if ('' !== $operation_id) {
@@ -290,6 +295,20 @@ class PaymentCaptureOutcomeApplier
 
         $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
 
-        (new UhfCardPersister())->persist($order->get_customer_id(), $alias_id, $mode, $card_fallback, $fetched);
+        $persisted = (new UhfCardPersister())->persist($order->get_customer_id(), $alias_id, $mode, $card_fallback, $fetched);
+
+        if (!$persisted) {
+            // The most likely real-world failure mode for this whole feature: an unexpected
+            // brand string, a code6x4 in an unanticipated shape, or a malformed validityDate
+            // gets rejected by UhfCardPersister's sanitization, and without this the customer
+            // ticks "save my card", the payment still succeeds, no card ever appears, and there
+            // was nothing anywhere to explain why.
+            (new WooCommerceLogger())->error(sprintf(
+                'UPC: save-card was requested for order #%s but the card data was rejected (fetched: %s, fallback: %s).',
+                $order->get_id(),
+                wp_json_encode($fetched),
+                wp_json_encode($card_fallback)
+            ));
+        }
     }
 }

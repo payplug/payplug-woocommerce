@@ -261,7 +261,11 @@ class PayplugCreditCard_test extends TestCase
         $user_id = wp_create_user('uhf_owner_' . wp_rand(), wp_generate_password());
         wp_set_current_user($user_id);
 
+        // A valid total: otherwise the amount-range check rejects this order (wc_create_order()
+        // defaults to a 0 total) before this test's own alias-choice branch is ever reached -
+        // same gotcha as test_process_payment_returns_failure_result_when_hf_token_is_missing.
         $order = wc_create_order();
+        $order->set_total(50.00);
         $order->save();
 
         $card_id = UhfCard::insert($user_id, 'alias_payment_1', 'VISA', '4242', 12, 2099, 'test');
@@ -272,11 +276,15 @@ class PayplugCreditCard_test extends TestCase
         $result = $gateway->process_payment($order->get_id());
 
         // No real network reachable in this test environment - createPayment() throws
-        // ApiException, caught by the generic failure branch. The assertion that matters is
-        // that the *alias* branch was taken rather than the hf_token branch: a missing-token
-        // failure never reaches the lock/try block at all, while an alias-branch failure does
-        // reach it (and releases the lock cleanly), which the next test's isolation depends on.
+        // ApiException, caught by the generic failure branch. 'failure' alone doesn't prove
+        // *which* branch produced it (missing-token and API failures both return the same
+        // shape) - the notice text does: 'payplug_hosted_fields_missing_token' is only ever
+        // added when the alias branch was never entered, while every failure inside it -
+        // ownership rejection or API failure alike - uses
+        // 'payplug_hosted_fields_tokenization_error'. This proves $use_alias correctly routed
+        // to the alias branch rather than falling through to the hf_token-required one.
         $this->assertSame('failure', $result['result']);
+        $this->assertLastErrorNotice('payplug_hosted_fields_tokenization_error');
 
         unset($_POST['payplug_uhf_card_choice']);
         wc_clear_notices();
@@ -296,10 +304,21 @@ class PayplugCreditCard_test extends TestCase
         $attacker_id = wp_create_user('uhf_attacker_' . wp_rand(), wp_generate_password());
         wp_set_current_user($attacker_id);
 
+        // Same valid-total gotcha as above.
         $order = wc_create_order();
+        $order->set_total(50.00);
         $order->save();
 
         $card_id = UhfCard::insert($owner_id, 'alias_payment_2', 'VISA', '4242', 12, 2099, 'test');
+
+        // Belt and braces: the gateway-level assertions below can't distinguish "the ownership
+        // check correctly rejected this" from "the ownership check was removed and the request
+        // failed later for an unrelated reason" - both produce an identical notice in this
+        // no-network test environment, since AliasPaymentContextBuilder->build() has no
+        // observable side effect before createPayment() throws. This asserts the real model
+        // method the gateway calls directly; the model layer has its own dedicated coverage in
+        // UhfCard_test::testFindForCustomerReturnsNullWhenTheCardBelongsToAnotherCustomer().
+        $this->assertNull(UhfCard::find_for_customer((int) $card_id, $attacker_id, 'test'));
 
         $_POST['payplug_uhf_card_choice'] = (string) $card_id;
 
@@ -307,6 +326,7 @@ class PayplugCreditCard_test extends TestCase
         $result = $gateway->process_payment($order->get_id());
 
         $this->assertSame('failure', $result['result']);
+        $this->assertLastErrorNotice('payplug_hosted_fields_tokenization_error');
 
         unset($_POST['payplug_uhf_card_choice']);
         wc_clear_notices();
@@ -326,7 +346,9 @@ class PayplugCreditCard_test extends TestCase
         $user_id = wp_create_user('uhf_owner_' . wp_rand(), wp_generate_password());
         wp_set_current_user($user_id);
 
+        // Same valid-total gotcha as above.
         $order = wc_create_order();
+        $order->set_total(50.00);
         $order->save();
 
         $card_id = UhfCard::insert($user_id, 'alias_payment_3', 'VISA', '4242', 12, 2099, 'test');
@@ -338,12 +360,23 @@ class PayplugCreditCard_test extends TestCase
 
         // save_card is off, so the alias branch never activates - falls through to the
         // hf_token-required branch, which fails on the missing token exactly like
-        // test_process_payment_returns_failure_result_when_hf_token_is_missing.
+        // test_process_payment_returns_failure_result_when_hf_token_is_missing. Asserting the
+        // notice text (not just 'failure') is what actually proves this: the alias branch's
+        // own failures all use 'payplug_hosted_fields_tokenization_error' instead.
         $this->assertSame('failure', $result['result']);
+        $this->assertLastErrorNotice('payplug_hosted_fields_missing_token');
 
         unset($_POST['payplug_uhf_card_choice']);
         wc_clear_notices();
         wp_delete_post($order->get_id(), true);
         wp_delete_user($user_id);
+    }
+
+    private function assertLastErrorNotice(string $msgid): void
+    {
+        $notices = wc_get_notices('error');
+
+        $this->assertNotEmpty($notices, 'Expected an error notice to have been added.');
+        $this->assertSame(__($msgid, 'payplug'), end($notices)['notice']);
     }
 }

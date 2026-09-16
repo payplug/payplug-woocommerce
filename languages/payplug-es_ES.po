@@ -1368,7 +1368,13 @@ msgid "payplug_hosted_fields_unsupported_brand_error"
 msgstr "Este tipo de tarjeta no se acepta con este modo de pago. Utiliza una tarjeta CB, Visa o Mastercard."
 
 msgid "payplug_hosted_fields_missing_token"
-msgstr "Se ha producido un error al verificar tu tarjeta. Inténtalo de nuevo."
+msgstr "No hemos podido leer los datos de tu tarjeta. Inténtalo de nuevo."
 
 msgid "payplug_hosted_fields_pay_with_another_card"
 msgstr "Pagar con otra tarjeta"
+
+msgid "payplug_uhf_saved_cards_deleted_notice"
+msgstr "La tarjeta ha sido eliminada."
+
+msgid "payplug_uhf_saved_cards_invalid_notice"
+msgstr "Tarjeta no válida."

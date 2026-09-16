@@ -5,8 +5,8 @@ namespace Payplug\PayplugWoocommerce\Controller;
 class HostedFields
 {
     /**
-     * @param bool     $save_card whether the BO "one-click" flag is on for this gateway
-     * @param object[] $cards     the current customer's saved UHF cards (Model\UhfCard::get_customer_cards() shape) - empty for a guest or when there are none
+     * @param bool $save_card whether the BO "one-click" flag is on for this gateway
+     * @param object[] $cards the current customer's saved UHF cards (Model\UhfCard::get_customer_cards() shape) - empty for a guest or when there are none
      */
     public static function template_form($save_card, array $cards = [])
     {
@@ -21,7 +21,7 @@ class HostedFields
         $cards_html = '';
         foreach ($cards as $card) {
             $cards_html .= sprintf(
-                '<label class="payplug HostedFields_savedCard"><input type="radio" name="payplug_uhf_card_choice" value="%d">%s &bull;&bull;&bull;&bull; %s &mdash; %02d/%d</label>',
+                '<label class="payplug HostedFields_savedCard"><input type="radio" name="payplug_uhf_card_choice" value="%d"><span></span>%s &bull;&bull;&bull;&bull; %s &mdash; %02d/%d</label>',
                 (int) $card->id,
                 esc_html($card->brand),
                 esc_html($card->last4),
@@ -32,10 +32,18 @@ class HostedFields
 
         if ('' !== $cards_html) {
             $cards_html .= sprintf(
-                '<label class="payplug HostedFields_savedCard -other"><input type="radio" name="payplug_uhf_card_choice" value="other" checked>%s</label>',
+                '<label class="payplug HostedFields_savedCard -other"><input type="radio" name="payplug_uhf_card_choice" value="other" checked><span></span>%s</label>',
                 $f(__('payplug_hosted_fields_pay_with_another_card', 'payplug'))
             );
-            $cards_html = '<div class="payplug HostedFields_container -savedCards" data-e2e-name="savedCards">' . $cards_html . '</div>';
+            // A sibling block, not nested inside the <form> below: this mirrors how a
+            // customer's saved payment methods always render as their own section,
+            // separate from the "new card" fields - the same visual/structural split
+            // Integrated Payment gets for free from WooCommerce's own native saved-token
+            // list (see PayplugCreditCard::payment_fields()), which this plugin cannot
+            // reuse here since a UHF alias is never a WC_Payment_Token. Keeping it out of
+            // the form also means the form's own "-hide" toggle (assets/js/payplug-hosted-fields.js)
+            // never hides the card choice itself when a saved card is selected.
+            $cards_html = '<div class="payplug HostedFields_savedCards" data-e2e-name="savedCards">' . $cards_html . '</div>';
         }
 
         if ($save_card) {
@@ -49,8 +57,8 @@ HTML;
         }
 
         return <<<HTML
+			{$cards_html}
 			<form class="payplug HostedFields -loaded">
-				{$cards_html}
 				<input type="hidden" name="hf_token" id="hf-token" value="" />
 				<input type="hidden" name="hf_selected_brand" id="hf-selected-brand" value="" />
 				<input type="hidden" name="hf_last4" id="hf-last4" value="" />
