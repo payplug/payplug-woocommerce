@@ -4,14 +4,17 @@ namespace Payplug\PayplugWoocommerce\Gateway;
 
 use Payplug\PayplugWoocommerce\Controller\HostedFields;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
+use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOrderStateMutator;
+use Payplug\PayplugWoocommerce\Upc\AliasPaymentContextBuilder;
 use Payplug\PayplugWoocommerce\Upc\PaymentCaptureContextBuilder;
 use Payplug\PayplugWoocommerce\Upc\PaymentCaptureOutcomeApplier;
 use Payplug\PayplugWoocommerce\Upc\UnifiedApiPaymentServiceFactory;
 use PayplugUnifiedCore\Exceptions\ApiException;
 use PayplugUnifiedCore\Exceptions\InvalidHostedFieldException;
+use PayplugUnifiedCore\Exceptions\InvalidPaymentException;
 use PayplugUnifiedCore\Exceptions\PayplugException;
 use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
@@ -167,9 +170,16 @@ class PayplugCreditCard extends PayplugGateway
             return ['result' => 'failure'];
         }
 
+        $uhf_card_choice = isset($_POST['payplug_uhf_card_choice']) ? sanitize_text_field(wp_unslash($_POST['payplug_uhf_card_choice'])) : '';
+        // The BO flag is re-checked here (not just relied on to keep the choice off the page in
+        // the first place): a posted card choice with the flag off falls through to requiring
+        // hf_token below, exactly like no choice was ever posted - defense in depth against a
+        // forged POST.
+        $use_alias = $this->save_card && '' !== $uhf_card_choice && 'other' !== $uhf_card_choice;
+
         $hf_token = isset($_POST['hf_token']) ? sanitize_text_field(wp_unslash($_POST['hf_token'])) : '';
 
-        if ('' === $hf_token) {
+        if (!$use_alias && '' === $hf_token) {
             wc_add_notice(__('payplug_hosted_fields_missing_token', 'payplug'), 'error');
 
             return ['result' => 'failure'];
@@ -177,6 +187,12 @@ class PayplugCreditCard extends PayplugGateway
 
         $selected_brand = isset($_POST['hf_selected_brand']) ? sanitize_text_field(wp_unslash($_POST['hf_selected_brand'])) : '';
         $save_card = !empty($_POST['savecard']);
+        $card_fallback = [
+            'brand' => $selected_brand,
+            'last4' => isset($_POST['hf_last4']) ? sanitize_text_field(wp_unslash($_POST['hf_last4'])) : '',
+            'exp_month' => isset($_POST['hf_expiration_month']) ? (int) $_POST['hf_expiration_month'] : 0,
+            'exp_year' => isset($_POST['hf_expiration_year']) ? (int) $_POST['hf_expiration_year'] : 0,
+        ];
 
         // Guards only the truly unambiguous half of the double-payment risk: two requests for the
         // *same* order genuinely in flight at once (a double-click, or two tabs) are always the
@@ -215,13 +231,34 @@ class PayplugCreditCard extends PayplugGateway
         }
 
         try {
+            if ($use_alias) {
+                $card = UhfCard::find_for_customer((int) $uhf_card_choice, get_current_user_id(), $this->mode);
+
+                if (null === $card) {
+                    wc_add_notice(__('payplug_hosted_fields_tokenization_error', 'payplug'), 'error');
+
+                    return ['result' => 'failure'];
+                }
+
+                $dto = (new AliasPaymentContextBuilder())->build($order, $card->alias_id);
+                $output = (new UnifiedApiPaymentServiceFactory())->create()->createPayment($dto);
+
+                // A one-click payment never creates a NEW alias (it pays with one that already
+                // exists), so save_card is always false here regardless of whatever the client
+                // posted - PaymentCaptureOutcomeApplier's own alias-persistence branch is then
+                // correctly a no-op for this request.
+                return (new PaymentCaptureOutcomeApplier())->apply($order, $output);
+            }
+
             $dto = (new PaymentCaptureContextBuilder())->build($order, $hf_token, $selected_brand, $save_card);
             $output = (new UnifiedApiPaymentServiceFactory())->create()->createPayment($dto);
 
-            return (new PaymentCaptureOutcomeApplier())->apply($order, $output);
+            return (new PaymentCaptureOutcomeApplier())->apply($order, $output, $save_card, $card_fallback);
         } catch (ApiException $e) {
             self::log(sprintf('UPC payment creation failed for order #%s: %s', $order_id, $e->getMessage()), 'error');
         } catch (InvalidHostedFieldException $e) {
+            self::log(sprintf('UPC payment creation rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } catch (InvalidPaymentException $e) {
             self::log(sprintf('UPC payment creation rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
         } catch (PayplugException $e) {
             // Catch-all for every other UPC exception (InvalidCommonFieldsException from a
@@ -455,10 +492,11 @@ class PayplugCreditCard extends PayplugGateway
         }
 
         if ('hosted_fields' == $this->embedded_mode && $this->hosted_fields_available) {
-            echo HostedFields::template_form($this->save_card);
-        }
-
-        if ($this->save_card_available()) {
+            $cards = ($this->save_card && is_user_logged_in())
+                ? UhfCard::get_customer_cards(get_current_user_id(), $this->mode)
+                : [];
+            echo HostedFields::template_form($this->save_card, $cards);
+        } elseif ($this->save_card_available()) {
             $this->tokenization_script();
             $this->saved_payment_methods();
         }

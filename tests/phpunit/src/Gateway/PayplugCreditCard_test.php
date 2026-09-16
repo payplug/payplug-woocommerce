@@ -3,6 +3,7 @@
 namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Gateway;
 
 use Payplug\PayplugWoocommerce\Gateway\PayplugCreditCard;
+use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use PHPUnit\Framework\TestCase;
 
@@ -26,6 +27,10 @@ class PayplugCreditCard_test extends TestCase
 
     protected function tearDown(): void
     {
+        if (UhfCard::check_table_exists()) {
+            global $wpdb;
+            $wpdb->query('TRUNCATE TABLE ' . $wpdb->base_prefix . 'woocommerce_payplug_uhf_cards');
+        }
         delete_option('woocommerce_payplug_settings');
         delete_option('woocommerce_currency');
         parent::tearDown();
@@ -243,5 +248,102 @@ class PayplugCreditCard_test extends TestCase
         $lock->release($lock_key);
         unset($_POST['hf_token']);
         wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_process_payment_pays_with_a_saved_alias_when_a_card_choice_is_posted(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['embedded_mode'] = 'hosted_fields';
+        $settings['payment_methods']['configuration']['payplug']['save_card'] = true;
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $user_id = wp_create_user('uhf_owner_' . wp_rand(), wp_generate_password());
+        wp_set_current_user($user_id);
+
+        $order = wc_create_order();
+        $order->save();
+
+        $card_id = UhfCard::insert($user_id, 'alias_payment_1', 'VISA', '4242', 12, 2099, 'test');
+
+        $_POST['payplug_uhf_card_choice'] = (string) $card_id;
+
+        $gateway = new PayplugCreditCard();
+        $result = $gateway->process_payment($order->get_id());
+
+        // No real network reachable in this test environment - createPayment() throws
+        // ApiException, caught by the generic failure branch. The assertion that matters is
+        // that the *alias* branch was taken rather than the hf_token branch: a missing-token
+        // failure never reaches the lock/try block at all, while an alias-branch failure does
+        // reach it (and releases the lock cleanly), which the next test's isolation depends on.
+        $this->assertSame('failure', $result['result']);
+
+        unset($_POST['payplug_uhf_card_choice']);
+        wc_clear_notices();
+        wp_delete_post($order->get_id(), true);
+        wp_delete_user($user_id);
+    }
+
+    public function test_process_payment_fails_when_the_posted_card_choice_does_not_belong_to_the_current_customer(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['embedded_mode'] = 'hosted_fields';
+        $settings['payment_methods']['configuration']['payplug']['save_card'] = true;
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $owner_id = wp_create_user('uhf_owner_' . wp_rand(), wp_generate_password());
+        $attacker_id = wp_create_user('uhf_attacker_' . wp_rand(), wp_generate_password());
+        wp_set_current_user($attacker_id);
+
+        $order = wc_create_order();
+        $order->save();
+
+        $card_id = UhfCard::insert($owner_id, 'alias_payment_2', 'VISA', '4242', 12, 2099, 'test');
+
+        $_POST['payplug_uhf_card_choice'] = (string) $card_id;
+
+        $gateway = new PayplugCreditCard();
+        $result = $gateway->process_payment($order->get_id());
+
+        $this->assertSame('failure', $result['result']);
+
+        unset($_POST['payplug_uhf_card_choice']);
+        wc_clear_notices();
+        wp_delete_post($order->get_id(), true);
+        wp_delete_user($owner_id);
+        wp_delete_user($attacker_id);
+    }
+
+    public function test_process_payment_ignores_the_card_choice_when_the_save_card_bo_flag_is_off(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['embedded_mode'] = 'hosted_fields';
+        $settings['payment_methods']['configuration']['payplug']['save_card'] = false;
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $user_id = wp_create_user('uhf_owner_' . wp_rand(), wp_generate_password());
+        wp_set_current_user($user_id);
+
+        $order = wc_create_order();
+        $order->save();
+
+        $card_id = UhfCard::insert($user_id, 'alias_payment_3', 'VISA', '4242', 12, 2099, 'test');
+
+        $_POST['payplug_uhf_card_choice'] = (string) $card_id;
+
+        $gateway = new PayplugCreditCard();
+        $result = $gateway->process_payment($order->get_id());
+
+        // save_card is off, so the alias branch never activates - falls through to the
+        // hf_token-required branch, which fails on the missing token exactly like
+        // test_process_payment_returns_failure_result_when_hf_token_is_missing.
+        $this->assertSame('failure', $result['result']);
+
+        unset($_POST['payplug_uhf_card_choice']);
+        wc_clear_notices();
+        wp_delete_post($order->get_id(), true);
+        wp_delete_user($user_id);
     }
 }
