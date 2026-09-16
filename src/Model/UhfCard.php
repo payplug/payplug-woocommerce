@@ -68,7 +68,7 @@ class UhfCard
         }
 
         $table_name = $wpdb->base_prefix . self::TABLE;
-        $wpdb->insert($table_name, [
+        $result = $wpdb->insert($table_name, [
             'customer_id' => $customer_id,
             'alias_id' => $alias_id,
             'brand' => $brand,
@@ -78,7 +78,7 @@ class UhfCard
             'mode' => $mode,
         ]);
 
-        if ($wpdb->insert_id) {
+        if (false !== $result) {
             return (int) $wpdb->insert_id;
         }
 
