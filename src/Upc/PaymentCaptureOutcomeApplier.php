@@ -2,12 +2,14 @@
 
 namespace Payplug\PayplugWoocommerce\Upc;
 
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLogger;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOrderStateMutator;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommercePaymentRepository;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
+use PayplugUnifiedCore\Exceptions\ApiException;
 use PayplugUnifiedCore\Exceptions\InvalidOperationDataException;
 use PayplugUnifiedCore\Exceptions\PaymentNotFoundException;
 use PayplugUnifiedCore\Output\PaymentOutput;
@@ -34,7 +36,7 @@ class PaymentCaptureOutcomeApplier
      */
     private const LOCK_TTL_SECONDS = 30;
 
-    public function apply(\WC_Order $order, PaymentOutput $output): array
+    public function apply(\WC_Order $order, PaymentOutput $output, bool $save_card = false, array $card_fallback = []): array
     {
         $data = json_decode($output->body, true);
         $data = is_array($data) ? $data : [];
@@ -45,7 +47,8 @@ class PaymentCaptureOutcomeApplier
                 $order,
                 $data,
                 '' !== $exec_code ? $exec_code : self::PENDING_THREE_DS_EXEC_CODE,
-                PaymentOutcome::THREE_DS_PENDING
+                PaymentOutcome::THREE_DS_PENDING,
+                $save_card
             );
 
             set_transient('payplug_upc_redirect_html_' . $order->get_id(), $output->redirectHtml, self::REDIRECT_HTML_TTL_SECONDS);
@@ -67,7 +70,8 @@ class PaymentCaptureOutcomeApplier
                 $order,
                 $data,
                 '' !== $exec_code ? $exec_code : self::PENDING_THREE_DS_EXEC_CODE,
-                PaymentOutcome::THREE_DS_PENDING
+                PaymentOutcome::THREE_DS_PENDING,
+                $save_card
             );
 
             return ['result' => 'success', 'redirect' => $output->redirectUrl];
@@ -75,9 +79,13 @@ class PaymentCaptureOutcomeApplier
 
         $outcome = ExecCodeMapper::toPaymentOutcome($exec_code);
 
-        $this->persist_operation($order, $data, $exec_code, $outcome);
+        $this->persist_operation($order, $data, $exec_code, $outcome, $save_card);
 
         $this->apply_terminal_outcome($order, $data, $outcome);
+
+        if ($save_card && null !== $output->aliasId && PaymentOutcome::FAILED !== $outcome) {
+            $this->maybe_persist_uhf_card($order, $output->aliasId, $data, $card_fallback);
+        }
 
         if (PaymentOutcome::FAILED === $outcome) {
             (new WooCommerceLogger())->error(sprintf('UPC payment creation failed for order #%s (execCode %s).', $order->get_id(), $exec_code));
@@ -178,7 +186,7 @@ class PaymentCaptureOutcomeApplier
      *
      * @param array<string, mixed> $data the json_decode()'d payment-creation response body
      */
-    private function persist_operation(\WC_Order $order, array $data, string $exec_code, string $outcome): void
+    private function persist_operation(\WC_Order $order, array $data, string $exec_code, string $outcome, bool $save_card = false): void
     {
         $operation_id = isset($data['id']) && is_scalar($data['id']) ? (string) $data['id'] : '';
         $operation_id_alt = isset($data['operationIds']) && is_array($data['operationIds']) && isset($data['operationIds'][0]) && is_scalar($data['operationIds'][0])
@@ -229,11 +237,59 @@ class PaymentCaptureOutcomeApplier
                 $order->delete_meta_data('_payplug_upc_treated');
             }
 
+            // NEW: same "clear first" pattern as the alt id above - a retried checkout whose
+            // savecard choice changed must not leave a previous attempt's intent bound to this
+            // order, since Front\UpcWebhook reads this meta with no other way to know the
+            // original request's POST data.
+            $order->delete_meta_data('_payplug_uhf_save_card');
+
+            if ($save_card) {
+                $order->update_meta_data('_payplug_uhf_save_card', '1');
+            }
+
             $order->save();
         } catch (InvalidOperationDataException $e) {
             (new WooCommerceLogger())->error(sprintf('UPC operation "%s" could not be persisted for order #%s: %s', $operation_id, $order->get_id(), $e->getMessage()));
         } catch (PaymentNotFoundException $e) {
             (new WooCommerceLogger())->error(sprintf('UPC operation "%s" could not be persisted for order #%s: %s', $operation_id, $order->get_id(), $e->getMessage()));
         }
+    }
+
+    /**
+     * Best-effort: a direct (non-3DS) success carries the alias id in PaymentOutput::$aliasId,
+     * but never its brand/last4/expiration - those are fetched from the public operation
+     * endpoint when possible, falling back to the (sanitized, re-validated) values the client
+     * submitted. Never fails the payment itself - a fetch failure only means the card metadata
+     * falls back further, or the card isn't saved at all.
+     *
+     * @param array<string, mixed> $data          the json_decode()'d payment-creation response body
+     * @param array<string, mixed> $card_fallback client-submitted brand/last4/exp_month/exp_year
+     */
+    private function maybe_persist_uhf_card(\WC_Order $order, string $alias_id, array $data, array $card_fallback): void
+    {
+        if (0 === $order->get_customer_id()) {
+            return;
+        }
+
+        $operation_id = isset($data['id']) && is_scalar($data['id']) ? (string) $data['id'] : '';
+        $fetched = [];
+
+        if ('' !== $operation_id) {
+            try {
+                $response = (new UnifiedApiPaymentServiceFactory())->create()->getOperation($operation_id);
+                $decoded = json_decode($response['body'], true);
+                $fetched = is_array($decoded) ? UhfCardDataExtractor::extract($decoded) : [];
+            } catch (ApiException $e) {
+                (new WooCommerceLogger())->error(sprintf(
+                    'UPC best-effort card metadata fetch failed for order #%s: %s',
+                    $order->get_id(),
+                    $e->getMessage()
+                ));
+            }
+        }
+
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+
+        (new UhfCardPersister())->persist($order->get_customer_id(), $alias_id, $mode, $card_fallback, $fetched);
     }
 }
