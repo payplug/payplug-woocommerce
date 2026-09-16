@@ -2,11 +2,14 @@
 
 namespace Payplug\PayplugWoocommerce\Front;
 
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceConfigurationRepository;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLogger;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOrderStateMutator;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommercePaymentRepository;
+use Payplug\PayplugWoocommerce\Upc\UhfCardDataExtractor;
+use Payplug\PayplugWoocommerce\Upc\UhfCardPersister;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PayplugUnifiedCore\Exceptions\InvalidNotificationException;
@@ -247,6 +250,11 @@ class UpcWebhook
                 $operation_data->orderId
             ));
             (new WooCommerceOrderStateMutator())->apply($operation_data->orderId, $operation_data->outcome);
+
+            if (PaymentOutcome::PAID === $operation_data->outcome) {
+                $this->maybe_persist_uhf_card($order, $raw_body);
+            }
+
             $payment_repository->markTreated($operation_data->operationId);
 
             return 200;
@@ -267,6 +275,47 @@ class UpcWebhook
         } finally {
             $lock->release($lock_key);
         }
+    }
+
+    /**
+     * The only place a 3DS-confirmed payment's card is ever saved - no alias is returned
+     * synchronously for a payment that went through a 3DS challenge, so the webhook's own raw
+     * body (already the same paymentMethod.{id, card, details} shape as the operation resource)
+     * is the sole source of truth here; no extra API call is made.
+     */
+    private function maybe_persist_uhf_card(\WC_Order $order, string $raw_body): void
+    {
+        if ('1' !== $order->get_meta('_payplug_uhf_save_card')) {
+            return;
+        }
+
+        if (0 === $order->get_customer_id()) {
+            return;
+        }
+
+        $decoded = json_decode($raw_body, true);
+
+        if (!is_array($decoded)) {
+            return;
+        }
+
+        $alias_id = isset($decoded['paymentMethod']['id']) && is_scalar($decoded['paymentMethod']['id'])
+            ? (string) $decoded['paymentMethod']['id']
+            : '';
+
+        if ('' === $alias_id) {
+            (new WooCommerceLogger())->error(sprintf(
+                'UPC webhook: save-card was requested but the notification carried no alias id for order #%s.',
+                $order->get_id()
+            ));
+
+            return;
+        }
+
+        $card_data = UhfCardDataExtractor::extract($decoded);
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+
+        (new UhfCardPersister())->persist($order->get_customer_id(), $alias_id, $mode, [], $card_data);
     }
 
     /**

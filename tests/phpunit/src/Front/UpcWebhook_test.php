@@ -3,6 +3,8 @@
 namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Front;
 
 use Payplug\PayplugWoocommerce\Front\UpcWebhook;
+use Payplug\PayplugWoocommerce\Model\UhfCard;
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
 class UpcWebhook_test extends \WP_Ajax_UnitTestCase
@@ -26,6 +28,10 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
 
     protected function tearDown(): void
     {
+        if (UhfCard::check_table_exists()) {
+            global $wpdb;
+            $wpdb->query('TRUNCATE TABLE ' . $wpdb->base_prefix . 'woocommerce_payplug_uhf_cards');
+        }
         wp_delete_post($this->order->get_id(), true);
         parent::tearDown();
     }
@@ -273,5 +279,91 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
         ob_get_clean();
 
         $this->assertSame('on-hold', wc_get_order($this->order->get_id())->get_status());
+    }
+
+    public function testASuccessfulNotificationPersistsTheUhfCardWhenSaveCardWasRequested(): void
+    {
+        $this->order->set_customer_id(1);
+        $this->order->update_meta_data('_payplug_uhf_save_card', '1');
+        $this->order->save();
+
+        $controller = new UpcWebhook();
+        $body = json_encode([
+            'id' => self::OPERATION_ID,
+            'execCode' => '0000',
+            'orderId' => (string) $this->order->get_id(),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'paymentMethod' => [
+                'id' => 'alias_webhook_1',
+                'card' => ['network' => 'VISA', 'code6x4' => '424242XXXXXX4242'],
+                'details' => ['validityDate' => '2030-12'],
+            ],
+        ]);
+
+        ob_start();
+        $controller->receive_notification($body);
+        ob_get_clean();
+
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+        $card = UhfCard::find_by_alias('alias_webhook_1', $mode);
+
+        $this->assertNotNull($card);
+        $this->assertSame('VISA', $card->brand);
+        $this->assertSame('4242', $card->last4);
+        $this->assertSame(12, (int) $card->exp_month);
+        $this->assertSame(2030, (int) $card->exp_year);
+    }
+
+    public function testASuccessfulNotificationDoesNotPersistACardWhenSaveCardWasNotRequested(): void
+    {
+        $this->order->set_customer_id(1);
+        $this->order->save();
+
+        $controller = new UpcWebhook();
+        $body = json_encode([
+            'id' => self::OPERATION_ID,
+            'execCode' => '0000',
+            'orderId' => (string) $this->order->get_id(),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'paymentMethod' => [
+                'id' => 'alias_webhook_2',
+                'card' => ['network' => 'VISA', 'code6x4' => '424242XXXXXX4242'],
+                'details' => ['validityDate' => '2030-12'],
+            ],
+        ]);
+
+        ob_start();
+        $controller->receive_notification($body);
+        ob_get_clean();
+
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+        $this->assertNull(UhfCard::find_by_alias('alias_webhook_2', $mode));
+    }
+
+    public function testAThreeDsPendingNotificationNeverPersistsACard(): void
+    {
+        $this->order->set_customer_id(1);
+        $this->order->update_meta_data('_payplug_uhf_save_card', '1');
+        $this->order->save();
+
+        $controller = new UpcWebhook();
+        $body = json_encode([
+            'id' => self::OPERATION_ID,
+            'execCode' => '0001',
+            'orderId' => (string) $this->order->get_id(),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'paymentMethod' => [
+                'id' => 'alias_webhook_3',
+                'card' => ['network' => 'VISA', 'code6x4' => '424242XXXXXX4242'],
+                'details' => ['validityDate' => '2030-12'],
+            ],
+        ]);
+
+        ob_start();
+        $controller->receive_notification($body);
+        ob_get_clean();
+
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+        $this->assertNull(UhfCard::find_by_alias('alias_webhook_3', $mode));
     }
 }
