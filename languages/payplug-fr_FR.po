@@ -1363,3 +1363,6 @@ msgstr "Ce type de carte n'est pas accepté avec ce mode de paiement. Merci d'ut
 
 msgid "payplug_hosted_fields_missing_token"
 msgstr "Une erreur est survenue lors de la vérification de votre carte. Merci de réessayer."
+
+msgid "payplug_hosted_fields_pay_with_another_card"
+msgstr "Payer avec une autre carte"

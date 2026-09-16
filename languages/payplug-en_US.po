@@ -739,3 +739,6 @@ msgstr "This card type is not accepted with this payment mode. Please use a CB, 
 
 msgid "payplug_hosted_fields_missing_token"
 msgstr "An error occurred while verifying your card. Please try again."
+
+msgid "payplug_hosted_fields_pay_with_another_card"
+msgstr "Pay with another card"

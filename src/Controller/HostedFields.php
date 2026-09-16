@@ -4,7 +4,11 @@ namespace Payplug\PayplugWoocommerce\Controller;
 
 class HostedFields
 {
-    public static function template_form($save_card)
+    /**
+     * @param bool     $save_card whether the BO "one-click" flag is on for this gateway
+     * @param object[] $cards     the current customer's saved UHF cards (Model\UhfCard::get_customer_cards() shape) - empty for a guest or when there are none
+     */
+    public static function template_form($save_card, array $cards = [])
     {
         // The transaction-secured/privacy-policy footer is visually identical to
         // Integrated Payment's, so it reuses IntegratedPayment_container classes and
@@ -14,11 +18,31 @@ class HostedFields
         $privacy_policy_url = __('payplug_integrated_payment_privacy_policy_url', 'payplug');
         $f = fn ($fn) => $fn;
 
+        $cards_html = '';
+        foreach ($cards as $card) {
+            $cards_html .= sprintf(
+                '<label class="payplug HostedFields_savedCard"><input type="radio" name="payplug_uhf_card_choice" value="%d">%s &bull;&bull;&bull;&bull; %s &mdash; %02d/%d</label>',
+                (int) $card->id,
+                esc_html($card->brand),
+                esc_html($card->last4),
+                (int) $card->exp_month,
+                (int) $card->exp_year
+            );
+        }
+
+        if ('' !== $cards_html) {
+            $cards_html .= sprintf(
+                '<label class="payplug HostedFields_savedCard -other"><input type="radio" name="payplug_uhf_card_choice" value="other" checked>%s</label>',
+                $f(__('payplug_hosted_fields_pay_with_another_card', 'payplug'))
+            );
+            $cards_html = '<div class="payplug HostedFields_container -savedCards" data-e2e-name="savedCards">' . $cards_html . '</div>';
+        }
+
         if ($save_card) {
             $saved = <<<HTML
-					<div class="payplug HostedFields_container -saveCard" data-e2e-name="saveCard">
-						<label><input type="checkbox" name="savecard"><span></span>{$f(__('payplug_integrated_payment_oneClick', 'payplug'))}</label>
-					</div>
+						<div class="payplug HostedFields_container -saveCard" data-e2e-name="saveCard">
+							<label><input type="checkbox" name="savecard"><span></span>{$f(__('payplug_integrated_payment_oneClick', 'payplug'))}</label>
+						</div>
 HTML;
         } else {
             $saved = '';
@@ -26,8 +50,12 @@ HTML;
 
         return <<<HTML
 			<form class="payplug HostedFields -loaded">
+				{$cards_html}
 				<input type="hidden" name="hf_token" id="hf-token" value="" />
 				<input type="hidden" name="hf_selected_brand" id="hf-selected-brand" value="" />
+				<input type="hidden" name="hf_last4" id="hf-last4" value="" />
+				<input type="hidden" name="hf_expiration_month" id="hf-expiration-month" value="" />
+				<input type="hidden" name="hf_expiration_year" id="hf-expiration-year" value="" />
 				<div class="payplug HostedFields_container -brand" id="hosted-fields-brand" data-e2e-name="brand"></div>
 				<div class="payplug HostedFields_container -card" id="hosted-fields-card" data-e2e-name="card"></div>
 				<div class="payplug HostedFields_container -expiry" id="hosted-fields-expiry" data-e2e-name="expiry"></div>
