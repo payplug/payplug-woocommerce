@@ -26,6 +26,7 @@ var HostedFields = {
 		// payment-methods markup, including these radios, with fresh elements that a
 		// direct .on('change', ...) binding would never reach again.
 		jQuery('body').on('change', '[name=wc-payplug-payment-token]', HostedFields.manageSavedCards);
+		jQuery('body').on('change', '[name=payplug_uhf_card_choice]', HostedFields.manageSavedCards);
 
 		// WooCommerce's own submit handler is bound on the same form; a plain .on('submit')
 		// runs after it, so return false can't cancel the already-dispatched place-order
@@ -52,8 +53,12 @@ var HostedFields = {
 	},
 	isNewCardSelected: function () {
 		var $tokens = jQuery('[name=wc-payplug-payment-token]');
+		var tokenIsNew = !$tokens.length || 'new' === $tokens.filter(':checked').val();
 
-		return !$tokens.length || 'new' === $tokens.filter(':checked').val();
+		var $uhfCards = jQuery('[name=payplug_uhf_card_choice]');
+		var uhfCardIsOther = !$uhfCards.length || 'other' === $uhfCards.filter(':checked').val();
+
+		return tokenIsNew && uhfCardIsOther;
 	},
 	// Mirrors payplug-integrated-payments.js's checkLoaded(): checking the DOM for an
 	// actually-mounted iframe (rather than trusting a boolean flag) means a checkout AJAX
@@ -125,6 +130,9 @@ var HostedFields = {
 		HostedFields.props.submitting = false;
 		jQuery('#hf-token').val('');
 		jQuery('#hf-selected-brand').val('');
+		jQuery('#hf-last4').val('');
+		jQuery('#hf-expiration-month').val('');
+		jQuery('#hf-expiration-year').val('');
 	},
 	tokenize: function () {
 		HostedFields.hideErrors();
@@ -149,6 +157,17 @@ var HostedFields = {
 
 			jQuery('#hf-token').val(result.hfToken);
 			jQuery('#hf-selected-brand').val(selectedBrand);
+
+			// Best-effort fallback metadata for the "save card" flow - server-side persistence
+			// (Upc\PaymentCaptureOutcomeApplier::maybe_persist_uhf_card()) falls back to these
+			// only when its own post-payment metadata fetch fails. Field names are this SDK's
+			// best-known shape and unconfirmed against a real createToken() response - see
+			// docs/superpowers/specs/2026-09-16-uhf-card-alias-design.md, Risk 1.
+			if (jQuery('[name=savecard]').is(':checked')) {
+				jQuery('#hf-last4').val(result.last4 || '');
+				jQuery('#hf-expiration-month').val(result.expirationMonth || '');
+				jQuery('#hf-expiration-year').val(result.expirationYear || '');
+			}
 
 			// The order isn't created yet at this point (tokenization happens before the
 			// real checkout POST), so there is no payment to create from this token here -
