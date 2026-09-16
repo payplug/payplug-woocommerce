@@ -66,6 +66,15 @@ function create_lock_table(): void
 
 add_action('upgrader_process_complete', __NAMESPACE__ . '\\create_lock_table', 10, 2);
 add_action('activated_plugin', __NAMESPACE__ . '\\create_lock_table', 10, 2);
+
+function create_uhf_cards_table(): void
+{
+    init();
+    \Payplug\PayplugWoocommerce\Model\UhfCard::create_table();
+}
+
+add_action('upgrader_process_complete', __NAMESPACE__ . '\\create_uhf_cards_table', 10, 2);
+add_action('activated_plugin', __NAMESPACE__ . '\\create_uhf_cards_table', 10, 2);
 add_action('plugins_loaded', __NAMESPACE__ . '\\init');
 
 /**
