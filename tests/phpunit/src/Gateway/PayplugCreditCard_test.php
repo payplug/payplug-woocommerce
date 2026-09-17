@@ -372,6 +372,136 @@ class PayplugCreditCard_test extends TestCase
         wp_delete_user($user_id);
     }
 
+    public function test_process_refund_falls_back_to_retail_api_when_order_has_no_upc_operation_id(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        update_option('woocommerce_payplug_settings', $this->base_settings);
+
+        $order = wc_create_order();
+        $order->set_total(50.00);
+        $order->save();
+
+        $gateway = new PayplugCreditCard();
+        $result = $gateway->process_refund($order->get_id(), 50.00);
+
+        // No _payplug_upc_operation_id meta -> falls back to the inherited Retail API
+        // process_refund(), which fails with this exact message because no api_key/jwt is
+        // configured in this test environment (PayplugGateway::user_logged_in() returns false).
+        // Proves the fallback ran, as distinguished from the UPC path's own generic error below.
+        $this->assertInstanceOf(\WP_Error::class, $result);
+        $this->assertSame('You must be logged in with your PayPlug account.', $result->get_error_message());
+
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_process_refund_returns_error_without_calling_the_api_for_a_non_positive_amount(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        update_option('woocommerce_payplug_settings', $this->base_settings);
+
+        $order = wc_create_order();
+        $order->set_total(50.00);
+        $order->update_meta_data('_payplug_upc_operation_id', 'op_123');
+        $order->save();
+
+        // 0.00 converts to 0 cents, rejected by UnifiedApiPaymentService::createRefund()'s own
+        // Assert::positive() before any network call is attempted - deterministic in this
+        // network-less test environment, unlike the other UPC-path tests below.
+        $result = (new PayplugCreditCard())->process_refund($order->get_id(), 0.00);
+
+        $this->assertInstanceOf(\WP_Error::class, $result);
+        $this->assertSame('process_refund_error', $result->get_error_code());
+        // Distinguishes a genuine UPC-path rejection from the inherited Retail fallback's own
+        // (differently-worded, but same error code) "must be logged in" message.
+        $this->assertNotSame('You must be logged in with your PayPlug account.', $result->get_error_message());
+
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_process_refund_calls_the_upc_service_when_order_has_an_upc_operation_id(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        update_option('woocommerce_payplug_settings', $this->base_settings);
+
+        $order = wc_create_order();
+        $order->set_total(50.00);
+        $order->update_meta_data('_payplug_upc_operation_id', 'op_123');
+        $order->save();
+
+        $gateway = new PayplugCreditCard();
+        $result = $gateway->process_refund($order->get_id(), 50.00);
+
+        // No real network reachable in this test environment - createRefund() throws
+        // ApiException while fetching an OAuth2 token, caught by process_refund()'s own generic
+        // failure branch. The assertion that matters is that the *UPC* branch was taken rather
+        // than falling back to Retail: a Retail fallback would surface the "must be logged in"
+        // message from the previous test instead.
+        $this->assertInstanceOf(\WP_Error::class, $result);
+        $this->assertSame('process_refund_error', $result->get_error_code());
+        $this->assertNotSame('You must be logged in with your PayPlug account.', $result->get_error_message());
+
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_process_refund_fails_without_calling_the_api_when_another_refund_request_for_the_same_order_is_in_flight(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        update_option('woocommerce_payplug_settings', $this->base_settings);
+
+        $order = wc_create_order();
+        $order->set_total(50.00);
+        $order->update_meta_data('_payplug_upc_operation_id', 'op_123');
+        $order->save();
+
+        $lock_key = 'payplug_upc_process_refund_' . $order->get_id();
+        $lock = new WooCommerceLock();
+        $lock->acquire($lock_key, 30);
+
+        $gateway = new PayplugCreditCard();
+        $result = $gateway->process_refund($order->get_id(), 50.00);
+
+        $this->assertInstanceOf(\WP_Error::class, $result);
+        $this->assertSame('process_refund_error', $result->get_error_code());
+        // Distinguishes genuine lock contention from the inherited Retail fallback's own
+        // (differently-worded, but same error code) "must be logged in" message.
+        $this->assertNotSame('You must be logged in with your PayPlug account.', $result->get_error_message());
+
+        $lock->release($lock_key);
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_build_refund_note_for_a_full_refund(): void
+    {
+        $note = (new PayplugCreditCard())->build_refund_note(null, '');
+
+        $this->assertSame(__('Refund: fully refunded', 'payplug'), $note);
+    }
+
+    public function test_build_refund_note_for_a_partial_refund_includes_the_formatted_amount(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+
+        $note = (new PayplugCreditCard())->build_refund_note(500, '');
+
+        $this->assertStringContainsString(wc_price(5.00), $note);
+        $this->assertStringStartsWith('Refund: refunded', $note);
+    }
+
+    public function test_build_refund_note_appends_an_escaped_reason(): void
+    {
+        $note = (new PayplugCreditCard())->build_refund_note(null, '<script>alert(1)</script>');
+
+        $this->assertStringContainsString('(&lt;script&gt;alert(1)&lt;/script&gt;)', $note);
+        $this->assertStringNotContainsString('<script>', $note);
+    }
+
+    public function test_build_refund_note_omits_the_parenthesized_reason_when_empty(): void
+    {
+        $note = (new PayplugCreditCard())->build_refund_note(null, '');
+
+        $this->assertStringNotContainsString('(', $note);
+    }
+
     private function assertLastErrorNotice(string $msgid): void
     {
         $notices = wc_get_notices('error');

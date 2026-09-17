@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7895aa2cdd57d1343ef94fe663ac515e",
+    "content-hash": "608d7df955b521b6e5c142b307a616ce",
     "packages": [
         {
             "name": "composer/installers",
@@ -392,16 +392,16 @@
         },
         {
             "name": "payplug/unified-plugin-core",
-            "version": "1.1.0",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/payplug/unified-plugin-core.git",
-                "reference": "f86247f8b52fba52c709cad206c50974927fa8dc"
+                "reference": "10ead914e201c06243ddfd61b5ac23f9799a39a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payplug/unified-plugin-core/zipball/f86247f8b52fba52c709cad206c50974927fa8dc",
-                "reference": "f86247f8b52fba52c709cad206c50974927fa8dc",
+                "url": "https://api.github.com/repos/payplug/unified-plugin-core/zipball/10ead914e201c06243ddfd61b5ac23f9799a39a1",
+                "reference": "10ead914e201c06243ddfd61b5ac23f9799a39a1",
                 "shasum": ""
             },
             "require": {
@@ -438,9 +438,9 @@
             "description": "Core foundations shared library for Payplug e-commerce plugins.",
             "support": {
                 "issues": "https://github.com/payplug/unified-plugin-core/issues",
-                "source": "https://github.com/payplug/unified-plugin-core/tree/1.1.0"
+                "source": "https://github.com/payplug/unified-plugin-core/tree/1.1.2"
             },
-            "time": "2026-08-28T14:15:47+00:00"
+            "time": "2026-09-15T14:24:30+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",

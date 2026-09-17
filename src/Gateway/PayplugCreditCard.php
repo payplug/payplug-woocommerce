@@ -6,6 +6,7 @@ use Payplug\PayplugWoocommerce\Controller\HostedFields;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceConfigurationRepository;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOrderStateMutator;
 use Payplug\PayplugWoocommerce\Upc\AliasPaymentContextBuilder;
@@ -15,7 +16,10 @@ use Payplug\PayplugWoocommerce\Upc\UnifiedApiPaymentServiceFactory;
 use PayplugUnifiedCore\Exceptions\ApiException;
 use PayplugUnifiedCore\Exceptions\InvalidHostedFieldException;
 use PayplugUnifiedCore\Exceptions\InvalidPaymentException;
+use PayplugUnifiedCore\Exceptions\InvalidRefundRequestException;
+use PayplugUnifiedCore\Exceptions\PaymentNotFoundException;
 use PayplugUnifiedCore\Exceptions\PayplugException;
+use PayplugUnifiedCore\Exceptions\RefundAmountException;
 use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
 class PayplugCreditCard extends PayplugGateway
@@ -27,6 +31,12 @@ class PayplugCreditCard extends PayplugGateway
      * long.
      */
     private const PROCESS_PAYMENT_LOCK_TTL_SECONDS = 30;
+
+    /**
+     * Same reasoning as PROCESS_PAYMENT_LOCK_TTL_SECONDS - comfortably above the OAuth token
+     * fetch + refund call's own combined worst case (10s timeout each).
+     */
+    private const PROCESS_REFUND_LOCK_TTL_SECONDS = 30;
 
     public $save_card = false;
 
@@ -276,6 +286,113 @@ class PayplugCreditCard extends PayplugGateway
         wc_add_notice(__('payplug_hosted_fields_tokenization_error', 'payplug'), 'error');
 
         return ['result' => 'failure'];
+    }
+
+    /**
+     * @param int $order_id
+     * @param float|string|null $amount
+     * @param string $reason
+     *
+     * @return bool|\WP_Error
+     */
+    public function process_refund($order_id, $amount = null, $reason = '')
+    {
+        $order = wc_get_order($order_id);
+
+        // No such order, or one paid via the Retail API (no UPC operation on it): both keep
+        // going through the inherited Retail process_refund() untouched - only a UPC-paid order
+        // takes this path. Delegating a missing order to it, rather than duplicating its own
+        // "order does not exist" WP_Error here, avoids a second untested error-message copy.
+        if (!$order instanceof \WC_Order) {
+            return parent::process_refund($order_id, $amount, $reason);
+        }
+
+        $operation_id = (string) $order->get_meta('_payplug_upc_operation_id');
+
+        if ('' === $operation_id) {
+            return parent::process_refund($order_id, $amount, $reason);
+        }
+
+        // No check here for whether the operation has actually reached a captured/paid state
+        // (e.g. still THREE_DS_PENDING) - deliberately left to the Unified API's own validation
+        // rather than an extra getPayment() round trip before every refund. Worst case is an
+        // ApiException on an operation that was never payable, caught below; no data corruption.
+        // Guards concurrent refund requests for the same order (double-click, two admin tabs)
+        // only - NOT a sequential retry of a request that already timed out. If createRefund()'s
+        // HTTP call times out (see PROCESS_REFUND_LOCK_TTL_SECONDS) after the Unified API already
+        // processed the refund, this method still returns a WP_Error, WooCommerce deletes the
+        // just-created local refund record (see wc_create_refund()), and a merchant retrying from
+        // the "Please try again" notice creates a second, real refund at Payplug - there is no
+        // idempotency key available from createRefund() to prevent this, and no reconciliation
+        // path analogous to the payment side's webhook/PaymentReconciler exists for refunds.
+        // Same class of known, accepted gap as process_payment()'s own sequential-retry note
+        // above, but with direct financial impact on the merchant rather than the shopper.
+        $lock = new WooCommerceLock();
+        $lock_key = 'payplug_upc_process_refund_' . $order_id;
+
+        if (!$lock->acquire($lock_key, self::PROCESS_REFUND_LOCK_TTL_SECONDS)) {
+            self::log(sprintf('Another refund request for order #%s is already in progress.', $order_id), 'error');
+
+            return new \WP_Error('process_refund_error', __('The transaction could not be refunded. Please try again.', 'payplug'));
+        }
+
+        try {
+            $configuration_repository = new WooCommerceConfigurationRepository();
+            $amount_in_cents = null !== $amount ? AmountHelper::toCents((float) $amount) : null;
+
+            (new UnifiedApiPaymentServiceFactory())->create()->createRefund(
+                $operation_id,
+                $configuration_repository->getPublicKeyId(),
+                (string) $order_id,
+                sprintf(__('Refund for order #%s', 'payplug'), $order->get_order_number()),
+                // Always null: submerchantExternalId only applies to EUR/Galitt UDV account
+                // configurations, which UHF never targets (non-EUR accounts own no submerchant -
+                // see the UHF technical spec). Sending one here would be for an account this
+                // module never talks to.
+                null,
+                $amount_in_cents,
+                $order->get_currency()
+            );
+
+            $order->add_order_note($this->build_refund_note($amount_in_cents, $reason));
+            self::log(sprintf('UPC refund complete for order #%s.', $order_id));
+
+            return true;
+        } catch (RefundAmountException $e) {
+            self::log(sprintf('UPC refund rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } catch (InvalidRefundRequestException $e) {
+            self::log(sprintf('UPC refund rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } catch (PaymentNotFoundException $e) {
+            self::log(sprintf('UPC refund rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } catch (ApiException $e) {
+            self::log(sprintf('UPC refund failed for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } catch (PayplugException $e) {
+            // Catch-all for every other UPC exception, mirroring process_payment()'s own
+            // discipline against letting an internal API message escape to the BO user.
+            self::log(sprintf('UPC refund failed for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } finally {
+            $lock->release($lock_key);
+        }
+
+        return new \WP_Error('process_refund_error', __('The transaction could not be refunded. Please try again.', 'payplug'));
+    }
+
+    /**
+     * Extracted from process_refund() specifically to be testable without a network call - the
+     * try block above can only be exercised end-to-end against a real (or real-looking) Unified
+     * API, which this test suite has no way to reach.
+     */
+    public function build_refund_note(?int $amount_in_cents, string $reason): string
+    {
+        $note = null !== $amount_in_cents
+            ? sprintf(__('Refund: refunded %s', 'payplug'), wc_price(AmountHelper::fromCents($amount_in_cents)))
+            : __('Refund: fully refunded', 'payplug');
+
+        if (!empty($reason)) {
+            $note .= sprintf(' (%s)', esc_html($reason));
+        }
+
+        return $note;
     }
 
     /**
