@@ -18,14 +18,15 @@ var HostedFields = {
 		HostedFields.maybeMount();
 	},
 	bindEvents: function () {
-		jQuery('body').on('payment_method_selected updated_checkout', HostedFields.maybeMount);
-		jQuery('body').on('updated_checkout', HostedFields.manageSavedCards);
+		jQuery('body').on('payment_method_selected', HostedFields.maybeMount);
+		jQuery('body').on('updated_checkout', HostedFields.handleCheckoutUpdated);
 		jQuery('body').on('checkout_error', HostedFields.resetToken);
 
 		// Delegated (not bound directly on the radios): updated_checkout replaces the
 		// payment-methods markup, including these radios, with fresh elements that a
 		// direct .on('change', ...) binding would never reach again.
 		jQuery('body').on('change', '[name=wc-payplug-payment-token]', HostedFields.manageSavedCards);
+		jQuery('body').on('change', '[name=payplug_uhf_card_choice]', HostedFields.manageSavedCards);
 
 		// WooCommerce's own submit handler is bound on the same form; a plain .on('submit')
 		// runs after it, so return false can't cancel the already-dispatched place-order
@@ -52,16 +53,26 @@ var HostedFields = {
 	},
 	isNewCardSelected: function () {
 		var $tokens = jQuery('[name=wc-payplug-payment-token]');
+		var tokenIsNew = !$tokens.length || 'new' === $tokens.filter(':checked').val();
 
-		return !$tokens.length || 'new' === $tokens.filter(':checked').val();
+		var $uhfCards = jQuery('[name=payplug_uhf_card_choice]');
+		var uhfCardIsOther = !$uhfCards.length || 'other' === $uhfCards.filter(':checked').val();
+
+		return tokenIsNew && uhfCardIsOther;
 	},
-	// Mirrors payplug-integrated-payments.js's checkLoaded(): checking the DOM for an
-	// actually-mounted iframe (rather than trusting a boolean flag) means a checkout AJAX
-	// refresh that replaces the containers - country, postcode, shipping method, coupon,
-	// quantity - is detected as "not loaded" and correctly triggers a remount, instead of
-	// leaving the customer with orphaned, unrecoverable iframes.
-	checkLoaded: function () {
-		return jQuery('#hosted-fields-card iframe').length > 0;
+	// WooCommerce's own checkout AJAX refresh (updated_checkout - quantity, coupon,
+	// shipping method, address...) tears down and rebuilds the entire #payment markup
+	// from scratch, including these containers: any previously mounted SDK instance is
+	// bound to DOM nodes that no longer exist. Forgetting it here, unconditionally and
+	// deterministically, is what lets the next maybeMount() call mount fresh into the new
+	// containers - relying on a DOM inspection instead (checking for an existing iframe)
+	// raced against the SDK's own async iframe injection, letting two calls on the same
+	// tick (this event alone used to bind two separate handlers that both called
+	// maybeMount()) both slip through and mount a second, duplicate set of iframes before
+	// the first attempt had actually rendered.
+	handleCheckoutUpdated: function () {
+		HostedFields.props.instance = null;
+		HostedFields.manageSavedCards();
 	},
 	// Cross-origin iframes mounted into a display:none container don't render. The real
 	// mount is therefore deferred until the method is both selected and its container is
@@ -71,7 +82,14 @@ var HostedFields = {
 			return;
 		}
 
-		if (HostedFields.checkLoaded()) {
+		// Checked synchronously, the instant a mount is decided (below) - not inferred
+		// from whether the SDK's iframe has actually rendered yet (asynchronous), which
+		// would otherwise let a second maybeMount() call - a rapid radio switch, or two
+		// event handlers firing on the same tick - slip through and mount a duplicate set
+		// of iframes before the first one appears. handleCheckoutUpdated() is the only
+		// place this is ever reset back to null, once WooCommerce has genuinely replaced
+		// the containers this instance was mounted into.
+		if (HostedFields.props.instance) {
 			return;
 		}
 
@@ -125,6 +143,9 @@ var HostedFields = {
 		HostedFields.props.submitting = false;
 		jQuery('#hf-token').val('');
 		jQuery('#hf-selected-brand').val('');
+		jQuery('#hf-last4').val('');
+		jQuery('#hf-expiration-month').val('');
+		jQuery('#hf-expiration-year').val('');
 	},
 	tokenize: function () {
 		HostedFields.hideErrors();
@@ -149,6 +170,20 @@ var HostedFields = {
 
 			jQuery('#hf-token').val(result.hfToken);
 			jQuery('#hf-selected-brand').val(selectedBrand);
+
+			// Best-effort fallback metadata for the "save card" flow - server-side persistence
+			// (Upc\PaymentCaptureOutcomeApplier::maybe_persist_uhf_card()) falls back to these
+			// only when its own post-payment metadata fetch fails. CAVEAT (PRE-3638): result.last4/
+			// expirationMonth/expirationYear are this SDK's best-known field names, unconfirmed
+			// against a real createToken() response - guarded by `|| ''` below so a wrong guess
+			// degrades to an empty fallback rather than crashing, but combined with a failed
+			// server-side fetch this is a card that silently never saves. Confirm/correct these
+			// against the browser console on a real staging tokenization before relying on them.
+			if (jQuery('[name=savecard]').is(':checked')) {
+				jQuery('#hf-last4').val(result.last4 || '');
+				jQuery('#hf-expiration-month').val(result.expirationMonth || '');
+				jQuery('#hf-expiration-year').val(result.expirationYear || '');
+			}
 
 			// The order isn't created yet at this point (tokenization happens before the
 			// real checkout POST), so there is no payment to create from this token here -

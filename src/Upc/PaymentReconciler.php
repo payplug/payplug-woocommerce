@@ -139,6 +139,11 @@ class PaymentReconciler
             ));
 
             (new WooCommerceOrderStateMutator())->apply((string) $order->get_id(), $outcome);
+
+            if (PaymentOutcome::PAID === $outcome) {
+                $this->maybe_persist_uhf_card($order, $operation_id);
+            }
+
             $payment_repository->markTreated($operation_id);
         } catch (InvalidOperationDataException $e) {
             (new WooCommerceLogger())->error(sprintf(
@@ -156,5 +161,41 @@ class PaymentReconciler
         } finally {
             $lock->release($lock_key);
         }
+    }
+
+    /**
+     * Closes the gap this class would otherwise leave in Front\UpcWebhook::maybe_persist_uhf_card():
+     * without this, a reconciliation that wins the race against the webhook (marks the operation
+     * treated first) would silently drop the shopper's save-card intent forever, since the
+     * webhook's own isTreated() guard then skips its own card-persistence call entirely once it
+     * does arrive. getPayment()'s response body (used above for the outcome/amount check) is not
+     * confirmed to carry the same paymentMethod.{id, card, details} shape the webhook and
+     * getOperation() both do (per the UHF spec: "la réponse de l'endpoint public d'opération a la
+     * même forme que la notification") - so this fetches the operation resource specifically,
+     * mirroring PaymentCaptureOutcomeApplier's own best-effort card-metadata fetch. Never fails
+     * the reconciliation itself: a fetch failure here only means the card isn't saved this time,
+     * with the webhook remaining a second chance if it eventually arrives.
+     */
+    private function maybe_persist_uhf_card(\WC_Order $order, string $operation_id): void
+    {
+        try {
+            $response = (new UnifiedApiPaymentServiceFactory())->create()->getOperation($operation_id);
+        } catch (PayplugException $e) {
+            (new WooCommerceLogger())->error(sprintf(
+                'UPC reconciliation: card metadata fetch failed for order #%s: %s',
+                $order->get_id(),
+                $e->getMessage()
+            ));
+
+            return;
+        }
+
+        $decoded = json_decode($response['body'], true);
+
+        if (!is_array($decoded)) {
+            return;
+        }
+
+        (new UhfCardFromOperationPersister())->maybe_persist($order, $decoded);
     }
 }
