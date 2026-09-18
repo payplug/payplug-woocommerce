@@ -102,6 +102,18 @@ class PayplugCreditCard extends PayplugGenericBlock
                 // the order exists.
                 $data['hostedFieldsTokenizationError'] = __('payplug_hosted_fields_tokenization_error', 'payplug');
                 $data['hostedFieldsUnsupportedBrandError'] = __('payplug_hosted_fields_unsupported_brand_error', 'payplug');
+                $data['hostedFieldsPayWithAnotherCard'] = __('payplug_hosted_fields_pay_with_another_card', 'payplug');
+                $data['uhfCards'] = (is_user_logged_in() && !empty($this->gateway->save_card))
+                    ? array_map(static function ($card) {
+                        return [
+                            'id' => (int) $card->id,
+                            'brand' => (string) $card->brand,
+                            'last4' => (string) $card->last4,
+                            'exp_month' => (int) $card->exp_month,
+                            'exp_year' => (int) $card->exp_year,
+                        ];
+                    }, \Payplug\PayplugWoocommerce\Model\UhfCard::get_customer_cards(get_current_user_id(), $this->gateway->mode))
+                    : [];
                 // The transaction-secured/privacy-policy footer is visually identical to
                 // Integrated Payment's, so it reuses the same settings keys and assets.
                 $data['logo'] = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/logo-payplug.png';

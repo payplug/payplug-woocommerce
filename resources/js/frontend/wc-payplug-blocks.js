@@ -68,7 +68,11 @@ const Payplug = {
 	supports: {
 		features: settings.supports,
 		showSaveOption: settings?.showSaveOption && (settings?.IP || settings?.hostedFields),
-		showSavedCards: settings.showSaveOption ?? false
+		// The native dropdown is WC_Payment_Token-shaped (like classic checkout's own
+		// saved_payment_methods()) - a UHF alias is never a WC_Payment_Token, so it would show
+		// nothing useful for hostedFields. HostedFields itself renders its own saved-card list
+		// instead, fed by settings.uhfCards (see wc-payplug-hostedFields-blocks.js).
+		showSavedCards: (settings.showSaveOption ?? false) && !settings?.hostedFields
 	},
 };
 
