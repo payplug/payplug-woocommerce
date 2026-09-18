@@ -2,6 +2,8 @@
 
 namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc;
 
+use Payplug\PayplugWoocommerce\Model\UhfCard;
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\PaymentCaptureOutcomeApplier;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
@@ -23,6 +25,10 @@ class PaymentCaptureOutcomeApplier_test extends TestCase
 
     protected function tearDown(): void
     {
+        if (UhfCard::check_table_exists()) {
+            global $wpdb;
+            $wpdb->query('TRUNCATE TABLE ' . $wpdb->base_prefix . 'woocommerce_payplug_uhf_cards');
+        }
         delete_transient('payplug_upc_redirect_html_' . $this->order->get_id());
         wp_delete_post($this->order->get_id(), true);
         parent::tearDown();
@@ -234,5 +240,70 @@ class PaymentCaptureOutcomeApplier_test extends TestCase
 
         $this->assertSame('success', $result['result']);
         $this->assertSame('processing', $this->reload()->get_status());
+    }
+
+    public function testDirectSuccessWithSaveCardPersistsTheAliasUsingFallbackData(): void
+    {
+        $this->order->set_customer_id(1);
+        $this->order->save();
+
+        $output = new PaymentOutput(200, '{"id":"op_alias_1","execCode":"0000"}', null, null, 'alias_new_1');
+
+        (new PaymentCaptureOutcomeApplier())->apply($this->order, $output, true, [
+            'brand' => 'VISA',
+            'last4' => '4242',
+            'exp_month' => 12,
+            'exp_year' => 2099,
+        ]);
+
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+        $card = UhfCard::find_by_alias('alias_new_1', $mode);
+
+        $this->assertNotNull($card);
+        $this->assertSame('VISA', $card->brand);
+    }
+
+    public function testDirectSuccessWithoutSaveCardDoesNotPersistAnAlias(): void
+    {
+        $this->order->set_customer_id(1);
+        $this->order->save();
+
+        $output = new PaymentOutput(200, '{"id":"op_alias_2","execCode":"0000"}', null, null, 'alias_new_2');
+
+        (new PaymentCaptureOutcomeApplier())->apply($this->order, $output, false, []);
+
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+        $this->assertNull(UhfCard::find_by_alias('alias_new_2', $mode));
+    }
+
+    public function testDirectFailureNeverPersistsAnAliasEvenIfOneWasReturned(): void
+    {
+        $this->order->set_customer_id(1);
+        $this->order->save();
+
+        $output = new PaymentOutput(200, '{"id":"op_alias_3","execCode":"9999"}', null, null, 'alias_new_3');
+
+        (new PaymentCaptureOutcomeApplier())->apply($this->order, $output, true, [
+            'brand' => 'VISA',
+            'last4' => '4242',
+            'exp_month' => 12,
+            'exp_year' => 2099,
+        ]);
+
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+        $this->assertNull(UhfCard::find_by_alias('alias_new_3', $mode));
+    }
+
+    public function testSaveCardIntentIsPersistedAsOrderMetaAndClearedOnARetryWithoutIt(): void
+    {
+        $output = new PaymentOutput(200, '{"id":"op_intent_1","execCode":"0000"}', null, null, null);
+        (new PaymentCaptureOutcomeApplier())->apply($this->order, $output, true);
+
+        $this->assertSame('1', $this->reload()->get_meta('_payplug_uhf_save_card'));
+
+        $second_output = new PaymentOutput(200, '{"id":"op_intent_2","execCode":"0000"}', null, null, null);
+        (new PaymentCaptureOutcomeApplier())->apply($this->reload(), $second_output, false);
+
+        $this->assertSame('', $this->reload()->get_meta('_payplug_uhf_save_card'));
     }
 }
