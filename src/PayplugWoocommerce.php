@@ -140,6 +140,7 @@ class PayplugWoocommerce
         new Front\ApplePay();
         new Front\HostedFields();
         new Front\UpcWebhook();
+        new Front\UhfSavedCards();
         add_action('woocommerce_api_payplug_upc_3ds', [$this, 'render_upc_3ds_redirect']);
         add_action('template_redirect', [$this, 'maybe_notice_upc_cancelled']);
         add_action('woocommerce_thankyou', [$this, 'maybe_reconcile_pending_upc_payment']);

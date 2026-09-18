@@ -7,6 +7,7 @@ use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLogger;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOrderStateMutator;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommercePaymentRepository;
+use Payplug\PayplugWoocommerce\Upc\UhfCardFromOperationPersister;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PayplugUnifiedCore\Exceptions\InvalidNotificationException;
@@ -247,6 +248,11 @@ class UpcWebhook
                 $operation_data->orderId
             ));
             (new WooCommerceOrderStateMutator())->apply($operation_data->orderId, $operation_data->outcome);
+
+            if (PaymentOutcome::PAID === $operation_data->outcome) {
+                $this->maybe_persist_uhf_card($order, $raw_body);
+            }
+
             $payment_repository->markTreated($operation_data->operationId);
 
             return 200;
@@ -267,6 +273,25 @@ class UpcWebhook
         } finally {
             $lock->release($lock_key);
         }
+    }
+
+    /**
+     * One of two places a 3DS-confirmed payment's card can be saved - the other is
+     * PaymentReconciler, whose own getOperation() fetch can win the race against this webhook
+     * and mark the operation treated first, in which case this method's caller never even
+     * reaches this call (see the isTreated() guard above). No extra API call is made here: the
+     * webhook's own raw body is already the same paymentMethod.{id, card, details} shape
+     * UhfCardFromOperationPersister expects.
+     */
+    private function maybe_persist_uhf_card(\WC_Order $order, string $raw_body): void
+    {
+        $decoded = json_decode($raw_body, true);
+
+        if (!is_array($decoded)) {
+            return;
+        }
+
+        (new UhfCardFromOperationPersister())->maybe_persist($order, $decoded);
     }
 
     /**
