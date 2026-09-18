@@ -2,12 +2,41 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway;
 
+use Payplug\PayplugWoocommerce\Controller\HostedFields;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
+use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
+use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOrderStateMutator;
+use Payplug\PayplugWoocommerce\Upc\AliasPaymentContextBuilder;
+use Payplug\PayplugWoocommerce\Upc\PaymentCaptureContextBuilder;
+use Payplug\PayplugWoocommerce\Upc\PaymentCaptureOutcomeApplier;
+use Payplug\PayplugWoocommerce\Upc\UnifiedApiPaymentServiceFactory;
+use PayplugUnifiedCore\Exceptions\ApiException;
+use PayplugUnifiedCore\Exceptions\InvalidHostedFieldException;
+use PayplugUnifiedCore\Exceptions\InvalidPaymentException;
+use PayplugUnifiedCore\Exceptions\PayplugException;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
 class PayplugCreditCard extends PayplugGateway
 {
+    /**
+     * Comfortably above the OAuth token fetch + payment-creation call's own combined worst case
+     * (10s timeout each, see Upc\Adapters\WpOAuthHttpClient/WpUnifiedApiHttpClient) - long enough
+     * to span one real attempt, short enough that a crashed request never locks an order out for
+     * long.
+     */
+    private const PROCESS_PAYMENT_LOCK_TTL_SECONDS = 30;
+
     public $save_card = false;
+
+    /**
+     * Whether the hosted_fields mode can actually render a working card form: both
+     * HOSTED_FIELDS_SDK_URL and the account's company_ref (from GET /account) must be
+     * available, or the SDK is given an empty src/companyId and silently renders nothing
+     * (see hosted_fields_scripts() and payment_fields()).
+     */
+    public bool $hosted_fields_available = true;
 
     public function __construct()
     {
@@ -23,6 +52,32 @@ class PayplugCreditCard extends PayplugGateway
         $this->description = $this->get_configuration()->get_option('payment_methods.configuration.payplug.description');
         $this->save_card = $this->get_configuration()->get_option('payment_methods.configuration.payplug.save_card') && is_user_logged_in();
         $this->embedded_mode = $this->get_configuration()->get_option('payment_methods.configuration.payplug.embedded_mode');
+
+        // A shop's stored mode can predate its current currency (e.g. it was 'popup'
+        // before switching to a non-EUR currency, or vice versa) - satisfy_requirements()
+        // no longer blocks the whole gateway on currency, so a stale mode would otherwise
+        // reach checkout and render the wrong flow for the current currency. Mirrors the
+        // BO-display normalization in PaymentMethods::payment_method_standard(); this
+        // doesn't persist anything, the stored value is only corrected once the merchant
+        // saves the BO settings again.
+        $is_eur_shop = PayplugWoocommerceHelper::is_eur_shop();
+        if ($is_eur_shop && !in_array($this->embedded_mode, ['redirect', 'popup', 'integrated'], true)) {
+            $this->embedded_mode = 'redirect';
+        } elseif (!$is_eur_shop && 'hosted_fields' !== $this->embedded_mode) {
+            $this->embedded_mode = 'hosted_fields';
+        }
+
+        if ('hosted_fields' === $this->embedded_mode) {
+            $company_ref = PayplugWoocommerceHelper::get_account_data_from_options()['company_ref'] ?? '';
+            $this->hosted_fields_available = !empty($company_ref) && !empty(HOSTED_FIELDS_SDK_URL);
+
+            if (!$this->hosted_fields_available) {
+                PayplugGateway::log(sprintf(
+                    'Hosted Fields form not rendered: %s.',
+                    empty($company_ref) ? 'company_ref is empty (GET /account failed?)' : 'HOSTED_FIELDS_SDK_URL is not configured'
+                ), 'error');
+            }
+        }
 
         $this->supports = [
             'products',
@@ -52,7 +107,7 @@ class PayplugCreditCard extends PayplugGateway
         }
 
         //add fields of IP to the description
-        if ('integrated' == $this->embedded_mode) {
+        if ('integrated' == $this->embedded_mode || 'hosted_fields' == $this->embedded_mode) {
             $this->has_fields = true;
         }
 
@@ -67,6 +122,160 @@ class PayplugCreditCard extends PayplugGateway
                 2
             );
         }
+    }
+
+    /**
+     * @param int $order_id
+     *
+     * @return array
+     */
+    public function process_payment($order_id)
+    {
+        if ('hosted_fields' !== $this->embedded_mode) {
+            return parent::process_payment($order_id);
+        }
+
+        $order = wc_get_order($order_id);
+
+        if (!$order instanceof \WC_Order) {
+            self::log(sprintf('Order #%s not found.', $order_id), 'error');
+            wc_add_notice(__('Order not found.', 'payplug'), 'error');
+
+            return ['result' => 'failure'];
+        }
+
+        // An order that already succeeded (payment_complete()'d) or was refunded must never get a
+        // second payment created against it - a double-click, or a resubmit after a slow-but-
+        // successful first response, would otherwise charge the customer twice. A pending/on-hold/
+        // failed order is deliberately NOT short-circuited here: telling "the same attempt,
+        // resubmitted" apart from "a genuinely new attempt with a fresh hf_token" isn't possible
+        // from this side alone without either an idempotency key the Unified API may not expose,
+        // or resolving the prior operation and guessing whether the shopper meant to retry it -
+        // both risk misapplying an outcome more than the rarer double-charge this guards against.
+        if (WooCommerceOrderStateMutator::isTerminal($order->get_status())) {
+            return ['result' => 'success', 'redirect' => $order->get_checkout_order_received_url()];
+        }
+
+        // Same range check every other Payplug payment path runs (PayplugGateway::process_payment()
+        // for popup/integrated, ApplePay, Oney3x) before ever calling the API. Deliberately after
+        // the terminal-status short-circuit above: an order that already succeeded must still
+        // redirect to the order-received page even if its amount would fail this check today
+        // (e.g. the account's thresholds were tightened after the order was paid).
+        $validated_amount = $this->validate_order_amount(AmountHelper::toCents((float) $order->get_total()));
+
+        if (is_wp_error($validated_amount)) {
+            self::log(sprintf('Invalid amount %s for order #%s.', $order->get_total(), $order_id), 'error');
+            wc_add_notice($validated_amount->get_error_message(), 'error');
+
+            return ['result' => 'failure'];
+        }
+
+        $uhf_card_choice = isset($_POST['payplug_uhf_card_choice']) ? sanitize_text_field(wp_unslash($_POST['payplug_uhf_card_choice'])) : '';
+        // The BO flag is re-checked here (not just relied on to keep the choice off the page in
+        // the first place): a posted card choice with the flag off falls through to requiring
+        // hf_token below, exactly like no choice was ever posted - defense in depth against a
+        // forged POST.
+        $use_alias = $this->save_card && '' !== $uhf_card_choice && 'other' !== $uhf_card_choice;
+
+        $hf_token = isset($_POST['hf_token']) ? sanitize_text_field(wp_unslash($_POST['hf_token'])) : '';
+
+        if (!$use_alias && '' === $hf_token) {
+            wc_add_notice(__('payplug_hosted_fields_missing_token', 'payplug'), 'error');
+
+            return ['result' => 'failure'];
+        }
+
+        $selected_brand = isset($_POST['hf_selected_brand']) ? sanitize_text_field(wp_unslash($_POST['hf_selected_brand'])) : '';
+        $save_card = !empty($_POST['savecard']);
+        $card_fallback = [
+            'brand' => $selected_brand,
+            'last4' => isset($_POST['hf_last4']) ? sanitize_text_field(wp_unslash($_POST['hf_last4'])) : '',
+            'exp_month' => isset($_POST['hf_expiration_month']) ? (int) $_POST['hf_expiration_month'] : 0,
+            'exp_year' => isset($_POST['hf_expiration_year']) ? (int) $_POST['hf_expiration_year'] : 0,
+        ];
+
+        // Guards only the truly unambiguous half of the double-payment risk: two requests for the
+        // *same* order genuinely in flight at once (a double-click, or two tabs) are always the
+        // same attempt - never a legitimate new one - so it's always correct to make the second
+        // wait rather than create a second payment. A *sequential* retry (this order's previous
+        // attempt already finished, successfully or not, before this request started) is
+        // deliberately left alone - see the comment on the terminal-status short-circuit above for
+        // why that case isn't resolved here.
+        $lock = new WooCommerceLock();
+        $lock_key = 'payplug_upc_process_payment_' . $order_id;
+
+        if (!$lock->acquire($lock_key, self::PROCESS_PAYMENT_LOCK_TTL_SECONDS)) {
+            wc_add_notice(__('payplug_hosted_fields_tokenization_error', 'payplug'), 'error');
+
+            return ['result' => 'failure'];
+        }
+
+        // Re-read and re-check now that the lock is actually held: the status read above happened
+        // before acquire(), so a request that was preempted for as long as another one's entire
+        // API round trip could otherwise still build and send a second payment against an order
+        // that has, by now, already succeeded.
+        $order = wc_get_order($order_id);
+
+        if (!$order instanceof \WC_Order) {
+            self::log(sprintf('Order #%s not found.', $order_id), 'error');
+            wc_add_notice(__('Order not found.', 'payplug'), 'error');
+            $lock->release($lock_key);
+
+            return ['result' => 'failure'];
+        }
+
+        if (WooCommerceOrderStateMutator::isTerminal($order->get_status())) {
+            $lock->release($lock_key);
+
+            return ['result' => 'success', 'redirect' => $order->get_checkout_order_received_url()];
+        }
+
+        try {
+            if ($use_alias) {
+                $card = UhfCard::find_for_customer((int) $uhf_card_choice, get_current_user_id(), $this->mode);
+
+                if (null === $card) {
+                    wc_add_notice(__('payplug_hosted_fields_tokenization_error', 'payplug'), 'error');
+
+                    return ['result' => 'failure'];
+                }
+
+                $dto = (new AliasPaymentContextBuilder())->build($order, $card->alias_id);
+                $output = (new UnifiedApiPaymentServiceFactory())->create()->createPayment($dto);
+
+                // A one-click payment never creates a NEW alias (it pays with one that already
+                // exists), so save_card is always false here regardless of whatever the client
+                // posted - PaymentCaptureOutcomeApplier's own alias-persistence branch is then
+                // correctly a no-op for this request.
+                return (new PaymentCaptureOutcomeApplier())->apply($order, $output);
+            }
+
+            $dto = (new PaymentCaptureContextBuilder())->build($order, $hf_token, $selected_brand, $save_card);
+            $output = (new UnifiedApiPaymentServiceFactory())->create()->createPayment($dto);
+
+            return (new PaymentCaptureOutcomeApplier())->apply($order, $output, $save_card, $card_fallback);
+        } catch (ApiException $e) {
+            self::log(sprintf('UPC payment creation failed for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } catch (InvalidHostedFieldException $e) {
+            self::log(sprintf('UPC payment creation rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } catch (InvalidPaymentException $e) {
+            self::log(sprintf('UPC payment creation rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } catch (PayplugException $e) {
+            // Catch-all for every other UPC exception (InvalidCommonFieldsException from a
+            // misconfigured/empty account id, InvalidPhoneNumberException, ...) - all of them
+            // share PayplugException as their base. Without this, one of their messages (internal,
+            // not written for a shopper) would escape to WC_Checkout::process_checkout()'s generic
+            // \Exception handler and get shown verbatim as a checkout error notice.
+            self::log(sprintf('UPC payment creation rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } catch (\LogicException $e) {
+            self::log(sprintf('UPC payment creation misconfigured for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } finally {
+            $lock->release($lock_key);
+        }
+
+        wc_add_notice(__('payplug_hosted_fields_tokenization_error', 'payplug'), 'error');
+
+        return ['result' => 'failure'];
     }
 
     /**
@@ -147,6 +356,10 @@ class PayplugCreditCard extends PayplugGateway
         if (('popup' == $this->embedded_mode) && ('payplug' == $this->id || 'american_express' == $this->id) && !PayplugWoocommerceHelper::is_checkout_block()) {
             $this->popup_payments_scripts();
         }
+
+        if ('hosted_fields' == $this->embedded_mode && (!PayplugWoocommerceHelper::is_checkout_block() || is_wc_endpoint_url('order-pay'))) {
+            $this->hosted_fields_scripts();
+        }
     }
 
     /**
@@ -215,6 +428,55 @@ class PayplugCreditCard extends PayplugGateway
     }
 
     /**
+     * Hosted Fields payment form scripts.
+     *
+     * Register scripts and additional data needed for the
+     * hosted fields payment form.
+     */
+    public function hosted_fields_scripts(): void
+    {
+        // An empty HOSTED_FIELDS_SDK_URL registers a script with no src (prints nothing,
+        // window.dalenys stays undefined) and an empty companyId renders a card form the
+        // SDK will never fill in - both silently, with no console error. Bail instead of
+        // enqueueing a form that can never work; payment_fields() uses the same
+        // hosted_fields_available flag (computed once in the constructor) to skip
+        // rendering the template altogether.
+        if (!$this->hosted_fields_available) {
+            return;
+        }
+
+        // The Dalenys SDK's companyId must be the account's UUID company_ref (from
+        // GET /account, mirroring the Sylius PayPlug plugin) - not the merchant-entered
+        // Account ID (hosted_fields.identifier), which is a different value reserved for
+        // a future server-side payment-capture call.
+        $account = PayplugWoocommerceHelper::get_account_data_from_options();
+
+        // ajax_url/nonce for wc_ajax_payplug_hosted_fields_token were dropped here: the
+        // client no longer round-trips the token through that endpoint before submitting
+        // (see payplug-hosted-fields.js's tokenize()) - process_payment() reads hf_token
+        // straight from the real checkout POST once the order exists.
+        $translations = [
+            'company_id' => $account['company_ref'] ?? '',
+        ];
+
+        wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+
+        wp_register_script('payplug-hosted-fields-sdk', HOSTED_FIELDS_SDK_URL, [], null, true);
+        wp_enqueue_script('payplug-hosted-fields-sdk');
+
+        // jquery-bind-first isn't guaranteed registered by the other embedded modes
+        // (hosted_fields and integrated are mutually exclusive), so it's registered here
+        // too rather than assumed - same handle/asset integrated_payments_scripts() uses.
+        wp_register_script('jquery-bind-first', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/jquery.bind-first-0.2.3.min.js', ['jquery'], '1.0.0', true);
+        wp_enqueue_script('jquery-bind-first');
+
+        wp_register_script('payplug-hosted-fields', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-hosted-fields.js', ['jquery', 'jquery-bind-first', 'payplug-hosted-fields-sdk'], PAYPLUG_GATEWAY_VERSION, true);
+        wp_enqueue_script('payplug-hosted-fields');
+
+        wp_localize_script('payplug-hosted-fields', 'payplug_hosted_fields_params', $translations);
+    }
+
+    /**
      * extra payment fields
      */
     public function payment_fields(): void
@@ -229,7 +491,18 @@ class PayplugCreditCard extends PayplugGateway
             echo IntegratedPayment::template_form($this->save_card);
         }
 
-        if ($this->save_card_available()) {
+        // Deliberately elseif, not two independent ifs: a UHF alias is never a WC_Payment_Token
+        // (see Controller/HostedFields.php), so WooCommerce's native saved_payment_methods()
+        // list would show the merchant's Retail-tokenized cards even though hosted_fields mode
+        // can never charge them - worse than not showing them at all. A merchant switching to
+        // hosted_fields therefore does lose the Retail card list from checkout with no
+        // migration; that's the intended trade-off, not an oversight.
+        if ('hosted_fields' == $this->embedded_mode && $this->hosted_fields_available) {
+            $cards = ($this->save_card && is_user_logged_in())
+                ? UhfCard::get_customer_cards(get_current_user_id(), $this->mode)
+                : [];
+            echo HostedFields::template_form($this->save_card, $cards);
+        } elseif ($this->save_card_available()) {
             $this->tokenization_script();
             $this->saved_payment_methods();
         }
