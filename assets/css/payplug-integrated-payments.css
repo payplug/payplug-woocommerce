@@ -319,3 +319,243 @@
 	}
 }
 
+/*
+ * Hosted Fields - reuses the Integrated Payment visual language above (same approach
+ * as the Payplug Magento module, which shares its Integrated Payment CSS with Hosted
+ * Fields rather than defining a separate style for it).
+ */
+.HostedFields.-loaded {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	width: 100%;
+	max-width: 400px;
+	margin-top: 20px;
+	position: relative;
+}
+/* The generic .-hide { display: none } rule (above) has lower specificity (one class)
+   than .HostedFields.-loaded (two classes) - toggling "-hide" on the same element via
+   assets/js/payplug-hosted-fields.js's manageSavedCards() would otherwise have no visual
+   effect at all, since .HostedFields.-loaded's own display:flex wins the cascade
+   regardless of source order. This explicit three-class override restores the intended
+   behavior: hide the whole "new card" form when a saved card is selected. */
+.HostedFields.-loaded.-hide {
+	display: none;
+}
+.HostedFields_container {
+	display: flex;
+	padding: 0;
+	margin: 0 0 10px;
+	width: 100%;
+}
+.HostedFields_container.-card, .HostedFields_container.-expiry, .HostedFields_container.-cryptogram {
+	position: relative;
+	height: 40px;
+	line-height: 40px;
+	border-radius: 2px;
+	padding: 0 16px 0 50px;
+	cursor: text;
+	border: solid 1px #d5d6d8;
+}
+.HostedFields_container.-card:before, .HostedFields_container.-expiry:before, .HostedFields_container.-cryptogram:before {
+	content: "";
+	position: absolute;
+	top: 20%;
+	left: 16px;
+	width: 24px;
+	height: 24px;
+	background: #95999e 50% no-repeat;
+	background-size: 100% auto;
+}
+.HostedFields_container.-card:before {
+	-webkit-mask-image: url(../images/integrated/card.svg);
+	mask-image: url(../images/integrated/card.svg);
+}
+.HostedFields_container.-expiry:before {
+	mask-image: url(../images/integrated/calendar.svg);
+	-webkit-mask-image: url(../images/integrated/calendar.svg);
+}
+.HostedFields_container.-cryptogram:before {
+	mask-image: url(../images/integrated/lock.svg);
+	-webkit-mask-image: url(../images/integrated/lock.svg);
+}
+.HostedFields_container.-expiry, .HostedFields_container.-cryptogram {
+	max-width: calc(50% - 2px);
+	display: inline-block;
+}
+/* The brand indicator sits in its own row above the card field, in the same spot and
+   with the same visual weight as Integrated Payment's -scheme selector row. Unlike
+   -scheme (static CSS background-image icons, always visible), -brand is a real
+   cross-origin SDK iframe: while it has no content to draw (its "empty state", before
+   the SDK detects/needs a brand choice), an unbordered/backgroundless container is a
+   fully transparent box on the page's white background - effectively invisible, unlike
+   -card/-expiry/-cryptogram below which stay visible via their own border even when
+   empty. This border/padding gives -brand the same always-visible box treatment.  */
+.HostedFields_container.-brand {
+	height: 30px;
+	margin: 10px 0;
+	border: solid 1px #d5d6d8;
+	border-radius: 2px;
+	padding: 0 8px;
+}
+/* The Blocks/React component (resources/js/frontend/wc-payplug-hostedFields-blocks.js)
+   hides these 4 containers individually via the "hidden" attribute rather than the
+   "-hide" class classic checkout uses on the whole form - the browser's own [hidden]
+   UA-stylesheet rule (display:none) has the same specificity as .HostedFields_container's
+   own display:flex/inline-block above, but author styles always win a same-specificity
+   tie against user-agent styles, so [hidden] alone has no visual effect here without this
+   explicit, higher-specificity override. */
+.HostedFields_container.-brand[hidden],
+.HostedFields_container.-card[hidden],
+.HostedFields_container.-expiry[hidden],
+.HostedFields_container.-cryptogram[hidden] {
+	display: none;
+}
+.HostedFields_container.-saveCard {
+	display: flex;
+	height: auto;
+	align-items: center;
+	padding: 10px 0 0;
+}
+.HostedFields_container.-saveCard label {
+	margin: 0;
+	cursor: pointer;
+	font-size: 12px;
+	color: #918f8f;
+}
+.HostedFields_container.-saveCard label span {
+	border: 1px solid #d5d6d8;
+	border-radius: 2px;
+	cursor: pointer;
+	display: inline-block;
+	height: 16px;
+	margin: 0 10px -3px 0;
+	position: relative;
+	transition: border .4s;
+	width: 16px;
+}
+.HostedFields_container.-saveCard label span:before {
+	border: 2.5px solid #2b343d;
+	border-radius: 1px;
+	border-right: none;
+	border-top: none;
+	content: "";
+	display: block;
+	height: 3px;
+	left: 50%;
+	opacity: 0;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%,-55%) rotate(-48deg);
+	transition: opacity .4s;
+	width: 9px;
+}
+.HostedFields_container.-saveCard label input {
+	display: none;
+}
+.HostedFields_container.-saveCard label:hover span {
+	border-color: #2b343d;
+}
+.HostedFields_container.-saveCard label:hover {
+	color: #2b343d;
+}
+.HostedFields_container.-saveCard label input:checked + span:before {
+	opacity: 1;
+}
+/* A sibling block, rendered before the "new card" form - not one of the
+   .HostedFields_container.-X variants, since it lives outside <form class="HostedFields">
+   entirely (see Controller/HostedFields.php). Same max-width as .HostedFields.-loaded so
+   both blocks line up visually as one column. */
+.HostedFields_savedCards {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-width: 400px;
+	margin: 20px 0 0;
+}
+.HostedFields_savedCard {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	font-size: 12px;
+	color: #918f8f;
+	padding: 10px 0;
+	margin: 0;
+	border-bottom: solid 1px #eceded;
+}
+.HostedFields_savedCard:last-child {
+	border-bottom: none;
+}
+.HostedFields_savedCard span {
+	border: 1px solid #d5d6d8;
+	border-radius: 50%;
+	cursor: pointer;
+	display: inline-block;
+	height: 16px;
+	width: 16px;
+	margin: 0 10px 0 0;
+	position: relative;
+	flex-shrink: 0;
+	transition: border .4s;
+}
+.HostedFields_savedCard span:before {
+	background: #2b343d;
+	border-radius: 50%;
+	content: "";
+	display: block;
+	height: 8px;
+	width: 8px;
+	left: 50%;
+	top: 50%;
+	opacity: 0;
+	position: absolute;
+	transform: translate(-50%,-50%);
+	transition: opacity .4s;
+}
+/* Visually hidden rather than display:none (unlike the pre-existing .-saveCard/-scheme
+   checkbox/radio patterns elsewhere in this file, which this one would otherwise just be
+   following): display:none removes an input from both the tab order and the accessibility
+   tree, so a keyboard user or screen reader could never select a saved card at all. This clip
+   pattern keeps it focusable and announced while the custom <span> next to it stays the only
+   visible indicator - the label wrapping both still toggles it on click exactly as before. */
+.HostedFields_savedCard input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+}
+.HostedFields_savedCard:hover span, .HostedFields_savedCard input:checked + span {
+	border-color: #2b343d;
+}
+.HostedFields_savedCard:hover {
+	color: #2b343d;
+}
+.HostedFields_savedCard input:checked + span:before {
+	opacity: 1;
+}
+.HostedFields_error {
+	color: #E91932;
+	font-size: 12px;
+	margin: -10px 0 10px;
+	width: 100%;
+	line-height: 18px;
+	padding-left: 4px;
+}
+.HostedFields_error.-tokenization {
+	background: rgba(233,25,50,0.08);
+	color: #e91932;
+	text-align: center;
+	width: 100%;
+	line-height: 18px;
+	align-items: center;
+	justify-content: center;
+	margin: 10px 0 0;
+	padding: 4px 0;
+}
+.HostedFields_error.-tokenization:not(.-hide) {
+	display: flex;
+}
+

@@ -13,4 +13,5 @@ if (get_option('woocommerce_payplug_settings')) {
     delete_site_option($option_name);
 
     \Payplug\PayplugWoocommerce\Model\Lock::delete_lock_table();
+    \Payplug\PayplugWoocommerce\Model\UhfCard::delete_table();
 }
