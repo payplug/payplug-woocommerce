@@ -33,7 +33,45 @@ class PayplugCreditCard_test extends TestCase
         }
         delete_option('woocommerce_payplug_settings');
         delete_option('woocommerce_currency');
+        remove_all_filters('pre_http_request');
+        // WooCommerceConfigurationRepository::getClientId() returns '' in every test here (no
+        // oauth_client_data option set), so every stubbed OAuth exchange below mints and caches
+        // a token under the same transient key - clear it, or a later test that expects a real
+        // network failure would instead silently reuse a token this class minted earlier.
+        delete_transient('upc_token_upc_oauth_token:');
         parent::tearDown();
+    }
+
+    /**
+     * Stubs both legs a UPC refund call makes: the OAuth2 token exchange (always a canned
+     * success - its own behavior isn't what these tests are about) and the refund endpoint
+     * itself, distinguished by URL. $captured_refund_request, if given, receives
+     * ['url' => ..., 'body' => <decoded JSON body>] from the refund call specifically, or stays
+     * null if the refund endpoint is never actually reached (e.g. a pre-flight guard rejected
+     * first).
+     */
+    private function stub_upc_http_requests(array $refund_response, ?array &$captured_refund_request = null): void
+    {
+        $captured_refund_request = null;
+
+        add_filter('pre_http_request', function ($preempt, $args, $url) use ($refund_response, &$captured_refund_request) {
+            if (false !== strpos($url, '/oauth2/token')) {
+                return [
+                    'response' => ['code' => 200, 'message' => 'OK'],
+                    'body' => json_encode(['access_token' => 'test_token', 'expires_in' => 3600, 'token_type' => 'Bearer']),
+                    'headers' => [],
+                    'cookies' => [],
+                ];
+            }
+
+            if (false !== strpos($url, '/refund')) {
+                $captured_refund_request = ['url' => $url, 'body' => json_decode($args['body'], true)];
+
+                return $refund_response;
+            }
+
+            return $preempt;
+        }, 10, 3);
     }
 
     public function test_gateway_enabled_when_module_enabled_as_boolean(): void
@@ -370,6 +408,247 @@ class PayplugCreditCard_test extends TestCase
         wc_clear_notices();
         wp_delete_post($order->get_id(), true);
         wp_delete_user($user_id);
+    }
+
+    public function test_process_refund_falls_back_to_retail_api_when_order_has_no_upc_operation_id(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        update_option('woocommerce_payplug_settings', $this->base_settings);
+
+        $order = wc_create_order();
+        $order->set_total(50.00);
+        $order->save();
+
+        $gateway = new PayplugCreditCard();
+        $result = $gateway->process_refund($order->get_id(), 50.00);
+
+        // No _payplug_upc_operation_id meta -> falls back to the inherited Retail API
+        // process_refund(), which fails with this exact message because no api_key/jwt is
+        // configured in this test environment (PayplugGateway::user_logged_in() returns false).
+        // Proves the fallback ran, as distinguished from the UPC path's own generic error below.
+        $this->assertInstanceOf(\WP_Error::class, $result);
+        $this->assertSame('You must be logged in with your PayPlug account.', $result->get_error_message());
+
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_process_refund_returns_error_without_calling_the_api_for_a_non_positive_amount(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] = 'acct_test';
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $order = wc_create_order();
+        $order->set_total(50.00);
+        $order->update_meta_data('_payplug_upc_operation_id', 'op_123');
+        $order->save();
+
+        // 0.00 converts to 0 cents, rejected by UnifiedApiPaymentService::createRefund()'s own
+        // Assert::positive() before any network call is attempted - deterministic without
+        // stubbing pre_http_request, unlike the other UPC-path tests below.
+        $result = (new PayplugCreditCard())->process_refund($order->get_id(), 0.00);
+
+        $this->assertInstanceOf(\WP_Error::class, $result);
+        $this->assertSame('process_refund_error', $result->get_error_code());
+        // Distinguishes a genuine UPC-path rejection from the inherited Retail fallback's own
+        // (differently-worded, but same error code) "must be logged in" message.
+        $this->assertNotSame('You must be logged in with your PayPlug account.', $result->get_error_message());
+
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_process_refund_returns_error_without_calling_the_api_when_account_id_is_not_configured(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        // base_settings never sets hosted_fields.identifier - getPublicKeyId() returns ''.
+        update_option('woocommerce_payplug_settings', $this->base_settings);
+
+        $order = wc_create_order();
+        $order->set_total(50.00);
+        $order->update_meta_data('_payplug_upc_operation_id', 'op_123');
+        $order->save();
+
+        $captured = null;
+        $this->stub_upc_http_requests(['response' => ['code' => 200, 'message' => 'OK'], 'body' => '{"id":"refund_789"}', 'headers' => [], 'cookies' => []], $captured);
+
+        $result = (new PayplugCreditCard())->process_refund($order->get_id(), 50.00);
+
+        $this->assertInstanceOf(\WP_Error::class, $result);
+        $this->assertSame('process_refund_error', $result->get_error_code());
+        $this->assertNull($captured, 'No HTTP call should have been made with an unconfigured account id.');
+
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_process_refund_calls_the_upc_service_when_order_has_an_upc_operation_id(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] = 'acct_test';
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $order = wc_create_order();
+        $order->set_total(50.00);
+        $order->update_meta_data('_payplug_upc_operation_id', 'op_123');
+        $order->save();
+
+        // Deterministic failure via a stubbed 400 from the refund endpoint itself, rather than
+        // relying on the OAuth host being unreachable: an unstubbed real network call is both an
+        // unwanted side effect from the test suite and indistinguishable, on a host with egress,
+        // from the success path also being reachable - the assertions below would then be
+        // failing for the wrong reason (or not failing, for the wrong reason) instead of
+        // testing that a genuine API rejection surfaces as this specific WP_Error.
+        $this->stub_upc_http_requests(['response' => ['code' => 400, 'message' => 'Bad Request'], 'body' => '{"error":"boom"}', 'headers' => [], 'cookies' => []]);
+
+        $gateway = new PayplugCreditCard();
+        $result = $gateway->process_refund($order->get_id(), 50.00);
+
+        $this->assertInstanceOf(\WP_Error::class, $result);
+        $this->assertSame('process_refund_error', $result->get_error_code());
+        $this->assertNotSame('You must be logged in with your PayPlug account.', $result->get_error_message());
+
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_process_refund_fails_without_calling_the_api_when_another_refund_request_for_the_same_order_is_in_flight(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] = 'acct_test';
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $order = wc_create_order();
+        $order->set_total(50.00);
+        $order->update_meta_data('_payplug_upc_operation_id', 'op_123');
+        $order->save();
+
+        $lock_key = 'payplug_upc_process_refund_' . $order->get_id();
+        $lock = new WooCommerceLock();
+        $lock->acquire($lock_key, 30);
+
+        $captured = null;
+        $this->stub_upc_http_requests(['response' => ['code' => 200, 'message' => 'OK'], 'body' => '{"id":"refund_789"}', 'headers' => [], 'cookies' => []], $captured);
+
+        $gateway = new PayplugCreditCard();
+        $result = $gateway->process_refund($order->get_id(), 50.00);
+
+        $this->assertInstanceOf(\WP_Error::class, $result);
+        $this->assertSame('process_refund_error', $result->get_error_code());
+        // Distinguishes genuine lock contention from the inherited Retail fallback's own
+        // (differently-worded, but same error code) "must be logged in" message.
+        $this->assertNotSame('You must be logged in with your PayPlug account.', $result->get_error_message());
+        $this->assertNull($captured, 'No HTTP call should have been made while the lock is held.');
+
+        $lock->release($lock_key);
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_process_refund_sends_the_correct_request_and_records_a_note_on_success(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] = 'acct_test';
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $order = wc_create_order();
+        $order->set_total(50.00);
+        $order->update_meta_data('_payplug_upc_operation_id', 'op_123');
+        $order->save();
+
+        $captured = null;
+        $this->stub_upc_http_requests([
+            'response' => ['code' => 200, 'message' => 'OK'],
+            'body' => json_encode(['id' => 'refund_789']),
+            'headers' => [],
+            'cookies' => [],
+        ], $captured);
+
+        $gateway = new PayplugCreditCard();
+        $result = $gateway->process_refund($order->get_id(), 50.00, 'customer request');
+
+        $this->assertTrue($result);
+        $this->assertNotNull($captured, 'Expected the refund endpoint to actually be called.');
+        $this->assertStringContainsString('/api/payment-gateway/payments/op_123/refund', $captured['url']);
+        $this->assertSame('acct_test', $captured['body']['account']['id']);
+        $this->assertSame((string) $order->get_id(), $captured['body']['orderId']);
+        // The gap this closes: an implementation that sent major units (50) instead of cents
+        // (5000) would have passed every pre-existing test in this file.
+        $this->assertSame(5000, $captured['body']['amount']);
+        $this->assertSame('USD', $captured['body']['currency']);
+        $this->assertArrayNotHasKey('submerchantExternalId', $captured['body']);
+
+        $order = wc_get_order($order->get_id());
+        $note_contents = array_map(static fn ($note) => $note->content, wc_get_order_notes(['order_id' => $order->get_id()]));
+        $matching_notes = array_values(array_filter($note_contents, static fn ($content) => false !== strpos($content, 'refund_789')));
+        $this->assertNotEmpty($matching_notes, 'Expected an order note referencing the refund id.');
+        $this->assertStringContainsString('(customer request)', $matching_notes[0]);
+        $this->assertSame('refund_789', $order->get_meta('_payplug_upc_refund_refund_789'));
+
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_extract_refund_id_returns_the_id_field_when_present(): void
+    {
+        $id = (new PayplugCreditCard())->extract_refund_id(json_encode(['id' => 'refund_789']));
+
+        $this->assertSame('refund_789', $id);
+    }
+
+    public function test_extract_refund_id_returns_null_for_malformed_or_missing_id(): void
+    {
+        $gateway = new PayplugCreditCard();
+
+        $this->assertNull($gateway->extract_refund_id('not json'));
+        $this->assertNull($gateway->extract_refund_id(json_encode(['status' => 'ok'])));
+        $this->assertNull($gateway->extract_refund_id(json_encode(['id' => ''])));
+    }
+
+    public function test_build_refund_note_for_a_full_refund(): void
+    {
+        $note = (new PayplugCreditCard())->build_refund_note(null, 'USD', '');
+
+        $this->assertSame(__('Refund: fully refunded', 'payplug'), $note);
+    }
+
+    public function test_build_refund_note_for_a_partial_refund_includes_the_formatted_amount(): void
+    {
+        $note = (new PayplugCreditCard())->build_refund_note(500, 'USD', '');
+
+        $this->assertStringContainsString(wc_price(5.00, ['currency' => 'USD']), $note);
+        $this->assertStringStartsWith('Refund: refunded', $note);
+    }
+
+    public function test_build_refund_note_uses_the_order_currency_not_the_shop_currency(): void
+    {
+        update_option('woocommerce_currency', 'EUR');
+
+        $note = (new PayplugCreditCard())->build_refund_note(500, 'USD', '');
+
+        $this->assertStringContainsString(wc_price(5.00, ['currency' => 'USD']), $note);
+        $this->assertStringNotContainsString(wc_price(5.00, ['currency' => 'EUR']), $note);
+    }
+
+    public function test_build_refund_note_includes_the_refund_id_when_present(): void
+    {
+        $note = (new PayplugCreditCard())->build_refund_note(null, 'USD', '', 'refund_789');
+
+        $this->assertStringStartsWith('Refund refund_789:', $note);
+    }
+
+    public function test_build_refund_note_appends_an_escaped_reason(): void
+    {
+        $note = (new PayplugCreditCard())->build_refund_note(null, 'USD', '<script>alert(1)</script>');
+
+        $this->assertStringContainsString('(&lt;script&gt;alert(1)&lt;/script&gt;)', $note);
+        $this->assertStringNotContainsString('<script>', $note);
+    }
+
+    public function test_build_refund_note_omits_the_parenthesized_reason_when_empty(): void
+    {
+        $note = (new PayplugCreditCard())->build_refund_note(null, 'USD', '');
+
+        $this->assertStringNotContainsString('(', $note);
     }
 
     private function assertLastErrorNotice(string $msgid): void
