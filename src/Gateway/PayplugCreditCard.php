@@ -6,6 +6,7 @@ use Payplug\PayplugWoocommerce\Controller\HostedFields;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceConfigurationRepository;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOrderStateMutator;
 use Payplug\PayplugWoocommerce\Upc\AliasPaymentContextBuilder;
@@ -15,7 +16,10 @@ use Payplug\PayplugWoocommerce\Upc\UnifiedApiPaymentServiceFactory;
 use PayplugUnifiedCore\Exceptions\ApiException;
 use PayplugUnifiedCore\Exceptions\InvalidHostedFieldException;
 use PayplugUnifiedCore\Exceptions\InvalidPaymentException;
+use PayplugUnifiedCore\Exceptions\InvalidRefundRequestException;
+use PayplugUnifiedCore\Exceptions\PaymentNotFoundException;
 use PayplugUnifiedCore\Exceptions\PayplugException;
+use PayplugUnifiedCore\Exceptions\RefundAmountException;
 use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
 class PayplugCreditCard extends PayplugGateway
@@ -27,6 +31,12 @@ class PayplugCreditCard extends PayplugGateway
      * long.
      */
     private const PROCESS_PAYMENT_LOCK_TTL_SECONDS = 30;
+
+    /**
+     * Same reasoning as PROCESS_PAYMENT_LOCK_TTL_SECONDS - comfortably above the OAuth token
+     * fetch + refund call's own combined worst case (10s timeout each).
+     */
+    private const PROCESS_REFUND_LOCK_TTL_SECONDS = 30;
 
     public $save_card = false;
 
@@ -276,6 +286,160 @@ class PayplugCreditCard extends PayplugGateway
         wc_add_notice(__('payplug_hosted_fields_tokenization_error', 'payplug'), 'error');
 
         return ['result' => 'failure'];
+    }
+
+    /**
+     * @param int $order_id
+     * @param float|string|null $amount
+     * @param string $reason
+     *
+     * @return bool|\WP_Error
+     */
+    public function process_refund($order_id, $amount = null, $reason = '')
+    {
+        $order = wc_get_order($order_id);
+
+        // No such order, or one paid via the Retail API (no UPC operation on it): both keep
+        // going through the inherited Retail process_refund() untouched - only a UPC-paid order
+        // takes this path. Delegating a missing order to it, rather than duplicating its own
+        // "order does not exist" WP_Error here, avoids a second untested error-message copy.
+        if (!$order instanceof \WC_Order) {
+            return parent::process_refund($order_id, $amount, $reason);
+        }
+
+        $operation_id = (string) $order->get_meta('_payplug_upc_operation_id');
+
+        if ('' === $operation_id) {
+            return parent::process_refund($order_id, $amount, $reason);
+        }
+
+        self::log(sprintf('Processing UPC refund for order #%s.', $order_id));
+
+        // No check here for whether the operation has actually reached a captured/paid state
+        // (e.g. still THREE_DS_PENDING) - deliberately left to the Unified API's own validation
+        // rather than an extra getPayment() round trip before every refund. Worst case is an
+        // ApiException on an operation that was never payable, caught below; no data corruption.
+        $configuration_repository = new WooCommerceConfigurationRepository();
+        $account_id = $configuration_repository->getPublicKeyId();
+
+        // A guard, not just a nicety: without it an unconfigured account id goes out as an empty
+        // string, the API rejects it with a generic 4xx, and that lands in the ApiException catch
+        // below indistinguishable from any other API failure - turning a one-line config problem
+        // into a support investigation. Checked before acquiring the lock since there is nothing
+        // here a concurrent request could race on.
+        if ('' === $account_id) {
+            self::log(sprintf('UPC refund misconfigured for order #%s: hosted_fields.identifier (account id) is not set.', $order_id), 'error');
+
+            return new \WP_Error('process_refund_error', __('The transaction could not be refunded. Please try again.', 'payplug'));
+        }
+
+        // Guards concurrent refund requests for the same order (double-click, two admin tabs)
+        // only - NOT a sequential retry of a request that already timed out. If createRefund()'s
+        // HTTP call times out (see PROCESS_REFUND_LOCK_TTL_SECONDS) after the Unified API already
+        // processed the refund, this method still returns a WP_Error, WooCommerce deletes the
+        // just-created local refund record (see wc_create_refund()), and a merchant retrying from
+        // the "Please try again" notice creates a second, real refund at Payplug - there is no
+        // idempotency key available from createRefund() to prevent this, and no reconciliation
+        // path analogous to the payment side's webhook/PaymentReconciler exists for refunds.
+        // Same class of known, accepted gap as process_payment()'s own sequential-retry note
+        // above, but with direct financial impact on the merchant rather than the shopper.
+        $lock = new WooCommerceLock();
+        $lock_key = 'payplug_upc_process_refund_' . $order_id;
+
+        if (!$lock->acquire($lock_key, self::PROCESS_REFUND_LOCK_TTL_SECONDS)) {
+            self::log(sprintf('Another refund request for order #%s is already in progress.', $order_id), 'error');
+
+            return new \WP_Error('process_refund_error', __('The transaction could not be refunded. Please try again.', 'payplug'));
+        }
+
+        try {
+            $amount_in_cents = null !== $amount ? AmountHelper::toCents((float) $amount) : null;
+
+            $response = (new UnifiedApiPaymentServiceFactory())->create()->createRefund(
+                $operation_id,
+                $account_id,
+                (string) $order_id,
+                sprintf(__('Refund for order #%s', 'payplug'), $order->get_order_number()),
+                // Always null: submerchantExternalId only applies to EUR/Galitt UDV account
+                // configurations, which UHF never targets (non-EUR accounts own no submerchant -
+                // see the UHF technical spec). Sending one here would be for an account this
+                // module never talks to.
+                null,
+                $amount_in_cents,
+                $order->get_currency()
+            );
+
+            $refund_id = $this->extract_refund_id($response['body']);
+
+            if (null !== $refund_id) {
+                // Namespaced separately from the Retail API's own `_pr_<id>` dedupe key (see
+                // PayplugResponse::process_refund()) rather than reusing it: a future UPC refund
+                // notification handler dedupes against this key the same way PayplugResponse
+                // dedupes against `_pr_<id>` today, but the two id spaces (Retail vs Unified API)
+                // must never be conflated.
+                $order->add_meta_data(sprintf('_payplug_upc_refund_%s', wc_clean($refund_id)), $refund_id, true);
+                $order->save_meta_data();
+            }
+
+            // Deliberately not firing payplug_gateway_refund_created: its existing consumers
+            // expect a Retail API RefundResource object (see PayplugGateway::process_refund()),
+            // not this endpoint's raw {status, body} array - firing it here would hand them a
+            // shape they don't expect, a behavior change for anyone already hooking it.
+            $order->add_order_note($this->build_refund_note($amount_in_cents, $order->get_currency(), $reason, $refund_id));
+            self::log(sprintf('UPC refund complete for order #%s.', $order_id));
+
+            return true;
+        } catch (RefundAmountException | InvalidRefundRequestException | PaymentNotFoundException $e) {
+            self::log(sprintf('UPC refund rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } catch (PayplugException $e) {
+            // Catches ApiException and every other UPC exception not explicitly rejected above -
+            // mirrors process_payment()'s own discipline against letting an internal API message
+            // escape to the BO user.
+            self::log(sprintf('UPC refund failed for order #%s: %s', $order_id, $e->getMessage()), 'error');
+        } finally {
+            $lock->release($lock_key);
+        }
+
+        return new \WP_Error('process_refund_error', __('The transaction could not be refunded. Please try again.', 'payplug'));
+    }
+
+    /**
+     * Best-effort: the Unified API's own refund response schema has never been empirically
+     * confirmed against a real account, unlike the payment-creation operationId question (see
+     * PaymentCaptureOutcomeApplier), which *was* resolved this way before being relied on. `id`
+     * is the most plausible field name given the API's own "operation" vocabulary (every
+     * processing event - a payment, a capture, a refund - is identified by an id per the SDK's
+     * own docs), but this is unverified. Returns null rather than guessing further if the body
+     * doesn't parse or lacks a non-empty string `id`, so an unrecognized shape degrades to "no
+     * id persisted" instead of a wrong one.
+     */
+    public function extract_refund_id(string $response_body): ?string
+    {
+        $data = json_decode($response_body, true);
+
+        return isset($data['id']) && is_string($data['id']) && '' !== $data['id'] ? $data['id'] : null;
+    }
+
+    /**
+     * Extracted from process_refund() specifically to be testable without a network call - the
+     * try block above can only be exercised end-to-end against a real (or real-looking) Unified
+     * API, which this test suite has no way to reach.
+     */
+    public function build_refund_note(?int $amount_in_cents, string $currency, string $reason, ?string $refund_id = null): string
+    {
+        $amount_text = null !== $amount_in_cents
+            ? sprintf(__('refunded %s', 'payplug'), wc_price(AmountHelper::fromCents($amount_in_cents), ['currency' => $currency]))
+            : __('fully refunded', 'payplug');
+
+        $note = null !== $refund_id
+            ? sprintf(__('Refund %s: %s', 'payplug'), wc_clean($refund_id), $amount_text)
+            : sprintf(__('Refund: %s', 'payplug'), $amount_text);
+
+        if (!empty($reason)) {
+            $note .= sprintf(' (%s)', esc_html($reason));
+        }
+
+        return $note;
     }
 
     /**
