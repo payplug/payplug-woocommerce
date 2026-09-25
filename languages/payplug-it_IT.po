@@ -1080,6 +1080,10 @@ msgstr "Data di scadenza non valida."
 msgid "payplug_integrated_payment_error"
 msgstr "La transazione non è stata conclusa e non è stato effettuato alcun addebito sulla tua carta."
 
+#: src/Gateway/PayplugCreditCard.php:173
+msgid "payplug_integrated_payment_check_error"
+msgstr "Non è stato possibile confermare il pagamento. Prima di riprovare, verifica di aver ricevuto un'e-mail di conferma dell'ordine oppure contattaci."
+
 msgid "payplug_thresholds_error_maxtext_msg"
 msgstr "Attenzione, l'importo massimo inserito è inferiore all'importo minimo inserito."
 

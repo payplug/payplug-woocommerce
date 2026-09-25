@@ -3,7 +3,6 @@
 namespace Payplug\PayplugWoocommerce;
 
 // Exit if accessed directly
-use Automattic\WooCommerce\Utilities\OrderUtil;
 use Payplug\Exception\HttpException;
 use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
@@ -375,8 +374,7 @@ class PayplugWoocommerceRequest
 
     public function check_payment(): void
     {
-        global $wpdb;
-        $payment_id = $_POST['payment_id'];
+        $payment_id = isset($_POST['payment_id']) ? wc_clean(wp_unslash($_POST['payment_id'])) : '';
         if (empty($payment_id)) {
             wp_send_json_error(__('Invalid request.', 'payplug'));
         }
@@ -426,7 +424,11 @@ class PayplugWoocommerceRequest
             }
         }
         $order_id = $this->getOrderFromPaymentId($payment_id);
-        $order = wc_get_order($order_id);
+        $order = $order_id ? wc_get_order($order_id) : false;
+        if (!$order) {
+            PayplugGateway::log(sprintf('No order found for payment %s', $payment_id), 'error');
+            wp_send_json_error(__('Invalid request.', 'payplug'));
+        }
         $return_url = esc_url_raw($order->get_checkout_order_received_url());
         if ((isset($payment->failure)) && (!empty($payment->failure)) || ($payment->is_paid === false && is_null($payment->paid_at))) {
             $order->update_status('failed', __('Order cancelled by customer.', 'woocommerce'));
@@ -484,38 +486,20 @@ class PayplugWoocommerceRequest
     /**
      * @param $payment_id
      *
-     * @return int|string|null
+     * @return int|null
      */
     private function getOrderFromPaymentId($payment_id)
     {
-        global $wpdb;
+        // 'transaction_id' is supported by both the HPOS and the legacy (posts) order stores.
+        $order_ids = wc_get_orders(
+            [
+                'transaction_id' => $payment_id,
+                'limit' => 1,
+                'return' => 'ids',
+            ]
+        );
 
-        if (OrderUtil::custom_orders_table_usage_is_enabled()) {
-            $orders = wc_get_orders(
-                [
-                    'field_query' => [
-                        [
-                            'key' => 'transaction_id',
-                            'comparison' => $payment_id,
-                        ],
-                    ],
-                ]
-            );
-            $order = $orders[0];
-            $order_id = $order->get_id();
-        } else {
-            $sql = 'SELECT post_id
-					FROM $wpdb->postmeta
-					WHERE meta_key = "_transaction_id" AND meta_value = %s';
-            $order_id = $wpdb->get_var(
-                $wpdb->prepare(
-                    $sql,
-                    $payment_id
-                )
-            );
-        }
-
-        return $order_id;
+        return !empty($order_ids) ? $order_ids[0] : null;
     }
 
     public function create_payment_intent(): void
