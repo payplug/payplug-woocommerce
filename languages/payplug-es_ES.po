@@ -1095,6 +1095,10 @@ msgstr "Fecha de caducidad inválida."
 msgid "payplug_integrated_payment_error"
 msgstr "La transacción no ha podido completarse, y su tarjeta no ha sido cargada."
 
+#: src/Gateway/PayplugCreditCard.php:173
+msgid "payplug_integrated_payment_check_error"
+msgstr "No hemos podido confirmar su pago. Antes de volver a intentarlo, compruebe si ha recibido un correo electrónico de confirmación del pedido o contacte con nosotros."
+
 msgid "payplug_thresholds_error_maxtext_msg"
 msgstr "Atención, el importe máximo introducido es inferior al importe mínimo introducido."
 

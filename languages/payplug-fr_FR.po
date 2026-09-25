@@ -1089,6 +1089,10 @@ msgstr "Date d’expiration invalide."
 msgid "payplug_integrated_payment_error"
 msgstr "La transaction n'a pas pu aboutir, et votre carte n'a pas été débitée."
 
+#: src/Gateway/PayplugCreditCard.php:173
+msgid "payplug_integrated_payment_check_error"
+msgstr "Nous n'avons pas pu confirmer votre paiement. Avant de réessayer, vérifiez si vous avez reçu un e-mail de confirmation de commande ou contactez-nous."
+
 msgid "payplug_thresholds_error_maxtext_msg"
 msgstr "Attention, le montant maximal renseigné est inférieur au montant minimal renseigné."
 
