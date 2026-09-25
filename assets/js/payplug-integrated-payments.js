@@ -118,6 +118,11 @@ var IntegratedPayment = {
 						console.log(jqXHR);
 						console.log(textStatus);
 						console.log(errorThrown);
+						// The payment status is unknown here (it may have succeeded), so show a neutral
+						// message instead of the "card not charged" payment error.
+						jQuery(".payplug.IntegratedPayment_error.-payment").hide();
+						IntegratedPayment.submit_error('<ul class="woocommerce-error" role="alert"><li>' + payplug_integrated_payment_params.check_payment_error + '</li></ul>');
+						IntegratedPayment.resetIntegratedForm();
 					},
 					success: function (response) {
 

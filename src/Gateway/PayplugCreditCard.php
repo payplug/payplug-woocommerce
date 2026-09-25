@@ -170,6 +170,7 @@ class PayplugCreditCard extends PayplugGateway
             'mode' => PayplugWoocommerceHelper::check_mode(), // true for TEST, false for LIVE
             'check_payment_url' => \WC_AJAX::get_endpoint('payplug_check_payment'),
             'secureDomain' => PayplugWoocommerceHelper::get_secure_domain(),
+            'check_payment_error' => __('payplug_integrated_payment_check_error', 'payplug'),
         ];
 
         /**x
@@ -185,7 +186,7 @@ class PayplugCreditCard extends PayplugGateway
         wp_register_script('jquery-bind-first', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/jquery.bind-first-0.2.3.min.js', ['jquery'], '1.0.0', true);
         wp_enqueue_script('jquery-bind-first');
 
-        wp_register_script('payplug-integrated-payments', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-integrated-payments.js', ['jquery', 'jquery-bind-first', 'payplug-integrated-payments-api'], 'v1.1', true);
+        wp_register_script('payplug-integrated-payments', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-integrated-payments.js', ['jquery', 'jquery-bind-first', 'payplug-integrated-payments-api'], PAYPLUG_GATEWAY_VERSION, true);
         wp_enqueue_script('payplug-integrated-payments');
 
         wp_localize_script('payplug-integrated-payments', 'payplug_integrated_payment_params', $translations);
