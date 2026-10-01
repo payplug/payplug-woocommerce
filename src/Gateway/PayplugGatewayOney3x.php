@@ -2,11 +2,11 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway;
 
-use libphonenumber\PhoneNumberType;
-use libphonenumber\PhoneNumberUtil;
 use Payplug\PayplugWoocommerce\Controller\PayplugGenericGateway;
 use Payplug\PayplugWoocommerce\Gateway\Oney\OneyAccountMapper;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
+use PayplugUnifiedCore\Utilities\Helpers\PhoneHelper;
 
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
@@ -87,8 +87,8 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
         $account = PayplugWoocommerceHelper::get_account_data_from_options();
         if ($account) {
             $oney_configuration = $account['configuration']['oney'];
-            $this->min_oney_price = $oney_configuration['min_amounts']['EUR'] / 100;
-            $this->max_oney_price = $oney_configuration['max_amounts']['EUR'] / 100;
+            $this->min_oney_price = AmountHelper::fromCents((int) $oney_configuration['min_amounts']['EUR']);
+            $this->max_oney_price = AmountHelper::fromCents((int) $oney_configuration['max_amounts']['EUR']);
             $this->allowed_country_codes = $oney_configuration['allowed_countries'];
         }
     }
@@ -208,8 +208,8 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
         // checkout validation and display never silently drift apart (PRE-3457 review).
         [$min_cents, $max_cents] = OneyAccountMapper::effective_bounds($oney_account_cfg, $oney_cfg);
         $oney_amount = [
-            'min' => $min_cents / 100,
-            'max' => $max_cents / 100,
+            'min' => AmountHelper::fromCents($min_cents),
+            'max' => AmountHelper::fromCents($max_cents),
         ];
         // validate_checkout() reads these to build its exception message - populate them
         // unconditionally (before any early return below) so they're never stale/unset there.
@@ -273,7 +273,8 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
      */
     public function validate_order_amount($amount)
     {
-        if ($amount / 100 < $this->min_oney_price || $amount / 100 > $this->max_oney_price) {
+        $order_amount = AmountHelper::fromCents((int) $amount);
+        if ($order_amount < $this->min_oney_price || $order_amount > $this->max_oney_price) {
             return new \WP_Error(
                 'invalid order amount',
                 sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Oney.', 'payplug'), $this->min_oney_price, $this->max_oney_price)
@@ -308,9 +309,7 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
             $country = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();
             $phone = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_phone : $order->get_billing_phone();
             $billing_email = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_email : $order->get_billing_email();
-            $phone_number_util = PhoneNumberUtil::getInstance();
-            $phone_number = $phone_number_util->parse($phone, $country);
-            if (PhoneNumberType::MOBILE !== $phone_number_util->getNumberType($phone_number)) {
+            if (!PhoneHelper::isMobile($phone, $country)) {
                 throw new \Exception(__('Mobile phone number fullfilled is invalid. Please retry.', 'payplug'));
             }
 
@@ -330,7 +329,7 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
             $items = $order->get_items();
             foreach ($items as $item) {
                 $data = $item->get_data();
-                $total = floatval(round($data['total'], 2)) * 100;
+                $total = AmountHelper::toCents((float) $data['total']);
                 $cart_items[] = [
                     'delivery_label' => 'storepickup',
                     'delivery_type' => 'storepickup',
@@ -338,8 +337,8 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
                     'merchant_item_id' => 'cart-' . $data['id'] . '-' . $data['product_id'],
                     'name' => $data['name'],
                     'expected_delivery_date' => date('Y-m-d'),
-                    'total_amount' => (int) $total,
-                    'price' => round($total / $data['quantity']),
+                    'total_amount' => $total,
+                    'price' => (int) round($total / $data['quantity']),
                     'quantity' => $data['quantity'],
                 ];
             }
@@ -522,6 +521,13 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
 
     public function checkGateway()
     {
+        // Oney is Euro-only, like every other gateway built on PayplugGenericGateway - but
+        // this override replaces PayplugGenericGateway::checkGateway() entirely rather than
+        // calling it, so its currency guard never runs for Oney unless repeated here.
+        if (!PayplugWoocommerceHelper::is_eur_shop()) {
+            return false;
+        }
+
         $options = PayplugWoocommerceHelper::get_payplug_options();
 
         // Now called unconditionally from the constructor (not just at checkout via

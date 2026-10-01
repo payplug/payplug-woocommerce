@@ -12,6 +12,7 @@ use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\Resource\IVerifiableAPIResource;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 use WC_Payment_Token_CC;
 use WC_Payment_Tokens;
 
@@ -285,7 +286,7 @@ class PayplugResponse
         }
 
         $refund = wc_create_refund([
-            'amount' => ((int) $resource->amount) / 100,
+            'amount' => AmountHelper::fromCents((int) $resource->amount),
             'reason' => isset($resource->metadata['reason']) ? $resource->metadata['reason'] : null,
             'order_id' => (int) $order_id,
             'refund_id' => 0,
@@ -303,7 +304,7 @@ class PayplugResponse
             $order->save();
         }
 
-        $note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($resource->id), wc_price(((int) $resource->amount) / 100));
+        $note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($resource->id), wc_price(AmountHelper::fromCents((int) $resource->amount)));
         if (!empty($resource->metadata['reason'])) {
             $note .= sprintf(' (%s)', esc_html($resource->metadata['reason']));
         }

@@ -15,6 +15,7 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 use Payplug\Resource\APIResource;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 use WC_Blocks_Utils;
 use WC_Subscriptions;
 
@@ -24,6 +25,16 @@ use WC_Subscriptions;
 class PayplugWoocommerceHelper
 {
     use ServiceGetter;
+
+    /**
+     * Check if the shop's payment currency is Euro.
+     *
+     * @return bool
+     */
+    public static function is_eur_shop()
+    {
+        return 'EUR' === get_woocommerce_currency();
+    }
 
     /**
      * Check if current WooCommerce version is below 3.0.0
@@ -382,7 +393,7 @@ class PayplugWoocommerceHelper
             return $amount;
         }
 
-        return absint(wc_format_decimal(((float) $amount * 100), wc_get_price_decimals()));
+        return AmountHelper::toCents((float) $amount);
     }
 
     /**
