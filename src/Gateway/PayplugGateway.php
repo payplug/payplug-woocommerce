@@ -11,6 +11,7 @@ use Payplug\Authentication;
 use Payplug\Exception\ConfigurationException;
 use Payplug\Exception\HttpException;
 use Payplug\Payplug;
+use Payplug\PayplugWoocommerce\Exception\LockUnavailableException;
 use Payplug\PayplugWoocommerce\Helper\Lock;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
@@ -292,7 +293,13 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 return;
             }
 
-            $lock_id = Lock::handle_insert($save_request, $transaction_id);
+            try {
+                $lock_id = Lock::handle_insert($save_request, $transaction_id);
+            } catch (LockUnavailableException $e) {
+                self::log(sprintf('Order #%s : Unable to lock payment %s: %s', $order_id, $transaction_id, $e->getMessage()), 'error');
+
+                return;
+            }
             if (!$lock_id) {
                 return;
             }
