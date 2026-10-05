@@ -2,8 +2,15 @@
 
 namespace Payplug\PayplugWoocommerce\Model;
 
+use Payplug\PayplugWoocommerce\Exception\LockUnavailableException;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
+
 class Lock
 {
+    public const REPAIR_LOCK_NAME = 'payplug_lock_table_repair';
+
+    public const REPAIR_LOCK_TIMEOUT = 5;
+
     /**
      * create Lock table
      */
@@ -50,9 +57,50 @@ class Lock
     }
 
     /**
+     * Make the `id` column auto-incremented, purging the rows of the unusable table.
+     * Serialised with a MySQL named lock so a concurrent repair cannot purge live locks.
+     *
+     * @throws LockUnavailableException
+     */
+    public static function repair_lock_table(): void
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
+        $acquired = $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, %d)', self::REPAIR_LOCK_NAME, static::REPAIR_LOCK_TIMEOUT));
+        if ('1' !== (string) $acquired) {
+            throw new LockUnavailableException(sprintf('Unable to acquire the repair lock of table %s. %s', $table_name, $wpdb->last_error));
+        }
+
+        try {
+            if (static::is_lock_table_healthy()) {
+                return;
+            }
+
+            if (false === $wpdb->query("DELETE FROM `{$table_name}`")) {
+                throw new LockUnavailableException(sprintf('Unable to purge table %s: %s', $table_name, $wpdb->last_error));
+            }
+
+            $id_column = $wpdb->get_row($wpdb->prepare("SHOW COLUMNS FROM `{$table_name}` LIKE %s", 'id'));
+            $altered = empty($id_column)
+                ? static::update_lock_table()
+                : false !== $wpdb->query("ALTER TABLE `{$table_name}` MODIFY `id` INT NOT NULL AUTO_INCREMENT");
+            $error = $wpdb->last_error;
+
+            if (!$altered || !static::is_lock_table_healthy()) {
+                throw new LockUnavailableException(sprintf('Unable to repair table %s: %s', $table_name, $error));
+            }
+
+            PayplugGateway::log(sprintf('Table %s repaired: auto-increment id restored.', $table_name));
+        } finally {
+            $wpdb->query($wpdb->prepare('SELECT RELEASE_LOCK(%s)', self::REPAIR_LOCK_NAME));
+        }
+    }
+
+    /**
      * update table
      */
-    public static function update_lock_table(): void
+    public static function update_lock_table(): bool
     {
         global $wpdb;
 
@@ -60,7 +108,8 @@ class Lock
         $sql .= ' ADD COLUMN `id` INT NOT NULL AUTO_INCREMENT FIRST,';
         $sql .= ' DROP PRIMARY KEY,';
         $sql .= ' ADD PRIMARY KEY (`id`);';
-        $wpdb->query($sql);
+
+        return false !== $wpdb->query($sql);
     }
 
     /**
