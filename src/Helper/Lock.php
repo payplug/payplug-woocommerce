@@ -2,8 +2,15 @@
 
 namespace Payplug\PayplugWoocommerce\Helper;
 
+use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
+
 class Lock
 {
+    /**
+     * @throws \Payplug\PayplugWoocommerce\Exception\LockUnavailableException when no lock id can be obtained
+     *
+     * @return false|int the lock id, or false when the payment must not be processed by this request
+     */
     public static function handle_insert($save, $payment_id)
     {
         if ($save) {
@@ -11,6 +18,8 @@ class Lock
 
             //there's a payment being processed this moment
             if (\Payplug\PayplugWoocommerce\Model\Lock::locked($payment_id, $lock_id)) {
+                PayplugGateway::log(sprintf('Payment %s already being processed.', $payment_id));
+
                 return false;
             }
 
