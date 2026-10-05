@@ -2,5 +2,5 @@
   "version": "3.1.1",
   "wc_tested_up_to": "10.6.1",
   "wp_tested_up_to": "6.9.4",
-  "changelog": "* Fix: fix order lookup in check_payment for integrated payment"
+  "changelog": "* Fix: fix order lookup in check_payment for integrated payment\n* Fix: Fix orders left awaiting payment when the PayPlug lock table has no auto-increment id, the table is now repaired automatically\n* Fix: Answer the payment notification (IPN) with HTTP 500 when the lock table cannot be repaired, so PayPlug sends it again"
 }
