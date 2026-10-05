@@ -27,15 +27,14 @@ class Lock
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         maybe_create_table($table_name, $sql);
 
-        $result = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT count(column_name) as column_exists FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{$wpdb->base_prefix}woocommerce_payplug_lock' AND column_name = %s ",
-                ['id']
-            )
-        );
+        if (static::is_lock_table_healthy()) {
+            return;
+        }
 
-        if (!empty($result) && !$result->column_exists) {
-            static::update_lock_table();
+        try {
+            static::repair_lock_table();
+        } catch (LockUnavailableException $e) {
+            PayplugGateway::log($e->getMessage(), 'error');
         }
     }
 
@@ -91,7 +90,7 @@ class Lock
                 throw new LockUnavailableException(sprintf('Unable to repair table %s: %s', $table_name, $error));
             }
 
-            PayplugGateway::log(sprintf('Table %s repaired: auto-increment id restored.', $table_name));
+            PayplugGateway::log(sprintf('Table %s now has an auto-increment id.', $table_name));
         } finally {
             $wpdb->query($wpdb->prepare('SELECT RELEASE_LOCK(%s)', self::REPAIR_LOCK_NAME));
         }

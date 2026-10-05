@@ -189,6 +189,35 @@ class Lock_test extends TestCase
         Lock::insert_lock('pay_test_123');
     }
 
+    public function test_create_lock_table_repairs_a_table_without_auto_increment(): void
+    {
+        $this->break_lock_table_without_auto_increment();
+
+        Lock::create_lock_table();
+
+        self::assertTrue(Lock::is_lock_table_healthy());
+    }
+
+    public function test_create_lock_table_keeps_the_rows_of_a_healthy_table(): void
+    {
+        $this->insert_raw_lock_row('pay_test_held');
+
+        Lock::create_lock_table();
+
+        self::assertSame(1, $this->count_lock_rows('pay_test_held'));
+    }
+
+    public function test_create_lock_table_logs_instead_of_throwing_when_the_repair_fails(): void
+    {
+        $this->break_lock_table_beyond_repair();
+
+        Lock::create_lock_table();
+
+        $errors = $this->logged_messages('error');
+        self::assertCount(1, $errors);
+        self::assertStringContainsString('Incorrect table definition', $errors[0]);
+    }
+
     private function repair_lock_is_free(): bool
     {
         global $wpdb;
