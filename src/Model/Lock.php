@@ -115,9 +115,11 @@ class Lock
     /**
      * @param $payment_id
      *
-     * @return bool|int
+     * @throws LockUnavailableException when no lock id can be obtained
+     *
+     * @return int the id of the inserted lock
      */
-    public static function insert_lock($payment_id)
+    public static function insert_lock($payment_id): int
     {
         global $wpdb;
         $wpdb->hide_errors();
@@ -125,9 +127,36 @@ class Lock
         if (!$lock_table_exists) {
             self::create_lock_table();
         }
-        $wpdb->insert($wpdb->base_prefix . 'woocommerce_payplug_lock', ['payment_id' => $payment_id]);
 
-        return $wpdb->insert_id;
+        $lock_id = self::try_insert($payment_id);
+        if ($lock_id > 0) {
+            return $lock_id;
+        }
+
+        $error = $wpdb->last_error;
+        if (static::is_lock_table_healthy()) {
+            throw new LockUnavailableException(sprintf('Unable to insert a lock for payment %s: %s', $payment_id, $error));
+        }
+
+        static::repair_lock_table();
+
+        $lock_id = self::try_insert($payment_id);
+        if ($lock_id > 0) {
+            return $lock_id;
+        }
+
+        throw new LockUnavailableException(sprintf('Unable to insert a lock for payment %s after repairing the table: %s', $payment_id, $wpdb->last_error));
+    }
+
+    private static function try_insert($payment_id): int
+    {
+        global $wpdb;
+
+        if (false === $wpdb->insert($wpdb->base_prefix . 'woocommerce_payplug_lock', ['payment_id' => $payment_id])) {
+            return 0;
+        }
+
+        return (int) $wpdb->insert_id;
     }
 
     /**

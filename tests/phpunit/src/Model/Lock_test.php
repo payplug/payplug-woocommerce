@@ -124,6 +124,71 @@ class Lock_test extends TestCase
         }
     }
 
+    public function test_insert_lock_returns_a_positive_id_on_a_healthy_table(): void
+    {
+        self::assertGreaterThan(0, Lock::insert_lock('pay_test_123'));
+    }
+
+    public function test_insert_lock_creates_a_missing_table(): void
+    {
+        Lock::delete_lock_table();
+
+        self::assertGreaterThan(0, Lock::insert_lock('pay_test_123'));
+        self::assertTrue(Lock::is_lock_table_healthy());
+    }
+
+    public function test_insert_lock_repairs_a_table_without_id_column_and_returns_an_id(): void
+    {
+        $this->break_lock_table_without_id_column();
+        $this->insert_raw_lock_row('pay_test_123');
+
+        $lock_id = Lock::insert_lock('pay_test_123');
+
+        self::assertGreaterThan(0, $lock_id);
+        self::assertSame(1, $this->count_lock_rows('pay_test_123'));
+        self::assertFalse(Lock::locked('pay_test_123', $lock_id));
+    }
+
+    public function test_insert_lock_repairs_a_table_without_auto_increment_and_returns_an_id(): void
+    {
+        $this->break_lock_table_without_auto_increment();
+        $this->insert_raw_lock_row('pay_test_123');
+
+        $lock_id = Lock::insert_lock('pay_test_123');
+
+        self::assertGreaterThan(0, $lock_id);
+        self::assertSame(1, $this->count_lock_rows('pay_test_123'));
+        self::assertFalse(Lock::locked('pay_test_123', $lock_id));
+    }
+
+    public function test_insert_lock_throws_without_repairing_when_a_healthy_table_refuses_the_insert(): void
+    {
+        global $wpdb;
+
+        $this->insert_raw_lock_row('pay_test_held');
+        $this->refuse_lock_inserts('lock insert refused');
+        $wpdb->insert_id = 4242;
+
+        try {
+            Lock::insert_lock('pay_test_123');
+            self::fail('LockUnavailableException expected');
+        } catch (LockUnavailableException $e) {
+            self::assertStringContainsString('lock insert refused', $e->getMessage());
+        }
+
+        self::assertSame(1, $this->count_lock_rows('pay_test_held'));
+    }
+
+    public function test_insert_lock_throws_instead_of_returning_no_id_when_the_table_cannot_be_repaired(): void
+    {
+        $this->break_lock_table_beyond_repair();
+
+        $this->expectException(LockUnavailableException::class);
+        $this->expectExceptionMessage('Incorrect table definition');
+
+        Lock::insert_lock('pay_test_123');
+    }
+
     private function repair_lock_is_free(): bool
     {
         global $wpdb;
