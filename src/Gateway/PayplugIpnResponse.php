@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 
 use Payplug\Exception\UnknownAPIResourceException;
 use Payplug\Notification;
+use Payplug\PayplugWoocommerce\Exception\LockUnavailableException;
 use Payplug\PayplugWoocommerce\Model\Lock;
 use Payplug\Resource\IVerifiableAPIResource;
 
@@ -48,8 +49,18 @@ class PayplugIpnResponse
             exit;
         }
 
-        call_user_func([$this, sprintf('process_%s_resource', $resource->object)], $resource);
+        try {
+            call_user_func([$this, sprintf('process_%s_resource', $resource->object)], $resource);
+        } catch (LockUnavailableException $e) {
+            $this->handle_lock_unavailable($resource->id, $e);
+        }
         exit;
+    }
+
+    public function handle_lock_unavailable(string $payment_id, \Throwable $e): void
+    {
+        PayplugGateway::log(sprintf('Unable to lock payment %s, notification not processed (will be replayed): %s', $payment_id, $e->getMessage()), 'error');
+        status_header(500);
     }
 
     /**
