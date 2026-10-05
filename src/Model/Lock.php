@@ -33,6 +33,23 @@ class Lock
     }
 
     /**
+     * The lock table is usable only when its `id` column is auto-incremented.
+     */
+    public static function is_lock_table_healthy(): bool
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
+        $column = $wpdb->get_row($wpdb->prepare("SHOW COLUMNS FROM `{$table_name}` LIKE %s", 'id'));
+
+        if (!empty($wpdb->last_error) || empty($column)) {
+            return false;
+        }
+
+        return false !== stripos((string) $column->Extra, 'auto_increment');
+    }
+
+    /**
      * update table
      */
     public static function update_lock_table(): void
