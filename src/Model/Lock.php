@@ -68,7 +68,7 @@ class Lock
         $table_name = $wpdb->base_prefix . 'woocommerce_payplug_lock';
         $acquired = $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, %d)', self::REPAIR_LOCK_NAME, static::REPAIR_LOCK_TIMEOUT));
         if ('1' !== (string) $acquired) {
-            throw new LockUnavailableException(sprintf('Unable to acquire the repair lock of table %s. %s', $table_name, $wpdb->last_error));
+            throw new LockUnavailableException(sprintf('Unable to acquire the repair lock of table %s: %s', $table_name, $wpdb->last_error ?: 'timed out'));
         }
 
         try {

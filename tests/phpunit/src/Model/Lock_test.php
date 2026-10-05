@@ -118,6 +118,7 @@ class Lock_test extends TestCase
             ImmediateRepairLock::repair_lock_table();
             self::fail('LockUnavailableException expected');
         } catch (LockUnavailableException $e) {
+            self::assertStringEndsWith(': timed out', $e->getMessage());
             self::assertFalse(Lock::is_lock_table_healthy());
         } finally {
             $other_connection->close();
