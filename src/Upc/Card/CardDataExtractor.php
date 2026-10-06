@@ -1,8 +1,8 @@
 <?php
 
-namespace Payplug\PayplugWoocommerce\Upc;
+namespace Payplug\PayplugWoocommerce\Upc\Card;
 
-class UhfCardDataExtractor
+class CardDataExtractor
 {
     /**
      * Reads the same `paymentMethod.{id, card.{network, code6x4}, details.{selectedBrand,

@@ -2,8 +2,13 @@ var HostedFields = {
 	props: {
 		instance: null,
 		submitting: false,
+		// Same state as the PrestaShop module's hosted_fields sub-module: the SDK only reports
+		// a field's validity through onInput, so every field starts out empty until it does.
+		fieldsInvalid: { cardHolder: true, pan: true, exp: true, cvv: true },
+		fieldsEmpty: { cardHolder: true, pan: true, exp: true, cvv: true },
 	},
 	ALLOWED_BRANDS: ['CB', 'VISA', 'MASTERCARD'],
+	CARDHOLDER_PATTERN: /^[A-Za-zÀ-ÖØ-öø-ÿ' .-]{2,}$/,
 	form: function () {
 		if (jQuery('form.woocommerce-checkout').length) {
 			return jQuery('form.woocommerce-checkout');
@@ -27,6 +32,7 @@ var HostedFields = {
 		// direct .on('change', ...) binding would never reach again.
 		jQuery('body').on('change', '[name=wc-payplug-payment-token]', HostedFields.manageSavedCards);
 		jQuery('body').on('change', '[name=payplug_uhf_card_choice]', HostedFields.manageSavedCards);
+		jQuery('body').on('input blur', '#hf-cardholder', HostedFields.validateCardholder);
 
 		// WooCommerce's own submit handler is bound on the same form; a plain .on('submit')
 		// runs after it, so return false can't cancel the already-dispatched place-order
@@ -72,6 +78,7 @@ var HostedFields = {
 	// the first attempt had actually rendered.
 	handleCheckoutUpdated: function () {
 		HostedFields.props.instance = null;
+		HostedFields.resetFieldsState();
 		HostedFields.manageSavedCards();
 	},
 	// Cross-origin iframes mounted into a display:none container don't render. The real
@@ -99,21 +106,92 @@ var HostedFields = {
 
 		HostedFields.props.instance = window.dalenys.hostedFields({
 			companyId: payplug_hosted_fields_params.company_id,
+			// Same field options as the PrestaShop module, so the SDK renders the same form.
 			fields: {
-				brand: { id: 'hosted-fields-brand' },
-				card: { id: 'hosted-fields-card' },
-				expiry: { id: 'hosted-fields-expiry' },
-				cryptogram: { id: 'hosted-fields-cryptogram' },
+				brand: {
+					id: 'hosted-fields-brand',
+					version: 2,
+					useInlineSelection: true,
+				},
+				card: {
+					id: 'hosted-fields-card',
+					placeholder: payplug_hosted_fields_params.placeholder_pan,
+					onInput: function (event) {
+						HostedFields.handleFieldEvent('pan', event);
+					},
+				},
+				expiry: {
+					id: 'hosted-fields-expiry',
+					placeholder: payplug_hosted_fields_params.placeholder_exp,
+					onInput: function (event) {
+						HostedFields.handleFieldEvent('exp', event);
+					},
+				},
+				cryptogram: {
+					id: 'hosted-fields-cryptogram',
+					placeholder: payplug_hosted_fields_params.placeholder_cvv,
+					onInput: function (event) {
+						HostedFields.handleFieldEvent('cvv', event);
+					},
+				},
 			},
 		});
 		HostedFields.props.instance.load();
+	},
+	resetFieldsState: function () {
+		['cardHolder', 'pan', 'exp', 'cvv'].forEach(function (field) {
+			HostedFields.props.fieldsInvalid[field] = true;
+			HostedFields.props.fieldsEmpty[field] = true;
+		});
+	},
+	handleFieldEvent: function (field, event) {
+		if ('invalid' === event.type) {
+			HostedFields.props.fieldsInvalid[field] = true;
+			HostedFields.props.fieldsEmpty[field] = 'FIELD_EMPTY' === event.errorName;
+			HostedFields.showFieldError(field);
+		} else if ('valid' === event.type) {
+			HostedFields.props.fieldsInvalid[field] = false;
+			HostedFields.props.fieldsEmpty[field] = false;
+			HostedFields.showFieldError(field);
+		}
+	},
+	// Unlike the PrestaShop module, an untouched cardholder field shows no error until the
+	// shopper leaves it or submits: nothing has been typed wrong yet.
+	validateCardholder: function () {
+		var value = String(jQuery('#hf-cardholder').val() || '').trim();
+		var empty = '' === value;
+
+		HostedFields.props.fieldsEmpty.cardHolder = empty;
+		HostedFields.props.fieldsInvalid.cardHolder = !empty && !HostedFields.CARDHOLDER_PATTERN.test(value);
+		HostedFields.showFieldError('cardHolder');
+	},
+	showFieldError: function (field) {
+		var empty = HostedFields.props.fieldsEmpty[field];
+		var invalid = HostedFields.props.fieldsInvalid[field] && !empty;
+		var $error = jQuery('.payplug.HostedFields_error.-' + field);
+
+		$error.find('.emptyField').toggleClass('-hide', !empty);
+		$error.find('.invalidField').toggleClass('-hide', !invalid);
+		jQuery('.payplug.HostedFields_container.-' + field).toggleClass('-invalid', empty || invalid);
+	},
+	// Shows every field's error at once on submit, and tells whether the form can be tokenized.
+	validateFields: function () {
+		HostedFields.validateCardholder();
+
+		// map() then every(), not every() alone: every() stops at the first bad field and would
+		// leave the others' errors hidden.
+		return ['cardHolder', 'pan', 'exp', 'cvv'].map(function (field) {
+			HostedFields.showFieldError(field);
+
+			return !HostedFields.props.fieldsInvalid[field] && !HostedFields.props.fieldsEmpty[field];
+		}).every(Boolean);
 	},
 	// One-click: a stored card is a completely different submission path (no card fields
 	// tokenized), so the form must be hidden - and never mounted, see isNewCardSelected()
 	// above - whenever the customer has a saved card selected rather than "pay with
 	// another card".
 	manageSavedCards: function () {
-		jQuery('form.payplug.HostedFields').toggleClass('-hide', !HostedFields.isNewCardSelected());
+		jQuery('.payplug.HostedFields').toggleClass('-hide', !HostedFields.isNewCardSelected());
 		HostedFields.maybeMount();
 	},
 	onSubmit: function () {
@@ -130,6 +208,12 @@ var HostedFields = {
 
 		if (jQuery('#hf-token').val()) {
 			return true;
+		}
+
+		HostedFields.hideErrors();
+
+		if (!HostedFields.validateFields()) {
+			return false;
 		}
 
 		HostedFields.tokenize();
@@ -173,16 +257,14 @@ var HostedFields = {
 
 			// Best-effort fallback metadata for the "save card" flow - server-side persistence
 			// (Upc\PaymentCaptureOutcomeApplier::maybe_persist_uhf_card()) falls back to these
-			// only when its own post-payment metadata fetch fails. CAVEAT (PRE-3638): result.last4/
-			// expirationMonth/expirationYear are this SDK's best-known field names, unconfirmed
-			// against a real createToken() response - guarded by `|| ''` below so a wrong guess
-			// degrades to an empty fallback rather than crashing, but combined with a failed
-			// server-side fetch this is a card that silently never saves. Confirm/correct these
-			// against the browser console on a real staging tokenization before relying on them.
+			// only when its own post-payment metadata fetch fails. Field names confirmed against
+			// a real staging createToken() result (2026-10-05): cardCode is the masked PAN
+			// ("406560XXXXXX0000"), cardValidityDate is "MM-YY".
 			if (jQuery('[name=savecard]').is(':checked')) {
-				jQuery('#hf-last4').val(result.last4 || '');
-				jQuery('#hf-expiration-month').val(result.expirationMonth || '');
-				jQuery('#hf-expiration-year').val(result.expirationYear || '');
+				var card = HostedFields.cardMetadata(result);
+				jQuery('#hf-last4').val(card.last4);
+				jQuery('#hf-expiration-month').val(card.expirationMonth);
+				jQuery('#hf-expiration-year').val(card.expirationYear);
 			}
 
 			// The order isn't created yet at this point (tokenization happens before the
@@ -194,13 +276,23 @@ var HostedFields = {
 			HostedFields.form().trigger('submit');
 		});
 	},
+	cardMetadata: function (result) {
+		var last4 = String(result.cardCode || '').slice(-4);
+		var validity = /^(\d{2})-(\d{2})$/.exec(String(result.cardValidityDate || ''));
+
+		return {
+			last4: /^\d{4}$/.test(last4) ? last4 : '',
+			expirationMonth: validity ? String(parseInt(validity[1], 10)) : '',
+			expirationYear: validity ? String(2000 + parseInt(validity[2], 10)) : ''
+		};
+	},
 	showError: function (className) {
-		jQuery('.payplug.HostedFields_error.-tokenization').removeClass('-hide');
-		jQuery('.payplug.HostedFields_error.-tokenization .' + className).removeClass('-hide');
+		jQuery('.payplug.HostedFields_error.-payment').addClass('-show');
+		jQuery('.payplug.HostedFields_error.-payment .' + className).removeClass('-hide');
 	},
 	hideErrors: function () {
-		jQuery('.payplug.HostedFields_error.-tokenization').addClass('-hide');
-		jQuery('.payplug.HostedFields_error.-tokenization .genericError, .payplug.HostedFields_error.-tokenization .brandError').addClass('-hide');
+		jQuery('.payplug.HostedFields_error.-payment').removeClass('-show');
+		jQuery('.payplug.HostedFields_error.-payment .genericError, .payplug.HostedFields_error.-payment .brandError').addClass('-hide');
 	},
 };
 

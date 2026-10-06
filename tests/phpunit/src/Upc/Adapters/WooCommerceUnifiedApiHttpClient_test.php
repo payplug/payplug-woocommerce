@@ -2,10 +2,10 @@
 
 namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc\Adapters;
 
-use Payplug\PayplugWoocommerce\Upc\Adapters\WpUnifiedApiHttpClient;
+use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceUnifiedApiHttpClient;
 use PHPUnit\Framework\TestCase;
 
-class WpUnifiedApiHttpClient_test extends TestCase
+class WooCommerceUnifiedApiHttpClient_test extends TestCase
 {
     protected function tearDown(): void
     {
@@ -24,7 +24,7 @@ class WpUnifiedApiHttpClient_test extends TestCase
             ];
         });
 
-        $result = (new WpUnifiedApiHttpClient())->get('https://example.test/api/payment-gateway/payments/pay_123');
+        $result = (new WooCommerceUnifiedApiHttpClient())->get('https://example.test/api/payment-gateway/payments/pay_123');
 
         $this->assertSame(200, $result['status']);
         $this->assertSame('{"id":"pay_123"}', $result['body']);
@@ -34,7 +34,7 @@ class WpUnifiedApiHttpClient_test extends TestCase
     {
         add_filter('pre_http_request', fn () => new \WP_Error('http_request_failed', 'Connection timed out.'));
 
-        $result = (new WpUnifiedApiHttpClient())->get('https://example.test/api/payment-gateway/payments/pay_123');
+        $result = (new WooCommerceUnifiedApiHttpClient())->get('https://example.test/api/payment-gateway/payments/pay_123');
 
         $this->assertSame(0, $result['status']);
         $this->assertSame('Connection timed out.', $result['body']);
@@ -54,7 +54,7 @@ class WpUnifiedApiHttpClient_test extends TestCase
             ];
         }, 10, 2);
 
-        $result = (new WpUnifiedApiHttpClient())->postJson('https://example.test/api/payment-gateway/payments', ['amount' => 1000]);
+        $result = (new WooCommerceUnifiedApiHttpClient())->postJson('https://example.test/api/payment-gateway/payments', ['amount' => 1000]);
 
         $this->assertSame(201, $result['status']);
         $this->assertSame('{"id":"pay_123"}', $result['body']);

@@ -2,10 +2,10 @@
 
 namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc\Adapters;
 
-use Payplug\PayplugWoocommerce\Upc\Adapters\WpOAuthHttpClient;
+use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOAuthHttpClient;
 use PHPUnit\Framework\TestCase;
 
-class WpOAuthHttpClient_test extends TestCase
+class WooCommerceOAuthHttpClient_test extends TestCase
 {
     protected function tearDown(): void
     {
@@ -24,7 +24,7 @@ class WpOAuthHttpClient_test extends TestCase
             ];
         });
 
-        $result = (new WpOAuthHttpClient())->post('https://example.test/oauth2/token', ['grant_type' => 'client_credentials']);
+        $result = (new WooCommerceOAuthHttpClient())->post('https://example.test/oauth2/token', ['grant_type' => 'client_credentials']);
 
         $this->assertSame(200, $result['status']);
         $this->assertSame('{"access_token":"abc"}', $result['body']);
@@ -34,7 +34,7 @@ class WpOAuthHttpClient_test extends TestCase
     {
         add_filter('pre_http_request', fn () => new \WP_Error('http_request_failed', 'Connection timed out.'));
 
-        $result = (new WpOAuthHttpClient())->post('https://example.test/oauth2/token', []);
+        $result = (new WooCommerceOAuthHttpClient())->post('https://example.test/oauth2/token', []);
 
         $this->assertSame(0, $result['status']);
         $this->assertSame('Connection timed out.', $result['body']);

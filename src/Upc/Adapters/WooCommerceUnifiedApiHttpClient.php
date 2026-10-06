@@ -4,7 +4,7 @@ namespace Payplug\PayplugWoocommerce\Upc\Adapters;
 
 use PayplugUnifiedCore\Contracts\IUnifiedApiHttpClient;
 
-class WpUnifiedApiHttpClient implements IUnifiedApiHttpClient
+class WooCommerceUnifiedApiHttpClient implements IUnifiedApiHttpClient
 {
     public function get(string $url, array $headers = []): array
     {
