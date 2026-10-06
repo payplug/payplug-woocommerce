@@ -1,6 +1,6 @@
 <?php
 
-namespace Payplug\PayplugWoocommerce\Upc;
+namespace Payplug\PayplugWoocommerce\Upc\Card;
 
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLogger;
@@ -16,7 +16,7 @@ use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLogger;
  * payment (the webhook's own isTreated() guard would otherwise skip persistence entirely once
  * the reconciler has already marked the operation treated).
  */
-class UhfCardFromOperationPersister
+class CardRecorderFromOperation
 {
     /**
      * @param array<string, mixed> $decoded json_decode()'d operation or webhook body
@@ -44,10 +44,10 @@ class UhfCardFromOperationPersister
             return;
         }
 
-        $card_data = UhfCardDataExtractor::extract($decoded);
+        $card_data = CardDataExtractor::extract($decoded);
         $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
 
-        $persisted = (new UhfCardPersister())->persist($order->get_customer_id(), $alias_id, $mode, [], $card_data);
+        $persisted = (new CardRecorder())->persist($order->get_customer_id(), $alias_id, $mode, [], $card_data);
 
         if (!$persisted) {
             // Same reasoning as the missing-alias-id branch above: a sanitization rejection

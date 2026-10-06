@@ -1,10 +1,10 @@
 <?php
 
-namespace Payplug\PayplugWoocommerce\Upc;
+namespace Payplug\PayplugWoocommerce\Upc\Card;
 
 use Payplug\PayplugWoocommerce\Model\UhfCard;
 
-class UhfCardPersister
+class CardRecorder
 {
     private const ALLOWED_BRANDS = ['CB', 'VISA', 'MASTERCARD'];
 

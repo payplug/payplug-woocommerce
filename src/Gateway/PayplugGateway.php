@@ -280,6 +280,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             return;
         }
 
+        // A hosted_fields (UPC) order has no Retail API payment to check: its outcome is applied
+        // by the Unified API flow (synchronous response, webhook, Upc\PaymentReconciler).
+        if ('' !== (string) $order->get_meta('_payplug_upc_operation_id')) {
+            return;
+        }
+
         $payment_method = PayplugWoocommerceHelper::is_pre_30() ? $order->payment_method : $order->get_payment_method();
         if (!in_array($payment_method, ['payplug', 'oney_x3_with_fees', 'oney_x4_with_fees', 'oney_x3_without_fees', 'oney_x4_without_fees', 'bancontact', 'apple_pay', 'american_express', 'satispay', 'mybank', 'ideal', 'wero', 'bizum', 'scalapay'])) {
             return;
