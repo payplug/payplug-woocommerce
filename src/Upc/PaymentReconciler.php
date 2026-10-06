@@ -2,10 +2,8 @@
 
 namespace Payplug\PayplugWoocommerce\Upc;
 
-use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLogger;
-use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOrderStateMutator;
-use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommercePaymentRepository;
+use Payplug\PayplugWoocommerce\Upc\Card\CardRecorderFromOperation;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PayplugUnifiedCore\Exceptions\InvalidOperationDataException;
@@ -26,21 +24,19 @@ use PayplugUnifiedCore\Utilities\Helpers\ExecCodeMapper;
 class PaymentReconciler
 {
     /**
-     * Same lock key format and TTL as Front\UpcWebhook - deliberately, so a webhook delivery and
-     * a reconciliation racing for the same operation contend for the exact same lock, and
-     * whichever wins finds the other's markTreated() already applied via isTreated() below.
-     */
-    private const LOCK_TTL_SECONDS = 30;
-
-    /**
      * The order-received page re-fires reconcile() on every load with no other backoff - a
      * shopper stuck on a pending order who refreshes repeatedly would otherwise hammer the
      * Unified API with an OAuth token fetch plus getOperation() (up to ~20s of synchronous calls,
-     * WpUnifiedApiHttpClient's 10s timeout each) on every single request.
+     * WooCommerceUnifiedApiHttpClient's 10s timeout each) on every single request.
      */
     private const RECONCILE_THROTTLE_SECONDS = 60;
 
-    public function reconcile(\WC_Order $order): void
+    /**
+     * @param bool $bypass_throttle true when the caller must know the current state right now
+     *                              (HostedFieldsPaymentProcessor::process_payment() deciding whether a new
+     *                              attempt may be created), rather than on a page render
+     */
+    public function reconcile(\WC_Order $order, bool $bypass_throttle = false): void
     {
         if (PaymentOutcome::THREE_DS_PENDING !== $order->get_meta('_payplug_upc_outcome')) {
             // Either never went through the UPC hosted-fields flow, or already resolved -
@@ -56,7 +52,7 @@ class PaymentReconciler
 
         $throttle_key = 'payplug_upc_reconcile_' . $order->get_id();
 
-        if (false !== get_transient($throttle_key)) {
+        if (!$bypass_throttle && false !== get_transient($throttle_key)) {
             return;
         }
 
@@ -116,44 +112,24 @@ class PaymentReconciler
             return;
         }
 
-        // Same lock + isTreated() guard as Front\UpcWebhook::receive_notification(): without it, a
-        // webhook delivery landing at the same moment as this reconciliation could have both read
-        // the order as not-yet-treated, both call the mutator, and both fire
-        // 'woocommerce_payment_complete' - duplicate emails/accounting-connector calls/subscription
-        // activations for the same order.
-        $lock = new WooCommerceLock();
-        $lock_key = 'payplug_upc_treat_' . $operation_id;
-
-        if (!$lock->acquire($lock_key, self::LOCK_TTL_SECONDS)) {
-            // Contended: a webhook delivery (or another reconciliation) is already handling this
-            // exact operation.
-            return;
-        }
-
-        $payment_repository = new WooCommercePaymentRepository();
-
+        // Through OperationOutcomeProcessor, like Front\UpcWebhook: a webhook delivery landing at the
+        // same moment as this reconciliation must not apply the outcome a second time. LOCKED or
+        // ALREADY_TREATED means the webhook is handling (or has handled) this exact operation.
         try {
-            if ($payment_repository->isTreated($operation_id)) {
-                return;
-            }
-
-            $payment_repository->save(new OperationData(
-                $operation_id,
-                $exec_code,
-                $outcome,
-                AmountHelper::toCents((float) $order->get_total(), $order->get_currency()),
-                (string) $order->get_id()
-            ));
-
-            (new WooCommerceOrderStateMutator())->apply((string) $order->get_id(), $outcome);
-
-            if (PaymentOutcome::PAID === $outcome) {
-                // The body just fetched is the operation resource, the same
-                // paymentMethod.{id, card, details} shape the webhook carries - no second fetch.
-                (new UhfCardFromOperationPersister())->maybe_persist($order, $data);
-            }
-
-            $payment_repository->markTreated($operation_id);
+            (new OperationOutcomeProcessor())->process(
+                new OperationData(
+                    $operation_id,
+                    $exec_code,
+                    $outcome,
+                    AmountHelper::toCents((float) $order->get_total(), $order->get_currency()),
+                    (string) $order->get_id()
+                ),
+                function () use ($order, $data): void {
+                    // The body just fetched is the operation resource, the same
+                    // paymentMethod.{id, card, details} shape the webhook carries - no second fetch.
+                    (new CardRecorderFromOperation())->maybe_persist($order, $data);
+                }
+            );
         } catch (InvalidOperationDataException $e) {
             (new WooCommerceLogger())->error(sprintf(
                 'UPC payment reconciliation built invalid operation data for order #%s: %s',
@@ -167,8 +143,6 @@ class PaymentReconciler
                 $order->get_id(),
                 $e->getMessage()
             ));
-        } finally {
-            $lock->release($lock_key);
         }
     }
 }

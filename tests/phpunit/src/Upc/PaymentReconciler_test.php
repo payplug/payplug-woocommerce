@@ -61,6 +61,8 @@ class PaymentReconciler_test extends TestCase
         (new PaymentReconciler())->apply_reconciled_state($this->order, 'op_pending_123', $this->body('0300'));
 
         $this->assertSame('failed', $this->reload()->get_status());
+        // Not marked treated: a later PAID notification for the same operation must still apply.
+        $this->assertSame('', $this->reload()->get_meta('_payplug_upc_treated'));
     }
 
     public function testAStillPendingStateLeavesTheOrderUntouched(): void

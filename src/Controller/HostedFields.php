@@ -10,12 +10,13 @@ class HostedFields
      */
     public static function template_form($save_card, array $cards = [])
     {
-        // The transaction-secured/privacy-policy footer is visually identical to
-        // Integrated Payment's, so it reuses IntegratedPayment_container classes and
-        // assets directly rather than duplicating them under HostedFields_container.
-        $logo = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/logo-payplug.png';
-        $lock = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
-        $privacy_policy_url = __('payplug_integrated_payment_privacy_policy_url', 'payplug');
+        // Same markup, classes and assets as the PrestaShop module's hosted_fields.tpl, so the UHF
+        // card form looks the same on both platforms (styles in assets/css/payplug-card-form.css).
+        // The wrapper is a <div>, not a <form>: it is rendered inside WooCommerce's own checkout
+        // (or order-pay) form, and the browser drops a nested <form> element altogether.
+        $logo = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/integrated/payplug.svg';
+        $lock = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/integrated/lock.svg';
+        $privacy_policy_url = esc_url(__('payplug_integrated_payment_privacy_policy_url', 'payplug'));
         $f = fn ($fn) => $fn;
 
         $cards_html = '';
@@ -58,31 +59,58 @@ HTML;
 
         return <<<HTML
 			{$cards_html}
-			<form class="payplug HostedFields -loaded">
+			<div class="payplug HostedFields -loaded">
 				<input type="hidden" name="hf_token" id="hf-token" value="" />
 				<input type="hidden" name="hf_selected_brand" id="hf-selected-brand" value="" />
 				<input type="hidden" name="hf_last4" id="hf-last4" value="" />
 				<input type="hidden" name="hf_expiration_month" id="hf-expiration-month" value="" />
 				<input type="hidden" name="hf_expiration_year" id="hf-expiration-year" value="" />
-				<div class="payplug HostedFields_container -brand" id="hosted-fields-brand" data-e2e-name="brand"></div>
-				<div class="payplug HostedFields_container -card" id="hosted-fields-card" data-e2e-name="card"></div>
-				<div class="payplug HostedFields_container -expiry" id="hosted-fields-expiry" data-e2e-name="expiry"></div>
-				<div class="payplug HostedFields_container -cryptogram" id="hosted-fields-cryptogram" data-e2e-name="cryptogram"></div>
+
+				<div class="payplug HostedFields_container -cardHolder">
+					<input type="text" name="hf_cardholder" id="hf-cardholder" placeholder="{$f(esc_attr__('payplug_integrated_payment_cardholder', 'payplug'))}" autocomplete="cc-name" />
+				</div>
+				<div class="payplug HostedFields_error -cardHolder">
+					<span class="-hide invalidField">{$f(esc_html__('payplug_integrated_payment_cardHolder_error', 'payplug'))}</span>
+					<span class="-hide emptyField">{$f(esc_html__('payplug_integrated_payment_empty', 'payplug'))}</span>
+				</div>
+
+				<div class="payplug HostedFields_container -scheme">
+					<div>{$f(esc_html__('payplug_integrated_payment_your_card', 'payplug'))}</div>
+					<div class="payplug HostedFields_schemes" id="hosted-fields-brand" data-e2e-name="brand"></div>
+				</div>
+
+				<div class="payplug HostedFields_container -pan" id="hosted-fields-card" data-e2e-name="card"></div>
+				<div class="payplug HostedFields_error -pan">
+					<span class="-hide invalidField">{$f(esc_html__('payplug_integrated_payment_pan_error', 'payplug'))}</span>
+					<span class="-hide emptyField">{$f(esc_html__('payplug_integrated_payment_empty', 'payplug'))}</span>
+				</div>
+
+				<div class="payplug HostedFields_container -exp" id="hosted-fields-expiry" data-e2e-name="expiry"></div>
+				<div class="payplug HostedFields_container -cvv" id="hosted-fields-cryptogram" data-e2e-name="cryptogram"></div>
+				<div class="payplug HostedFields_error -exp">
+					<span class="-hide invalidField">{$f(esc_html__('payplug_integrated_payment_exp_error', 'payplug'))}</span>
+					<span class="-hide emptyField">{$f(esc_html__('payplug_integrated_payment_empty', 'payplug'))}</span>
+				</div>
+				<div class="payplug HostedFields_error -cvv">
+					<span class="-hide invalidField">{$f(esc_html__('payplug_integrated_payment_cvv_error', 'payplug'))}</span>
+					<span class="-hide emptyField">{$f(esc_html__('payplug_integrated_payment_empty', 'payplug'))}</span>
+				</div>
 
 				{$saved}
 
-				<div class="payplug HostedFields_error -tokenization -hide">
-					<span class="genericError">{$f(__('payplug_hosted_fields_tokenization_error', 'payplug'))}</span>
-					<span class="brandError -hide">{$f(__('payplug_hosted_fields_unsupported_brand_error', 'payplug'))}</span>
+				<div class="payplug HostedFields_error -payment">
+					<span class="-hide genericError">{$f(esc_html__('payplug_hosted_fields_tokenization_error', 'payplug'))}</span>
+					<span class="-hide brandError">{$f(esc_html__('payplug_hosted_fields_unsupported_brand_error', 'payplug'))}</span>
 				</div>
 
-				<div class="payplug IntegratedPayment_container -transaction">
-					<img class="lock-icon" src="$lock" /><label class="transaction-label">{$f(__('payplug_integrated_payment_transaction_secure', 'payplug'))}</label><img class="payplug-logo" src="$logo" />
+				<div class="payplug HostedFields_privacy_policy">
+					<img class="-lock" src="{$lock}" alt="" />
+					<span>{$f(esc_html__('payplug_integrated_payment_transaction_secure', 'payplug'))}</span>
+					<img class="-logo" src="{$logo}" alt="Payplug" />
+					<br />
+					<a href="{$privacy_policy_url}" target="_blank" rel="noopener noreferrer">{$f(esc_html__('payplug_integrated_payment_privacy_policy', 'payplug'))}</a>
 				</div>
-				<div class="payplug IntegratedPayment_container -privacy-policy">
-					<a href="$privacy_policy_url" target="_blank">{$f(__('payplug_integrated_payment_privacy_policy', 'payplug'))}</a>
-				</div>
-			</form>
+			</div>
 HTML;
     }
 }

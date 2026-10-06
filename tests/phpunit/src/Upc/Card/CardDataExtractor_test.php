@@ -1,11 +1,11 @@
 <?php
 
-namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc;
+namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc\Card;
 
-use Payplug\PayplugWoocommerce\Upc\UhfCardDataExtractor;
+use Payplug\PayplugWoocommerce\Upc\Card\CardDataExtractor;
 use PHPUnit\Framework\TestCase;
 
-class UhfCardDataExtractor_test extends TestCase
+class CardDataExtractor_test extends TestCase
 {
     public function testExtractReadsBrandLast4AndExpirationFromAFullPaymentMethodShape(): void
     {
@@ -17,7 +17,7 @@ class UhfCardDataExtractor_test extends TestCase
             ],
         ];
 
-        $result = UhfCardDataExtractor::extract($decoded);
+        $result = CardDataExtractor::extract($decoded);
 
         $this->assertSame('VISA', $result['brand']);
         $this->assertSame('4242', $result['last4']);
@@ -33,14 +33,14 @@ class UhfCardDataExtractor_test extends TestCase
             ],
         ];
 
-        $result = UhfCardDataExtractor::extract($decoded);
+        $result = CardDataExtractor::extract($decoded);
 
         $this->assertSame('MASTERCARD', $result['brand']);
     }
 
     public function testExtractReturnsEmptyValuesWhenPaymentMethodIsMissing(): void
     {
-        $result = UhfCardDataExtractor::extract([]);
+        $result = CardDataExtractor::extract([]);
 
         $this->assertSame('', $result['brand']);
         $this->assertSame('', $result['last4']);
@@ -56,7 +56,7 @@ class UhfCardDataExtractor_test extends TestCase
             ],
         ];
 
-        $result = UhfCardDataExtractor::extract($decoded);
+        $result = CardDataExtractor::extract($decoded);
 
         $this->assertSame(0, $result['exp_month']);
         $this->assertSame(0, $result['exp_year']);
