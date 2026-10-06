@@ -744,6 +744,9 @@ msgstr "This card type is not accepted with this payment mode. Please use a CB, 
 msgid "payplug_hosted_fields_missing_token"
 msgstr "We could not read your card details. Please try again."
 
+msgid "payplug_hosted_fields_payment_in_progress"
+msgstr "A payment for this order is already in progress. Please wait a few minutes before trying again."
+
 msgid "payplug_hosted_fields_pay_with_another_card"
 msgstr "Pay with another card"
 

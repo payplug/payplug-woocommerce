@@ -1,9 +1,9 @@
 <?php
 
-namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc;
+namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc\Builders;
 
 use Payplug\PayplugWoocommerce\Service\Configuration;
-use Payplug\PayplugWoocommerce\Upc\PaymentCaptureContextBuilder;
+use Payplug\PayplugWoocommerce\Upc\Builders\PaymentCaptureContextBuilder;
 use PHPUnit\Framework\TestCase;
 
 class PaymentCaptureContextBuilder_test extends TestCase
@@ -142,6 +142,20 @@ class PaymentCaptureContextBuilder_test extends TestCase
         $this->assertSame('Jane Doe', $dto->paymentMethod['details']['fullName']);
     }
 
+    public function testBuildSendsTheTypedCardholderAsFullName(): void
+    {
+        $dto = (new PaymentCaptureContextBuilder())->build($this->order, 'hf_token_123', 'visa', true, '  John Smith ');
+
+        $this->assertSame('John Smith', $dto->paymentMethod['details']['fullName']);
+    }
+
+    public function testBuildFallsBackToTheBillingNameWhenNoCardholderIsTyped(): void
+    {
+        $dto = (new PaymentCaptureContextBuilder())->build($this->order, 'hf_token_123', 'visa', true, '   ');
+
+        $this->assertSame('Jane Doe', $dto->paymentMethod['details']['fullName']);
+    }
+
     /**
      * @return string[][]
      */
@@ -182,7 +196,7 @@ class PaymentCaptureContextBuilder_test extends TestCase
      */
     public function testBuildResetsADisallowedBrandToAnEmptyString(string $brand): void
     {
-        // PayplugWoocommerce::render_upc_3ds_redirect() echoes the Unified API's challenge HTML
+        // Front\UpcCheckoutReturn::render_upc_3ds_redirect() echoes the Unified API's challenge HTML
         // unescaped on the shop's own origin - selectedBrand must never reach that API call as
         // anything but a known-safe value.
         $dto = (new PaymentCaptureContextBuilder())->build($this->order, 'hf_token_123', $brand, false);

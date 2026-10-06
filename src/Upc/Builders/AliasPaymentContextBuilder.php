@@ -1,8 +1,7 @@
 <?php
 
-namespace Payplug\PayplugWoocommerce\Upc;
+namespace Payplug\PayplugWoocommerce\Upc\Builders;
 
-use Payplug\PayplugWoocommerce\Upc\Traits\BuildsCommonFields;
 use PayplugUnifiedCore\Dto\PaymentDto;
 
 class AliasPaymentContextBuilder

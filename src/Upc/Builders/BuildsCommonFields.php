@@ -1,6 +1,6 @@
 <?php
 
-namespace Payplug\PayplugWoocommerce\Upc\Traits;
+namespace Payplug\PayplugWoocommerce\Upc\Builders;
 
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceConfigurationRepository;
 use PayplugUnifiedCore\Dto\AddressDto;

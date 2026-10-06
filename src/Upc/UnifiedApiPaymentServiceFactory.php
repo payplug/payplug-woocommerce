@@ -3,9 +3,9 @@
 namespace Payplug\PayplugWoocommerce\Upc;
 
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceConfigurationRepository;
+use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOAuthHttpClient;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceTokenCache;
-use Payplug\PayplugWoocommerce\Upc\Adapters\WpOAuthHttpClient;
-use Payplug\PayplugWoocommerce\Upc\Adapters\WpUnifiedApiHttpClient;
+use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceUnifiedApiHttpClient;
 use PayplugUnifiedCore\Auth\OAuth2Client;
 use PayplugUnifiedCore\Auth\TokenManager;
 use PayplugUnifiedCore\Services\UnifiedApiPaymentService;
@@ -22,7 +22,7 @@ class UnifiedApiPaymentServiceFactory
         // already obtained via the existing account-linking flow) - hardcoded empty rather than
         // adding config constants nobody can meaningfully fill in for this flow.
         $oauth2_client = new OAuth2Client(
-            new WpOAuthHttpClient(),
+            new WooCommerceOAuthHttpClient(),
             UPC_OAUTH_BASE_URL,
             '',
             '',
@@ -32,7 +32,7 @@ class UnifiedApiPaymentServiceFactory
         $token_manager = new TokenManager(new WooCommerceTokenCache(), $oauth2_client);
 
         return new UnifiedApiPaymentService(
-            new WpUnifiedApiHttpClient(),
+            new WooCommerceUnifiedApiHttpClient(),
             $token_manager,
             UPC_UNIFIED_API_BASE_URL,
             $configuration_repository->getClientId(),

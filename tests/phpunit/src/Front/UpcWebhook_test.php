@@ -61,6 +61,30 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
         $this->assertSame('yes', $order->get_meta('_payplug_upc_treated'));
     }
 
+    public function testALatePaidNotificationStillCompletesAnOrderAFailedOutcomeWasAppliedTo(): void
+    {
+        $controller = new UpcWebhook();
+
+        // e.g. an unmapped "Acceptation" execCode (0002, WAITING_PROVIDER) mapped to FAILED first.
+        ob_start();
+        $first_status = $controller->receive_notification($this->notificationBody('0002'));
+        ob_get_clean();
+
+        $order = wc_get_order($this->order->get_id());
+        $this->assertSame(200, $first_status);
+        $this->assertSame('failed', $order->get_status());
+        $this->assertSame('', $order->get_meta('_payplug_upc_treated'));
+
+        ob_start();
+        $second_status = $controller->receive_notification($this->notificationBody('0000'));
+        ob_get_clean();
+
+        $order = wc_get_order($this->order->get_id());
+        $this->assertSame(200, $second_status);
+        $this->assertSame('processing', $order->get_status());
+        $this->assertSame('yes', $order->get_meta('_payplug_upc_treated'));
+    }
+
     public function testAThreeDsPendingNotificationDoesNotChangeTheOrderStatusOrMarkTreated(): void
     {
         $controller = new UpcWebhook();

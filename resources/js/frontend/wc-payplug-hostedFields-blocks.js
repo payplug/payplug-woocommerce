@@ -1,6 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 
 const ALLOWED_BRANDS = ['CB', 'VISA', 'MASTERCARD'];
+const CARDHOLDER_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ' .-]{2,}$/;
+const FIELDS = ['cardHolder', 'pan', 'exp', 'cvv'];
+
+// 'empty', 'invalid' or null (valid) - same states as the PrestaShop module's UHF form.
+const cardholderState = (value) => {
+	const trimmed = String(value || '').trim();
+
+	if ('' === trimmed) {
+		return 'empty';
+	}
+
+	return CARDHOLDER_PATTERN.test(trimmed) ? null : 'invalid';
+};
 
 const HostedFields = ({ settings: settings, props: props }) => {
 	const { eventRegistration, shouldSavePayment } = props;
@@ -9,6 +22,30 @@ const HostedFields = ({ settings: settings, props: props }) => {
 	const cards = settings?.uhfCards || [];
 	const [selectedCard, setSelectedCard] = useState('other');
 	const showingNewCardForm = 'other' === selectedCard;
+	const [cardholder, setCardholder] = useState('');
+	// What each field's error line currently shows. The SDK only reports a card field's
+	// validity through onInput, so fieldStates (a ref, read at submit time) starts out
+	// 'empty' for all of them, while nothing is displayed until the shopper interacts or submits.
+	const fieldStates = useRef({ cardHolder: 'empty', pan: 'empty', exp: 'empty', cvv: 'empty' });
+	const [displayedErrors, setDisplayedErrors] = useState({});
+
+	const setFieldState = (field, state) => {
+		fieldStates.current[field] = state;
+		setDisplayedErrors((errors) => ({ ...errors, [field]: state }));
+	};
+
+	const handleFieldEvent = (field) => (event) => {
+		if ('invalid' === event.type) {
+			setFieldState(field, 'FIELD_EMPTY' === event.errorName ? 'empty' : 'invalid');
+		} else if ('valid' === event.type) {
+			setFieldState(field, null);
+		}
+	};
+
+	const onCardholderChange = (value) => {
+		setCardholder(value);
+		setFieldState('cardHolder', cardholderState(value));
+	};
 
 	// Mounted exactly once, on initial render (selectedCard's initial state is always
 	// 'other', so showingNewCardForm is guaranteed true here) - never re-run when
@@ -32,11 +69,24 @@ const HostedFields = ({ settings: settings, props: props }) => {
 
 		instance.current = window.dalenys.hostedFields({
 			companyId: settings?.hostedFieldsCompanyId,
+			// Same field options as the PrestaShop module, so the SDK renders the same form.
 			fields: {
-				brand: { id: 'hosted-fields-brand' },
-				card: { id: 'hosted-fields-card' },
-				expiry: { id: 'hosted-fields-expiry' },
-				cryptogram: { id: 'hosted-fields-cryptogram' },
+				brand: { id: 'hosted-fields-brand', version: 2, useInlineSelection: true },
+				card: {
+					id: 'hosted-fields-card',
+					placeholder: settings?.payplug_integrated_payment_card_number,
+					onInput: handleFieldEvent('pan'),
+				},
+				expiry: {
+					id: 'hosted-fields-expiry',
+					placeholder: settings?.payplug_integrated_payment_expiration_date,
+					onInput: handleFieldEvent('exp'),
+				},
+				cryptogram: {
+					id: 'hosted-fields-cryptogram',
+					placeholder: settings?.payplug_integrated_payment_cvv,
+					onInput: handleFieldEvent('cvv'),
+				},
 			},
 		});
 		instance.current.load();
@@ -63,6 +113,18 @@ const HostedFields = ({ settings: settings, props: props }) => {
 				return Promise.resolve({
 					type: 'error',
 					message: settings?.hostedFieldsTokenizationError,
+				});
+			}
+
+			// Shows every field's error at once, like the classic form, and never tokenizes an
+			// incomplete card.
+			fieldStates.current.cardHolder = cardholderState(cardholder);
+			setDisplayedErrors({ ...fieldStates.current });
+
+			if (FIELDS.some((field) => null !== fieldStates.current[field])) {
+				return Promise.resolve({
+					type: 'error',
+					message: settings?.hostedFieldsInvalidForm,
 				});
 			}
 
@@ -97,23 +159,24 @@ const HostedFields = ({ settings: settings, props: props }) => {
 					// POST), and process_payment() reads these straight from
 					// meta.paymentMethodData once the order exists. The token is already
 					// validated client-side above; no server round-trip is needed before
-					// resolving. CAVEAT (PRE-3638): result.last4/expirationMonth/expirationYear
-					// are this SDK's best-known field names, unconfirmed against a real
-					// createToken() response - guarded by `|| ''` below so a wrong guess
-					// degrades rather than crashes, but combined with a failed server-side
-					// getOperation() fetch this is a card that silently never saves. Confirm/
-					// correct these against the browser console on a real staging tokenization
-					// before relying on them in production.
+					// resolving. Card metadata field names confirmed against a real staging
+					// createToken() result (2026-10-05): cardCode is the masked PAN
+					// ("406560XXXXXX0000"), cardValidityDate is "MM-YY".
+					const cardCode = String(result.cardCode || '');
+					const last4 = cardCode.slice(-4);
+					const validity = /^(\d{2})-(\d{2})$/.exec(String(result.cardValidityDate || ''));
+
 					resolve({
 						type: 'success',
 						meta: {
 							paymentMethodData: {
 								hf_token: result.hfToken,
 								hf_selected_brand: selectedBrand,
+								hf_cardholder: String(cardholder).trim(),
 								savecard: shouldSavePayment ? '1' : '',
-								hf_last4: result.last4 || '',
-								hf_expiration_month: result.expirationMonth || '',
-								hf_expiration_year: result.expirationYear || '',
+								hf_last4: /^\d{4}$/.test(last4) ? last4 : '',
+								hf_expiration_month: validity ? String(parseInt(validity[1], 10)) : '',
+								hf_expiration_year: validity ? String(2000 + parseInt(validity[2], 10)) : '',
 							},
 						},
 					});
@@ -123,7 +186,15 @@ const HostedFields = ({ settings: settings, props: props }) => {
 		const unsubscribe = onPaymentSetup(handlePaymentProcessing);
 
 		return () => { unsubscribe(); };
-	}, [onPaymentSetup, showingNewCardForm, selectedCard, shouldSavePayment]);
+	}, [onPaymentSetup, showingNewCardForm, selectedCard, shouldSavePayment, cardholder]);
+
+	const fieldError = (field, invalidMessage) => (
+		<div className={`payplug HostedFields_error -${field}`}>
+			<span className={'invalid' === displayedErrors[field] ? 'invalidField' : '-hide invalidField'}>{invalidMessage}</span>
+			<span className={'empty' === displayedErrors[field] ? 'emptyField' : '-hide emptyField'}>{settings?.payplug_integrated_payment_empty}</span>
+		</div>
+	);
+	const containerClass = (field) => `payplug HostedFields_container -${field}${displayedErrors[field] ? ' -invalid' : ''}`;
 
 	return (
 		<>
@@ -163,20 +234,45 @@ const HostedFields = ({ settings: settings, props: props }) => {
 					</label>
 				</div>
 			)}
+			{/* Same markup and classes as the classic form (Controller/HostedFields.php), itself
+				aligned on the PrestaShop module's UHF form. The new-card fields are hidden as a whole
+				(never unmounted: the SDK has no way to remount its iframes) while a saved card is selected. */}
 			<div id="payplug-hosted-fields" className="payplug HostedFields -loaded">
-				<div className="payplug HostedFields_container -brand" id="hosted-fields-brand" data-e2e-name="brand" hidden={!showingNewCardForm}></div>
-				<div className="payplug HostedFields_container -card" id="hosted-fields-card" data-e2e-name="card" hidden={!showingNewCardForm}></div>
-				<div className="payplug HostedFields_container -expiry" id="hosted-fields-expiry" data-e2e-name="expiry" hidden={!showingNewCardForm}></div>
-				<div className="payplug HostedFields_container -cryptogram" id="hosted-fields-cryptogram" data-e2e-name="cryptogram" hidden={!showingNewCardForm}></div>
-				{/* Visually identical to Integrated Payment's footer, so it reuses the same
-					IntegratedPayment_container classes and settings keys rather than duplicating them. */}
-				<div className="payplug IntegratedPayment_container -transaction">
-					<img className="lock-icon" src={settings?.lock} />
-					<label className="transaction-label">{settings?.payplug_integrated_payment_transaction_secure}</label>
-					<img className="payplug-logo" src={settings?.logo} />
+				<div className="payplug HostedFields_newCard" hidden={!showingNewCardForm}>
+					<div className={containerClass('cardHolder')}>
+						<input
+							type="text"
+							name="hf_cardholder"
+							id="hf-cardholder"
+							placeholder={settings?.payplug_integrated_payment_cardholder}
+							autoComplete="cc-name"
+							value={cardholder}
+							onChange={(event) => onCardholderChange(event.target.value)}
+							onBlur={(event) => onCardholderChange(event.target.value)}
+						/>
+					</div>
+					{fieldError('cardHolder', settings?.payplug_integrated_payment_cardHolder_error)}
+
+					<div className="payplug HostedFields_container -scheme">
+						<div>{settings?.payplug_integrated_payment_your_card}</div>
+						<div className="payplug HostedFields_schemes" id="hosted-fields-brand" data-e2e-name="brand"></div>
+					</div>
+
+					<div className={containerClass('pan')} id="hosted-fields-card" data-e2e-name="card"></div>
+					{fieldError('pan', settings?.payplug_integrated_payment_pan_error)}
+
+					<div className={containerClass('exp')} id="hosted-fields-expiry" data-e2e-name="expiry"></div>
+					<div className={containerClass('cvv')} id="hosted-fields-cryptogram" data-e2e-name="cryptogram"></div>
+					{fieldError('exp', settings?.payplug_integrated_payment_exp_error)}
+					{fieldError('cvv', settings?.payplug_integrated_payment_cvv_error)}
 				</div>
-				<div className="payplug IntegratedPayment_container -privacy-policy">
-					<a href={settings?.payplug_integrated_payment_privacy_policy_url} target="_blank">{settings?.payplug_integrated_payment_privacy_policy}</a>
+
+				<div className="payplug HostedFields_privacy_policy">
+					<img className="-lock" src={settings?.lock} alt="" />{' '}
+					<span>{settings?.payplug_integrated_payment_transaction_secure}</span>{' '}
+					<img className="-logo" src={settings?.logo} alt="Payplug" />
+					<br />
+					<a href={settings?.payplug_integrated_payment_privacy_policy_url} target="_blank" rel="noopener noreferrer">{settings?.payplug_integrated_payment_privacy_policy}</a>
 				</div>
 			</div>
 		</>

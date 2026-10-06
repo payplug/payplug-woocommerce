@@ -3,11 +3,10 @@
 namespace Payplug\PayplugWoocommerce\Front;
 
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceConfigurationRepository;
-use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLogger;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOrderStateMutator;
-use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommercePaymentRepository;
-use Payplug\PayplugWoocommerce\Upc\UhfCardFromOperationPersister;
+use Payplug\PayplugWoocommerce\Upc\Card\CardRecorderFromOperation;
+use Payplug\PayplugWoocommerce\Upc\OperationOutcomeProcessor;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PayplugUnifiedCore\Exceptions\InvalidNotificationException;
@@ -18,8 +17,6 @@ use PayplugUnifiedCore\Utilities\Helpers\WebhookNotificationHelper;
 
 class UpcWebhook
 {
-    private const LOCK_TTL_SECONDS = 30;
-
     /**
      * Fixed path Payplug's Unified API notifier actually delivers to - confirmed against the
      * Sylius reference implementation (Controller/UnifiedApiIpnAction.php): the Unified API's
@@ -216,53 +213,34 @@ class UpcWebhook
             return 400;
         }
 
-        // Keyed on the order's primary operation id - always set by persist_operation() - rather
-        // than the id this exact notification carries, so a delivery bound to the alt id and
-        // PaymentReconciler::apply_reconciled_state() (which only ever knows the primary id)
-        // contend for the same lock instead of two different ones.
-        $lock = new WooCommerceLock();
-        $lock_key = 'payplug_upc_treat_' . $stored_operation_id;
-
-        if (!$lock->acquire($lock_key, self::LOCK_TTL_SECONDS)) {
-            // Contended: another delivery (a Payplug retry) is already handling this operation.
-            return 200;
-        }
-
         try {
-            $payment_repository = new WooCommercePaymentRepository();
-
-            if ($payment_repository->isTreated($operation_data->operationId)) {
-                return 200;
-            }
-
-            // Persisted with $stored_operation_id, never $operation_data->operationId directly:
-            // on an alt-only match, the latter is the alt id, and save() would otherwise
+            // Persisted and locked with $stored_operation_id, never $operation_data->operationId
+            // directly: on an alt-only match the latter is the alt id, and save() would otherwise
             // overwrite the order's true primary operation id with it - contradicting
             // PaymentCaptureOutcomeApplier::persist_operation()'s own guarantee that the alt id
-            // "never becomes the order's primary operation binding".
-            $payment_repository->save(new OperationData(
+            // "never becomes the order's primary operation binding". It also makes this delivery
+            // and PaymentReconciler (which only knows the primary id) contend for the same lock.
+            $operation = new OperationData(
                 $stored_operation_id,
                 $operation_data->execCode,
                 $operation_data->outcome,
                 $operation_data->amount,
                 $operation_data->orderId
-            ));
-            (new WooCommerceOrderStateMutator())->apply($operation_data->orderId, $operation_data->outcome);
+            );
 
-            if (PaymentOutcome::PAID === $operation_data->outcome) {
+            // LOCKED (another delivery, a Payplug retry or a reconciliation is applying this
+            // operation right now) and ALREADY_TREATED both answer 200: the outcome is, or is
+            // about to be, applied - nothing for Payplug's notifier to retry.
+            (new OperationOutcomeProcessor())->process($operation, function () use ($order, $raw_body): void {
                 $this->maybe_persist_uhf_card($order, $raw_body);
-            }
-
-            $payment_repository->markTreated($operation_data->operationId);
+            });
 
             return 200;
         } catch (InvalidOperationDataException $e) {
             // Not expected in practice - $stored_operation_id is non-empty here (guaranteed by
             // the matches_primary/matches_alt check above) and every other field comes from
             // $operation_data, already validated by WebhookNotificationHelper::parse(). Guarded
-            // anyway, the same way PaymentCaptureOutcomeApplier::persist_operation() and
-            // PaymentReconciler::apply_reconciled_state() both guard their own OperationData
-            // construction - this endpoint must not fatal on an assumption that turns out wrong.
+            // anyway: this endpoint must not fatal on an assumption that turns out wrong.
             $logger->error(sprintf('UPC webhook built invalid operation data for order #%s: %s', $order->get_id(), $e->getMessage()));
 
             return 500;
@@ -270,18 +248,15 @@ class UpcWebhook
             $logger->error(sprintf('UPC webhook could not persist operation "%s": %s', $operation_data->operationId, $e->getMessage()));
 
             return 500;
-        } finally {
-            $lock->release($lock_key);
         }
     }
 
     /**
      * One of two places a 3DS-confirmed payment's card can be saved - the other is
-     * PaymentReconciler, whose own getOperation() fetch can win the race against this webhook
-     * and mark the operation treated first, in which case this method's caller never even
-     * reaches this call (see the isTreated() guard above). No extra API call is made here: the
-     * webhook's own raw body is already the same paymentMethod.{id, card, details} shape
-     * UhfCardFromOperationPersister expects.
+     * PaymentReconciler, whose own getOperation() fetch can win the race against this webhook and
+     * mark the operation treated first, in which case OperationOutcomeProcessor never calls this.
+     * No extra API call is made here: the webhook's own raw body is already the same
+     * paymentMethod.{id, card, details} shape CardRecorderFromOperation expects.
      */
     private function maybe_persist_uhf_card(\WC_Order $order, string $raw_body): void
     {
@@ -291,7 +266,7 @@ class UpcWebhook
             return;
         }
 
-        (new UhfCardFromOperationPersister())->maybe_persist($order, $decoded);
+        (new CardRecorderFromOperation())->maybe_persist($order, $decoded);
     }
 
     /**

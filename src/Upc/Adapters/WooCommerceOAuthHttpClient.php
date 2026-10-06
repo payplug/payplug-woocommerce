@@ -4,7 +4,7 @@ namespace Payplug\PayplugWoocommerce\Upc\Adapters;
 
 use PayplugUnifiedCore\Contracts\IOAuthHttpClient;
 
-class WpOAuthHttpClient implements IOAuthHttpClient
+class WooCommerceOAuthHttpClient implements IOAuthHttpClient
 {
     public function post(string $url, array $formParams, array $headers = []): array
     {

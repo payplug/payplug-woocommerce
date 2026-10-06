@@ -18,7 +18,7 @@ class WooCommerceOrderStateMutator implements IOrderStateMutator
     private const TERMINAL_STATUSES = ['processing', 'completed', 'refunded'];
 
     /**
-     * The single source of truth for "is this order already finished" - PayplugCreditCard::
+     * The single source of truth for "is this order already finished" - HostedFieldsPaymentProcessor::
      * process_payment() calls this instead of re-typing the same array literal at its own two
      * call sites, so the three copies can no longer silently drift apart.
      */
@@ -32,6 +32,11 @@ class WooCommerceOrderStateMutator implements IOrderStateMutator
      * to set the status directly, it goes through WC_Order::payment_complete() instead, which
      * picks 'processing' vs 'completed' itself. The entry stays so the isset() guard in apply()
      * still recognizes PAID as a mapped (not silently ignored) outcome.
+     *
+     * AUTHORIZED/REFUNDED are effectively unreachable today: ExecCodeMapper never produces them,
+     * and an order paid through this flow is 'processing', which isTerminal() short-circuits
+     * first. Kept for the complete UPC outcome vocabulary (spec §4.4) - a refund initiated from
+     * the module goes through HostedFieldsPaymentProcessor::process_refund(), not through this mutator.
      */
     private const OUTCOME_TO_STATUS = [
         PaymentOutcome::PAID => 'processing',

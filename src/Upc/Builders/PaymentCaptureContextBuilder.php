@@ -1,8 +1,7 @@
 <?php
 
-namespace Payplug\PayplugWoocommerce\Upc;
+namespace Payplug\PayplugWoocommerce\Upc\Builders;
 
-use Payplug\PayplugWoocommerce\Upc\Traits\BuildsCommonFields;
 use PayplugUnifiedCore\Dto\HostedFieldDto;
 
 class PaymentCaptureContextBuilder
@@ -12,13 +11,17 @@ class PaymentCaptureContextBuilder
     /**
      * Same allowlist as the client-side check (HostedFields.ALLOWED_BRANDS in
      * payplug-hosted-fields.js / ALLOWED_BRANDS in wc-payplug-hostedFields-blocks.js) -
-     * re-asserted here because PayplugWoocommerce::render_upc_3ds_redirect() echoes the Unified
+     * re-asserted here because Front\UpcCheckoutReturn::render_upc_3ds_redirect() echoes the Unified
      * API's challenge HTML unescaped on the shop's own origin, and selectedBrand reaches that API
      * call with nothing but sanitize_text_field() applied to raw checkout POST data.
      */
     private const ALLOWED_BRANDS = ['CB', 'VISA', 'MASTERCARD'];
 
-    public function build(\WC_Order $order, string $hfToken, string $selectedBrand, bool $saveCard): HostedFieldDto
+    /**
+     * @param string $cardholder the name typed in the card form's cardholder field - the billing
+     *                           name is sent instead when it is empty (e.g. a client that predates the field)
+     */
+    public function build(\WC_Order $order, string $hfToken, string $selectedBrand, bool $saveCard, string $cardholder = ''): HostedFieldDto
     {
         if (!in_array(strtoupper($selectedBrand), self::ALLOWED_BRANDS, true)) {
             // Case-insensitive so an already-valid value's own casing is preserved verbatim
@@ -31,7 +34,7 @@ class PaymentCaptureContextBuilder
         $payment_method = [
             'details' => [
                 'selectedBrand' => $selectedBrand,
-                'fullName' => $order->get_formatted_billing_full_name(),
+                'fullName' => '' !== trim($cardholder) ? trim($cardholder) : $order->get_formatted_billing_full_name(),
             ],
         ];
 
