@@ -6,6 +6,12 @@ class UhfCard
 {
     private const TABLE = 'woocommerce_payplug_uhf_cards';
 
+    /**
+     * Only a positive answer is cached: once the table exists it stays for the rest of the
+     * request (delete_table() resets it), whereas a missing table may be created by insert().
+     */
+    private static bool $table_exists = false;
+
     public static function create_table(): void
     {
         global $wpdb;
@@ -66,11 +72,16 @@ class UhfCard
 
         $table_name = $wpdb->base_prefix . self::TABLE;
         $wpdb->query("DROP TABLE IF EXISTS {$table_name};");
+        self::$table_exists = false;
     }
 
     public static function check_table_exists(): bool
     {
         global $wpdb;
+
+        if (self::$table_exists) {
+            return true;
+        }
 
         $table_name = $wpdb->base_prefix . self::TABLE;
         // esc_like(): the table name is full of underscores, each of which is a LIKE
@@ -79,8 +90,9 @@ class UhfCard
         // (get_var() only ever returns the first row), which would make check_table_exists()
         // return false for a table that does exist and cards would silently disappear.
         $exists = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($table_name)));
+        self::$table_exists = $exists === $table_name;
 
-        return $exists === $table_name;
+        return self::$table_exists;
     }
 
     /**

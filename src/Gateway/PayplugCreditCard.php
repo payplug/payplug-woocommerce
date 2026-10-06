@@ -6,38 +6,10 @@ use Payplug\PayplugWoocommerce\Controller\HostedFields;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
-use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceConfigurationRepository;
-use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
-use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOrderStateMutator;
-use Payplug\PayplugWoocommerce\Upc\AliasPaymentContextBuilder;
-use Payplug\PayplugWoocommerce\Upc\PaymentCaptureContextBuilder;
-use Payplug\PayplugWoocommerce\Upc\PaymentCaptureOutcomeApplier;
-use Payplug\PayplugWoocommerce\Upc\UnifiedApiPaymentServiceFactory;
-use PayplugUnifiedCore\Exceptions\ApiException;
-use PayplugUnifiedCore\Exceptions\InvalidHostedFieldException;
-use PayplugUnifiedCore\Exceptions\InvalidPaymentException;
-use PayplugUnifiedCore\Exceptions\InvalidRefundRequestException;
-use PayplugUnifiedCore\Exceptions\PaymentNotFoundException;
-use PayplugUnifiedCore\Exceptions\PayplugException;
-use PayplugUnifiedCore\Exceptions\RefundAmountException;
-use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
+use Payplug\PayplugWoocommerce\Upc\HostedFieldsPaymentProcessor;
 
 class PayplugCreditCard extends PayplugGateway
 {
-    /**
-     * Comfortably above the OAuth token fetch + payment-creation call's own combined worst case
-     * (10s timeout each, see Upc\Adapters\WpOAuthHttpClient/WpUnifiedApiHttpClient) - long enough
-     * to span one real attempt, short enough that a crashed request never locks an order out for
-     * long.
-     */
-    private const PROCESS_PAYMENT_LOCK_TTL_SECONDS = 30;
-
-    /**
-     * Same reasoning as PROCESS_PAYMENT_LOCK_TTL_SECONDS - comfortably above the OAuth token
-     * fetch + refund call's own combined worst case (10s timeout each).
-     */
-    private const PROCESS_REFUND_LOCK_TTL_SECONDS = 30;
-
     public $save_card = false;
 
     /**
@@ -135,6 +107,21 @@ class PayplugCreditCard extends PayplugGateway
     }
 
     /**
+     * A hosted_fields gateway whose card form can't render (see $hosted_fields_available) must
+     * not be offered at all: the shopper would otherwise see "Card" with nothing to fill in and
+     * only get a "missing token" error on submit. Non-EUR shops are forced into hosted_fields,
+     * so they have no other card flow to fall back to.
+     */
+    public function is_available()
+    {
+        if ('hosted_fields' === $this->embedded_mode && !$this->hosted_fields_available) {
+            return false;
+        }
+
+        return parent::is_available();
+    }
+
+    /**
      * @param int $order_id
      *
      * @return array
@@ -145,147 +132,7 @@ class PayplugCreditCard extends PayplugGateway
             return parent::process_payment($order_id);
         }
 
-        $order = wc_get_order($order_id);
-
-        if (!$order instanceof \WC_Order) {
-            self::log(sprintf('Order #%s not found.', $order_id), 'error');
-            wc_add_notice(__('Order not found.', 'payplug'), 'error');
-
-            return ['result' => 'failure'];
-        }
-
-        // An order that already succeeded (payment_complete()'d) or was refunded must never get a
-        // second payment created against it - a double-click, or a resubmit after a slow-but-
-        // successful first response, would otherwise charge the customer twice. A pending/on-hold/
-        // failed order is deliberately NOT short-circuited here: telling "the same attempt,
-        // resubmitted" apart from "a genuinely new attempt with a fresh hf_token" isn't possible
-        // from this side alone without either an idempotency key the Unified API may not expose,
-        // or resolving the prior operation and guessing whether the shopper meant to retry it -
-        // both risk misapplying an outcome more than the rarer double-charge this guards against.
-        if (WooCommerceOrderStateMutator::isTerminal($order->get_status())) {
-            return ['result' => 'success', 'redirect' => $order->get_checkout_order_received_url()];
-        }
-
-        // Same range check every other Payplug payment path runs (PayplugGateway::process_payment()
-        // for popup/integrated, ApplePay, Oney3x) before ever calling the API. Deliberately after
-        // the terminal-status short-circuit above: an order that already succeeded must still
-        // redirect to the order-received page even if its amount would fail this check today
-        // (e.g. the account's thresholds were tightened after the order was paid).
-        $validated_amount = $this->validate_order_amount(AmountHelper::toCents((float) $order->get_total(), $order->get_currency()), $order->get_currency());
-
-        if (is_wp_error($validated_amount)) {
-            self::log(sprintf('Invalid amount %s for order #%s.', $order->get_total(), $order_id), 'error');
-            wc_add_notice($validated_amount->get_error_message(), 'error');
-
-            return ['result' => 'failure'];
-        }
-
-        $uhf_card_choice = isset($_POST['payplug_uhf_card_choice']) ? sanitize_text_field(wp_unslash($_POST['payplug_uhf_card_choice'])) : '';
-        // The BO flag is re-checked here (not just relied on to keep the choice off the page in
-        // the first place): a posted card choice with the flag off falls through to requiring
-        // hf_token below, exactly like no choice was ever posted - defense in depth against a
-        // forged POST.
-        $use_alias = $this->save_card && '' !== $uhf_card_choice && 'other' !== $uhf_card_choice;
-
-        $hf_token = isset($_POST['hf_token']) ? sanitize_text_field(wp_unslash($_POST['hf_token'])) : '';
-
-        if (!$use_alias && '' === $hf_token) {
-            wc_add_notice(__('payplug_hosted_fields_missing_token', 'payplug'), 'error');
-
-            return ['result' => 'failure'];
-        }
-
-        $selected_brand = isset($_POST['hf_selected_brand']) ? sanitize_text_field(wp_unslash($_POST['hf_selected_brand'])) : '';
-        $save_card = !empty($_POST['savecard']);
-        $card_fallback = [
-            'brand' => $selected_brand,
-            'last4' => isset($_POST['hf_last4']) ? sanitize_text_field(wp_unslash($_POST['hf_last4'])) : '',
-            'exp_month' => isset($_POST['hf_expiration_month']) ? (int) $_POST['hf_expiration_month'] : 0,
-            'exp_year' => isset($_POST['hf_expiration_year']) ? (int) $_POST['hf_expiration_year'] : 0,
-        ];
-
-        // Guards only the truly unambiguous half of the double-payment risk: two requests for the
-        // *same* order genuinely in flight at once (a double-click, or two tabs) are always the
-        // same attempt - never a legitimate new one - so it's always correct to make the second
-        // wait rather than create a second payment. A *sequential* retry (this order's previous
-        // attempt already finished, successfully or not, before this request started) is
-        // deliberately left alone - see the comment on the terminal-status short-circuit above for
-        // why that case isn't resolved here.
-        $lock = new WooCommerceLock();
-        $lock_key = 'payplug_upc_process_payment_' . $order_id;
-
-        if (!$lock->acquire($lock_key, self::PROCESS_PAYMENT_LOCK_TTL_SECONDS)) {
-            wc_add_notice(__('payplug_hosted_fields_tokenization_error', 'payplug'), 'error');
-
-            return ['result' => 'failure'];
-        }
-
-        // Re-read and re-check now that the lock is actually held: the status read above happened
-        // before acquire(), so a request that was preempted for as long as another one's entire
-        // API round trip could otherwise still build and send a second payment against an order
-        // that has, by now, already succeeded.
-        $order = wc_get_order($order_id);
-
-        if (!$order instanceof \WC_Order) {
-            self::log(sprintf('Order #%s not found.', $order_id), 'error');
-            wc_add_notice(__('Order not found.', 'payplug'), 'error');
-            $lock->release($lock_key);
-
-            return ['result' => 'failure'];
-        }
-
-        if (WooCommerceOrderStateMutator::isTerminal($order->get_status())) {
-            $lock->release($lock_key);
-
-            return ['result' => 'success', 'redirect' => $order->get_checkout_order_received_url()];
-        }
-
-        try {
-            if ($use_alias) {
-                $card = UhfCard::find_for_customer((int) $uhf_card_choice, get_current_user_id(), $this->mode);
-
-                if (null === $card) {
-                    wc_add_notice(__('payplug_hosted_fields_tokenization_error', 'payplug'), 'error');
-
-                    return ['result' => 'failure'];
-                }
-
-                $dto = (new AliasPaymentContextBuilder())->build($order, $card->alias_id);
-                $output = (new UnifiedApiPaymentServiceFactory())->create()->createPayment($dto);
-
-                // A one-click payment never creates a NEW alias (it pays with one that already
-                // exists), so save_card is always false here regardless of whatever the client
-                // posted - PaymentCaptureOutcomeApplier's own alias-persistence branch is then
-                // correctly a no-op for this request.
-                return (new PaymentCaptureOutcomeApplier())->apply($order, $output);
-            }
-
-            $dto = (new PaymentCaptureContextBuilder())->build($order, $hf_token, $selected_brand, $save_card);
-            $output = (new UnifiedApiPaymentServiceFactory())->create()->createPayment($dto);
-
-            return (new PaymentCaptureOutcomeApplier())->apply($order, $output, $save_card, $card_fallback);
-        } catch (ApiException $e) {
-            self::log(sprintf('UPC payment creation failed for order #%s: %s', $order_id, $e->getMessage()), 'error');
-        } catch (InvalidHostedFieldException $e) {
-            self::log(sprintf('UPC payment creation rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
-        } catch (InvalidPaymentException $e) {
-            self::log(sprintf('UPC payment creation rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
-        } catch (PayplugException $e) {
-            // Catch-all for every other UPC exception (InvalidCommonFieldsException from a
-            // misconfigured/empty account id, InvalidPhoneNumberException, ...) - all of them
-            // share PayplugException as their base. Without this, one of their messages (internal,
-            // not written for a shopper) would escape to WC_Checkout::process_checkout()'s generic
-            // \Exception handler and get shown verbatim as a checkout error notice.
-            self::log(sprintf('UPC payment creation rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
-        } catch (\LogicException $e) {
-            self::log(sprintf('UPC payment creation misconfigured for order #%s: %s', $order_id, $e->getMessage()), 'error');
-        } finally {
-            $lock->release($lock_key);
-        }
-
-        wc_add_notice(__('payplug_hosted_fields_tokenization_error', 'payplug'), 'error');
-
-        return ['result' => 'failure'];
+        return (new HostedFieldsPaymentProcessor($this))->process_payment((int) $order_id);
     }
 
     /**
@@ -313,138 +160,7 @@ class PayplugCreditCard extends PayplugGateway
             return parent::process_refund($order_id, $amount, $reason);
         }
 
-        self::log(sprintf('Processing UPC refund for order #%s.', $order_id));
-
-        // No check here for whether the operation has actually reached a captured/paid state
-        // (e.g. still THREE_DS_PENDING) - deliberately left to the Unified API's own validation
-        // rather than an extra getPayment() round trip before every refund. Worst case is an
-        // ApiException on an operation that was never payable, caught below; no data corruption.
-        $configuration_repository = new WooCommerceConfigurationRepository();
-        $account_id = $configuration_repository->getPublicKeyId();
-
-        // A guard, not just a nicety: without it an unconfigured account id goes out as an empty
-        // string, the API rejects it with a generic 4xx, and that lands in the ApiException catch
-        // below indistinguishable from any other API failure - turning a one-line config problem
-        // into a support investigation. Checked before acquiring the lock since there is nothing
-        // here a concurrent request could race on.
-        if ('' === $account_id) {
-            self::log(sprintf('UPC refund misconfigured for order #%s: hosted_fields.identifier (account id) is not set.', $order_id), 'error');
-
-            return new \WP_Error('process_refund_error', __('The transaction could not be refunded. Please try again.', 'payplug'));
-        }
-
-        // Guards concurrent refund requests for the same order (double-click, two admin tabs)
-        // only - NOT a sequential retry of a request that already timed out. If createRefund()'s
-        // HTTP call times out (see PROCESS_REFUND_LOCK_TTL_SECONDS) after the Unified API already
-        // processed the refund, this method still returns a WP_Error, WooCommerce deletes the
-        // just-created local refund record (see wc_create_refund()), and a merchant retrying from
-        // the "Please try again" notice creates a second, real refund at Payplug - there is no
-        // idempotency key available from createRefund() to prevent this, and no reconciliation
-        // path analogous to the payment side's webhook/PaymentReconciler exists for refunds.
-        // Same class of known, accepted gap as process_payment()'s own sequential-retry note
-        // above, but with direct financial impact on the merchant rather than the shopper.
-        $lock = new WooCommerceLock();
-        $lock_key = 'payplug_upc_process_refund_' . $order_id;
-
-        if (!$lock->acquire($lock_key, self::PROCESS_REFUND_LOCK_TTL_SECONDS)) {
-            self::log(sprintf('Another refund request for order #%s is already in progress.', $order_id), 'error');
-
-            return new \WP_Error('process_refund_error', __('The transaction could not be refunded. Please try again.', 'payplug'));
-        }
-
-        try {
-            $amount_in_cents = null !== $amount ? AmountHelper::toCents((float) $amount, $order->get_currency()) : null;
-
-            $response = (new UnifiedApiPaymentServiceFactory())->create()->createRefund(
-                $operation_id,
-                $account_id,
-                (string) $order_id,
-                sprintf(__('Refund for order #%s', 'payplug'), $order->get_order_number()),
-                // Always null: submerchantExternalId only applies to EUR/Galitt UDV account
-                // configurations, which UHF never targets (non-EUR accounts own no submerchant -
-                // see the UHF technical spec). Sending one here would be for an account this
-                // module never talks to.
-                null,
-                $amount_in_cents,
-                $order->get_currency()
-            );
-
-            $refund_id = $this->extract_refund_id($response['body']);
-
-            if (null !== $refund_id) {
-                // Namespaced separately from the Retail API's own `_pr_<id>` dedupe key (see
-                // PayplugResponse::process_refund()) rather than reusing it: a future UPC refund
-                // notification handler dedupes against this key the same way PayplugResponse
-                // dedupes against `_pr_<id>` today, but the two id spaces (Retail vs Unified API)
-                // must never be conflated.
-                $order->add_meta_data(sprintf('_payplug_upc_refund_%s', wc_clean($refund_id)), $refund_id, true);
-                $order->save_meta_data();
-            }
-
-            // Deliberately not firing payplug_gateway_refund_created: its existing consumers
-            // expect a Retail API RefundResource object (see PayplugGateway::process_refund()),
-            // not this endpoint's raw {status, body} array - firing it here would hand them a
-            // shape they don't expect, a behavior change for anyone already hooking it.
-            $order->add_order_note($this->build_refund_note($amount_in_cents, $order->get_currency(), $reason, $refund_id));
-            self::log(sprintf('UPC refund complete for order #%s.', $order_id));
-
-            return true;
-        } catch (RefundAmountException | InvalidRefundRequestException | PaymentNotFoundException $e) {
-            self::log(sprintf('UPC refund rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
-        } catch (PayplugException $e) {
-            // Catches ApiException and every other UPC exception not explicitly rejected above -
-            // mirrors process_payment()'s own discipline against letting an internal API message
-            // escape to the BO user.
-            self::log(sprintf('UPC refund failed for order #%s: %s', $order_id, $e->getMessage()), 'error');
-        } finally {
-            $lock->release($lock_key);
-        }
-
-        return new \WP_Error('process_refund_error', __('The transaction could not be refunded. Please try again.', 'payplug'));
-    }
-
-    /**
-     * The refund operation's own id: operationIds[0]. Observed on staging (2026-10-05), the
-     * refund response's top-level "id" is the refunded PAYMENT's id, identical for every refund
-     * of the same order - using it would give two refunds the same dedupe key. The top-level id
-     * remains a fallback for a response without operationIds. Returns null for a body that
-     * doesn't parse or carries neither, so an unrecognized shape degrades to "no id persisted".
-     *
-     * Assumption, to be confirmed with the API team: operationIds[0] is THIS refund's operation.
-     * Every refund response seen on staging (EUR, USD and JPY accounts) carried exactly one id.
-     * If the API ever returns several, only the first is used as the dedupe key.
-     */
-    public function extract_refund_id(string $response_body): ?string
-    {
-        $data = json_decode($response_body, true);
-
-        if (isset($data['operationIds'][0]) && is_string($data['operationIds'][0]) && '' !== $data['operationIds'][0]) {
-            return $data['operationIds'][0];
-        }
-
-        return isset($data['id']) && is_string($data['id']) && '' !== $data['id'] ? $data['id'] : null;
-    }
-
-    /**
-     * Extracted from process_refund() specifically to be testable without a network call - the
-     * try block above can only be exercised end-to-end against a real (or real-looking) Unified
-     * API, which this test suite has no way to reach.
-     */
-    public function build_refund_note(?int $amount_in_cents, string $currency, string $reason, ?string $refund_id = null): string
-    {
-        $amount_text = null !== $amount_in_cents
-            ? sprintf(__('refunded %s', 'payplug'), wc_price(AmountHelper::fromCents($amount_in_cents, $currency), ['currency' => $currency]))
-            : __('fully refunded', 'payplug');
-
-        $note = null !== $refund_id
-            ? sprintf(__('Refund %s: %s', 'payplug'), wc_clean($refund_id), $amount_text)
-            : sprintf(__('Refund: %s', 'payplug'), $amount_text);
-
-        if (!empty($reason)) {
-            $note .= sprintf(' (%s)', esc_html($reason));
-        }
-
-        return $note;
+        return (new HostedFieldsPaymentProcessor($this))->process_refund($order, $operation_id, $amount, (string) $reason);
     }
 
     /**
@@ -465,15 +181,28 @@ class PayplugCreditCard extends PayplugGateway
     }
 
     /**
+     * Hosted fields (UHF) is only offered for non-EUR currencies, where CB cards aren't
+     * accepted: its logo shows Visa and Mastercard only.
+     */
+    public static function scheme_logo_url(?string $embedded_mode): string
+    {
+        if ('hosted_fields' === $embedded_mode) {
+            return PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/checkout/logos_scheme_visa_mastercard.svg';
+        }
+
+        return ('it_IT' === get_locale())
+            ? PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_PostePay.svg'
+            : PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_CB.svg';
+    }
+
+    /**
      * Get payment icons.
      *
      * @return string
      */
     public function get_icon()
     {
-        $src = ('it_IT' === get_locale())
-            ? PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_PostePay.svg'
-            : PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_CB.svg';
+        $src = self::scheme_logo_url($this->embedded_mode);
 
         $icons = apply_filters('payplug_payment_icons', [
             'payplug' => sprintf('<img src="%s" alt="Visa & Mastercard" class="payplug-payment-icon" />', esc_url($src)),
@@ -558,7 +287,7 @@ class PayplugCreditCard extends PayplugGateway
         /**x
          * Integrated payments scripts
          */
-        wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+        wp_enqueue_style('payplug-card-form', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-card-form.css', [], PAYPLUG_GATEWAY_VERSION);
 
         wp_register_script('payplug-domain', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-domain.js', [], 'v1.0');
         wp_enqueue_script('payplug-domain');
@@ -621,15 +350,17 @@ class PayplugCreditCard extends PayplugGateway
         // a future server-side payment-capture call.
         $account = PayplugWoocommerceHelper::get_account_data_from_options();
 
-        // ajax_url/nonce for wc_ajax_payplug_hosted_fields_token were dropped here: the
-        // client no longer round-trips the token through that endpoint before submitting
-        // (see payplug-hosted-fields.js's tokenize()) - process_payment() reads hf_token
-        // straight from the real checkout POST once the order exists.
+        // No ajax_url/nonce: the client never round-trips the token through a separate
+        // endpoint (see payplug-hosted-fields.js's tokenize()) - process_payment() reads
+        // hf_token straight from the real checkout POST once the order exists.
         $translations = [
             'company_id' => $account['company_ref'] ?? '',
+            'placeholder_pan' => __('payplug_integrated_payment_card_number', 'payplug'),
+            'placeholder_exp' => __('payplug_integrated_payment_expiration_date', 'payplug'),
+            'placeholder_cvv' => __('payplug_integrated_payment_cvv', 'payplug'),
         ];
 
-        wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+        wp_enqueue_style('payplug-card-form', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-card-form.css', [], PAYPLUG_GATEWAY_VERSION);
 
         wp_register_script('payplug-hosted-fields-sdk', HOSTED_FIELDS_SDK_URL, [], null, true);
         wp_enqueue_script('payplug-hosted-fields-sdk');

@@ -636,14 +636,17 @@ class Ajax
         $options['payment_methods']['configuration']['payplug']['description'] = (string) $data['standard_payment_description'];
         $options['payment_methods']['configuration']['payplug']['embedded_mode'] = (string) $data['payplug_embeded'];
         $options['payment_methods']['configuration']['payplug']['save_card'] = (bool) $data['enable_one_click'];
-        $hosted_fields_identifier = sanitize_text_field((string) ($data['identifier'] ?? ''));
+        // the field is absent from $data (EUR shop, or a UI build that doesn't send it) - keep
+        // the stored value rather than overwriting it with '', and validate that stored value
+        // too, or every save of a non-EUR shop (forced into hosted_fields) would fail
+        if (array_key_exists('identifier', $data)) {
+            $hosted_fields_identifier = sanitize_text_field((string) $data['identifier']);
+        } else {
+            $hosted_fields_identifier = (string) ($options['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] ?? '');
+        }
         // halts the request via wp_send_json_error() when Hosted Fields is selected without an identifier
         Validator::hostedFieldsPaymentGatewayOptions($options['payment_methods']['configuration']['payplug']['embedded_mode'], $hosted_fields_identifier);
-        // the field is absent from $data (EUR shop, or a non-EUR shop before the front-end
-        // package ships) - keep the stored value rather than overwriting it with ''
-        if (array_key_exists('identifier', $data)) {
-            $options['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] = $hosted_fields_identifier;
-        }
+        $options['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] = $hosted_fields_identifier;
 
         // applepay payment - Euro-only, not rendered (so absent from $data) for a non-EUR
         // shop; leave the stored config untouched rather than silently wiping it.

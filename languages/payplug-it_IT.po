@@ -1360,6 +1360,9 @@ msgstr "Questo tipo di carta non è accettato con questa modalità di pagamento.
 msgid "payplug_hosted_fields_missing_token"
 msgstr "Non siamo riusciti a leggere i dati della tua carta. Riprova."
 
+msgid "payplug_hosted_fields_payment_in_progress"
+msgstr "È già in corso un pagamento per questo ordine. Attendi qualche minuto prima di riprovare."
+
 msgid "payplug_hosted_fields_pay_with_another_card"
 msgstr "Paga con un'altra carta"
 
@@ -1371,3 +1374,31 @@ msgstr "Carta non valida."
 
 msgid "payplug_payment_currency_not_supported"
 msgstr "Questo metodo di pagamento non è disponibile per gli ordini in questa valuta."
+
+msgid "Your payment was not completed. Please try again."
+msgstr "Il pagamento non è stato completato. Riprova."
+
+msgid "This payment confirmation link has expired."
+msgstr "Questo link di conferma del pagamento è scaduto."
+
+msgid "Order not found."
+msgstr "Ordine non trovato."
+
+#, php-format
+msgid "Refund for order #%s"
+msgstr "Rimborso dell'ordine n. %s"
+
+#, php-format
+msgid "refunded %s"
+msgstr "%s rimborsato/i"
+
+msgid "fully refunded"
+msgstr "rimborso totale"
+
+#, php-format
+msgid "Refund %s: %s"
+msgstr "Rimborso %s: %s"
+
+#, php-format
+msgid "Refund: %s"
+msgstr "Rimborso: %s"

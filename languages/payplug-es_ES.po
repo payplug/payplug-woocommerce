@@ -1375,6 +1375,9 @@ msgstr "Este tipo de tarjeta no se acepta con este modo de pago. Utiliza una tar
 msgid "payplug_hosted_fields_missing_token"
 msgstr "No hemos podido leer los datos de tu tarjeta. Inténtalo de nuevo."
 
+msgid "payplug_hosted_fields_payment_in_progress"
+msgstr "Ya hay un pago en curso para este pedido. Espera unos minutos antes de volver a intentarlo."
+
 msgid "payplug_hosted_fields_pay_with_another_card"
 msgstr "Pagar con otra tarjeta"
 
@@ -1386,3 +1389,31 @@ msgstr "Tarjeta no válida."
 
 msgid "payplug_payment_currency_not_supported"
 msgstr "Este método de pago no está disponible para pedidos en esta moneda."
+
+msgid "Your payment was not completed. Please try again."
+msgstr "Tu pago no se ha completado. Inténtalo de nuevo."
+
+msgid "This payment confirmation link has expired."
+msgstr "Este enlace de confirmación de pago ha caducado."
+
+msgid "Order not found."
+msgstr "Pedido no encontrado."
+
+#, php-format
+msgid "Refund for order #%s"
+msgstr "Reembolso del pedido n.º %s"
+
+#, php-format
+msgid "refunded %s"
+msgstr "%s reembolsado(s)"
+
+msgid "fully refunded"
+msgstr "reembolso total"
+
+#, php-format
+msgid "Refund %s: %s"
+msgstr "Reembolso %s: %s"
+
+#, php-format
+msgid "Refund: %s"
+msgstr "Reembolso: %s"

@@ -962,6 +962,7 @@ msgstr ""
 #, php-format
 msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
 msgstr ""
+
 msgid "payplug_section_standard_payment_option_hosted_fields_label"
 msgstr "Advanced (beta) Hosted Fields"
 
@@ -994,3 +995,34 @@ msgstr "This card type is not accepted with this payment mode. Please use a CB, 
 
 msgid "payplug_hosted_fields_missing_token"
 msgstr "An error occurred while verifying your card. Please try again."
+
+msgid "payplug_hosted_fields_payment_in_progress"
+msgstr "A payment for this order is already in progress. Please wait a few minutes before trying again."
+
+msgid "Your payment was not completed. Please try again."
+msgstr ""
+
+msgid "This payment confirmation link has expired."
+msgstr ""
+
+msgid "Order not found."
+msgstr ""
+
+#, php-format
+msgid "Refund for order #%s"
+msgstr ""
+
+#, php-format
+msgid "refunded %s"
+msgstr ""
+
+msgid "fully refunded"
+msgstr ""
+
+#, php-format
+msgid "Refund %s: %s"
+msgstr ""
+
+#, php-format
+msgid "Refund: %s"
+msgstr ""

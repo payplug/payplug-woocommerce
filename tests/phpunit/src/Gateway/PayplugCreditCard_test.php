@@ -5,6 +5,8 @@ namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Gateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugCreditCard;
 use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
+use Payplug\PayplugWoocommerce\Upc\HostedFieldsPaymentProcessor;
+use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PHPUnit\Framework\TestCase;
 
 class PayplugCreditCard_test extends TestCase
@@ -284,6 +286,141 @@ class PayplugCreditCard_test extends TestCase
         $this->assertSame('failure', $result['result']);
 
         $lock->release($lock_key);
+        unset($_POST['hf_token']);
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_gateway_is_unavailable_when_the_hosted_fields_form_cannot_render(): void
+    {
+        // HOSTED_FIELDS_SDK_URL is empty in the test environment and no company_ref is stored,
+        // so the forced hosted_fields mode of a non-EUR shop has no card form to render.
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['embedded_mode'] = 'hosted_fields';
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $gateway = new PayplugCreditCard();
+
+        $this->assertFalse($gateway->hosted_fields_available);
+        $this->assertFalse($gateway->is_available());
+    }
+
+    /**
+     * Stubs the Unified API for a reconciliation of a previous 3DS attempt: the OAuth2 token
+     * exchange, then getOperation() answering $payment_body (the order has no alt id, so the
+     * reconciler fetches the operation by its primary id). Any other call (a new payment
+     * creation in particular) is recorded in $other_requests and answered with a 500.
+     */
+    private function stub_reconciliation(array $payment_body, ?array &$other_requests = null): void
+    {
+        $other_requests = [];
+
+        add_filter('pre_http_request', function ($preempt, $args, $url) use ($payment_body, &$other_requests) {
+            if (false !== strpos($url, '/oauth2/token')) {
+                return [
+                    'response' => ['code' => 200, 'message' => 'OK'],
+                    'body' => json_encode(['access_token' => 'test_token', 'expires_in' => 3600, 'token_type' => 'Bearer']),
+                    'headers' => [],
+                    'cookies' => [],
+                ];
+            }
+
+            if (false !== strpos($url, '/processing-operations/operations/public/op_in_flight')) {
+                return [
+                    'response' => ['code' => 200, 'message' => 'OK'],
+                    'body' => json_encode($payment_body),
+                    'headers' => [],
+                    'cookies' => [],
+                ];
+            }
+
+            $other_requests[] = $url;
+
+            return ['response' => ['code' => 500, 'message' => 'Error'], 'body' => '', 'headers' => [], 'cookies' => []];
+        }, 10, 3);
+    }
+
+    private function create_order_with_a_pending_3ds_attempt(int $created_at): \WC_Order
+    {
+        $order = wc_create_order();
+        $order->set_total(50.00);
+        $order->update_meta_data('_payplug_upc_operation_id', 'op_in_flight');
+        $order->update_meta_data('_payplug_upc_outcome', PaymentOutcome::THREE_DS_PENDING);
+        $order->update_meta_data('_payplug_upc_created_at', $created_at);
+        $order->save();
+
+        return $order;
+    }
+
+    public function test_process_payment_refuses_a_new_attempt_while_a_recent_3ds_attempt_is_still_pending(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['embedded_mode'] = 'hosted_fields';
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $order = $this->create_order_with_a_pending_3ds_attempt(time() - 60);
+        $this->stub_reconciliation(['execCode' => '0001', 'amount' => 5000], $other_requests);
+        $_POST['hf_token'] = 'hf_token_123';
+
+        $result = (new PayplugCreditCard())->process_payment($order->get_id());
+
+        $this->assertSame('failure', $result['result']);
+        $this->assertLastErrorNotice('payplug_hosted_fields_payment_in_progress');
+        $this->assertSame([], $other_requests, 'No new payment must be created.');
+        $this->assertSame('op_in_flight', wc_get_order($order->get_id())->get_meta('_payplug_upc_operation_id'));
+
+        wc_clear_notices();
+        unset($_POST['hf_token']);
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_process_payment_redirects_to_order_received_when_the_pending_3ds_attempt_is_now_paid(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['embedded_mode'] = 'hosted_fields';
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $order = $this->create_order_with_a_pending_3ds_attempt(time() - 60);
+        $order->add_product(\WC_Helper_Product::create_simple_product(), 1);
+        $order->set_total(50.00);
+        $order->save();
+        $this->stub_reconciliation(['execCode' => '0000', 'amount' => 5000], $other_requests);
+        $_POST['hf_token'] = 'hf_token_123';
+
+        $result = (new PayplugCreditCard())->process_payment($order->get_id());
+        $order = wc_get_order($order->get_id());
+
+        $this->assertSame('success', $result['result']);
+        $this->assertSame($order->get_checkout_order_received_url(), $result['redirect']);
+        $this->assertSame('processing', $order->get_status());
+        $this->assertSame('op_in_flight', $order->get_meta('_payplug_upc_operation_id'));
+
+        unset($_POST['hf_token']);
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_process_payment_allows_a_new_attempt_once_the_pending_3ds_attempt_is_older_than_the_window(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['embedded_mode'] = 'hosted_fields';
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $order = $this->create_order_with_a_pending_3ds_attempt(time() - 3600);
+        $this->stub_reconciliation(['execCode' => '0001', 'amount' => 5000], $other_requests);
+        // No hf_token: reaching the missing-token branch proves the in-flight guard let the
+        // request through, without ever calling the API.
+        $_POST['hf_token'] = '';
+
+        $result = (new PayplugCreditCard())->process_payment($order->get_id());
+
+        $this->assertSame('failure', $result['result']);
+        $this->assertLastErrorNotice('payplug_hosted_fields_missing_token');
+        $this->assertSame([], $other_requests);
+
+        wc_clear_notices();
         unset($_POST['hf_token']);
         wp_delete_post($order->get_id(), true);
     }
@@ -624,7 +761,7 @@ class PayplugCreditCard_test extends TestCase
 
     public function test_extract_refund_id_returns_the_id_field_when_present(): void
     {
-        $id = (new PayplugCreditCard())->extract_refund_id(json_encode(['id' => 'refund_789']));
+        $id = (new HostedFieldsPaymentProcessor(new PayplugCreditCard()))->extract_refund_id(json_encode(['id' => 'refund_789']));
 
         $this->assertSame('refund_789', $id);
     }
@@ -632,7 +769,7 @@ class PayplugCreditCard_test extends TestCase
     public function test_extract_refund_id_prefers_the_refund_operation_id_over_the_payment_id(): void
     {
         // Shape observed on staging: "id" is the refunded payment's, operationIds[0] the refund's.
-        $id = (new PayplugCreditCard())->extract_refund_id(json_encode(['id' => 'payment_123', 'operationIds' => ['refund_op_456']]));
+        $id = (new HostedFieldsPaymentProcessor(new PayplugCreditCard()))->extract_refund_id(json_encode(['id' => 'payment_123', 'operationIds' => ['refund_op_456']]));
 
         $this->assertSame('refund_op_456', $id);
     }
@@ -641,30 +778,30 @@ class PayplugCreditCard_test extends TestCase
     {
         // Never observed (staging always returns exactly one): pins the documented assumption
         // that operationIds[0] is the refund's own operation.
-        $id = (new PayplugCreditCard())->extract_refund_id(json_encode(['id' => 'payment_123', 'operationIds' => ['refund_op_456', 'other_op_789']]));
+        $id = (new HostedFieldsPaymentProcessor(new PayplugCreditCard()))->extract_refund_id(json_encode(['id' => 'payment_123', 'operationIds' => ['refund_op_456', 'other_op_789']]));
 
         $this->assertSame('refund_op_456', $id);
     }
 
     public function test_extract_refund_id_returns_null_for_malformed_or_missing_id(): void
     {
-        $gateway = new PayplugCreditCard();
+        $processor = new HostedFieldsPaymentProcessor(new PayplugCreditCard());
 
-        $this->assertNull($gateway->extract_refund_id('not json'));
-        $this->assertNull($gateway->extract_refund_id(json_encode(['status' => 'ok'])));
-        $this->assertNull($gateway->extract_refund_id(json_encode(['id' => ''])));
+        $this->assertNull($processor->extract_refund_id('not json'));
+        $this->assertNull($processor->extract_refund_id(json_encode(['status' => 'ok'])));
+        $this->assertNull($processor->extract_refund_id(json_encode(['id' => ''])));
     }
 
     public function test_build_refund_note_for_a_full_refund(): void
     {
-        $note = (new PayplugCreditCard())->build_refund_note(null, 'USD', '');
+        $note = (new HostedFieldsPaymentProcessor(new PayplugCreditCard()))->build_refund_note(null, 'USD', '');
 
         $this->assertSame(__('Refund: fully refunded', 'payplug'), $note);
     }
 
     public function test_build_refund_note_for_a_partial_refund_includes_the_formatted_amount(): void
     {
-        $note = (new PayplugCreditCard())->build_refund_note(500, 'USD', '');
+        $note = (new HostedFieldsPaymentProcessor(new PayplugCreditCard()))->build_refund_note(500, 'USD', '');
 
         $this->assertStringContainsString(wc_price(5.00, ['currency' => 'USD']), $note);
         $this->assertStringStartsWith('Refund: refunded', $note);
@@ -674,7 +811,7 @@ class PayplugCreditCard_test extends TestCase
     {
         update_option('woocommerce_currency', 'EUR');
 
-        $note = (new PayplugCreditCard())->build_refund_note(500, 'USD', '');
+        $note = (new HostedFieldsPaymentProcessor(new PayplugCreditCard()))->build_refund_note(500, 'USD', '');
 
         $this->assertStringContainsString(wc_price(5.00, ['currency' => 'USD']), $note);
         $this->assertStringNotContainsString(wc_price(5.00, ['currency' => 'EUR']), $note);
@@ -682,14 +819,14 @@ class PayplugCreditCard_test extends TestCase
 
     public function test_build_refund_note_includes_the_refund_id_when_present(): void
     {
-        $note = (new PayplugCreditCard())->build_refund_note(null, 'USD', '', 'refund_789');
+        $note = (new HostedFieldsPaymentProcessor(new PayplugCreditCard()))->build_refund_note(null, 'USD', '', 'refund_789');
 
         $this->assertStringStartsWith('Refund refund_789:', $note);
     }
 
     public function test_build_refund_note_appends_an_escaped_reason(): void
     {
-        $note = (new PayplugCreditCard())->build_refund_note(null, 'USD', '<script>alert(1)</script>');
+        $note = (new HostedFieldsPaymentProcessor(new PayplugCreditCard()))->build_refund_note(null, 'USD', '<script>alert(1)</script>');
 
         $this->assertStringContainsString('(&lt;script&gt;alert(1)&lt;/script&gt;)', $note);
         $this->assertStringNotContainsString('<script>', $note);
@@ -697,7 +834,7 @@ class PayplugCreditCard_test extends TestCase
 
     public function test_build_refund_note_omits_the_parenthesized_reason_when_empty(): void
     {
-        $note = (new PayplugCreditCard())->build_refund_note(null, 'USD', '');
+        $note = (new HostedFieldsPaymentProcessor(new PayplugCreditCard()))->build_refund_note(null, 'USD', '');
 
         $this->assertStringNotContainsString('(', $note);
     }

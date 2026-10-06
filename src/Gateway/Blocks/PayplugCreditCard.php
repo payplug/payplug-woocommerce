@@ -21,9 +21,7 @@ class PayplugCreditCard extends PayplugGenericBlock
     {
         $data = parent::get_payment_method_data();
         $data['icon'] = [
-            'src' => ('it_IT' === get_locale()) ?
-                PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_PostePay.svg' :
-                PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_CB.svg',
+            'src' => \Payplug\PayplugWoocommerce\Gateway\PayplugCreditCard::scheme_logo_url($this->gateway->embedded_mode ?? null),
             'icon_alt' => 'Visa & Mastercard',
         ];
         $data['IP'] = false;
@@ -95,14 +93,14 @@ class PayplugCreditCard extends PayplugGenericBlock
                 // merchant-entered Account ID (hosted_fields.identifier), which is a
                 // different value reserved for a future server-side payment-capture call.
                 $data['hostedFieldsCompanyId'] = PayplugWoocommerceHelper::get_account_data_from_options()['company_ref'] ?? '';
-                // hostedFieldsAjaxUrl/hostedFieldsNonce for wc_ajax_payplug_hosted_fields_token
-                // were dropped here: the client no longer round-trips the token through that
+                // No ajax url/nonce: the client never round-trips the token through a separate
                 // endpoint before resolving onPaymentSetup (see wc-payplug-hostedFields-blocks.js) -
                 // process_payment() reads hf_token straight from meta.paymentMethodData once
                 // the order exists.
                 $data['hostedFieldsTokenizationError'] = __('payplug_hosted_fields_tokenization_error', 'payplug');
                 $data['hostedFieldsUnsupportedBrandError'] = __('payplug_hosted_fields_unsupported_brand_error', 'payplug');
                 $data['hostedFieldsPayWithAnotherCard'] = __('payplug_hosted_fields_pay_with_another_card', 'payplug');
+                $data['hostedFieldsInvalidForm'] = __('payplug_required_fields_error', 'payplug');
                 $data['uhfCards'] = (is_user_logged_in() && !empty($this->gateway->save_card))
                     ? array_map(static function ($card) {
                         return [
@@ -114,10 +112,20 @@ class PayplugCreditCard extends PayplugGenericBlock
                         ];
                     }, \Payplug\PayplugWoocommerce\Model\UhfCard::get_customer_cards(get_current_user_id(), $this->gateway->mode))
                     : [];
-                // The transaction-secured/privacy-policy footer is visually identical to
-                // Integrated Payment's, so it reuses the same settings keys and assets.
-                $data['logo'] = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/logo-payplug.png';
-                $data['lock'] = PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/integrated/lock.svg';
+                // Same labels, errors and assets as the classic form (Controller/HostedFields.php),
+                // itself aligned on the PrestaShop module's UHF form.
+                $data['payplug_integrated_payment_cardholder'] = __('payplug_integrated_payment_cardholder', 'payplug');
+                $data['payplug_integrated_payment_your_card'] = __('payplug_integrated_payment_your_card', 'payplug');
+                $data['payplug_integrated_payment_card_number'] = __('payplug_integrated_payment_card_number', 'payplug');
+                $data['payplug_integrated_payment_expiration_date'] = __('payplug_integrated_payment_expiration_date', 'payplug');
+                $data['payplug_integrated_payment_cvv'] = __('payplug_integrated_payment_cvv', 'payplug');
+                $data['payplug_integrated_payment_empty'] = __('payplug_integrated_payment_empty', 'payplug');
+                $data['payplug_integrated_payment_cardHolder_error'] = __('payplug_integrated_payment_cardHolder_error', 'payplug');
+                $data['payplug_integrated_payment_pan_error'] = __('payplug_integrated_payment_pan_error', 'payplug');
+                $data['payplug_integrated_payment_exp_error'] = __('payplug_integrated_payment_exp_error', 'payplug');
+                $data['payplug_integrated_payment_cvv_error'] = __('payplug_integrated_payment_cvv_error', 'payplug');
+                $data['logo'] = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/integrated/payplug.svg';
+                $data['lock'] = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/integrated/lock.svg';
                 $data['payplug_integrated_payment_transaction_secure'] = __('payplug_integrated_payment_transaction_secure', 'payplug');
                 $data['payplug_integrated_payment_privacy_policy_url'] = __('payplug_integrated_payment_privacy_policy_url', 'payplug');
                 $data['payplug_integrated_payment_privacy_policy'] = __('payplug_integrated_payment_privacy_policy', 'payplug');
@@ -166,7 +174,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 
     private function ip_scripts(): void
     {
-        wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+        wp_enqueue_style('payplug-card-form', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-card-form.css', [], PAYPLUG_GATEWAY_VERSION);
         wp_register_script(
             'payplug-integrated-payments-api',
             IP_API,
@@ -206,7 +214,7 @@ class PayplugCreditCard extends PayplugGenericBlock
 
     private function hosted_fields_scripts(): void
     {
-        wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+        wp_enqueue_style('payplug-card-form', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-card-form.css', [], PAYPLUG_GATEWAY_VERSION);
         wp_register_script('payplug-hosted-fields-sdk', HOSTED_FIELDS_SDK_URL, [], null, true);
         wp_enqueue_script('payplug-hosted-fields-sdk');
     }

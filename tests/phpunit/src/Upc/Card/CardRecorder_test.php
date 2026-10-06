@@ -1,12 +1,12 @@
 <?php
 
-namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc;
+namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc\Card;
 
 use Payplug\PayplugWoocommerce\Model\UhfCard;
-use Payplug\PayplugWoocommerce\Upc\UhfCardPersister;
+use Payplug\PayplugWoocommerce\Upc\Card\CardRecorder;
 use PHPUnit\Framework\TestCase;
 
-class UhfCardPersister_test extends TestCase
+class CardRecorder_test extends TestCase
 {
     protected function setUp(): void
     {
@@ -23,7 +23,7 @@ class UhfCardPersister_test extends TestCase
 
     public function testPersistPrefersFetchedDataOverFallback(): void
     {
-        $result = (new UhfCardPersister())->persist(
+        $result = (new CardRecorder())->persist(
             42,
             'alias_fetched',
             'live',
@@ -40,7 +40,7 @@ class UhfCardPersister_test extends TestCase
 
     public function testPersistFallsBackWhenFetchedDataIsIncomplete(): void
     {
-        $result = (new UhfCardPersister())->persist(
+        $result = (new CardRecorder())->persist(
             42,
             'alias_fallback',
             'live',
@@ -57,7 +57,7 @@ class UhfCardPersister_test extends TestCase
 
     public function testPersistRejectsABrandOutsideTheAllowedWhitelist(): void
     {
-        $result = (new UhfCardPersister())->persist(
+        $result = (new CardRecorder())->persist(
             42,
             'alias_bad_brand',
             'live',
@@ -71,7 +71,7 @@ class UhfCardPersister_test extends TestCase
 
     public function testPersistRejectsANonNumericLast4(): void
     {
-        $result = (new UhfCardPersister())->persist(
+        $result = (new CardRecorder())->persist(
             42,
             'alias_bad_last4',
             'live',
@@ -84,7 +84,7 @@ class UhfCardPersister_test extends TestCase
 
     public function testPersistRejectsAnOutOfRangeMonth(): void
     {
-        $result = (new UhfCardPersister())->persist(
+        $result = (new CardRecorder())->persist(
             42,
             'alias_bad_month',
             'live',
@@ -97,7 +97,7 @@ class UhfCardPersister_test extends TestCase
 
     public function testPersistReturnsFalseWhenNoUsableDataIsAvailableAtAll(): void
     {
-        $result = (new UhfCardPersister())->persist(42, 'alias_empty', 'live', [], []);
+        $result = (new CardRecorder())->persist(42, 'alias_empty', 'live', [], []);
 
         $this->assertFalse($result);
     }
