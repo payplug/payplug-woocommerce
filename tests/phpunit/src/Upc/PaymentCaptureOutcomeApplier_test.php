@@ -175,6 +175,21 @@ class PaymentCaptureOutcomeApplier_test extends TestCase
         $this->assertSame('failed', $this->reload()->get_status());
     }
 
+    public function testAResponseWithoutATopLevelIdIsBoundToItsFirstOperationId(): void
+    {
+        // Shape observed on staging (2026-10-05): no top-level "id", only operationIds.
+        $output = new PaymentOutput(200, '{"execCode":"0000","operationIds":["op_only_1"]}', null, null, null);
+
+        $result = (new PaymentCaptureOutcomeApplier())->apply($this->order, $output);
+
+        $order = $this->reload();
+        $this->assertSame('success', $result['result']);
+        $this->assertSame('op_only_1', $order->get_meta('_payplug_upc_operation_id'));
+        $this->assertSame('', $order->get_meta('_payplug_upc_operation_id_alt'));
+        $this->assertSame('yes', $order->get_meta('_payplug_upc_treated'));
+        $this->assertSame('processing', $order->get_status());
+    }
+
     public function testAResponseWithoutAnOperationIdPersistsNothingAndStillCompletesTheFlow(): void
     {
         $output = new PaymentOutput(200, '{"execCode":"0000"}', null, null, null);

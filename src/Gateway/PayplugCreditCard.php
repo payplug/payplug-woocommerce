@@ -404,18 +404,19 @@ class PayplugCreditCard extends PayplugGateway
     }
 
     /**
-     * Best-effort: the Unified API's own refund response schema has never been empirically
-     * confirmed against a real account, unlike the payment-creation operationId question (see
-     * PaymentCaptureOutcomeApplier), which *was* resolved this way before being relied on. `id`
-     * is the most plausible field name given the API's own "operation" vocabulary (every
-     * processing event - a payment, a capture, a refund - is identified by an id per the SDK's
-     * own docs), but this is unverified. Returns null rather than guessing further if the body
-     * doesn't parse or lacks a non-empty string `id`, so an unrecognized shape degrades to "no
-     * id persisted" instead of a wrong one.
+     * The refund operation's own id: operationIds[0]. Observed on staging (2026-10-05), the
+     * refund response's top-level "id" is the refunded PAYMENT's id, identical for every refund
+     * of the same order - using it would give two refunds the same dedupe key. The top-level id
+     * remains a fallback for a response without operationIds. Returns null for a body that
+     * doesn't parse or carries neither, so an unrecognized shape degrades to "no id persisted".
      */
     public function extract_refund_id(string $response_body): ?string
     {
         $data = json_decode($response_body, true);
+
+        if (isset($data['operationIds'][0]) && is_string($data['operationIds'][0]) && '' !== $data['operationIds'][0]) {
+            return $data['operationIds'][0];
+        }
 
         return isset($data['id']) && is_string($data['id']) && '' !== $data['id'] ? $data['id'] : null;
     }

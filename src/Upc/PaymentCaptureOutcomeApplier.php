@@ -110,7 +110,7 @@ class PaymentCaptureOutcomeApplier
      */
     private function apply_terminal_outcome(\WC_Order $order, array $data, string $outcome): void
     {
-        $operation_id = isset($data['id']) && is_scalar($data['id']) ? (string) $data['id'] : '';
+        $operation_id = self::extract_operation_id($data);
 
         if ('' === $operation_id) {
             // persist_operation() already logged this - there is no operation id for any webhook
@@ -188,7 +188,7 @@ class PaymentCaptureOutcomeApplier
      */
     private function persist_operation(\WC_Order $order, array $data, string $exec_code, string $outcome, bool $save_card = false): void
     {
-        $operation_id = isset($data['id']) && is_scalar($data['id']) ? (string) $data['id'] : '';
+        $operation_id = self::extract_operation_id($data);
         $operation_id_alt = isset($data['operationIds']) && is_array($data['operationIds']) && isset($data['operationIds'][0]) && is_scalar($data['operationIds'][0])
             ? (string) $data['operationIds'][0]
             : '';
@@ -256,6 +256,23 @@ class PaymentCaptureOutcomeApplier
     }
 
     /**
+     * The order's primary operation binding: the response's top-level "id" when present, else
+     * operationIds[0]. The Unified API does not always send the top-level id - two identical
+     * successful payment creations on staging (2026-10-05) came back one with it, one with only
+     * operationIds - and without this fallback such an order would be bound to nothing at all.
+     *
+     * @param array<string, mixed> $data the json_decode()'d payment-creation response body
+     */
+    private static function extract_operation_id(array $data): string
+    {
+        if (isset($data['id']) && is_scalar($data['id']) && '' !== (string) $data['id']) {
+            return (string) $data['id'];
+        }
+
+        return isset($data['operationIds'][0]) && is_scalar($data['operationIds'][0]) ? (string) $data['operationIds'][0] : '';
+    }
+
+    /**
      * Best-effort: a direct (non-3DS) success carries the alias id in PaymentOutput::$aliasId,
      * but never its brand/last4/expiration - those are fetched from the public operation
      * endpoint when possible, falling back to the (sanitized, re-validated) values the client
@@ -271,12 +288,12 @@ class PaymentCaptureOutcomeApplier
             return;
         }
 
-        // Same "id" then "operationIds[0]" fallback as persist_operation() - without it, a
-        // response that only carries operationIds skips this fetch entirely and falls straight
-        // back to the client-submitted values, which are exactly the ones least trusted.
-        $operation_id = isset($data['id']) && is_scalar($data['id'])
-            ? (string) $data['id']
-            : (isset($data['operationIds'][0]) && is_scalar($data['operationIds'][0]) ? (string) $data['operationIds'][0] : '');
+        // operationIds[0] first: the public operation endpoint only knows the operation, not the
+        // payment's own top-level "id" (a 404 for it, observed on staging 2026-10-05). The
+        // top-level id stays as a fallback for a response that carries no operationIds.
+        $operation_id = isset($data['operationIds'][0]) && is_scalar($data['operationIds'][0])
+            ? (string) $data['operationIds'][0]
+            : (isset($data['id']) && is_scalar($data['id']) ? (string) $data['id'] : '');
         $fetched = [];
 
         if ('' !== $operation_id) {
