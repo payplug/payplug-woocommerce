@@ -2,6 +2,8 @@
 
 namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc;
 
+use Payplug\PayplugWoocommerce\Model\UhfCard;
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\PaymentReconciler;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
@@ -90,6 +92,67 @@ class PaymentReconciler_test extends TestCase
         $order = $this->reload();
         $this->assertSame('pending', $order->get_status());
         $this->assertSame('', $order->get_meta('_payplug_upc_treated'));
+    }
+
+    public function testReconcileFetchesTheOperationResourceByItsAlternateOperationId(): void
+    {
+        // getPayment() answers 404 on staging; the public operation endpoint answers for
+        // operationIds[0], stored as the alternate operation id.
+        $this->order->update_meta_data('_payplug_upc_operation_id_alt', 'op_alt_456');
+        $this->order->save();
+        $requested_urls = [];
+
+        add_filter('pre_http_request', function ($preempt, $args, $url) use (&$requested_urls) {
+            $requested_urls[] = $url;
+
+            if (false !== strpos($url, '/oauth2/token')) {
+                return ['response' => ['code' => 200, 'message' => 'OK'], 'body' => json_encode(['access_token' => 'test_token', 'expires_in' => 3600, 'token_type' => 'Bearer']), 'headers' => [], 'cookies' => []];
+            }
+
+            if (false !== strpos($url, '/processing-operations/operations/public/op_alt_456')) {
+                return ['response' => ['code' => 200, 'message' => 'OK'], 'body' => $this->body('0000'), 'headers' => [], 'cookies' => []];
+            }
+
+            return ['response' => ['code' => 404, 'message' => 'Not Found'], 'body' => '', 'headers' => [], 'cookies' => []];
+        }, 10, 3);
+
+        (new PaymentReconciler())->reconcile($this->reload());
+
+        remove_all_filters('pre_http_request');
+        delete_transient('upc_token_upc_oauth_token:');
+        delete_transient('payplug_upc_reconcile_' . $this->order->get_id());
+
+        $this->assertSame('processing', $this->reload()->get_status());
+        $this->assertEmpty(array_filter($requested_urls, static fn (string $url): bool => false !== strpos($url, '/api/payment-gateway/payments/')), 'getPayment() must not be called anymore.');
+    }
+
+    public function testAPaidReconciliationSavesTheCardFromTheFetchedOperationBody(): void
+    {
+        $this->order->set_customer_id(1);
+        $this->order->update_meta_data('_payplug_uhf_save_card', '1');
+        $this->order->save();
+
+        $body = json_encode([
+            'id' => 'op_pending_123',
+            'execCode' => '0000',
+            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'paymentMethod' => [
+                'id' => 'alias_reconciled_1',
+                'card' => ['network' => 'visa', 'code6x4' => '424242XXXXXX4242'],
+                'details' => ['selectedBrand' => 'VISA', 'validityDate' => '2099-12'],
+            ],
+        ]);
+
+        (new PaymentReconciler())->apply_reconciled_state($this->reload(), 'op_pending_123', $body);
+
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+        $card = UhfCard::find_by_alias('alias_reconciled_1', $mode);
+
+        $this->assertNotNull($card);
+        $this->assertSame('4242', $card->last4);
+
+        global $wpdb;
+        $wpdb->query('TRUNCATE TABLE ' . $wpdb->base_prefix . 'woocommerce_payplug_uhf_cards');
     }
 
     public function testReconcileSkipsOrdersNotInThreeDsPending(): void
