@@ -1,9 +1,9 @@
 <?php
 
-namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc;
+namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc\Builders;
 
 use Payplug\PayplugWoocommerce\Service\Configuration;
-use Payplug\PayplugWoocommerce\Upc\AliasPaymentContextBuilder;
+use Payplug\PayplugWoocommerce\Upc\Builders\AliasPaymentContextBuilder;
 use PHPUnit\Framework\TestCase;
 
 class AliasPaymentContextBuilder_test extends TestCase

@@ -1369,6 +1369,9 @@ msgstr "Ce type de carte n'est pas accepté avec ce mode de paiement. Merci d'ut
 msgid "payplug_hosted_fields_missing_token"
 msgstr "Nous n'avons pas pu récupérer les informations de votre carte. Merci de réessayer."
 
+msgid "payplug_hosted_fields_payment_in_progress"
+msgstr "Un paiement est déjà en cours pour cette commande. Merci de patienter quelques minutes avant de réessayer."
+
 msgid "payplug_hosted_fields_pay_with_another_card"
 msgstr "Payer avec une autre carte"
 
@@ -1380,3 +1383,31 @@ msgstr "Carte invalide."
 
 msgid "payplug_payment_currency_not_supported"
 msgstr "Ce moyen de paiement n’est pas disponible pour les commandes dans cette devise."
+
+msgid "Your payment was not completed. Please try again."
+msgstr "Votre paiement n'a pas abouti. Merci de réessayer."
+
+msgid "This payment confirmation link has expired."
+msgstr "Ce lien de confirmation de paiement a expiré."
+
+msgid "Order not found."
+msgstr "Commande introuvable."
+
+#, php-format
+msgid "Refund for order #%s"
+msgstr "Remboursement de la commande n°%s"
+
+#, php-format
+msgid "refunded %s"
+msgstr "%s remboursé(s)"
+
+msgid "fully refunded"
+msgstr "remboursement total"
+
+#, php-format
+msgid "Refund %s: %s"
+msgstr "Remboursement %s : %s"
+
+#, php-format
+msgid "Refund: %s"
+msgstr "Remboursement : %s"

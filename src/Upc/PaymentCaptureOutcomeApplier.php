@@ -3,10 +3,11 @@
 namespace Payplug\PayplugWoocommerce\Upc;
 
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
-use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLogger;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOrderStateMutator;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommercePaymentRepository;
+use Payplug\PayplugWoocommerce\Upc\Card\CardDataExtractor;
+use Payplug\PayplugWoocommerce\Upc\Card\CardRecorder;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PayplugUnifiedCore\Exceptions\ApiException;
@@ -27,14 +28,6 @@ class PaymentCaptureOutcomeApplier
      * state those two branches leave the payment in.
      */
     private const PENDING_THREE_DS_EXEC_CODE = '0001';
-
-    /**
-     * Same lock key format/TTL as Front\UpcWebhook and PaymentReconciler - this direct/final
-     * branch is the third path that can apply a terminal outcome for a given operation, and
-     * persist_operation() has already bound the order to it by the time apply_terminal_outcome()
-     * runs, so a webhook for this exact operation can race in concurrently.
-     */
-    private const LOCK_TTL_SECONDS = 30;
 
     public function apply(\WC_Order $order, PaymentOutput $output, bool $save_card = false, array $card_fallback = []): array
     {
@@ -81,7 +74,7 @@ class PaymentCaptureOutcomeApplier
 
         $this->persist_operation($order, $data, $exec_code, $outcome, $save_card);
 
-        $this->apply_terminal_outcome($order, $data, $outcome);
+        $this->apply_terminal_outcome($order, $data, $exec_code, $outcome);
 
         if ($save_card && null !== $output->aliasId && PaymentOutcome::FAILED !== $outcome) {
             $this->maybe_persist_uhf_card($order, $output->aliasId, $data, $card_fallback);
@@ -99,68 +92,55 @@ class PaymentCaptureOutcomeApplier
 
     /**
      * By the time this runs, persist_operation() has already bound the order to this operation
-     * id, so an IPN for the exact same operation can legitimately race in and reach
-     * Front\UpcWebhook::receive_notification() concurrently with this still-in-flight synchronous
-     * request. Same lock key format, and the same isTreated()/markTreated() guard, as
-     * Front\UpcWebhook and PaymentReconciler::apply_reconciled_state() use, so whichever side
-     * wins the lock finds the other's application already done and skips re-applying it - closing
-     * a race that would otherwise double-fire 'woocommerce_payment_complete'.
+     * id, so an IPN for the exact same operation can legitimately race in concurrently with this
+     * still-in-flight synchronous request - hence OperationOutcomeProcessor, shared with
+     * Front\UpcWebhook and PaymentReconciler, so the outcome is applied exactly once.
      *
      * @param array<string, mixed> $data the json_decode()'d payment-creation response body
      */
-    private function apply_terminal_outcome(\WC_Order $order, array $data, string $outcome): void
+    private function apply_terminal_outcome(\WC_Order $order, array $data, string $exec_code, string $outcome): void
     {
         $operation_id = self::extract_operation_id($data);
 
-        if ('' === $operation_id) {
-            // persist_operation() already logged this - there is no operation id for any webhook
-            // to ever bind to for this attempt, so there is nothing to race against either.
+        if ('' === $operation_id || '' === $exec_code) {
+            // persist_operation() already logged this - the order isn't bound to any operation,
+            // so no webhook can ever race this attempt: apply directly.
             (new WooCommerceOrderStateMutator())->apply((string) $order->get_id(), $outcome);
 
             return;
         }
 
-        $lock = new WooCommerceLock();
-        $lock_key = 'payplug_upc_treat_' . $operation_id;
+        try {
+            $result = (new OperationOutcomeProcessor())->process(new OperationData(
+                $operation_id,
+                $exec_code,
+                $outcome,
+                AmountHelper::toCents((float) $order->get_total(), $order->get_currency()),
+                (string) $order->get_id()
+            ));
+        } catch (InvalidOperationDataException | PaymentNotFoundException $e) {
+            (new WooCommerceLogger())->error(sprintf(
+                'UPC payment creation could not apply outcome "%s" for order #%s: %s',
+                $outcome,
+                $order->get_id(),
+                $e->getMessage()
+            ));
 
-        if (!$lock->acquire($lock_key, self::LOCK_TTL_SECONDS)) {
+            return;
+        }
+
+        if (OperationOutcomeProcessor::LOCKED === $result) {
             // Contended: a webhook delivery (or a reconciliation) for this exact operation is
-            // already applying it - let it own the outcome rather than racing it. Logged
-            // (unlike Front\UpcWebhook/PaymentReconciler's own contended branches) because,
+            // already applying it. Logged (unlike Front\UpcWebhook/PaymentReconciler) because,
             // unlike a 3DS-pending order, nothing else retries a direct/final outcome if this
-            // contention was actually a transient WooCommerceLock DB error rather than a real
-            // concurrent webhook - the shopper would otherwise be redirected to "Thank you" while
-            // the order silently never transitions, with no trace of why.
+            // contention was actually a transient WooCommerceLock DB error - the shopper would
+            // otherwise be redirected to "Thank you" while the order silently never transitions.
             (new WooCommerceLogger())->error(sprintf(
                 'UPC payment creation could not apply outcome "%s" for order #%s: operation "%s" is locked.',
                 $outcome,
                 $order->get_id(),
                 $operation_id
             ));
-
-            return;
-        }
-
-        try {
-            $payment_repository = new WooCommercePaymentRepository();
-
-            if (!$payment_repository->isTreated($operation_id)) {
-                (new WooCommerceOrderStateMutator())->apply((string) $order->get_id(), $outcome);
-                $payment_repository->markTreated($operation_id);
-            }
-        } catch (PaymentNotFoundException $e) {
-            // Only reachable when persist_operation() itself bailed out just above (a present
-            // "id" but an empty execCode) - the order was never actually bound to $operation_id,
-            // so markTreated() has nothing to find. The mutator call above already ran; this
-            // only means the operation can't be marked treated for a future webhook to respect.
-            (new WooCommerceLogger())->error(sprintf(
-                'UPC payment creation could not mark operation "%s" treated for order #%s: %s',
-                $operation_id,
-                $order->get_id(),
-                $e->getMessage()
-            ));
-        } finally {
-            $lock->release($lock_key);
         }
     }
 
@@ -249,7 +229,11 @@ class PaymentCaptureOutcomeApplier
                 $order->delete_meta_data('_payplug_upc_treated');
             }
 
-            // NEW: same "clear first" pattern as the alt id above - a retried checkout whose
+            // When this attempt was created: HostedFieldsPaymentProcessor::resolve_in_flight_attempt() only
+            // blocks a new payment while a 3DS-pending attempt is recent enough to still complete.
+            $order->update_meta_data('_payplug_upc_created_at', time());
+
+            // Same "clear first" pattern as the alt id above - a retried checkout whose
             // savecard choice changed must not leave a previous attempt's intent bound to this
             // order, since Front\UpcWebhook reads this meta with no other way to know the
             // original request's POST data.
@@ -312,7 +296,7 @@ class PaymentCaptureOutcomeApplier
             try {
                 $response = (new UnifiedApiPaymentServiceFactory())->create()->getOperation($operation_id);
                 $decoded = json_decode($response['body'], true);
-                $fetched = is_array($decoded) ? UhfCardDataExtractor::extract($decoded) : [];
+                $fetched = is_array($decoded) ? CardDataExtractor::extract($decoded) : [];
             } catch (ApiException $e) {
                 (new WooCommerceLogger())->error(sprintf(
                     'UPC best-effort card metadata fetch failed for order #%s: %s',
@@ -324,12 +308,12 @@ class PaymentCaptureOutcomeApplier
 
         $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
 
-        $persisted = (new UhfCardPersister())->persist($order->get_customer_id(), $alias_id, $mode, $card_fallback, $fetched);
+        $persisted = (new CardRecorder())->persist($order->get_customer_id(), $alias_id, $mode, $card_fallback, $fetched);
 
         if (!$persisted) {
             // The most likely real-world failure mode for this whole feature: an unexpected
             // brand string, a code6x4 in an unanticipated shape, or a malformed validityDate
-            // gets rejected by UhfCardPersister's sanitization, and without this the customer
+            // gets rejected by CardRecorder's sanitization, and without this the customer
             // ticks "save my card", the payment still succeeds, no card ever appears, and there
             // was nothing anywhere to explain why.
             (new WooCommerceLogger())->error(sprintf(

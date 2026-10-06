@@ -320,9 +320,9 @@
 }
 
 /*
- * Hosted Fields - reuses the Integrated Payment visual language above (same approach
- * as the Payplug Magento module, which shares its Integrated Payment CSS with Hosted
- * Fields rather than defining a separate style for it).
+ * Hosted Fields - same rules and values as the PrestaShop module's UHF form
+ * (dev/css/less/component/payplug/embedded.less, .payplugHostedFields), so the card form
+ * looks the same on both platforms.
  */
 .HostedFields.-loaded {
 	display: flex;
@@ -330,98 +330,138 @@
 	justify-content: space-between;
 	width: 100%;
 	max-width: 400px;
-	margin-top: 20px;
-	position: relative;
+	padding: 20px 0 30px;
 }
 /* The generic .-hide { display: none } rule (above) has lower specificity (one class)
    than .HostedFields.-loaded (two classes) - toggling "-hide" on the same element via
    assets/js/payplug-hosted-fields.js's manageSavedCards() would otherwise have no visual
-   effect at all, since .HostedFields.-loaded's own display:flex wins the cascade
-   regardless of source order. This explicit three-class override restores the intended
-   behavior: hide the whole "new card" form when a saved card is selected. */
+   effect at all. This explicit three-class override hides the whole "new card" form when a
+   saved card is selected. */
 .HostedFields.-loaded.-hide {
+	display: none;
+}
+.HostedFields_newCard {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	width: 100%;
+}
+/* The Blocks component hides the new-card fields through the "hidden" attribute: the UA
+   stylesheet's [hidden] rule loses against the display:flex above, hence this override. */
+.HostedFields_newCard[hidden] {
 	display: none;
 }
 .HostedFields_container {
 	display: flex;
-	padding: 0;
 	margin: 0 0 10px;
+	padding: 0;
+	position: relative;
 	width: 100%;
 }
-.HostedFields_container.-card, .HostedFields_container.-expiry, .HostedFields_container.-cryptogram {
-	position: relative;
+.HostedFields_container.-cardHolder, .HostedFields_container.-pan, .HostedFields_container.-exp, .HostedFields_container.-cvv {
+	display: flex;
+	align-items: center;
+	overflow: hidden;
+	box-sizing: border-box;
+	/* White like the PrestaShop checkout, whatever the theme paints behind the payment
+	   method: the SDK's iframes have a white background of their own. */
+	background: #fff;
+	border: 1px solid #d5d6d8;
+	border-radius: 2px;
+	cursor: text;
 	height: 40px;
 	line-height: 40px;
-	border-radius: 2px;
 	padding: 0 16px 0 50px;
-	cursor: text;
-	border: solid 1px #d5d6d8;
+	transition: border .4s;
 }
-.HostedFields_container.-card:before, .HostedFields_container.-expiry:before, .HostedFields_container.-cryptogram:before {
-	content: "";
-	position: absolute;
-	top: 20%;
-	left: 16px;
-	width: 24px;
-	height: 24px;
+.HostedFields_container.-cardHolder:before, .HostedFields_container.-pan:before, .HostedFields_container.-exp:before, .HostedFields_container.-cvv:before {
 	background: #95999e 50% no-repeat;
 	background-size: 100% auto;
+	content: "";
+	height: 24px;
+	left: 16px;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 24px;
 }
-.HostedFields_container.-card:before {
-	-webkit-mask-image: url(../images/integrated/card.svg);
+.HostedFields_container.-cardHolder.-invalid, .HostedFields_container.-pan.-invalid, .HostedFields_container.-exp.-invalid, .HostedFields_container.-cvv.-invalid {
+	border-color: #e91932;
+}
+.HostedFields_container.-cardHolder:before {
+	mask-image: url(../images/integrated/account.svg);
+	-webkit-mask-image: url(../images/integrated/account.svg);
+}
+.HostedFields_container.-pan:before {
 	mask-image: url(../images/integrated/card.svg);
+	-webkit-mask-image: url(../images/integrated/card.svg);
 }
-.HostedFields_container.-expiry:before {
+.HostedFields_container.-exp:before {
 	mask-image: url(../images/integrated/calendar.svg);
 	-webkit-mask-image: url(../images/integrated/calendar.svg);
 }
-.HostedFields_container.-cryptogram:before {
+.HostedFields_container.-cvv:before {
 	mask-image: url(../images/integrated/lock.svg);
 	-webkit-mask-image: url(../images/integrated/lock.svg);
 }
-.HostedFields_container.-expiry, .HostedFields_container.-cryptogram {
-	max-width: calc(50% - 2px);
-	display: inline-block;
+.HostedFields_container.-exp, .HostedFields_container.-cvv {
+	max-width: calc(50% - 5px);
+	width: 100%;
 }
-/* The brand indicator sits in its own row above the card field, in the same spot and
-   with the same visual weight as Integrated Payment's -scheme selector row. Unlike
-   -scheme (static CSS background-image icons, always visible), -brand is a real
-   cross-origin SDK iframe: while it has no content to draw (its "empty state", before
-   the SDK detects/needs a brand choice), an unbordered/backgroundless container is a
-   fully transparent box on the page's white background - effectively invisible, unlike
-   -card/-expiry/-cryptogram below which stay visible via their own border even when
-   empty. This border/padding gives -brand the same always-visible box treatment.  */
-.HostedFields_container.-brand {
-	height: 30px;
+.HostedFields_container.-cardHolder iframe, .HostedFields_container.-pan iframe, .HostedFields_container.-exp iframe, .HostedFields_container.-cvv iframe {
+	height: 50% !important;
+}
+/* Theme input styles (border, padding, background, box-shadow) are reset so the cardholder
+   field looks like the SDK's own iframe fields next to it. */
+.HostedFields_container input[type="text"] {
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	color: #2b343d;
+	font-family: Poppins, sans-serif;
+	font-size: 14px;
+	height: auto;
+	line-height: normal;
+	margin: 0;
+	min-height: 0;
+	outline: none;
+	padding: 0;
+	text-align: left;
+	width: 100%;
+}
+.HostedFields_container input[type="text"]::placeholder {
+	color: #2b343d;
+	opacity: 1;
+}
+.HostedFields_container.-scheme {
+	align-items: center;
+	font-size: 14px;
+	font-weight: 700;
+	height: 22px;
+	justify-content: space-between;
 	margin: 10px 0;
-	border: solid 1px #d5d6d8;
-	border-radius: 2px;
-	padding: 0 8px;
+	text-transform: uppercase;
 }
-/* The Blocks/React component (resources/js/frontend/wc-payplug-hostedFields-blocks.js)
-   hides these 4 containers individually via the "hidden" attribute rather than the
-   "-hide" class classic checkout uses on the whole form - the browser's own [hidden]
-   UA-stylesheet rule (display:none) has the same specificity as .HostedFields_container's
-   own display:flex/inline-block above, but author styles always win a same-specificity
-   tie against user-agent styles, so [hidden] alone has no visual effect here without this
-   explicit, higher-specificity override. */
-.HostedFields_container.-brand[hidden],
-.HostedFields_container.-card[hidden],
-.HostedFields_container.-expiry[hidden],
-.HostedFields_container.-cryptogram[hidden] {
-	display: none;
+.HostedFields_schemes {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	height: 35px;
+	width: 140px;
 }
 .HostedFields_container.-saveCard {
+	align-items: center;
 	display: flex;
 	height: auto;
-	align-items: center;
 	padding: 10px 0 0;
 }
 .HostedFields_container.-saveCard label {
-	margin: 0;
+	color: #918f8f;
 	cursor: pointer;
 	font-size: 12px;
-	color: #918f8f;
+	margin: 0;
+	transition: color .4s;
 }
 .HostedFields_container.-saveCard label span {
 	border: 1px solid #d5d6d8;
@@ -441,26 +481,29 @@
 	border-top: none;
 	content: "";
 	display: block;
-	height: 3px;
+	height: 6px;
 	left: 50%;
 	opacity: 0;
 	position: absolute;
 	top: 50%;
 	transform: translate(-50%,-55%) rotate(-48deg);
 	transition: opacity .4s;
-	width: 9px;
+	width: 12px;
 }
 .HostedFields_container.-saveCard label input {
 	display: none;
 }
-.HostedFields_container.-saveCard label:hover span {
+.HostedFields_container.-saveCard label input:checked + span {
 	border-color: #2b343d;
+}
+.HostedFields_container.-saveCard label input:checked + span:before {
+	opacity: 1;
 }
 .HostedFields_container.-saveCard label:hover {
 	color: #2b343d;
 }
-.HostedFields_container.-saveCard label input:checked + span:before {
-	opacity: 1;
+.HostedFields_container.-saveCard label:hover span {
+	border-color: #2b343d;
 }
 /* A sibling block, rendered before the "new card" form - not one of the
    .HostedFields_container.-X variants, since it lives outside <form class="HostedFields">
@@ -537,25 +580,72 @@
 	opacity: 1;
 }
 .HostedFields_error {
-	color: #E91932;
-	font-size: 12px;
-	margin: -10px 0 10px;
-	width: 100%;
-	line-height: 18px;
-	padding-left: 4px;
-}
-.HostedFields_error.-tokenization {
-	background: rgba(233,25,50,0.08);
 	color: #e91932;
-	text-align: center;
-	width: 100%;
+	display: flex;
+	font-family: Poppins, sans-serif;
+	font-size: 12px;
+	font-weight: 400;
 	line-height: 18px;
+	margin: -10px 0 10px;
+	padding-left: 4px;
+	width: 100%;
+}
+.HostedFields_error.-cardHolder {
+	margin: -10px 0 0;
+}
+.HostedFields_error.-exp, .HostedFields_error.-cvv {
+	max-width: calc(50% - 5px);
+	width: 100%;
+}
+.HostedFields_error.-cvv {
+	justify-self: flex-end;
+	margin: -10px 0 10px auto;
+}
+.HostedFields_error .-hide {
+	display: none;
+}
+.HostedFields_error.-payment {
 	align-items: center;
+	background: rgba(233,25,50,.08);
+	color: #e91932;
+	display: none;
+	font-family: Poppins, sans-serif;
+	font-size: 14px;
+	font-weight: 400;
 	justify-content: center;
+	line-height: 18px;
 	margin: 10px 0 0;
 	padding: 4px 0;
+	text-align: center;
+	width: 100%;
 }
-.HostedFields_error.-tokenization:not(.-hide) {
+.HostedFields_error.-payment.-show {
 	display: flex;
 }
-
+.HostedFields_privacy_policy {
+	font-family: Gantari, sans-serif;
+	font-size: 14px;
+	margin-top: 20px;
+	text-align: center;
+	width: 100%;
+}
+.HostedFields_privacy_policy span {
+	vertical-align: middle;
+}
+/* Themes commonly float, shrink or space out images inside the payment method box. */
+.HostedFields_privacy_policy img {
+	display: inline;
+	float: none;
+	margin: 0;
+	max-height: none;
+	vertical-align: middle;
+}
+.HostedFields_privacy_policy img.-lock {
+	width: 20px;
+}
+.HostedFields_privacy_policy img.-logo {
+	width: 100px;
+}
+.HostedFields_privacy_policy a {
+	display: block;
+}

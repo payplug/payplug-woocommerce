@@ -248,13 +248,40 @@ class PaymentCaptureOutcomeApplier_test extends TestCase
         (new PaymentCaptureOutcomeApplier())->apply($this->order, $first_output);
 
         $this->assertSame('failed', $this->reload()->get_status());
-        $this->assertSame('yes', $this->reload()->get_meta('_payplug_upc_treated'));
+
+        // A FAILED outcome is no longer marked treated by itself - set the stale marker by hand
+        // to keep exercising the "new operation id clears it" fix.
+        $order = $this->reload();
+        $order->update_meta_data('_payplug_upc_treated', 'yes');
+        $order->save();
 
         $second_output = new PaymentOutput(200, '{"id":"op_attempt_2","execCode":"0000"}', null, null, null);
         $result = (new PaymentCaptureOutcomeApplier())->apply($this->reload(), $second_output);
 
         $this->assertSame('success', $result['result']);
         $this->assertSame('processing', $this->reload()->get_status());
+    }
+
+    public function testDirectFailureIsNotMarkedTreatedSoALaterPaidNotificationCanStillApply(): void
+    {
+        // An unmapped "Acceptation" execCode (here 0002, WAITING_PROVIDER) falls into FAILED.
+        $output = new PaymentOutput(200, '{"id":"op_failed_1","execCode":"0002"}', null, null, null);
+
+        $result = (new PaymentCaptureOutcomeApplier())->apply($this->order, $output);
+
+        $this->assertSame('failure', $result['result']);
+        $this->assertSame('failed', $this->reload()->get_status());
+        $this->assertSame('', $this->reload()->get_meta('_payplug_upc_treated'));
+        wc_clear_notices();
+    }
+
+    public function testEveryPersistedOperationRecordsWhenTheAttemptWasCreated(): void
+    {
+        $output = new PaymentOutput(200, '{"id":"op_html_1","execCode":"0001"}', null, '<html>3ds form</html>', null);
+
+        (new PaymentCaptureOutcomeApplier())->apply($this->order, $output);
+
+        $this->assertEqualsWithDelta(time(), (int) $this->reload()->get_meta('_payplug_upc_created_at'), 5);
     }
 
     public function testDirectSuccessWithSaveCardPersistsTheAliasUsingFallbackData(): void
