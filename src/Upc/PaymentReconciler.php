@@ -35,7 +35,7 @@ class PaymentReconciler
     /**
      * The order-received page re-fires reconcile() on every load with no other backoff - a
      * shopper stuck on a pending order who refreshes repeatedly would otherwise hammer the
-     * Unified API with an OAuth token fetch plus getPayment() (up to ~20s of synchronous calls,
+     * Unified API with an OAuth token fetch plus getOperation() (up to ~20s of synchronous calls,
      * WpUnifiedApiHttpClient's 10s timeout each) on every single request.
      */
     private const RECONCILE_THROTTLE_SECONDS = 60;
@@ -62,8 +62,15 @@ class PaymentReconciler
 
         set_transient($throttle_key, '1', self::RECONCILE_THROTTLE_SECONDS);
 
+        // The operation resource, not the payment one: getPayment() answers 404 for both of the
+        // order's ids, while the public operation endpoint answers for operationIds[0] (the alt
+        // id) with the execCode, amount and paymentMethod this needs (observed on staging,
+        // 2026-10-05). Lock and treated marker stay keyed on the primary id.
+        $fetch_id = (string) $order->get_meta('_payplug_upc_operation_id_alt');
+        $fetch_id = '' !== $fetch_id ? $fetch_id : $operation_id;
+
         try {
-            $response = (new UnifiedApiPaymentServiceFactory())->create()->getPayment($operation_id);
+            $response = (new UnifiedApiPaymentServiceFactory())->create()->getOperation($fetch_id);
         } catch (PayplugException $e) {
             (new WooCommerceLogger())->error(sprintf('UPC payment reconciliation failed for order #%s: %s', $order->get_id(), $e->getMessage()));
 
@@ -141,7 +148,9 @@ class PaymentReconciler
             (new WooCommerceOrderStateMutator())->apply((string) $order->get_id(), $outcome);
 
             if (PaymentOutcome::PAID === $outcome) {
-                $this->maybe_persist_uhf_card($order, $operation_id);
+                // The body just fetched is the operation resource, the same
+                // paymentMethod.{id, card, details} shape the webhook carries - no second fetch.
+                (new UhfCardFromOperationPersister())->maybe_persist($order, $data);
             }
 
             $payment_repository->markTreated($operation_id);
@@ -161,41 +170,5 @@ class PaymentReconciler
         } finally {
             $lock->release($lock_key);
         }
-    }
-
-    /**
-     * Closes the gap this class would otherwise leave in Front\UpcWebhook::maybe_persist_uhf_card():
-     * without this, a reconciliation that wins the race against the webhook (marks the operation
-     * treated first) would silently drop the shopper's save-card intent forever, since the
-     * webhook's own isTreated() guard then skips its own card-persistence call entirely once it
-     * does arrive. getPayment()'s response body (used above for the outcome/amount check) is not
-     * confirmed to carry the same paymentMethod.{id, card, details} shape the webhook and
-     * getOperation() both do (per the UHF spec: "la réponse de l'endpoint public d'opération a la
-     * même forme que la notification") - so this fetches the operation resource specifically,
-     * mirroring PaymentCaptureOutcomeApplier's own best-effort card-metadata fetch. Never fails
-     * the reconciliation itself: a fetch failure here only means the card isn't saved this time,
-     * with the webhook remaining a second chance if it eventually arrives.
-     */
-    private function maybe_persist_uhf_card(\WC_Order $order, string $operation_id): void
-    {
-        try {
-            $response = (new UnifiedApiPaymentServiceFactory())->create()->getOperation($operation_id);
-        } catch (PayplugException $e) {
-            (new WooCommerceLogger())->error(sprintf(
-                'UPC reconciliation: card metadata fetch failed for order #%s: %s',
-                $order->get_id(),
-                $e->getMessage()
-            ));
-
-            return;
-        }
-
-        $decoded = json_decode($response['body'], true);
-
-        if (!is_array($decoded)) {
-            return;
-        }
-
-        (new UhfCardFromOperationPersister())->maybe_persist($order, $decoded);
     }
 }

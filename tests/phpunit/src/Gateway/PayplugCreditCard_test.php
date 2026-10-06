@@ -595,6 +595,14 @@ class PayplugCreditCard_test extends TestCase
         $this->assertSame('refund_789', $id);
     }
 
+    public function test_extract_refund_id_prefers_the_refund_operation_id_over_the_payment_id(): void
+    {
+        // Shape observed on staging: "id" is the refunded payment's, operationIds[0] the refund's.
+        $id = (new PayplugCreditCard())->extract_refund_id(json_encode(['id' => 'payment_123', 'operationIds' => ['refund_op_456']]));
+
+        $this->assertSame('refund_op_456', $id);
+    }
+
     public function test_extract_refund_id_returns_null_for_malformed_or_missing_id(): void
     {
         $gateway = new PayplugCreditCard();
