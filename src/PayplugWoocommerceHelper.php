@@ -27,6 +27,12 @@ class PayplugWoocommerceHelper
     use ServiceGetter;
 
     /**
+     * Oney and Scalapay only accept EUR: their thresholds and amounts are always in euro cents,
+     * whatever the shop or order currency.
+     */
+    public const ONEY_SCALAPAY_CURRENCY = 'EUR';
+
+    /**
      * Check if the shop's payment currency is Euro.
      *
      * @return bool
@@ -381,19 +387,22 @@ class PayplugWoocommerceHelper
     }
 
     /**
-     * Convert amount in cents.
+     * Convert an amount to the minor units of its currency (cents for EUR/USD, units for a
+     * zero-decimal currency such as JPY).
      *
      * @param float $amount
+     * @param string|null $currency ISO 4217 code of $amount: pass the order's currency whenever
+     *                              there is an order; defaults to the shop currency
      *
      * @return int
      */
-    public static function get_payplug_amount($amount)
+    public static function get_payplug_amount($amount, ?string $currency = null)
     {
         if (is_null($amount)) {
             return $amount;
         }
 
-        return AmountHelper::toCents((float) $amount);
+        return AmountHelper::toCents((float) $amount, $currency ?? get_woocommerce_currency());
     }
 
     /**

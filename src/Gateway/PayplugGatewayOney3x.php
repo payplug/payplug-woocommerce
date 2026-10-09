@@ -87,8 +87,8 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
         $account = PayplugWoocommerceHelper::get_account_data_from_options();
         if ($account) {
             $oney_configuration = $account['configuration']['oney'];
-            $this->min_oney_price = AmountHelper::fromCents((int) $oney_configuration['min_amounts']['EUR']);
-            $this->max_oney_price = AmountHelper::fromCents((int) $oney_configuration['max_amounts']['EUR']);
+            $this->min_oney_price = AmountHelper::fromCents((int) $oney_configuration['min_amounts']['EUR'], PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY);
+            $this->max_oney_price = AmountHelper::fromCents((int) $oney_configuration['max_amounts']['EUR'], PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY);
             $this->allowed_country_codes = $oney_configuration['allowed_countries'];
         }
     }
@@ -208,8 +208,8 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
         // checkout validation and display never silently drift apart (PRE-3457 review).
         [$min_cents, $max_cents] = OneyAccountMapper::effective_bounds($oney_account_cfg, $oney_cfg);
         $oney_amount = [
-            'min' => AmountHelper::fromCents($min_cents),
-            'max' => AmountHelper::fromCents($max_cents),
+            'min' => AmountHelper::fromCents($min_cents, PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY),
+            'max' => AmountHelper::fromCents($max_cents, PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY),
         ];
         // validate_checkout() reads these to build its exception message - populate them
         // unconditionally (before any early return below) so they're never stale/unset there.
@@ -267,13 +267,14 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
     /**
      * Check the order amount to ensure it's on the allowed range.
      *
-     * @param int $amount
+     * @param int $amount in minor units of $currency
+     * @param string|null $currency ISO 4217 code of $amount; defaults to the shop currency
      *
      * @return int|\WP_Error
      */
-    public function validate_order_amount($amount)
+    public function validate_order_amount($amount, ?string $currency = null)
     {
-        $order_amount = AmountHelper::fromCents((int) $amount);
+        $order_amount = AmountHelper::fromCents((int) $amount, $currency ?? get_woocommerce_currency());
         if ($order_amount < $this->min_oney_price || $order_amount > $this->max_oney_price) {
             return new \WP_Error(
                 'invalid order amount',
@@ -329,7 +330,7 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
             $items = $order->get_items();
             foreach ($items as $item) {
                 $data = $item->get_data();
-                $total = AmountHelper::toCents((float) $data['total']);
+                $total = AmountHelper::toCents((float) $data['total'], $order->get_currency());
                 $cart_items[] = [
                     'delivery_label' => 'storepickup',
                     'delivery_type' => 'storepickup',

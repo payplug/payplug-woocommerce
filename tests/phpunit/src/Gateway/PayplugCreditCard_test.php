@@ -588,6 +588,40 @@ class PayplugCreditCard_test extends TestCase
         wp_delete_post($order->get_id(), true);
     }
 
+    /**
+     * PRE-3727: a partial refund is sent in the minor units of the ORDER's currency - 300 JPY is
+     * sent as 300, not 30000.
+     */
+    public function test_process_refund_sends_a_zero_decimal_currency_amount_as_is(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] = 'acct_test';
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $order = wc_create_order();
+        $order->set_currency('JPY');
+        $order->set_total(1000);
+        $order->update_meta_data('_payplug_upc_operation_id', 'op_jpy');
+        $order->save();
+
+        $captured = null;
+        $this->stub_upc_http_requests([
+            'response' => ['code' => 200, 'message' => 'OK'],
+            'body' => json_encode(['id' => 'op_jpy', 'operationIds' => ['refund_jpy']]),
+            'headers' => [],
+            'cookies' => [],
+        ], $captured);
+
+        $result = (new PayplugCreditCard())->process_refund($order->get_id(), 300, '');
+
+        $this->assertTrue($result);
+        $this->assertSame(300, $captured['body']['amount']);
+        $this->assertSame('JPY', $captured['body']['currency']);
+
+        wp_delete_post($order->get_id(), true);
+    }
+
     public function test_extract_refund_id_returns_the_id_field_when_present(): void
     {
         $id = (new PayplugCreditCard())->extract_refund_id(json_encode(['id' => 'refund_789']));

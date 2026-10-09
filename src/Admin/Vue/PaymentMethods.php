@@ -5,6 +5,7 @@ namespace Payplug\PayplugWoocommerce\Admin\Vue;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Scalapay;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
 class PaymentMethods
 {
@@ -634,11 +635,11 @@ class PaymentMethods
         // possibly-narrower custom choice.
         [$authorized_min, $authorized_max] = Scalapay::authorized_bounds($config, $api_amounts);
 
-        // Convert cents to euros for display
-        $min = $min / 100;
-        $max = $max / 100;
-        $authorized_min = $authorized_min / 100;
-        $authorized_max = $authorized_max / 100;
+        // Convert cents to euros for display (Scalapay is Euro-only)
+        $min = AmountHelper::fromCents((int) $min, PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY);
+        $max = AmountHelper::fromCents((int) $max, PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY);
+        $authorized_min = AmountHelper::fromCents((int) $authorized_min, PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY);
+        $authorized_max = AmountHelper::fromCents((int) $authorized_max, PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY);
 
         return [
             'name' => 'thresholds',

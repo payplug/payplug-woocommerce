@@ -98,7 +98,8 @@ class OneyDisplay
         }
 
         $fee_mode = !empty($oney_settings['with_fees']) ? 'with_fees' : 'without_fees';
-        $amount_in_cents = AmountHelper::toCents($price);
+        // Oney is Euro-only, and its account bounds are euro cents.
+        $amount_in_cents = AmountHelper::toCents($price, PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY);
         $eligible = $mapper->is_eligible($country, $amount_in_cents);
 
         // Only country + amount-in-range decide eligibility (see is_eligible()), and country
@@ -117,7 +118,7 @@ class OneyDisplay
         $logo_class = 'with_fees' === $fee_mode ? 'oney-3x4x' : 'oney-without-fees-3x4x';
 
         $threshold_attrs = $country_eligible
-            ? sprintf(' data-min-oney="%s" data-max-oney="%s"', esc_attr(AmountHelper::fromCents($mapper->get_min_amount())), esc_attr(AmountHelper::fromCents($mapper->get_max_amount())))
+            ? sprintf(' data-min-oney="%s" data-max-oney="%s"', esc_attr(AmountHelper::fromCents($mapper->get_min_amount(), PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY)), esc_attr(AmountHelper::fromCents($mapper->get_max_amount(), PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY)))
             : '';
 
         printf(

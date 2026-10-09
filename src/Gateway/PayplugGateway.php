@@ -370,8 +370,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         $oney_cfg = $this->get_configuration()->get_option('payment_methods.configuration.oney');
         if (!empty($oney_cfg)) {
             $oney_amount = json_decode($oney_cfg['custom_amounts'], true);
-            $oney_amount['min'] = AmountHelper::fromCents((int) $oney_amount['min']);
-            $oney_amount['max'] = AmountHelper::fromCents((int) $oney_amount['max']);
+            $oney_amount['min'] = AmountHelper::fromCents((int) $oney_amount['min'], PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY);
+            $oney_amount['max'] = AmountHelper::fromCents((int) $oney_amount['max'], PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY);
         } else {
             $oney_amount = [
                 'min' => 100,
@@ -700,8 +700,8 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             throw new \Exception(__('Order not found.', 'payplug'));
         }
         $customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
-        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total());
-        $amount = $this->validate_order_amount($amount);
+        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total(), $order->get_currency());
+        $amount = $this->validate_order_amount($amount, $order->get_currency());
 
         if (is_wp_error($amount)) {
             self::log(sprintf('Invalid amount %s for the order.', $order->get_total()), 'error');
@@ -1105,7 +1105,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         ];
 
         if (!is_null($amount)) {
-            $data['amount'] = PayplugWoocommerceHelper::get_payplug_amount($amount);
+            $data['amount'] = PayplugWoocommerceHelper::get_payplug_amount($amount, $order->get_currency());
         }
 
         if (!empty($reason)) {
@@ -1141,7 +1141,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
                 $order->save();
             }
 
-            $note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($refund->id), wc_price(AmountHelper::fromCents((int) $refund->amount)));
+            $note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($refund->id), wc_price(AmountHelper::fromCents((int) $refund->amount, $order->get_currency()), ['currency' => $order->get_currency()]));
             if (!empty($refund->metadata['reason'])) {
                 $note .= sprintf(' (%s)', esc_html($refund->metadata['reason']));
             }
@@ -1171,19 +1171,27 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     /**
      * Check the order amount to ensure it's on the allowed range.
      *
-     * @param int $amount
+     * The bounds (PayplugWoocommerceHelper::get_minimum_amount()/get_maximum_amount()) are
+     * currency-agnostic minor units, sized for 2-decimal currencies (0.99 to 20,000). For a
+     * zero-decimal currency they apply as-is: a JPY order is checked against ¥99 to ¥2,000,000.
+     * Per-currency bounds are a product decision, out of scope of the currency conversion.
+     *
+     * @param int $amount in minor units of $currency
+     * @param string|null $currency ISO 4217 code of $amount; defaults to the shop currency
      *
      * @return int|\WP_Error
      */
-    public function validate_order_amount($amount)
+    public function validate_order_amount($amount, ?string $currency = null)
     {
+        $currency = $currency ?? get_woocommerce_currency();
+
         if (
             $amount < PayplugWoocommerceHelper::get_minimum_amount()
             || $amount > PayplugWoocommerceHelper::get_maximum_amount()
         ) {
             return new \WP_Error(
                 'invalid order amount',
-                sprintf(__('Payments for this amount (%s) are not authorised with this payment gateway.', 'payplug'), \wc_price(AmountHelper::fromCents((int) $amount)))
+                sprintf(__('Payments for this amount (%s) are not authorised with this payment gateway.', 'payplug'), \wc_price(AmountHelper::fromCents((int) $amount, $currency), ['currency' => $currency]))
             );
         }
 
@@ -1339,7 +1347,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             $order_amount = $this->get_order_total();
             foreach ($gateways[$this->id]->settings['payment_methods']['permissions'] as $key => &$permission) {
                 $method_amounts = json_decode($permission['amounts'], true);
-                if ($order_amount < AmountHelper::fromCents((int) $method_amounts['min']['EUR']) || $order_amount > AmountHelper::fromCents((int) $method_amounts['max']['EUR'])) {
+                if ($order_amount < AmountHelper::fromCents((int) $method_amounts['min']['EUR'], PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY) || $order_amount > AmountHelper::fromCents((int) $method_amounts['max']['EUR'], PayplugWoocommerceHelper::ONEY_SCALAPAY_CURRENCY)) {
                     unset($gateways[$key]);
                 }
             }
