@@ -69,13 +69,16 @@ class Scalapay extends PayplugGenericGateway
             $this->settings['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
         );
 
-        // Compared in euros rather than multiplying the total by 100: a float cents value
+        // Compared in euros rather than converting the total to cents: a float cents value
         // such as 19.99 * 100 => 1998.9999999999998 can fall the wrong side of an exact
         // boundary, whereas dividing the (integer) bound by 100 yields the same double as
-        // the parsed total. Same direction as PayplugGatewayOney3x's amount checks.
+        // the parsed total. Same direction as PayplugGatewayOney3x's amount checks. Scalapay
+        // is Euro-only, so its bounds are euro cents.
+        $min = AmountHelper::fromCents($min_cents, PayplugWoocommerceHelper::EURO_CURRENCY);
+        $max = AmountHelper::fromCents($max_cents, PayplugWoocommerceHelper::EURO_CURRENCY);
         $order_total = (float) $this->get_order_total();
-        if ($order_total < $min_cents / 100 || $order_total > $max_cents / 100) {
-            throw new \Exception(sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Scalapay.', 'payplug'), $min_cents / 100, $max_cents / 100));
+        if ($order_total < $min || $order_total > $max) {
+            throw new \Exception(sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Scalapay.', 'payplug'), $min, $max));
         }
     }
 
@@ -102,7 +105,7 @@ class Scalapay extends PayplugGenericGateway
 
             // Euro comparison, for the float-precision reason spelled out in validate_checkout().
             $order_total = (float) $this->get_order_total();
-            if ($order_total < $min_cents / 100 || $order_total > $max_cents / 100) {
+            if ($order_total < AmountHelper::fromCents($min_cents, PayplugWoocommerceHelper::EURO_CURRENCY) || $order_total > AmountHelper::fromCents($max_cents, PayplugWoocommerceHelper::EURO_CURRENCY)) {
                 unset($gateways[$this->id]);
             }
         }
@@ -200,7 +203,7 @@ class Scalapay extends PayplugGenericGateway
             $items = $order->get_items();
             foreach ($items as $item) {
                 $data = $item->get_data();
-                $total = AmountHelper::toCents((float) $data['total']);
+                $total = AmountHelper::toCents((float) $data['total'], $order->get_currency());
                 $cart_items[] = [
                     'delivery_label' => 'storepickup',
                     'delivery_type' => 'storepickup',

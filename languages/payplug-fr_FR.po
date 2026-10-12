@@ -1335,6 +1335,7 @@ msgstr "Limites de montant Scalapay invalides"
 #, php-format
 msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
 msgstr "Le montant total de votre panier doit être compris entre %s€ et %s€ pour payer avec Scalapay."
+
 msgid "payplug_section_standard_payment_option_hosted_fields_label"
 msgstr "Advanced (beta) Hosted Fields"
 
@@ -1376,3 +1377,6 @@ msgstr "La carte a été supprimée."
 
 msgid "payplug_uhf_saved_cards_invalid_notice"
 msgstr "Carte invalide."
+
+msgid "payplug_payment_currency_not_supported"
+msgstr "Ce moyen de paiement n’est pas disponible pour les commandes dans cette devise."
