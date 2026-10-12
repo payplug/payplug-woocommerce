@@ -2,5 +2,5 @@
   "version": "3.1.1",
   "wc_tested_up_to": "10.6.1",
   "wp_tested_up_to": "6.9.4",
-  "changelog": "* Fix: fix order lookup in check_payment for integrated payment"
+  "changelog": "* Fix: fix order lookup in check_payment for integrated payment\n* Fix: secure the OAuth setup callback and the PayPlug REST routes (capability check, nonce, POST only)"
 }
