@@ -2,6 +2,7 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway;
 
+use Payplug\PayplugWoocommerce\Admin\SetupCallback;
 use Payplug\PayplugWoocommerce\Traits\Configuration;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
@@ -83,7 +84,7 @@ class AccountGateway
         $this->get_configuration()->update_option('oauth_code_verifier', $code_verifier);
 
         // Then get callbackUri
-        $oauth_callback_uri = admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug');
+        $oauth_callback_uri = SetupCallback::oauth_callback_uri();
         $this->get_configuration()->update_option('oauth_callback_uri', $oauth_callback_uri);
 
         // Initiate OAuth flow using the PayPlug library

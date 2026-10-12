@@ -22,6 +22,9 @@ class SetupCallback
     use ServiceGetter;
     use GatewayGetter;
 
+    public const SETUP_NONCE_ACTION = 'payplug_setup';
+    public const SETUP_NONCE_PARAM = 'payplug_setup_nonce';
+
     /**
      * Initialize the handler
      */
@@ -36,8 +39,7 @@ class SetupCallback
      */
     public function handle_setup_callback(): void
     {
-        // Check if we're on the PayPlug settings page
-        if (!$this->is_payplug_settings_page()) {
+        if (wp_doing_ajax() || !$this->is_payplug_settings_page() || !current_user_can('manage_woocommerce')) {
             return;
         }
 
@@ -45,9 +47,18 @@ class SetupCallback
         if (isset($_GET['client_id']) && isset($_GET['company_id'])) {
             $client_id = sanitize_text_field($_GET['client_id']);
             $company_id = sanitize_text_field($_GET['company_id']);
-            $this
-                ->get_gateway('account')
-                ->initialize_jwt($client_id, $company_id);
+            $nonce = isset($_GET[self::SETUP_NONCE_PARAM]) ? sanitize_text_field(wp_unslash($_GET[self::SETUP_NONCE_PARAM])) : '';
+            if (!wp_verify_nonce($nonce, self::SETUP_NONCE_ACTION)) {
+                PayplugGateway::log('Setup callback rejected: invalid or missing nonce', 'warning');
+                add_action('admin_notices', function (): void {
+                    echo '<div class="notice notice-error is-dismissible">' .
+                        '<p>' . esc_html__('The PayPlug setup link is invalid or has expired. Please restart the connection from the PayPlug settings page.', 'payplug') . '</p>' .
+                        '</div>';
+                });
+
+                return;
+            }
+            $this->start_oauth($client_id, $company_id);
         }
 
         // Display success message if setup was successful
@@ -123,6 +134,36 @@ class SetupCallback
         // Redirect to success page
         wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplug'));
         exit;
+    }
+
+    /**
+     * Reset the PayPlug configuration and redirect to the OAuth authorization page
+     */
+    protected function start_oauth(string $client_id, string $company_id): void
+    {
+        $this
+            ->get_gateway('account')
+            ->initialize_jwt($client_id, $company_id);
+    }
+
+    /**
+     * OAuth redirect_uri registered on the PayPlug portal, compared by exact match
+     */
+    public static function oauth_callback_uri(): string
+    {
+        return get_admin_url(null, '/admin.php?page=wc-settings&tab=checkout&section=payplug');
+    }
+
+    /**
+     * URI the PayPlug portal redirects to with client_id and company_id
+     */
+    public static function setup_redirection_uri(): string
+    {
+        return add_query_arg(
+            self::SETUP_NONCE_PARAM,
+            wp_create_nonce(self::SETUP_NONCE_ACTION),
+            self::oauth_callback_uri()
+        );
     }
 
     /**
