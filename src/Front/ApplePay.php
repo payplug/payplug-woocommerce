@@ -160,8 +160,8 @@ class ApplePay
     {
         $order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
         $customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
-        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total() - ($order->get_shipping_tax() + $order->get_shipping_total()));
-        $amount = $gateway->validate_order_amount($amount);
+        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total() - ($order->get_shipping_tax() + $order->get_shipping_total()), $order->get_currency());
+        $amount = $gateway->validate_order_amount($amount, $order->get_currency());
         wp_send_json([
             'total' => $amount,
             'order_id' => $order_id,
@@ -326,11 +326,21 @@ class ApplePay
         $payment_token = $_POST['payment_token'];
         $amount = $_POST['amount'];
 
+        $order = wc_get_order($order_id);
+
+        if (!$order instanceof \WC_Order) {
+            // Fail fast: without an order there is no currency to convert the amount with, and
+            // PayplugAddressData::from_order() below would fail anyway. The JS treats any
+            // non-success response as a failed payment and cancels the Apple Pay session.
+            wp_send_json_error();
+
+            return;
+        }
+
         $payment = \Payplug\Payment::retrieve($payment_id);
 
-        $order = wc_get_order($order_id);
-        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($amount);
-        $amount = $applepay->validate_order_amount($amount);
+        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($amount, $order->get_currency());
+        $amount = $applepay->validate_order_amount($amount, $order->get_currency());
 
         $address_data = PayplugAddressData::from_order($order);
 
