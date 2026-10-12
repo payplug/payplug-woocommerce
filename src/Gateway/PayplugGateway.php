@@ -668,7 +668,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             [
                 'img_path' => esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/dist/'),
                 'ajax_url' => get_home_url(),
-                'rest_url' => get_home_url() . '/?rest_route=/payplug_api/',
+                'rest_url' => get_home_url() . '/?_wpnonce=' . wp_create_nonce('wp_rest') . '&rest_route=/payplug_api/',
             ]
         ); ?>
 		<script>window.get_data_url = "<?php echo rest_url('payplug/data'); ?>"</script>
