@@ -422,6 +422,8 @@ class ApplePay
             return;
         }
 
+        $cart_lines = $this->get_cart_lines_from_order($order);
+
         if ('' !== $payment_id) {
             $payplug = $this->get_merchant_client();
             $payment = null;
@@ -429,7 +431,7 @@ class ApplePay
                 try {
                     $payment = $this->retrieve_payment($payment_id, $payplug);
                 } catch (\Throwable $e) {
-                    PayplugGateway::log(sprintf('Apple Pay: payment of order #%d could not be retrieved', $order_id), 'warning');
+                    $this->log_api_failure('retrieved', $order_id, $e);
                 }
             }
 
@@ -462,7 +464,6 @@ class ApplePay
             }
         }
 
-        $cart_lines = $this->get_cart_lines_from_order($order);
         if (!$order->delete(true)) {
             wp_send_json_error([
                 'message' => __('Your order was cancelled.', 'woocommerce'),
@@ -516,7 +517,7 @@ class ApplePay
     }
 
     /**
-     * Aborts the payment. When the abort fails, true only if the payment is confirmed not paid.
+     * Aborts the payment. When the abort fails, true only if the payment is not paid and carries a failure.
      *
      * @param \Payplug\Resource\Payment $payment
      */
@@ -527,18 +528,27 @@ class ApplePay
 
             return true;
         } catch (\Throwable $e) {
-            PayplugGateway::log(sprintf('Apple Pay: payment of order #%d could not be aborted', $order_id), 'warning');
+            $this->log_api_failure('aborted', $order_id, $e);
         }
 
         try {
-            return empty($this->retrieve_payment($payment_id, $payplug)->is_paid);
+            $payment = $this->retrieve_payment($payment_id, $payplug);
         } catch (\Throwable $e) {
+            $this->log_api_failure('retrieved', $order_id, $e);
+
             return false;
         }
+
+        return empty($payment->is_paid) && !empty($payment->failure);
+    }
+
+    private function log_api_failure(string $failed_action, int $order_id, \Throwable $e): void
+    {
+        PayplugGateway::log(sprintf('Apple Pay: payment of order #%d could not be %s (%s: %s)', $order_id, $failed_action, get_class($e), $e->getMessage()), 'warning');
     }
 
     /**
-     * Read before the order is deleted, added to the cart once the deletion succeeded.
+     * Lines to add back to the cart once the order is deleted, without the lines whose variation no longer exists.
      *
      * @return array[] add_to_cart() arguments, one entry per order line
      */
@@ -550,8 +560,11 @@ class ApplePay
             $variations = [];
 
             if ($variation_id) {
-                $product = wc_get_product($variation_id);
-                $variations = $product->get_variation_attributes();
+                $variation = wc_get_product($variation_id);
+                if (!$variation instanceof \WC_Product_Variation || !$variation->get_parent_id()) {
+                    continue;
+                }
+                $variations = $variation->get_variation_attributes();
             }
 
             $lines[] = [$item->get_product_id(), $item->get_quantity(), $variation_id, $variations];

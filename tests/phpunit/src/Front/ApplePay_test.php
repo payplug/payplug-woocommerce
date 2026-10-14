@@ -2,12 +2,15 @@
 
 namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Front;
 
+use Payplug\Exception\ConnectionException;
+use Payplug\Exception\ForbiddenException;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Front\ApplePay;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Service\Api;
 use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\FakeGateway;
 use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\FakePayment;
+use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\GatewayLogSpy;
 use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\PayplugWoocommerceRequestDouble;
 use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\WooCommerceAjaxFixtures;
 use PHPUnit\Framework\TestCase;
@@ -23,6 +26,11 @@ class ApplePay_test extends TestCase
      */
     private $apple_pay;
 
+    /**
+     * @var GatewayLogSpy|null
+     */
+    private $log_spy;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -32,6 +40,10 @@ class ApplePay_test extends TestCase
 
     protected function tearDown(): void
     {
+        if ($this->log_spy) {
+            $this->log_spy->stop();
+            $this->log_spy = null;
+        }
         $this->tear_down_wc_frontend();
         parent::tearDown();
     }
@@ -126,8 +138,8 @@ class ApplePay_test extends TestCase
     {
         list($posted_order_id, $order_id) = $scenario($this);
         $_POST = $this->with_order_id($posted_order_id, [
-            'shipping' => ['familyName' => 'Mallory', 'addressLines' => ['6 rue du Vol'], 'emailAddress' => 'mallory@example.test'],
-            'billing' => ['familyName' => 'Mallory', 'country' => 'DE'],
+            'shipping' => ['familyName' => 'Durand', 'addressLines' => ['6 rue des Lilas'], 'emailAddress' => 'durand@example.test'],
+            'billing' => ['familyName' => 'Durand', 'country' => 'DE'],
             'shipping_method' => 'flat_rate_1',
         ]);
         $before = null === $order_id ? null : $this->order_snapshot($order_id);
@@ -143,8 +155,8 @@ class ApplePay_test extends TestCase
     public function garbage_contact_provider(): array
     {
         return [
-            'string contacts' => [['shipping' => 'Mallory', 'billing' => 'Mallory']],
-            'nested arrays' => [['shipping' => ['familyName' => ['Mallory'], 'addressLines' => 'x'], 'billing' => [['x']]]],
+            'string contacts' => [['shipping' => 'Durand', 'billing' => 'Durand']],
+            'nested arrays' => [['shipping' => ['familyName' => ['Durand'], 'addressLines' => 'x'], 'billing' => [['x']]]],
         ];
     }
 
@@ -549,6 +561,19 @@ class ApplePay_test extends TestCase
 
                 return [[new \RuntimeException('API unreachable')], 1];
             },
+            'abort fails, payment neither paid nor failed' => static function (FakePayment $payment): array {
+                $payment->abort_exception = new \RuntimeException('abort refused');
+
+                return [[clone $payment], 1];
+            },
+            'abort fails, payment paid and carrying a failure' => static function (FakePayment $payment): array {
+                $payment->abort_exception = new \RuntimeException('abort refused');
+                $paid = clone $payment;
+                $paid->is_paid = true;
+                $paid->failure = (object) ['code' => 'aborted', 'message' => 'Payment aborted'];
+
+                return [[$paid], 1];
+            },
         ];
 
         return $this->with_and_without_posted_payment_id($scenarios);
@@ -583,11 +608,21 @@ class ApplePay_test extends TestCase
         $scenarios = [
             'payment aborted' => static fn (\WC_Order $order): array => ['pending', [new FakePayment($order->get_transaction_id(), $order->get_id())], 1],
             'failed order, payment aborted' => static fn (\WC_Order $order): array => ['failed', [new FakePayment($order->get_transaction_id(), $order->get_id())], 1],
-            'abort fails, payment confirmed not paid' => static function (\WC_Order $order): array {
+            'abort fails, payment already aborted' => static function (\WC_Order $order): array {
                 $payment = new FakePayment($order->get_transaction_id(), $order->get_id());
                 $payment->abort_exception = new \RuntimeException('abort refused');
+                $failed = clone $payment;
+                $failed->failure = (object) ['code' => 'aborted', 'message' => 'Payment aborted'];
 
-                return ['pending', [$payment, clone $payment], 2];
+                return ['pending', [$payment, $failed], 2];
+            },
+            'abort fails, payment failed' => static function (\WC_Order $order): array {
+                $payment = new FakePayment($order->get_transaction_id(), $order->get_id());
+                $payment->abort_exception = new \RuntimeException('abort refused');
+                $failed = clone $payment;
+                $failed->failure = (object) ['code' => 'timeout', 'message' => 'The customer has not tried to pay and left the payment page.'];
+
+                return ['pending', [$payment, $failed], 2];
             },
         ];
 
@@ -702,7 +737,7 @@ class ApplePay_test extends TestCase
     }
 
     /**
-     * Also the case of an Apple Pay cart order created before the cart button marked its orders.
+     * Apple Pay order without the cart order mark, such as one placed from the checkout page.
      *
      * @dataProvider transaction_id_provider
      */
@@ -805,6 +840,126 @@ class ApplePay_test extends TestCase
         self::assertSame('pending', wc_get_order($order->get_id())->get_status());
     }
 
+    public function deleted_variation_provider(): array
+    {
+        return [
+            'variation deleted before the cancel' => [static function (\WC_Product_Variation $variation): void {
+                $variation->delete(true);
+            }],
+            'variation deleted once the order lines are read' => [static function (\WC_Product_Variation $variation): void {
+                add_filter('woocommerce_order_get_items', static function (array $items) use ($variation): array {
+                    if (get_post($variation->get_id())) {
+                        $variation->delete(true);
+                    }
+
+                    return $items;
+                });
+            }],
+            'variation deleted once the order lines are read, product type no longer cached' => [static function (\WC_Product_Variation $variation): void {
+                $variation_id = $variation->get_id();
+                add_filter('woocommerce_order_get_items', static function (array $items) use ($variation, $variation_id): array {
+                    if (get_post($variation_id)) {
+                        $variation->delete(true);
+                        \WC_Cache_Helper::invalidate_cache_group('product_' . $variation_id);
+                    }
+
+                    return $items;
+                });
+            }],
+            'variation detached from its variable product' => [static function (\WC_Product_Variation $variation): void {
+                global $wpdb;
+
+                $wpdb->update($wpdb->posts, ['post_parent' => 0], ['ID' => $variation->get_id()]);
+                clean_post_cache($variation->get_id());
+            }],
+        ];
+    }
+
+    /**
+     * @dataProvider deleted_variation_provider
+     */
+    public function test_applepay_cancel_order_with_a_deleted_variation_deletes_the_order_and_restores_the_other_lines(callable $delete_variation): void
+    {
+        $order = $this->make_cancellable_order();
+        $simple_product_id = $this->order_product_id($order);
+        $variations = $this->make_variations(['S', 'M']);
+        $order->add_product($variations['S'], 2);
+        $order->add_product($variations['M'], 3);
+        $order->save();
+        $delete_variation($variations['S']);
+        $_POST = ['order_id' => (string) $order->get_id(), 'payment_id' => $order->get_transaction_id()];
+        $deletions_before = did_action('woocommerce_delete_order');
+
+        $response = $this->capture_ajax([$this->apple_pay, 'applepay_cancel_order']);
+        $retry = $this->capture_ajax([$this->apple_pay, 'applepay_cancel_order']);
+
+        self::assertSame($this->cancelled_success_response(), $response);
+        self::assertSame($this->forbidden_response(), $retry);
+        self::assertSame(1, $this->apple_pay->payment->aborts);
+        self::assertFalse(wc_get_order($order->get_id()));
+        self::assertSame(1, did_action('woocommerce_delete_order') - $deletions_before);
+        self::assertSame([
+            [$simple_product_id, 0, 1, []],
+            [$variations['M']->get_parent_id(), $variations['M']->get_id(), 3, ['attribute_size' => 'M']],
+        ], array_map(static fn (array $item): array => [$item['product_id'], $item['variation_id'], $item['quantity'], $item['variation']], array_values(WC()->cart->get_cart())));
+        self::assertSame(0, $this->session_order_id());
+    }
+
+    /**
+     * Each case returns [the answers of the retrieve calls for the order, the expected warnings with %d for the order id].
+     */
+    public function api_failure_log_provider(): array
+    {
+        $unreachable = static fn (): ConnectionException => new ConnectionException('Connection to the API failed with the following message: timeout', 28);
+        $refusing_abort = static function (\WC_Order $order): FakePayment {
+            $payment = new FakePayment($order->get_transaction_id(), $order->get_id());
+            $payment->abort_exception = new ForbiddenException('Forbidden error. You are not allowed to access this resource.', '{"object":"error","message":"api response body"}', 403);
+
+            return $payment;
+        };
+        $retrieve_warning = 'Apple Pay: payment of order #%d could not be retrieved (Payplug\Exception\ConnectionException: Connection to the API failed with the following message: timeout)';
+        $abort_warning = 'Apple Pay: payment of order #%d could not be aborted (Payplug\Exception\ForbiddenException: Forbidden error. You are not allowed to access this resource.)';
+
+        return [
+            'payment not retrieved' => [static fn (\WC_Order $order): array => [$unreachable()], [$retrieve_warning]],
+            'abort refused' => [static function (\WC_Order $order) use ($refusing_abort): array {
+                $payment = $refusing_abort($order);
+                $failed = clone $payment;
+                $failed->failure = (object) ['code' => 'aborted', 'message' => 'Payment aborted'];
+
+                return [$payment, $failed];
+            }, [$abort_warning]],
+            'abort refused, payment not retrieved again' => [
+                static fn (\WC_Order $order): array => [$refusing_abort($order), $unreachable()],
+                [$abort_warning, $retrieve_warning],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider api_failure_log_provider
+     *
+     * @param string[] $expected_warnings
+     */
+    public function test_applepay_cancel_order_logs_the_class_and_message_of_the_api_exception(callable $retrieve_results, array $expected_warnings): void
+    {
+        $order = $this->make_cancellable_order();
+        $this->apple_pay->retrieve_results = $retrieve_results($order);
+        $_POST = ['order_id' => (string) $order->get_id(), 'payment_id' => $order->get_transaction_id()];
+        $this->log_spy = GatewayLogSpy::start();
+
+        $this->capture_ajax([$this->apple_pay, 'applepay_cancel_order']);
+
+        $warnings = array_column(array_filter($this->log_spy->entries, static fn (array $entry): bool => 'warning' === $entry['level']), 'message');
+        foreach ($expected_warnings as $expected) {
+            self::assertContains(sprintf($expected, $order->get_id()), $warnings);
+        }
+        foreach ($this->log_spy->entries as $entry) {
+            self::assertStringNotContainsString('sk_test_double', $entry['message']);
+            self::assertStringNotContainsString('api response body', $entry['message']);
+        }
+    }
+
     public function merchant_key_provider(): array
     {
         $both = ['test' => 'sk_test_key', 'live' => 'sk_live_key'];
@@ -895,6 +1050,42 @@ class ApplePay_test extends TestCase
         foreach (array_merge($this->apple_pay->retrieve_clients, $payment->abort_clients) as $client) {
             self::assertSame($this->apple_pay->merchant_client, $client);
         }
+    }
+
+    /**
+     * Published variations of one variable product with a size attribute, deleted after the test.
+     *
+     * @param string[] $sizes
+     *
+     * @return \WC_Product_Variation[] keyed by size
+     */
+    private function make_variations(array $sizes): array
+    {
+        $attribute = new \WC_Product_Attribute();
+        $attribute->set_name('size');
+        $attribute->set_options($sizes);
+        $attribute->set_visible(true);
+        $attribute->set_variation(true);
+        $parent = new \WC_Product_Variable();
+        $parent->set_name('Variable product');
+        $parent->set_attributes([$attribute]);
+        $parent->set_status('publish');
+        $parent->save();
+        $this->fixture_product_ids[] = $parent->get_id();
+
+        $variations = [];
+        foreach ($sizes as $size) {
+            $variation = new \WC_Product_Variation();
+            $variation->set_parent_id($parent->get_id());
+            $variation->set_attributes(['size' => $size]);
+            $variation->set_regular_price('10');
+            $variation->set_status('publish');
+            $variation->save();
+            $this->fixture_product_ids[] = $variation->get_id();
+            $variations[$size] = $variation;
+        }
+
+        return $variations;
     }
 
     private function order_product_id(\WC_Order $order): int
