@@ -193,6 +193,18 @@ class UpcWebhook
         if (!$matches_primary && !$matches_alt) {
             $logger->error(sprintf('UPC webhook notification operation "%s" is not the operation bound to order #%s.', $operation_data->operationId, $order->get_id()));
 
+            if ($this->is_superseded_operation($order, $operation_data->operationId)) {
+                // A retried checkout replaced this operation. Its outcome can never be applied to
+                // the order any more, but a PAID one means the shopper was most likely charged by
+                // both attempts: flag it on the order for support to refund. 200 either way, the
+                // notification can never bind to anything.
+                if (PaymentOutcome::PAID === $operation_data->outcome) {
+                    $this->flag_superseded_operation_paid($order, $operation_data->operationId);
+                }
+
+                return 200;
+            }
+
             if (WooCommerceOrderStateMutator::isTerminal($order->get_status())) {
                 // The order already reached a final state through a different (or since-
                 // superseded) operation - this notification's own operation id can never bind to
@@ -249,6 +261,56 @@ class UpcWebhook
 
             return 500;
         }
+    }
+
+    /**
+     * Whether the operation is one a retried checkout replaced on this order (see
+     * PaymentCaptureOutcomeApplier::remember_superseded_operation()). Exact hash_equals() match,
+     * like the bound ids above.
+     */
+    private function is_superseded_operation(\WC_Order $order, string $operation_id): bool
+    {
+        $superseded = $order->get_meta('_payplug_upc_superseded_operation_ids');
+
+        if (!is_array($superseded)) {
+            return false;
+        }
+
+        foreach ($superseded as $superseded_id) {
+            if (is_string($superseded_id) && '' !== $superseded_id && hash_equals($superseded_id, $operation_id)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Logged and noted once per operation: a redelivery of the same notification must not stack
+     * notes on the order.
+     */
+    private function flag_superseded_operation_paid(\WC_Order $order, string $operation_id): void
+    {
+        $flagged = $order->get_meta('_payplug_upc_superseded_paid_operation_ids');
+        $flagged = is_array($flagged) ? $flagged : [];
+
+        if (in_array($operation_id, $flagged, true)) {
+            return;
+        }
+
+        (new WooCommerceLogger())->error(sprintf(
+            'UPC operation "%s" was replaced on order #%s by a later attempt but is reported PAID: the customer may have been charged twice.',
+            $operation_id,
+            $order->get_id()
+        ));
+
+        $flagged[] = $operation_id;
+        $order->update_meta_data('_payplug_upc_superseded_paid_operation_ids', $flagged);
+        $order->add_order_note(sprintf(
+            __('Payplug payment %s from an earlier attempt on this order was confirmed as paid. The customer may have been charged twice: check the transactions and refund the duplicate if needed.', 'payplug'),
+            wc_clean($operation_id)
+        ));
+        $order->save();
     }
 
     /**

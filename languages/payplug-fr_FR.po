@@ -1370,7 +1370,7 @@ msgid "payplug_hosted_fields_missing_token"
 msgstr "Nous n'avons pas pu récupérer les informations de votre carte. Merci de réessayer."
 
 msgid "payplug_hosted_fields_payment_in_progress"
-msgstr "Un paiement est déjà en cours pour cette commande. Merci de patienter quelques minutes avant de réessayer."
+msgstr "Un paiement est déjà en cours pour cette commande, sa confirmation peut prendre quelques minutes. Merci de ne pas payer à nouveau : réessayez plus tard uniquement si la commande n'est toujours pas payée."
 
 msgid "payplug_hosted_fields_pay_with_another_card"
 msgstr "Payer avec une autre carte"
@@ -1411,3 +1411,6 @@ msgstr "Remboursement %s : %s"
 #, php-format
 msgid "Refund: %s"
 msgstr "Remboursement : %s"
+
+msgid "Payplug payment %s from an earlier attempt on this order was confirmed as paid. The customer may have been charged twice: check the transactions and refund the duplicate if needed."
+msgstr "Le paiement Payplug %s d'une tentative précédente sur cette commande a été confirmé comme payé. Le client a pu être débité deux fois : vérifiez les transactions et remboursez le doublon si nécessaire."
