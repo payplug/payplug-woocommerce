@@ -221,6 +221,61 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
         $this->assertSame('processing', wc_get_order($this->order->get_id())->get_status());
     }
 
+    public function testAPaidNotificationForASupersededOperationFlagsAPossibleDoubleChargeOnce(): void
+    {
+        // A first attempt came back FAILED (e.g. an unmapped "Acceptation" execCode) and the
+        // retry rebound the order: the first operation's late PAID notification must be flagged.
+        $this->order->update_meta_data('_payplug_upc_superseded_operation_ids', ['op_superseded_1']);
+        $this->order->save();
+
+        $controller = new UpcWebhook();
+        $body = json_encode([
+            'id' => 'op_superseded_1',
+            'execCode' => '0000',
+            'orderId' => (string) $this->order->get_id(),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
+        ]);
+
+        ob_start();
+        $first_status = $controller->receive_notification($body);
+        $second_status = $controller->receive_notification($body);
+        ob_get_clean();
+
+        $order = wc_get_order($this->order->get_id());
+        $notes = wc_get_order_notes(['order_id' => $order->get_id()]);
+        $flag_notes = array_filter($notes, fn ($note) => false !== strpos($note->content, 'op_superseded_1'));
+
+        $this->assertSame(200, $first_status);
+        $this->assertSame(200, $second_status);
+        $this->assertSame('pending', $order->get_status());
+        $this->assertSame('', $order->get_meta('_payplug_upc_treated'));
+        $this->assertCount(1, $flag_notes);
+    }
+
+    public function testAFailedNotificationForASupersededOperationIsAcknowledgedWithoutANote(): void
+    {
+        $this->order->update_meta_data('_payplug_upc_superseded_operation_ids', ['op_superseded_1']);
+        $this->order->save();
+
+        $controller = new UpcWebhook();
+        $body = json_encode([
+            'id' => 'op_superseded_1',
+            'execCode' => '9999',
+            'orderId' => (string) $this->order->get_id(),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
+        ]);
+
+        ob_start();
+        $status = $controller->receive_notification($body);
+        ob_get_clean();
+
+        $notes = wc_get_order_notes(['order_id' => $this->order->get_id()]);
+
+        $this->assertSame(200, $status);
+        $this->assertSame('pending', wc_get_order($this->order->get_id())->get_status());
+        $this->assertCount(0, array_filter($notes, fn ($note) => false !== strpos($note->content, 'op_superseded_1')));
+    }
+
     public function testANotificationForAnOrderThatNeverWentThroughUpcIsRejected(): void
     {
         $this->order->delete_meta_data('_payplug_upc_operation_id');
