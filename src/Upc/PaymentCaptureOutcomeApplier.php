@@ -21,6 +21,8 @@ class PaymentCaptureOutcomeApplier
 {
     private const REDIRECT_HTML_TTL_SECONDS = 600;
 
+    private const MAX_SUPERSEDED_OPERATION_IDS = 20;
+
     /**
      * Fallback execCode for the two 3DS-pending shapes: the Unified API's raw-redirect response
      * does not always carry an execCode of its own, and ExecCodeMapper maps "0001"
@@ -201,6 +203,7 @@ class PaymentCaptureOutcomeApplier
         // already completed) must not inherit that prior attempt's 'treated' marker, or the new
         // operation's real outcome would be silently blocked from ever applying.
         $previous_operation_id = (string) $order->get_meta('_payplug_upc_operation_id');
+        $previous_operation_id_alt = (string) $order->get_meta('_payplug_upc_operation_id_alt');
 
         try {
             (new WooCommercePaymentRepository())->save(new OperationData(
@@ -227,6 +230,7 @@ class PaymentCaptureOutcomeApplier
 
             if ($previous_operation_id !== $operation_id) {
                 $order->delete_meta_data('_payplug_upc_treated');
+                self::remember_superseded_operation($order, $previous_operation_id, $previous_operation_id_alt);
             }
 
             // When this attempt was created: HostedFieldsPaymentProcessor::resolve_in_flight_attempt() only
@@ -249,6 +253,33 @@ class PaymentCaptureOutcomeApplier
         } catch (PaymentNotFoundException $e) {
             (new WooCommerceLogger())->error(sprintf('UPC operation "%s" could not be persisted for order #%s: %s', $operation_id, $order->get_id(), $e->getMessage()));
         }
+    }
+
+    /**
+     * Keeps the ids of the operation a retried checkout replaces. A FAILED outcome can hide a
+     * payment that actually went through (unmapped "Acceptation" execCodes such as 0002/0003 fall
+     * into FAILED), so the shopper may be charged by both attempts. The late PAID notification
+     * for the replaced operation no longer matches the order's binding: Front\UpcWebhook looks it
+     * up here to flag the possible double charge instead of dropping it silently.
+     */
+    private static function remember_superseded_operation(\WC_Order $order, string $operation_id, string $operation_id_alt): void
+    {
+        if ('' === $operation_id) {
+            return;
+        }
+
+        $superseded = $order->get_meta('_payplug_upc_superseded_operation_ids');
+        $superseded = is_array($superseded) ? $superseded : [];
+
+        foreach ([$operation_id, $operation_id_alt] as $id) {
+            if ('' !== $id && !in_array($id, $superseded, true)) {
+                $superseded[] = $id;
+            }
+        }
+
+        // Bounded: each retry adds at most two ids, and a shopper retrying more than a handful of
+        // times on the same order is not a case worth growing the meta for.
+        $order->update_meta_data('_payplug_upc_superseded_operation_ids', array_slice($superseded, -self::MAX_SUPERSEDED_OPERATION_IDS));
     }
 
     /**

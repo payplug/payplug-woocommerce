@@ -1376,7 +1376,7 @@ msgid "payplug_hosted_fields_missing_token"
 msgstr "No hemos podido leer los datos de tu tarjeta. Inténtalo de nuevo."
 
 msgid "payplug_hosted_fields_payment_in_progress"
-msgstr "Ya hay un pago en curso para este pedido. Espera unos minutos antes de volver a intentarlo."
+msgstr "Ya hay un pago en curso para este pedido y su confirmación puede tardar unos minutos. No vuelvas a pagar: inténtalo más tarde solo si el pedido sigue sin pagar."
 
 msgid "payplug_hosted_fields_pay_with_another_card"
 msgstr "Pagar con otra tarjeta"
@@ -1417,6 +1417,9 @@ msgstr "Reembolso %s: %s"
 #, php-format
 msgid "Refund: %s"
 msgstr "Reembolso: %s"
+
+msgid "Payplug payment %s from an earlier attempt on this order was confirmed as paid. The customer may have been charged twice: check the transactions and refund the duplicate if needed."
+msgstr "El pago Payplug %s de un intento anterior en este pedido se ha confirmado como pagado. Es posible que se haya cobrado dos veces al cliente: comprueba las transacciones y reembolsa el duplicado si es necesario."
 
 #: src/PayplugWoocommerceRequest.php:485
 #, php-format
