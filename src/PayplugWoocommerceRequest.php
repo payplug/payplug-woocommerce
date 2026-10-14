@@ -113,7 +113,7 @@ class PayplugWoocommerceRequest
         $order_key = isset($_POST['order_key']) ? wc_clean(wp_unslash($_POST['order_key'])) : '';
 
         $order = $order_id ? wc_get_order($order_id) : null;
-        if (!$order || !hash_equals($order->get_order_key(), $order_key)) {
+        if (!$order || !is_string($order_key) || !hash_equals($order->get_order_key(), $order_key)) {
             wp_send_json([
                 'result' => 'failure',
                 'messages' => '<ul class="woocommerce-error"><li>' . __('Invalid order.', 'payplug') . '</li></ul>',
@@ -368,13 +368,13 @@ class PayplugWoocommerceRequest
 
     /**
      * Order whose transaction id is this payment, when the current visitor owns it.
-     * Sends the 403 answer and returns null otherwise.
+     * Sends the 403 answer and returns null otherwise, also for a payment id that is not a string.
      *
-     * @param string $payment_id
+     * @param mixed $payment_id
      */
     private function get_owned_order_from_payment_id($payment_id, string $handler): ?\WC_Order
     {
-        $order_id = '' !== $payment_id ? (int) $this->getOrderFromPaymentId($payment_id) : 0;
+        $order_id = is_string($payment_id) && '' !== $payment_id ? (int) $this->getOrderFromPaymentId($payment_id) : 0;
         $order = $order_id ? wc_get_order($order_id) : false;
         if (!PayplugWoocommerceHelper::session_owns_order($order)) {
             $this->refuse_order($handler, $order_id);
@@ -629,7 +629,7 @@ class PayplugWoocommerceRequest
         $order = $order_id ? wc_get_order($order_id) : false;
 
         $order_pay_key = isset($_POST['order_pay_key']) ? wc_clean(wp_unslash($_POST['order_pay_key'])) : '';
-        if (!$order instanceof \WC_Order) {
+        if (!$order instanceof \WC_Order || !is_string($order_pay_key)) {
             $authorised = false;
         } elseif ('' !== $order_pay_key) {
             $authorised = hash_equals($order->get_order_key(), $order_pay_key);

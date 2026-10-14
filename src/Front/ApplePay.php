@@ -13,6 +13,11 @@ class ApplePay
 {
     use ServiceGetter;
 
+    /**
+     * Marks the orders created by place_order_with_dummy_data(), the only ones applepay_cancel_order() deletes.
+     */
+    private const CART_ORDER_META = '_payplug_applepay_cart_order';
+
     private $options;
 
     public function __construct()
@@ -133,6 +138,7 @@ class ApplePay
                 ], 'shipping');
 
                 $order->set_payment_method($apple_pay);
+                $order->update_meta_data(self::CART_ORDER_META, 'yes');
 
                 $packages = WC()->cart->get_shipping_packages();
 
@@ -333,6 +339,7 @@ class ApplePay
         $order = $order_id ? wc_get_order($order_id) : false;
         if (
             !PayplugWoocommerceHelper::session_owns_order($order)
+            || !is_string($payment_id)
             || '' === $payment_id
             || !hash_equals((string) $order->get_transaction_id(), $payment_id)
         ) {
@@ -394,9 +401,9 @@ class ApplePay
         }
 
         $order_id = absint(wp_unslash($_POST['order_id']));
-        $payment_id = !empty($_POST['payment_id']) ? wc_clean(wp_unslash($_POST['payment_id'])) : '';
+        $posted_payment_id = !empty($_POST['payment_id']) ? wc_clean(wp_unslash($_POST['payment_id'])) : '';
         $order = $order_id ? wc_get_order($order_id) : false;
-        if (!PayplugWoocommerceHelper::session_owns_order($order)) {
+        if (!PayplugWoocommerceHelper::session_owns_order($order) || !$this->is_cart_order($order)) {
             $this->refuse_order('applepay_cancel_order', $order_id);
 
             return;
@@ -408,16 +415,14 @@ class ApplePay
             return;
         }
 
-        //if there's no payment created
-        if ('' === $payment_id) {
-            $this->restore_cart_from_order($order);
-        } else {
-            if (!hash_equals((string) $order->get_transaction_id(), $payment_id)) {
-                $this->refuse_order('applepay_cancel_order', $order_id);
+        $payment_id = (string) $order->get_transaction_id();
+        if ('' !== $posted_payment_id && (!is_string($posted_payment_id) || !hash_equals($payment_id, $posted_payment_id))) {
+            $this->refuse_order('applepay_cancel_order', $order_id);
 
-                return;
-            }
+            return;
+        }
 
+        if ('' !== $payment_id) {
             $payplug = $this->get_merchant_client();
             $payment = null;
             if ($payplug) {
@@ -429,7 +434,6 @@ class ApplePay
             }
 
             if (!$payment) {
-                $this->restore_cart_from_order($order);
                 wp_send_json_error([
                     'message' => __('Your order was cancelled.', 'woocommerce'),
                 ]);
@@ -450,8 +454,6 @@ class ApplePay
                 return;
             }
 
-            $this->restore_cart_from_order($order);
-
             if (!$this->abort_payment($payment, $payment_id, $payplug, $order_id)) {
                 PayplugGateway::log(sprintf('Apple Pay: payment of order #%d may be paid, order kept', $order_id), 'warning');
                 $this->send_order_kept();
@@ -460,6 +462,7 @@ class ApplePay
             }
         }
 
+        $cart_lines = $this->get_cart_lines_from_order($order);
         if (!$order->delete(true)) {
             wp_send_json_error([
                 'message' => __('Your order was cancelled.', 'woocommerce'),
@@ -468,6 +471,8 @@ class ApplePay
             return;
         }
 
+        $this->restore_cart($cart_lines);
+
         if (WC()->session && absint(WC()->session->get('order_awaiting_payment')) === $order_id) {
             WC()->session->set('order_awaiting_payment', null);
         }
@@ -475,6 +480,14 @@ class ApplePay
         wp_send_json_success([
             'message' => __('Your order was cancelled.', 'woocommerce'),
         ]);
+    }
+
+    /**
+     * Order created by the Apple Pay cart or product button, still to be paid with Apple Pay.
+     */
+    private function is_cart_order(\WC_Order $order): bool
+    {
+        return 'apple_pay' === $order->get_payment_method() && 'yes' === $order->get_meta(self::CART_ORDER_META);
     }
 
     /**
@@ -489,19 +502,17 @@ class ApplePay
     }
 
     /**
-     * Client authenticated with the merchant key, null when no key is configured.
+     * Client authenticated for the configured mode, null when that mode has no key.
      */
     protected function get_merchant_client(): ?Payplug
     {
-        $api_key = json_decode($this->options['api_key'] ?? '', true);
-        $test_key = !empty($api_key['test']) ? $api_key['test'] : '';
-        $live_key = !empty($api_key['live']) ? $api_key['live'] : '';
-
-        if (empty($test_key) && empty($live_key)) {
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+        $bearer_token = (string) $this->get_api()->get_bearer_token($mode);
+        if ('' === $bearer_token) {
             return null;
         }
 
-        return new Payplug((bool) $this->options ? $live_key : $test_key);
+        return new Payplug($bearer_token, '2019-08-06');
     }
 
     /**
@@ -526,11 +537,15 @@ class ApplePay
         }
     }
 
-    private function restore_cart_from_order(\WC_Order $order): void
+    /**
+     * Read before the order is deleted, added to the cart once the deletion succeeded.
+     *
+     * @return array[] add_to_cart() arguments, one entry per order line
+     */
+    private function get_cart_lines_from_order(\WC_Order $order): array
     {
+        $lines = [];
         foreach ($order->get_items() as $item) {
-            $product_id = $item->get_product_id();
-            $quantity = $item->get_quantity();
             $variation_id = $item->get_variation_id();
             $variations = [];
 
@@ -539,6 +554,18 @@ class ApplePay
                 $variations = $product->get_variation_attributes();
             }
 
+            $lines[] = [$item->get_product_id(), $item->get_quantity(), $variation_id, $variations];
+        }
+
+        return $lines;
+    }
+
+    /**
+     * @param array[] $lines
+     */
+    private function restore_cart(array $lines): void
+    {
+        foreach ($lines as list($product_id, $quantity, $variation_id, $variations)) {
             WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variations);
         }
     }
