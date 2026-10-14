@@ -745,7 +745,7 @@ msgid "payplug_hosted_fields_missing_token"
 msgstr "We could not read your card details. Please try again."
 
 msgid "payplug_hosted_fields_payment_in_progress"
-msgstr "A payment for this order is already in progress. Please wait a few minutes before trying again."
+msgstr "A payment for this order is already in progress and its confirmation can take a few minutes. Please do not pay again: only try again later if the order is still unpaid."
 
 msgid "payplug_hosted_fields_pay_with_another_card"
 msgstr "Pay with another card"
@@ -758,3 +758,6 @@ msgstr "Invalid card."
 
 msgid "payplug_payment_currency_not_supported"
 msgstr "This payment method is not available for orders in this currency."
+
+msgid "Payplug payment %s from an earlier attempt on this order was confirmed as paid. The customer may have been charged twice: check the transactions and refund the duplicate if needed."
+msgstr "Payplug payment %s from an earlier attempt on this order was confirmed as paid. The customer may have been charged twice: check the transactions and refund the duplicate if needed."

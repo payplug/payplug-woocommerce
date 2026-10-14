@@ -1026,3 +1026,6 @@ msgstr ""
 #, php-format
 msgid "Refund: %s"
 msgstr ""
+
+msgid "Payplug payment %s from an earlier attempt on this order was confirmed as paid. The customer may have been charged twice: check the transactions and refund the duplicate if needed."
+msgstr ""

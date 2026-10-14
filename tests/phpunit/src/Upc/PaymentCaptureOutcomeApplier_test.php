@@ -262,6 +262,19 @@ class PaymentCaptureOutcomeApplier_test extends TestCase
         $this->assertSame('processing', $this->reload()->get_status());
     }
 
+    public function testARetryWithANewOperationIdRemembersTheReplacedOperationIds(): void
+    {
+        $first_output = new PaymentOutput(200, '{"id":"op_attempt_1","operationIds":["op_attempt_1_alt"],"execCode":"9999"}', null, null, null);
+        (new PaymentCaptureOutcomeApplier())->apply($this->order, $first_output);
+
+        $this->assertSame('', $this->reload()->get_meta('_payplug_upc_superseded_operation_ids'));
+
+        $second_output = new PaymentOutput(200, '{"id":"op_attempt_2","execCode":"0000"}', null, null, null);
+        (new PaymentCaptureOutcomeApplier())->apply($this->reload(), $second_output);
+
+        $this->assertSame(['op_attempt_1', 'op_attempt_1_alt'], $this->reload()->get_meta('_payplug_upc_superseded_operation_ids'));
+    }
+
     public function testDirectFailureIsNotMarkedTreatedSoALaterPaidNotificationCanStillApply(): void
     {
         // An unmapped "Acceptation" execCode (here 0002, WAITING_PROVIDER) falls into FAILED.
