@@ -4,7 +4,7 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 5.0
 Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 3.1.0
+Stable tag: 3.1.1
 VueJs Payplug UI lib tag: 1.7.12
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -81,12 +81,20 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 3.1.1 =
+* Fix: remove PHP warnings in the back office when Scalapay is activated
+* Fix: fix order lookup in check_payment for integrated payment
+* Fix: secure the OAuth setup callback and the PayPlug REST routes (capability check, nonce, POST only)
+* Change: PayPlug settings now require the WooCommerce manage_woocommerce capability (editors lose access, shop managers gain it, GET on payplug_api routes is removed)
+* Fix: Apple Pay and integrated/popup card AJAX endpoints now check that the order belongs to the current customer
+* Fix: order-pay Apple Pay and card payment creation refuse orders that no longer need payment
+* Fix: Apple Pay payment update charges the order total instead of the amount sent by the browser, and cancelling the Apple Pay sheet only deletes orders created by the Apple Pay cart button
+
 = 3.1.0 =
 * Feat: Replace internal Oney simulator with the official Oney widget on product page, cart and checkout
 * Fix Oney Availability in BO Payments section
 * Feat: allow merchant to overload min/Max scalapay values
 
-== Changelog ==
 = 3.0.0 =
 * UPGRADE: Upgrading module with minimal PHP 7.4 version
 * Fix: Fix order not available on admin order page
@@ -99,7 +107,6 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 * Fix: Fix repay an order with Apple Pay is KO
 * Adding MCP tool to create a paymentLink
 
-== Changelog ==
 = 2.18.0 =
 * Fix: OAuth collision with other plugins
  * Fix: Apple Pay with virtual products
@@ -107,27 +114,21 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
  * Fix: Apple Pay undefined HTTP_HOST warning in WP-Cron context
  * Fix : deprecated Jquery callbacks
 
-== Changelog ==
 = 2.17.3 =
 * Changing translations for Scalapay
 
-== Changelog ==
 = 2.17.2 =
 * Various improvements
 
-== Changelog ==
 = 2.17.1 =
 * Patch: Fix for Payplug plugin upgrade disconnecting
 
-== Changelog ==
 = 2.17.0 =
 * New feature: Add Scalapay payment method
 
-== Changelog ==
 = 2.16.1 =
 * patch assets generation
 
-== Changelog ==
 = 2.16.0 =
 * New feature: Add Wero payment method
 * New feature: Add Bizum payment method
@@ -135,20 +136,17 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 * Tested up to WordPress 6.9.4
 * Tested up to WooCommerce 10.6.1
 
-== Changelog ==
 = 2.15.1 =
 * Bug Fixes
 * Tested up to WordPress 6.9
 * Tested up to WooCommerce 10.4.3
 
-== Changelog ==
 = 2.15.0 =
 * New feature: ApplePay on product page
 * Bug fix and improvements on ApplePay cart page
 * Tested up to WordPress 6.8.3
 * Tested up to WooCommerce 10.3.4
 
-== Changelog ==
 = 2.14.1 =
 * Bug Fixes and Improvements
 * Tested up to WordPress 6.8.2

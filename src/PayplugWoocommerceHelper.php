@@ -386,6 +386,89 @@ class PayplugWoocommerceHelper
     }
 
     /**
+     * Whether the current visitor started this order (order awaiting payment in its WC session)
+     * or is the logged-in customer of the order.
+     *
+     * @param mixed $order
+     */
+    public static function session_owns_order($order): bool
+    {
+        if (!$order instanceof \WC_Order) {
+            return false;
+        }
+
+        $id = (int) $order->get_id();
+        if ($id <= 0) {
+            return false;
+        }
+
+        if (function_exists('WC') && WC()->session && absint(WC()->session->get('order_awaiting_payment')) === $id) {
+            return true;
+        }
+
+        $user_id = get_current_user_id();
+
+        return $user_id > 0 && (int) $order->get_customer_id() === $user_id;
+    }
+
+    /**
+     * Store the order in the WC session so that the next AJAX calls of the same payment flow
+     * pass session_owns_order(). Starts the session cookie when the visitor has none yet.
+     *
+     * @param int $order_id
+     */
+    public static function remember_order_awaiting_payment($order_id): void
+    {
+        $session = function_exists('WC') ? WC()->session : null;
+        if (!$session) {
+            return;
+        }
+
+        if (is_callable([$session, 'has_session']) && !$session->has_session()) {
+            $session->set_customer_session_cookie(true);
+        }
+
+        $session->set('order_awaiting_payment', absint($order_id));
+
+        if (is_callable([$session, 'save_data'])) {
+            $session->save_data();
+        }
+    }
+
+    /**
+     * Log a refused AJAX call, then answer the uniform 403.
+     *
+     * @param string $handler name of the refused handler
+     * @param int $order_id
+     * @param string $log_prefix prepended to the log line
+     */
+    public static function refuse_order(string $handler, int $order_id, string $log_prefix = ''): void
+    {
+        PayplugGateway::log(sprintf('%s%s refused for order #%d', $log_prefix, $handler, $order_id), 'warning');
+        self::send_order_forbidden();
+    }
+
+    /**
+     * Same answer for an unknown order and for an order owned by someone else.
+     */
+    public static function send_order_forbidden(): void
+    {
+        wp_send_json_error(__('Invalid order.', 'payplug'), 403);
+    }
+
+    /**
+     * Order id stored in the metadata of a PayPlug payment, 0 when absent.
+     *
+     * @param mixed $payment
+     */
+    public static function get_payment_order_id($payment): int
+    {
+        $metadata = isset($payment->metadata) ? $payment->metadata : [];
+
+        return is_array($metadata) && isset($metadata['order_id']) ? absint($metadata['order_id']) : 0;
+    }
+
+    /**
      * Extract useful metadata from PayPlug response.
      *
      * @param APIResource $resource

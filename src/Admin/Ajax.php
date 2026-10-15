@@ -35,118 +35,121 @@ class Ajax
 
     public function __construct()
     {
-        $permission = (current_user_can('editor') || current_user_can('administrator'));
-
-        add_action('rest_api_init', function () use ($permission): void {
+        add_action('rest_api_init', function (): void {
             //Path to REST route and the callback function
             register_rest_route('payplug_api', '/save/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'save_action'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/init/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'payplug_init'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/login/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'login_action'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/logout/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'payplug_logout'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/refresh_keys/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'refresh_keys'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/check_requirements/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'payplug_check_requirements'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/bancontact_permissions/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'api_check_bancontact_permissions'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/applepay_permissions/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'api_check_applepay_permissions'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/american_express_permissions/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'api_check_american_express_permissions'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/oney_permissions/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'api_check_oney_permissions'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/one_click_permissions/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'api_check_one_click_permission'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/satispay_permissions/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'api_check_satispay_permissions'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/mybank_permissions/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'api_check_mybank_permissions'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/ideal_permissions/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'api_check_ideal_permissions'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/integrated_permissions/', [
-                'methods' => ['GET', 'POST'],
+                'methods' => 'POST',
                 'callback' => [$this, 'api_check_integrated_payment'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
             ]);
             register_rest_route('payplug_api', '/wero_permissions/', [
                 'methods' => 'POST',
                 'callback' => [$this, 'api_check_wero_permissions'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/bizum_permissions/', [
                 'methods' => 'POST',
                 'callback' => [$this, 'api_check_bizum_permissions'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
             register_rest_route('payplug_api', '/scalapay_permissions/', [
                 'methods' => 'POST',
                 'callback' => [$this, 'api_check_scalapay_permissions'],
-                'permission_callback' => fn () => $permission,
+                'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
         });
+    }
+
+    public function check_permission(): bool
+    {
+        return current_user_can('manage_woocommerce');
     }
 
     public function refresh_keys(WP_REST_Request $request): void
@@ -585,6 +588,13 @@ class Ajax
         }
     }
 
+    protected function get_json_body(): ?array
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        return is_array($data) ? $data : null;
+    }
+
     public function save_action(WP_REST_Request $request): void
     {
         if (!$this->get_gateway('account')->is_logged()) {
@@ -592,10 +602,16 @@ class Ajax
             wp_send_json_error('You are not logged in !');
         }
 
+        $data = $this->get_json_body();
+        // A body that is not a settings payload (empty, malformed, or missing the global
+        // keys) must not reach the (bool) casts below: undefined keys read as false and
+        // would disable every payment method.
+        if (empty($data) || array_diff_key(array_flip(['payplug_enable', 'enable_debug', 'payplug_sandbox']), $data)) {
+            wp_send_json_error(['msg' => 'Invalid request body.'], 400);
+        }
+
         $payplug = new PayplugGateway();
         $options = $payplug->settings;
-
-        $data = json_decode(file_get_contents('php://input'), true);
 
         // global configuration
         $options['enabled'] = (bool) $data['payplug_enable'];

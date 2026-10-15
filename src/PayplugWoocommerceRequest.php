@@ -3,7 +3,6 @@
 namespace Payplug\PayplugWoocommerce;
 
 // Exit if accessed directly
-use Automattic\WooCommerce\Utilities\OrderUtil;
 use Payplug\Exception\HttpException;
 use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
@@ -114,7 +113,7 @@ class PayplugWoocommerceRequest
         $order_key = isset($_POST['order_key']) ? wc_clean(wp_unslash($_POST['order_key'])) : '';
 
         $order = $order_id ? wc_get_order($order_id) : null;
-        if (!$order || !hash_equals($order->get_order_key(), $order_key)) {
+        if (!$order || !is_string($order_key) || !hash_equals($order->get_order_key(), $order_key)) {
             wp_send_json([
                 'result' => 'failure',
                 'messages' => '<ul class="woocommerce-error"><li>' . __('Invalid order.', 'payplug') . '</li></ul>',
@@ -123,6 +122,24 @@ class PayplugWoocommerceRequest
             return;
         }
 
+        if (!$order->needs_payment()) {
+            $this->log_order_cannot_be_paid($order);
+            wp_send_json([
+                'result' => 'failure',
+                'messages' => '<ul class="woocommerce-error"><li>' . esc_html($this->get_order_cannot_be_paid_message($order)) . '</li></ul>',
+            ]);
+
+            return;
+        }
+
+        $this->process_apple_pay_order_pay($order_id);
+    }
+
+    /**
+     * @param int $order_id
+     */
+    protected function process_apple_pay_order_pay($order_id): void
+    {
         // This AJAX request's own URL never carries the order-pay query var (only the page
         // that triggered it does), but WC_Payment_Gateway::get_order_total() - used by this
         // plugin's own check_gateway() filter on woocommerce_available_payment_gateways to
@@ -143,6 +160,10 @@ class PayplugWoocommerceRequest
 
             return;
         }
+
+        // After the availability checks: on order-pay they rebuild the cart from the order,
+        // and emptying the cart clears order_awaiting_payment from the session.
+        PayplugWoocommerceHelper::remember_order_awaiting_payment($order_id);
 
         try {
             $result = $available_gateways['apple_pay']->process_payment($order_id);
@@ -241,7 +262,7 @@ class PayplugWoocommerceRequest
         }
 
         // Store Order ID in session so it can be re-used after payment failure.
-        WC()->session->set('order_awaiting_payment', $order_id);
+        PayplugWoocommerceHelper::remember_order_awaiting_payment($order_id);
 
         // Process Payment.
         $result = $available_gateways[$payment_method]->process_payment($order_id);
@@ -267,7 +288,36 @@ class PayplugWoocommerceRequest
      */
     public function applepay_update_payment(): void
     {
-        $payment_id = $_POST['payment_id'];
+        $payment_id = isset($_POST['payment_id']) ? wc_clean(wp_unslash($_POST['payment_id'])) : '';
+        $order = $this->get_owned_order_from_payment_id($payment_id, 'applepay_update_payment');
+        if (!$order) {
+            return;
+        }
+
+        if (!$this->init_api()) {
+            return;
+        }
+
+        $payment = $this->retrieve_payment($payment_id);
+        if (PayplugWoocommerceHelper::get_payment_order_id($payment) !== (int) $order->get_id()) {
+            PayplugWoocommerceHelper::refuse_order('applepay_update_payment', (int) $order->get_id());
+
+            return;
+        }
+
+        $apple_pay = [];
+        $apple_pay['payment_token'] = $_POST['payment_token'] ?? null;
+        $data = ['apple_pay' => $apple_pay];
+        $update = $payment->update($data);
+        wp_send_json_success(['result' => $update->is_paid]);
+    }
+
+    /**
+     * Initialise the PayPlug SDK with the merchant bearer token, refreshing it once on a 401.
+     * Sends the JSON error and returns false when the SDK cannot be initialised.
+     */
+    protected function init_api(): bool
+    {
         $apiService = new \Payplug\PayplugWoocommerce\Service\Api();
         $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
         $bearer_token = $apiService->get_bearer_token($mode);
@@ -289,7 +339,7 @@ class PayplugWoocommerceRequest
                     PayplugWoocommerceHelper::payplug_logout();
                     wp_send_json_error(__('You have been disconnected from the Payplug module (error 401)', 'payplug'));
 
-                    return;
+                    return false;
                 }
             } else {
                 if ($is_401) {
@@ -299,15 +349,53 @@ class PayplugWoocommerceRequest
                     wp_send_json_error($e->getMessage());
                 }
 
-                return;
+                return false;
             }
         }
-        $apple_pay = [];
-        $apple_pay['payment_token'] = $_POST['payment_token'];
-        $payment = \Payplug\Payment::retrieve($payment_id);
-        $data = ['apple_pay' => $apple_pay];
-        $update = $payment->update($data);
-        wp_send_json_success(['result' => $update->is_paid]);
+
+        return true;
+    }
+
+    /**
+     * @param string $payment_id
+     *
+     * @return \Payplug\Resource\Payment
+     */
+    protected function retrieve_payment($payment_id)
+    {
+        return \Payplug\Payment::retrieve($payment_id);
+    }
+
+    /**
+     * Order whose transaction id is this payment, when the current visitor owns it.
+     * Sends the 403 answer and returns null otherwise, also for a payment id that is not a string.
+     *
+     * @param mixed $payment_id
+     */
+    private function get_owned_order_from_payment_id($payment_id, string $handler): ?\WC_Order
+    {
+        $order_id = is_string($payment_id) && '' !== $payment_id ? (int) $this->getOrderFromPaymentId($payment_id) : 0;
+        $order = $order_id ? wc_get_order($order_id) : false;
+        if (!PayplugWoocommerceHelper::session_owns_order($order)) {
+            PayplugWoocommerceHelper::refuse_order($handler, $order_id);
+
+            return null;
+        }
+
+        return $order;
+    }
+
+    private function get_order_cannot_be_paid_message(\WC_Order $order): string
+    {
+        return sprintf(
+            __('This order&rsquo;s status is &ldquo;%s&rdquo;&mdash;it cannot be paid for. Please contact us if you need assistance.', 'woocommerce'),
+            wc_get_order_status_name($order->get_status())
+        );
+    }
+
+    private function log_order_cannot_be_paid(\WC_Order $order): void
+    {
+        PayplugGateway::log(sprintf('Order #%d cannot be paid (status %s)', $order->get_id(), $order->get_status()), 'warning');
     }
 
     public function applepay_get_order_totals(): void
@@ -375,58 +463,20 @@ class PayplugWoocommerceRequest
 
     public function check_payment(): void
     {
-        global $wpdb;
-        $payment_id = $_POST['payment_id'];
+        $payment_id = isset($_POST['payment_id']) ? wc_clean(wp_unslash($_POST['payment_id'])) : '';
         if (empty($payment_id)) {
             wp_send_json_error(__('Invalid request.', 'payplug'));
-        }
-        $apiService = new \Payplug\PayplugWoocommerce\Service\Api();
-        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
-        $bearer_token = $apiService->get_bearer_token($mode);
-        try {
-            \Payplug\Payplug::init([
-                'secretKey' => $bearer_token,
-                'apiVersion' => '2019-08-06',
-            ]);
-            $payment = \Payplug\Payment::retrieve($payment_id);
-        } catch (\Exception $e) {
-            $is_401 = (method_exists($e, 'getCode') && $e->getCode() == 401)
-                || strpos($e->getMessage(), '401') !== false;
-            if ($is_401) {
-                if ($this->try_refresh_jwt($apiService, $mode)) {
-                    try {
-                        \Payplug\Payplug::init([
-                            'secretKey' => $apiService->get_bearer_token($mode),
-                            'apiVersion' => '2019-08-06',
-                        ]);
-                        $payment = \Payplug\Payment::retrieve($payment_id);
-                    } catch (\Exception $e) {
-                        PayplugWoocommerceHelper::payplug_logout();
-                        wp_send_json_error(__('You have been disconnected from the Payplug module (error 401)', 'payplug'));
 
-                        return;
-                    }
-                } else {
-                    PayplugWoocommerceHelper::payplug_logout();
-                    wp_send_json_error(__('You have been disconnected from the Payplug module (error 401)', 'payplug'));
-
-                    return;
-                }
-            } else {
-                $order_id = $this->getOrderFromPaymentId($payment_id);
-                $order = wc_get_order($order_id);
-                PayplugGateway::log(
-                    sprintf(
-                        'Order #%s : An error occurred while retrieving the payment data with the message : %s',
-                        $order_id,
-                        $e->getMessage()
-                    )
-                );
-                wp_send_json_error($e->getMessage());
-            }
+            return;
         }
-        $order_id = $this->getOrderFromPaymentId($payment_id);
-        $order = wc_get_order($order_id);
+        $order = $this->get_owned_order_from_payment_id($payment_id, 'check_payment');
+        if (!$order) {
+            return;
+        }
+        $payment = $this->load_payment($payment_id, (int) $order->get_id());
+        if (!$payment) {
+            return;
+        }
         $return_url = esc_url_raw($order->get_checkout_order_received_url());
         if ((isset($payment->failure)) && (!empty($payment->failure)) || ($payment->is_paid === false && is_null($payment->paid_at))) {
             $order->update_status('failed', __('Order cancelled by customer.', 'woocommerce'));
@@ -445,6 +495,66 @@ class PayplugWoocommerceRequest
             'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
             'cancel' => !empty($payment->hosted_payment->cancel_url) ? $payment->hosted_payment->cancel_url : null,
         ]);
+    }
+
+    /**
+     * Initialise the SDK and retrieve the payment, refreshing the bearer token once on a 401.
+     * Sends the JSON error and returns null when the payment cannot be retrieved.
+     *
+     * @param string $payment_id
+     * @param int $order_id
+     *
+     * @return \Payplug\Resource\Payment|null
+     */
+    protected function load_payment($payment_id, $order_id)
+    {
+        $apiService = new \Payplug\PayplugWoocommerce\Service\Api();
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+        $bearer_token = $apiService->get_bearer_token($mode);
+        try {
+            \Payplug\Payplug::init([
+                'secretKey' => $bearer_token,
+                'apiVersion' => '2019-08-06',
+            ]);
+
+            return $this->retrieve_payment($payment_id);
+        } catch (\Exception $e) {
+            $is_401 = (method_exists($e, 'getCode') && $e->getCode() == 401)
+                || strpos($e->getMessage(), '401') !== false;
+            if ($is_401) {
+                if ($this->try_refresh_jwt($apiService, $mode)) {
+                    try {
+                        \Payplug\Payplug::init([
+                            'secretKey' => $apiService->get_bearer_token($mode),
+                            'apiVersion' => '2019-08-06',
+                        ]);
+
+                        return $this->retrieve_payment($payment_id);
+                    } catch (\Exception $e) {
+                        PayplugWoocommerceHelper::payplug_logout();
+                        wp_send_json_error(__('You have been disconnected from the Payplug module (error 401)', 'payplug'));
+
+                        return null;
+                    }
+                }
+
+                PayplugWoocommerceHelper::payplug_logout();
+                wp_send_json_error(__('You have been disconnected from the Payplug module (error 401)', 'payplug'));
+
+                return null;
+            }
+
+            PayplugGateway::log(
+                sprintf(
+                    'Order #%s : An error occurred while retrieving the payment data with the message : %s',
+                    $order_id,
+                    $e->getMessage()
+                )
+            );
+            wp_send_json_error($e->getMessage());
+
+            return null;
+        }
     }
 
     /**
@@ -484,38 +594,20 @@ class PayplugWoocommerceRequest
     /**
      * @param $payment_id
      *
-     * @return int|string|null
+     * @return int|null
      */
     private function getOrderFromPaymentId($payment_id)
     {
-        global $wpdb;
+        // 'transaction_id' is supported by both the HPOS and the legacy (posts) order stores.
+        $order_ids = wc_get_orders(
+            [
+                'transaction_id' => $payment_id,
+                'limit' => 1,
+                'return' => 'ids',
+            ]
+        );
 
-        if (OrderUtil::custom_orders_table_usage_is_enabled()) {
-            $orders = wc_get_orders(
-                [
-                    'field_query' => [
-                        [
-                            'key' => 'transaction_id',
-                            'comparison' => $payment_id,
-                        ],
-                    ],
-                ]
-            );
-            $order = $orders[0];
-            $order_id = $order->get_id();
-        } else {
-            $sql = 'SELECT post_id
-					FROM $wpdb->postmeta
-					WHERE meta_key = "_transaction_id" AND meta_value = %s';
-            $order_id = $wpdb->get_var(
-                $wpdb->prepare(
-                    $sql,
-                    $payment_id
-                )
-            );
-        }
-
-        return $order_id;
+        return !empty($order_ids) ? $order_ids[0] : null;
     }
 
     public function create_payment_intent(): void
@@ -528,27 +620,43 @@ class PayplugWoocommerceRequest
 
         $order_id = isset($_POST['order_id']) ? absint(wp_unslash($_POST['order_id'])) : 0;
         $this->gateway = $this->get_payplug_gateway(isset($_POST['gateway']) ? wc_clean(wp_unslash($_POST['gateway'])) : '');
-        $order = wc_get_order($order_id);
+        $order = $order_id ? wc_get_order($order_id) : false;
 
-        if (!$order instanceof \WC_Order || !$this->gateway) {
+        $order_pay_key = isset($_POST['order_pay_key']) ? wc_clean(wp_unslash($_POST['order_pay_key'])) : '';
+        if (!$order instanceof \WC_Order || !is_string($order_pay_key)) {
+            $authorised = false;
+        } elseif ('' !== $order_pay_key) {
+            $authorised = hash_equals($order->get_order_key(), $order_pay_key);
+        } else {
+            $authorised = PayplugWoocommerceHelper::session_owns_order($order);
+        }
+        if (!$authorised) {
+            PayplugWoocommerceHelper::refuse_order('create_payment_intent', $order_id);
+
+            return;
+        }
+
+        if (!$this->gateway) {
             wp_send_json_error(__('Invalid order.', 'payplug'));
 
             return;
         }
 
+        if (!$order->needs_payment()) {
+            $this->log_order_cannot_be_paid($order);
+            wp_send_json_error(wp_strip_all_tags(html_entity_decode($this->get_order_cannot_be_paid_message($order), ENT_QUOTES, 'UTF-8')), 409);
+
+            return;
+        }
+
+        if ('' !== $order_pay_key) {
+            PayplugWoocommerceHelper::remember_order_awaiting_payment($order_id);
+        }
+
         // On order-pay, closing the payment sheet should keep the customer on the order-pay
         // page, not cancel the order and send them to the cart like a fresh checkout attempt
         // would.
-        $is_order_pay = is_wc_endpoint_url('order-pay') || !empty($_POST['order_pay_key']);
-
-        if (!empty($_POST['order_pay_key'])) {
-            $order_pay_key = wc_clean(wp_unslash($_POST['order_pay_key']));
-            if (!hash_equals($order->get_order_key(), $order_pay_key)) {
-                wp_send_json_error(__('Invalid order.', 'payplug'));
-
-                return;
-            }
-        }
+        $is_order_pay = is_wc_endpoint_url('order-pay') || '' !== $order_pay_key;
 
         $cancel_url = $is_order_pay
             ? esc_url_raw($order->get_checkout_payment_url())
@@ -622,7 +730,7 @@ class PayplugWoocommerceRequest
         $payment_data = apply_filters('payplug_gateway_payment_data', $payment_data, $order_id, [], $address_data);
 
         try {
-            $payment = $this->gateway->payplug_api->payment_create($payment_data);
+            $payment = $this->create_payment($payment_data);
         } catch (HttpException $e) {
             PayplugGateway::log(sprintf('Error while processing order #%s : %s', $order_id, wc_print_r($e->getErrorObject(), true)), 'error');
             wp_send_json_error(__('Payment processing failed. Please retry.', 'payplug'));
@@ -651,6 +759,14 @@ class PayplugWoocommerceRequest
             'redirect' => !empty($payment->hosted_payment->payment_url) ? $payment->hosted_payment->payment_url : $return_url,
             'cancel' => $cancel_url,
         ]);
+    }
+
+    /**
+     * @return \Payplug\Resource\Payment
+     */
+    protected function create_payment(array $payment_data)
+    {
+        return $this->gateway->payplug_api->payment_create($payment_data);
     }
 
     /**

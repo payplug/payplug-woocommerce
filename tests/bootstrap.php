@@ -50,3 +50,7 @@ activate_plugin('woocommerce/woocommerce.php');
 // Activate your plugin
 $plugin_basename = basename(dirname(dirname(__FILE__))) . '/payplug.php';
 activate_plugin($plugin_basename);
+
+// Shadows wp_send_json* in the plugin namespaces. Loaded once up front: PHP caches the resolution
+// of an unqualified call per call site, so a late include could leave the global function in use.
+require_once __DIR__ . '/phpunit/src/Support/json_status_spy.php';

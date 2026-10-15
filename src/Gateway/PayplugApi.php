@@ -47,15 +47,18 @@ class PayplugApi
     /**
      * Get register url
      *
-     * @param string $callback_uri
+     * @param string $setup_redirection_uri
+     * @param string|null $oauth_callback_uri defaults to $setup_redirection_uri
      *
      * @throws \Payplug\Exception\ConfigurationException
      *
      * @return object
      */
-    public function retrieve_register_url($callback_uri)
+    public function retrieve_register_url($setup_redirection_uri, $oauth_callback_uri = null)
     {
-        return $this->do_request_with_fallback('\Payplug\Authentication::getRegisterUrl', [$callback_uri, $callback_uri]);
+        $oauth_callback_uri = $oauth_callback_uri ?? $setup_redirection_uri;
+
+        return $this->do_request_with_fallback('\Payplug\Authentication::getRegisterUrl', [$setup_redirection_uri, $oauth_callback_uri]);
     }
 
     /**
