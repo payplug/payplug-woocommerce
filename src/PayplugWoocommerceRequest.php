@@ -300,7 +300,7 @@ class PayplugWoocommerceRequest
 
         $payment = $this->retrieve_payment($payment_id);
         if (PayplugWoocommerceHelper::get_payment_order_id($payment) !== (int) $order->get_id()) {
-            $this->refuse_order('applepay_update_payment', (int) $order->get_id());
+            PayplugWoocommerceHelper::refuse_order('applepay_update_payment', (int) $order->get_id());
 
             return;
         }
@@ -377,18 +377,12 @@ class PayplugWoocommerceRequest
         $order_id = is_string($payment_id) && '' !== $payment_id ? (int) $this->getOrderFromPaymentId($payment_id) : 0;
         $order = $order_id ? wc_get_order($order_id) : false;
         if (!PayplugWoocommerceHelper::session_owns_order($order)) {
-            $this->refuse_order($handler, $order_id);
+            PayplugWoocommerceHelper::refuse_order($handler, $order_id);
 
             return null;
         }
 
         return $order;
-    }
-
-    private function refuse_order(string $handler, int $order_id): void
-    {
-        PayplugGateway::log(sprintf('%s refused for order #%d', $handler, $order_id), 'warning');
-        PayplugWoocommerceHelper::send_order_forbidden();
     }
 
     private function get_order_cannot_be_paid_message(\WC_Order $order): string
@@ -637,7 +631,7 @@ class PayplugWoocommerceRequest
             $authorised = PayplugWoocommerceHelper::session_owns_order($order);
         }
         if (!$authorised) {
-            $this->refuse_order('create_payment_intent', $order_id);
+            PayplugWoocommerceHelper::refuse_order('create_payment_intent', $order_id);
 
             return;
         }
@@ -650,7 +644,7 @@ class PayplugWoocommerceRequest
 
         if (!$order->needs_payment()) {
             $this->log_order_cannot_be_paid($order);
-            wp_send_json_error($this->get_order_cannot_be_paid_message($order), 409);
+            wp_send_json_error(wp_strip_all_tags(html_entity_decode($this->get_order_cannot_be_paid_message($order), ENT_QUOTES, 'UTF-8')), 409);
 
             return;
         }

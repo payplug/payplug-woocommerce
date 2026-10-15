@@ -436,6 +436,19 @@ class PayplugWoocommerceHelper
     }
 
     /**
+     * Log a refused AJAX call, then answer the uniform 403.
+     *
+     * @param string $handler name of the refused handler
+     * @param int $order_id
+     * @param string $log_prefix prepended to the log line
+     */
+    public static function refuse_order(string $handler, int $order_id, string $log_prefix = ''): void
+    {
+        PayplugGateway::log(sprintf('%s%s refused for order #%d', $log_prefix, $handler, $order_id), 'warning');
+        self::send_order_forbidden();
+    }
+
+    /**
      * Same answer for an unknown order and for an order owned by someone else.
      */
     public static function send_order_forbidden(): void

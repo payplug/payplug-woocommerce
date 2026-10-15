@@ -184,7 +184,14 @@ class ApplePay
         $order_id = isset($_POST['order_id']) ? absint(wp_unslash($_POST['order_id'])) : 0;
         $order = $order_id ? wc_get_order($order_id) : false;
         if (!PayplugWoocommerceHelper::session_owns_order($order)) {
-            $this->refuse_order('update_applepay_order', $order_id);
+            PayplugWoocommerceHelper::refuse_order('update_applepay_order', $order_id, 'Apple Pay: ');
+
+            return;
+        }
+
+        // A logged-in customer owns all their orders: never rewrite the shipping or the total of a settled one.
+        if (!$order->needs_payment()) {
+            $this->send_order_kept();
 
             return;
         }
@@ -343,7 +350,13 @@ class ApplePay
             || '' === $payment_id
             || !hash_equals((string) $order->get_transaction_id(), $payment_id)
         ) {
-            $this->refuse_order('update_applepay_payment', $order_id);
+            PayplugWoocommerceHelper::refuse_order('update_applepay_payment', $order_id, 'Apple Pay: ');
+
+            return;
+        }
+
+        if (!$order->needs_payment()) {
+            $this->send_order_kept();
 
             return;
         }
@@ -353,7 +366,7 @@ class ApplePay
 
         $payment = $this->retrieve_payment($payment_id);
         if (PayplugWoocommerceHelper::get_payment_order_id($payment) !== $order_id) {
-            $this->refuse_order('update_applepay_payment', $order_id);
+            PayplugWoocommerceHelper::refuse_order('update_applepay_payment', $order_id, 'Apple Pay: ');
 
             return;
         }
@@ -404,7 +417,7 @@ class ApplePay
         $posted_payment_id = !empty($_POST['payment_id']) ? wc_clean(wp_unslash($_POST['payment_id'])) : '';
         $order = $order_id ? wc_get_order($order_id) : false;
         if (!PayplugWoocommerceHelper::session_owns_order($order) || !$this->is_cart_order($order)) {
-            $this->refuse_order('applepay_cancel_order', $order_id);
+            PayplugWoocommerceHelper::refuse_order('applepay_cancel_order', $order_id, 'Apple Pay: ');
 
             return;
         }
@@ -417,7 +430,7 @@ class ApplePay
 
         $payment_id = (string) $order->get_transaction_id();
         if ('' !== $posted_payment_id && (!is_string($posted_payment_id) || !hash_equals($payment_id, $posted_payment_id))) {
-            $this->refuse_order('applepay_cancel_order', $order_id);
+            PayplugWoocommerceHelper::refuse_order('applepay_cancel_order', $order_id, 'Apple Pay: ');
 
             return;
         }
@@ -436,15 +449,13 @@ class ApplePay
             }
 
             if (!$payment) {
-                wp_send_json_error([
-                    'message' => __('Your order was cancelled.', 'woocommerce'),
-                ]);
+                $this->send_order_not_cancelled();
 
                 return;
             }
 
             if (PayplugWoocommerceHelper::get_payment_order_id($payment) !== $order_id) {
-                $this->refuse_order('applepay_cancel_order', $order_id);
+                PayplugWoocommerceHelper::refuse_order('applepay_cancel_order', $order_id, 'Apple Pay: ');
 
                 return;
             }
@@ -465,9 +476,7 @@ class ApplePay
         }
 
         if (!$order->delete(true)) {
-            wp_send_json_error([
-                'message' => __('Your order was cancelled.', 'woocommerce'),
-            ]);
+            $this->send_order_not_cancelled();
 
             return;
         }
@@ -590,10 +599,14 @@ class ApplePay
         ]);
     }
 
-    private function refuse_order(string $handler, int $order_id): void
+    /**
+     * The order is still there: do not tell the customer it was cancelled.
+     */
+    private function send_order_not_cancelled(): void
     {
-        PayplugGateway::log(sprintf('Apple Pay: %s refused for order #%d', $handler, $order_id), 'warning');
-        PayplugWoocommerceHelper::send_order_forbidden();
+        wp_send_json_error([
+            'message' => __('Your order could not be cancelled.', 'payplug'),
+        ]);
     }
 
     public function applepay_empty_cart(): void

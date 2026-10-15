@@ -572,6 +572,8 @@ class PayplugWoocommerceRequest_test extends TestCase
         self::assertFalse($response['body']['success']);
         self::assertStringContainsString('cannot be paid for', $response['body']['data']);
         self::assertStringContainsString(wc_get_order_status_name($status), $response['body']['data']);
+        // Blocks puts this string in a JS Error as is: it must be plain text, not HTML entities.
+        self::assertNotRegExp('/&[a-z]+;|&#\d+;/i', $response['body']['data']);
         self::assertSame([], $this->request->calls);
         self::assertSame($before, $this->order_snapshot($order->get_id()));
         self::assertSame(0, $this->session_order_id());

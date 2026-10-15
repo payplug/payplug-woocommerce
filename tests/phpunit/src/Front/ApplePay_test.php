@@ -372,6 +372,52 @@ class ApplePay_test extends TestCase
         self::assertSame([], $this->apple_pay->payment->updates);
     }
 
+    public function settled_order_status_provider(): array
+    {
+        return [['processing'], ['completed'], ['on-hold'], ['cancelled'], ['refunded']];
+    }
+
+    /**
+     * @dataProvider settled_order_status_provider
+     */
+    public function test_update_applepay_order_leaves_an_order_that_no_longer_needs_payment_untouched(string $status): void
+    {
+        $user_id = $this->make_customer();
+        $order = $this->make_order(['customer_id' => $user_id, 'status' => $status]);
+        wp_set_current_user($user_id);
+        $total = $order->get_total();
+        $_POST = [
+            'order_id' => (string) $order->get_id(),
+            'shipping' => ['locality' => 'Lyon'],
+            'shipping_method' => 'flat_rate:1',
+        ];
+
+        $response = $this->capture_ajax([$this->apple_pay, 'update_applepay_order']);
+
+        $saved = wc_get_order($order->get_id());
+        self::assertFalse($response['body']['success']);
+        self::assertSame('Paris', $saved->get_shipping_city());
+        self::assertSame($total, $saved->get_total());
+        self::assertSame($status, $saved->get_status());
+    }
+
+    /**
+     * @dataProvider settled_order_status_provider
+     */
+    public function test_update_applepay_payment_does_not_touch_the_payment_of_an_order_that_no_longer_needs_payment(string $status): void
+    {
+        $user_id = $this->make_customer();
+        $order = $this->make_order(['transaction_id' => true, 'customer_id' => $user_id, 'status' => $status]);
+        wp_set_current_user($user_id);
+        $this->apple_pay->payment = new FakePayment($order->get_transaction_id(), $order->get_id());
+        $_POST = ['order_id' => (string) $order->get_id(), 'payment_id' => $order->get_transaction_id(), 'payment_token' => 'token'];
+
+        $response = $this->capture_ajax([$this->apple_pay, 'update_applepay_payment']);
+
+        self::assertFalse($response['body']['success']);
+        self::assertSame([], $this->apple_pay->payment->updates);
+    }
+
     public function test_update_applepay_payment_logged_in_customer_of_the_order_is_allowed(): void
     {
         $user_id = $this->make_customer();
@@ -516,8 +562,8 @@ class ApplePay_test extends TestCase
         $first = $this->capture_ajax([$this->apple_pay, 'applepay_cancel_order']);
         $second = $this->capture_ajax([$this->apple_pay, 'applepay_cancel_order']);
 
-        self::assertSame($this->cancelled_error_response(), $first);
-        self::assertSame($this->cancelled_error_response(), $second);
+        self::assertSame($this->not_cancelled_error_response(), $first);
+        self::assertSame($this->not_cancelled_error_response(), $second);
         self::assertSame(1, WC()->cart->get_cart_contents_count());
         self::assertSame('pending', wc_get_order($order->get_id())->get_status());
         self::assertSame($order->get_id(), $this->session_order_id());
@@ -531,7 +577,7 @@ class ApplePay_test extends TestCase
 
         $response = $this->capture_ajax([$this->apple_pay, 'applepay_cancel_order']);
 
-        self::assertSame($this->cancelled_error_response(), $response);
+        self::assertSame($this->not_cancelled_error_response(), $response);
         self::assertSame(['get_merchant_client'], $this->apple_pay->calls);
         self::assertSame(0, WC()->cart->get_cart_contents_count());
         self::assertSame('pending', wc_get_order($order->get_id())->get_status());
@@ -834,7 +880,7 @@ class ApplePay_test extends TestCase
         $response = $this->capture_ajax([$this->apple_pay, 'applepay_cancel_order']);
         remove_filter('woocommerce_pre_delete_order', $refuse_delete);
 
-        self::assertSame($this->cancelled_error_response(), $response);
+        self::assertSame($this->not_cancelled_error_response(), $response);
         self::assertSame(1, $this->apple_pay->payment->aborts);
         self::assertSame(0, WC()->cart->get_cart_contents_count());
         self::assertSame('pending', wc_get_order($order->get_id())->get_status());
@@ -1098,6 +1144,11 @@ class ApplePay_test extends TestCase
     private function cancelled_error_response(): array
     {
         return ['status' => 200, 'body' => ['success' => false, 'data' => ['message' => 'Your order was cancelled.']], 'died' => true];
+    }
+
+    private function not_cancelled_error_response(): array
+    {
+        return ['status' => 200, 'body' => ['success' => false, 'data' => ['message' => 'Your order could not be cancelled.']], 'died' => true];
     }
 
     private function cancelled_success_response(): array
