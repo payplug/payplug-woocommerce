@@ -4,7 +4,7 @@ Tags: payplug, woocommerce, gateway, payment, credit card, carte de crédit, car
 Requires at least: 5.0
 Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 3.1.0
+Stable tag: 3.1.1
 VueJs Payplug UI lib tag: 1.7.12
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -81,6 +81,15 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 3.1.1 =
+* Fix: remove PHP warnings in the back office when Scalapay is activated
+* Fix: fix order lookup in check_payment for integrated payment
+* Fix: secure the OAuth setup callback and the PayPlug REST routes (capability check, nonce, POST only)
+* Change: PayPlug settings now require the WooCommerce manage_woocommerce capability (editors lose access, shop managers gain it, GET on payplug_api routes is removed)
+* Fix: Apple Pay and integrated/popup card AJAX endpoints now check that the order belongs to the current customer
+* Fix: order-pay Apple Pay and card payment creation refuse orders that no longer need payment
+* Fix: Apple Pay payment update charges the order total instead of the amount sent by the browser, and cancelling the Apple Pay sheet only deletes orders created by the Apple Pay cart button
+
 = 3.1.0 =
 * Feat: Replace internal Oney simulator with the official Oney widget on product page, cart and checkout
 * Fix Oney Availability in BO Payments section
