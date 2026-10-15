@@ -603,7 +603,10 @@ class Ajax
         }
 
         $data = $this->get_json_body();
-        if (empty($data)) {
+        // A body that is not a settings payload (empty, malformed, or missing the global
+        // keys) must not reach the (bool) casts below: undefined keys read as false and
+        // would disable every payment method.
+        if (empty($data) || array_diff_key(array_flip(['payplug_enable', 'enable_debug', 'payplug_sandbox']), $data)) {
             wp_send_json_error(['msg' => 'Invalid request body.'], 400);
         }
 

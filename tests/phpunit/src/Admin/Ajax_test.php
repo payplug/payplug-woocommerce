@@ -80,6 +80,7 @@ class Ajax_test extends TestCase
         });
 
         self::assertFalse($output['success']);
+        self::assertSame(400, http_response_code());
         self::assertSame($settings, get_option('woocommerce_payplug_settings'));
     }
 
@@ -88,6 +89,8 @@ class Ajax_test extends TestCase
         return [
             'empty json object' => [[]],
             'malformed json' => [null],
+            'unrelated keys only' => [['foo' => 1]],
+            'only some of the global keys' => [['payplug_enable' => true]],
         ];
     }
 
