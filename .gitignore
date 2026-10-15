@@ -51,3 +51,9 @@ assets/js/payplug-domain.js
 
 # docs
 docs/
+
+# superpowers scratch (SDD ledgers, review packages)
+.superpowers/
+
+# local, per-developer config override (real staging/QA values) - never commit this
+payplug-config.local.php

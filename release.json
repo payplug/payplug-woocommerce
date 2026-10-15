@@ -1,6 +1,6 @@
 {
-  "version": "3.1.1",
+  "version": "3.2.0",
   "wc_tested_up_to": "10.6.1",
   "wp_tested_up_to": "6.9.4",
-  "changelog": "* Fix: fix order lookup in check_payment for integrated payment"
+  "changelog": "* Feat: Add Unified Hosted Fields (UHF) card payment, with back-office configuration, on classic and Blocks checkout\n* Feat: Allow customers to save and reuse their card with UHF\n* Feat: Support 3D Secure confirmation by webhook for UHF payments\n* Feat: Support refunds for UHF orders\n* Refactor: Connect the plugin to Unified Plugin Core (UPC) for authentication, payment creation and amount/phone conversion\n* Fix: Send amounts in the minor units of the order currency, so zero-decimal currencies such as JPY are no longer multiplied by 100\n* Fix: Hide Apple Pay on non-EUR shops and reject non-EUR orders on EUR-only payment methods"
 }
