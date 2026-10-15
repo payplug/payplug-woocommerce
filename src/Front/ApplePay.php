@@ -5,12 +5,18 @@ namespace Payplug\PayplugWoocommerce\Front;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Controller\ApplePay as ApplePayGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
+use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
 class ApplePay
 {
     use ServiceGetter;
+
+    /**
+     * Marks the orders created by place_order_with_dummy_data(), the only ones applepay_cancel_order() deletes.
+     */
+    private const CART_ORDER_META = '_payplug_applepay_cart_order';
 
     private $options;
 
@@ -132,6 +138,7 @@ class ApplePay
                 ], 'shipping');
 
                 $order->set_payment_method($apple_pay);
+                $order->update_meta_data(self::CART_ORDER_META, 'yes');
 
                 $packages = WC()->cart->get_shipping_packages();
 
@@ -144,6 +151,9 @@ class ApplePay
                 $order->save();
 
                 $cart->empty_cart();
+
+                // After empty_cart(): emptying the cart clears order_awaiting_payment from the session.
+                PayplugWoocommerceHelper::remember_order_awaiting_payment($order->get_id());
 
                 $this->process_cart_payment($order, $apple_pay);
             } catch (\Exception $exception) {
@@ -171,8 +181,20 @@ class ApplePay
 
     public function update_applepay_order(): void
     {
-        $order_id = $_POST['order_id'];
-        $order = wc_get_order($order_id);
+        $order_id = isset($_POST['order_id']) ? absint(wp_unslash($_POST['order_id'])) : 0;
+        $order = $order_id ? wc_get_order($order_id) : false;
+        if (!PayplugWoocommerceHelper::session_owns_order($order)) {
+            PayplugWoocommerceHelper::refuse_order('update_applepay_order', $order_id, 'Apple Pay: ');
+
+            return;
+        }
+
+        // A logged-in customer owns all their orders: never rewrite the shipping or the total of a settled one.
+        if (!$order->needs_payment()) {
+            $this->send_order_kept();
+
+            return;
+        }
 
         $selected_shipping_method = !empty($_POST['shipping_method']) ? $_POST['shipping_method'] : null;
         if (!empty($_POST['shipping'])) {
@@ -319,18 +341,44 @@ class ApplePay
      */
     public function update_applepay_payment(): void
     {
+        $payment_id = isset($_POST['payment_id']) ? wc_clean(wp_unslash($_POST['payment_id'])) : '';
+        $order_id = isset($_POST['order_id']) ? absint(wp_unslash($_POST['order_id'])) : 0;
+        $order = $order_id ? wc_get_order($order_id) : false;
+        if (
+            !PayplugWoocommerceHelper::session_owns_order($order)
+            || !is_string($payment_id)
+            || '' === $payment_id
+            || !hash_equals((string) $order->get_transaction_id(), $payment_id)
+        ) {
+            PayplugWoocommerceHelper::refuse_order('update_applepay_payment', $order_id, 'Apple Pay: ');
+
+            return;
+        }
+
+        if (!$order->needs_payment()) {
+            $this->send_order_kept();
+
+            return;
+        }
+
         $applepay = new ApplePayGateway();
+        $payment_token = $_POST['payment_token'] ?? null;
 
-        $payment_id = $_POST['payment_id'];
-        $order_id = $_POST['order_id'];
-        $payment_token = $_POST['payment_token'];
-        $amount = $_POST['amount'];
+        $payment = $this->retrieve_payment($payment_id);
+        if (PayplugWoocommerceHelper::get_payment_order_id($payment) !== $order_id) {
+            PayplugWoocommerceHelper::refuse_order('update_applepay_payment', $order_id, 'Apple Pay: ');
 
-        $payment = \Payplug\Payment::retrieve($payment_id);
+            return;
+        }
 
-        $order = wc_get_order($order_id);
-        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($amount);
+        // The order total already holds the shipping method chosen in the sheet (update_applepay_order).
+        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total());
         $amount = $applepay->validate_order_amount($amount);
+        if (is_wp_error($amount)) {
+            wp_send_json_error(['message' => $amount->get_error_message()]);
+
+            return;
+        }
 
         $address_data = PayplugAddressData::from_order($order);
 
@@ -357,56 +405,208 @@ class ApplePay
 
     public function applepay_cancel_order(): void
     {
-        $payment_id = !empty($_POST['payment_id']) ? $_POST['payment_id'] : null;
-        $order_id = $_POST['order_id'];
-
         if (empty($_POST['order_id'])) {
             wp_send_json_error([
                 'message' => __('Your order was cancelled.', 'woocommerce'),
             ]);
+
+            return;
         }
 
-        $order = wc_get_order($order_id);
-        $items = $order->get_items();
-        foreach ($items as $item) {
-            $product_id = $item->get_product_id();
-            $quantity = $item->get_quantity();
+        $order_id = absint(wp_unslash($_POST['order_id']));
+        $posted_payment_id = !empty($_POST['payment_id']) ? wc_clean(wp_unslash($_POST['payment_id'])) : '';
+        $order = $order_id ? wc_get_order($order_id) : false;
+        if (!PayplugWoocommerceHelper::session_owns_order($order) || !$this->is_cart_order($order)) {
+            PayplugWoocommerceHelper::refuse_order('applepay_cancel_order', $order_id, 'Apple Pay: ');
+
+            return;
+        }
+
+        if (!$order->has_status(['pending', 'failed'])) {
+            $this->send_order_kept();
+
+            return;
+        }
+
+        $payment_id = (string) $order->get_transaction_id();
+        if ('' !== $posted_payment_id && (!is_string($posted_payment_id) || !hash_equals($payment_id, $posted_payment_id))) {
+            PayplugWoocommerceHelper::refuse_order('applepay_cancel_order', $order_id, 'Apple Pay: ');
+
+            return;
+        }
+
+        $cart_lines = $this->get_cart_lines_from_order($order);
+
+        if ('' !== $payment_id) {
+            $payplug = $this->get_merchant_client();
+            $payment = null;
+            if ($payplug) {
+                try {
+                    $payment = $this->retrieve_payment($payment_id, $payplug);
+                } catch (\Throwable $e) {
+                    $this->log_api_failure('retrieved', $order_id, $e);
+                }
+            }
+
+            if (!$payment) {
+                $this->send_order_not_cancelled();
+
+                return;
+            }
+
+            if (PayplugWoocommerceHelper::get_payment_order_id($payment) !== $order_id) {
+                PayplugWoocommerceHelper::refuse_order('applepay_cancel_order', $order_id, 'Apple Pay: ');
+
+                return;
+            }
+
+            if (!empty($payment->is_paid)) {
+                PayplugGateway::log(sprintf('Apple Pay: payment of order #%d may be paid, order kept', $order_id), 'warning');
+                $this->send_order_kept();
+
+                return;
+            }
+
+            if (!$this->abort_payment($payment, $payment_id, $payplug, $order_id)) {
+                PayplugGateway::log(sprintf('Apple Pay: payment of order #%d may be paid, order kept', $order_id), 'warning');
+                $this->send_order_kept();
+
+                return;
+            }
+        }
+
+        if (!$order->delete(true)) {
+            $this->send_order_not_cancelled();
+
+            return;
+        }
+
+        $this->restore_cart($cart_lines);
+
+        if (WC()->session && absint(WC()->session->get('order_awaiting_payment')) === $order_id) {
+            WC()->session->set('order_awaiting_payment', null);
+        }
+
+        wp_send_json_success([
+            'message' => __('Your order was cancelled.', 'woocommerce'),
+        ]);
+    }
+
+    /**
+     * Order created by the Apple Pay cart or product button, still to be paid with Apple Pay.
+     */
+    private function is_cart_order(\WC_Order $order): bool
+    {
+        return 'apple_pay' === $order->get_payment_method() && 'yes' === $order->get_meta(self::CART_ORDER_META);
+    }
+
+    /**
+     * @param string $payment_id
+     * @param Payplug|null $payplug client to call the API with, the SDK default configuration when null
+     *
+     * @return \Payplug\Resource\Payment
+     */
+    protected function retrieve_payment($payment_id, $payplug = null)
+    {
+        return \Payplug\Payment::retrieve($payment_id, $payplug);
+    }
+
+    /**
+     * Client authenticated for the configured mode, null when that mode has no key.
+     */
+    protected function get_merchant_client(): ?Payplug
+    {
+        $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
+        $bearer_token = (string) $this->get_api()->get_bearer_token($mode);
+        if ('' === $bearer_token) {
+            return null;
+        }
+
+        return new Payplug($bearer_token, '2019-08-06');
+    }
+
+    /**
+     * Aborts the payment. When the abort fails, true only if the payment is not paid and carries a failure.
+     *
+     * @param \Payplug\Resource\Payment $payment
+     */
+    private function abort_payment($payment, string $payment_id, Payplug $payplug, int $order_id): bool
+    {
+        try {
+            $payment->abort($payplug);
+
+            return true;
+        } catch (\Throwable $e) {
+            $this->log_api_failure('aborted', $order_id, $e);
+        }
+
+        try {
+            $payment = $this->retrieve_payment($payment_id, $payplug);
+        } catch (\Throwable $e) {
+            $this->log_api_failure('retrieved', $order_id, $e);
+
+            return false;
+        }
+
+        return empty($payment->is_paid) && !empty($payment->failure);
+    }
+
+    private function log_api_failure(string $failed_action, int $order_id, \Throwable $e): void
+    {
+        PayplugGateway::log(sprintf('Apple Pay: payment of order #%d could not be %s (%s: %s)', $order_id, $failed_action, get_class($e), $e->getMessage()), 'warning');
+    }
+
+    /**
+     * Lines to add back to the cart once the order is deleted, without the lines whose variation no longer exists.
+     *
+     * @return array[] add_to_cart() arguments, one entry per order line
+     */
+    private function get_cart_lines_from_order(\WC_Order $order): array
+    {
+        $lines = [];
+        foreach ($order->get_items() as $item) {
             $variation_id = $item->get_variation_id();
             $variations = [];
 
             if ($variation_id) {
-                $product = wc_get_product($variation_id);
-                $variations = $product->get_variation_attributes();
+                $variation = wc_get_product($variation_id);
+                if (!$variation instanceof \WC_Product_Variation || !$variation->get_parent_id()) {
+                    continue;
+                }
+                $variations = $variation->get_variation_attributes();
             }
 
+            $lines[] = [$item->get_product_id(), $item->get_quantity(), $variation_id, $variations];
+        }
+
+        return $lines;
+    }
+
+    /**
+     * @param array[] $lines
+     */
+    private function restore_cart(array $lines): void
+    {
+        foreach ($lines as list($product_id, $quantity, $variation_id, $variations)) {
             WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variations);
         }
+    }
 
-        //if there's no payment created
-        if (!empty($payment_id)) {
-            $api_key = json_decode($this->options['api_key'], true);
-            $test_key = !empty($api_key['test']) ? $api_key['test'] : '';
-            $live_key = !empty($api_key['live']) ? $api_key['live'] : '';
+    private function send_order_kept(): void
+    {
+        wp_send_json_error([
+            'message' => __('Invalid order.', 'payplug'),
+        ]);
+    }
 
-            if (empty($test_key) && empty($live_key)) {
-                wp_send_json_error([
-                    'message' => __('Your order was cancelled.', 'woocommerce'),
-                ]);
-            }
-
-            $payment = \Payplug\Payment::retrieve($payment_id, new Payplug((bool) $this->options ? $live_key : $test_key));
-            $payment->abort(new Payplug((bool) $this->options ? $live_key : $test_key));
-        }
-
-        if ($order->delete(true)) {
-            wp_send_json_success([
-                'message' => __('Your order was cancelled.', 'woocommerce'),
-            ]);
-        } else {
-            wp_send_json_error([
-                'message' => __('Your order was cancelled.', 'woocommerce'),
-            ]);
-        }
+    /**
+     * The order is still there: do not tell the customer it was cancelled.
+     */
+    private function send_order_not_cancelled(): void
+    {
+        wp_send_json_error([
+            'message' => __('Your order could not be cancelled.', 'payplug'),
+        ]);
     }
 
     public function applepay_empty_cart(): void

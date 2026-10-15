@@ -698,6 +698,12 @@ class PayplugGateway extends WC_Payment_Gateway_CC
             self::log(sprintf('Order #%s not found.', $order_id), 'error');
             throw new \Exception(__('Order not found.', 'payplug'));
         }
+
+        // The Blocks checkout (Store API) keeps the order in store_api_draft_order, never in
+        // order_awaiting_payment: without this, a guest fails the ownership check of the
+        // check_payment and applepay_update_payment AJAX calls that follow.
+        PayplugWoocommerceHelper::remember_order_awaiting_payment($order_id);
+
         $customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
         $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total());
         $amount = $this->validate_order_amount($amount);
