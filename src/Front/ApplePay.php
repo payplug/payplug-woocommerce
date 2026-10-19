@@ -18,6 +18,26 @@ class ApplePay
      */
     private const CART_ORDER_META = '_payplug_applepay_cart_order';
 
+    /**
+     * Order setter of each Apple Pay contact field, besides addressLines and emailAddress.
+     */
+    private const SHIPPING_CONTACT_SETTERS = [
+        'familyName' => 'set_shipping_last_name',
+        'givenName' => 'set_shipping_first_name',
+        'country' => 'set_shipping_country',
+        'locality' => 'set_shipping_city',
+        'phoneNumber' => 'set_shipping_phone',
+        'postalCode' => 'set_shipping_postcode',
+    ];
+
+    private const BILLING_CONTACT_SETTERS = [
+        'familyName' => 'set_billing_last_name',
+        'givenName' => 'set_billing_first_name',
+        'locality' => 'set_billing_city',
+        'country' => 'set_billing_country',
+        'postalCode' => 'set_billing_postcode',
+    ];
+
     private $options;
 
     public function __construct()
@@ -110,6 +130,12 @@ class ApplePay
         $cart = WC()->cart;
 
         if (!$cart->is_empty()) {
+            if (!ApplePayRateLimiter::allow()) {
+                $this->send_rate_limited();
+
+                return;
+            }
+
             try {
                 $checkout = WC()->checkout();
 
@@ -197,66 +223,8 @@ class ApplePay
         }
 
         $selected_shipping_method = !empty($_POST['shipping_method']) ? $_POST['shipping_method'] : null;
-        if (!empty($_POST['shipping'])) {
-            foreach ($_POST['shipping'] as $key => $data) {
-                switch ($key) {
-                    case 'familyName':
-                        $order->set_shipping_last_name($data);
-                        break;
-                    case 'givenName':
-                        $order->set_shipping_first_name($data);
-                        break;
-                    case 'country':
-                        $order->set_shipping_country($data);
-                        break;
-                    case 'locality':
-                        $order->set_shipping_city($data);
-                        break;
-                    case 'phoneNumber':
-                        $order->set_shipping_phone($data);
-                        break;
-                    case 'postalCode':
-                        $order->set_shipping_postcode($data);
-                        break;
-                    case 'addressLines':
-                        $order->set_shipping_address_1($data[0]);
-                        if (!empty($data[1])) {
-                            $order->set_shipping_address_2($data[1]);
-                        }
-                        break;
-                    case 'emailAddress':
-                        $order->set_billing_email($data);
-                        break;
-                }
-            }
-        }
-        if (!empty($_POST['billing'])) {
-            foreach ($_POST['billing'] as $key => $data) {
-                switch ($key) {
-                    case 'familyName':
-                        $order->set_billing_last_name($data);
-                        break;
-                    case 'givenName':
-                        $order->set_billing_first_name($data);
-                        break;
-                    case 'addressLines':
-                        $order->set_billing_address_1($data[0]);
-                        if (!empty($data[1])) {
-                            $order->set_billing_address_2($data[1]);
-                        }
-                        break;
-                    case 'locality':
-                        $order->set_billing_city($data);
-                        break;
-                    case 'country':
-                        $order->set_billing_country($data);
-                        break;
-                    case 'postalCode':
-                        $order->set_billing_postcode($data);
-                        break;
-                }
-            }
-        }
+        $this->apply_contact($order, PayplugWoocommerceHelper::sanitize_apple_pay_contact($_POST['shipping'] ?? null), 'shipping');
+        $this->apply_contact($order, PayplugWoocommerceHelper::sanitize_apple_pay_contact($_POST['billing'] ?? null), 'billing');
 
         $address_data = PayplugAddressData::from_order($order);
 
@@ -329,7 +297,32 @@ class ApplePay
         $order->calculate_totals(wc_tax_enabled());
         $order->save();
 
-        wp_send_json($order);
+        wp_send_json_success();
+    }
+
+    /**
+     * @param array<string, string|string[]> $contact output of PayplugWoocommerceHelper::sanitize_apple_pay_contact()
+     * @param string $type 'shipping' or 'billing'
+     */
+    private function apply_contact(\WC_Order $order, array $contact, string $type): void
+    {
+        $setters = 'shipping' === $type ? self::SHIPPING_CONTACT_SETTERS : self::BILLING_CONTACT_SETTERS;
+        foreach ($setters as $key => $setter) {
+            if (isset($contact[$key])) {
+                $order->{$setter}($contact[$key]);
+            }
+        }
+
+        if (isset($contact['addressLines'])) {
+            $order->{'set_' . $type . '_address_1'}($contact['addressLines'][0]);
+            if (isset($contact['addressLines'][1])) {
+                $order->{'set_' . $type . '_address_2'}($contact['addressLines'][1]);
+            }
+        }
+
+        if ('shipping' === $type && isset($contact['emailAddress'])) {
+            $order->set_billing_email($contact['emailAddress']);
+        }
     }
 
     /**
@@ -590,6 +583,19 @@ class ApplePay
         foreach ($lines as list($product_id, $quantity, $variation_id, $variations)) {
             WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variations);
         }
+    }
+
+    /**
+     * HTTP 200 because the cart and product page JS have no fail branch. They read data.msg, the Blocks JS reads data.message.
+     */
+    private function send_rate_limited(): void
+    {
+        $message = __('Too many Apple Pay attempts. Please wait a few minutes and try again.', 'payplug');
+
+        wp_send_json_error([
+            'msg' => $message,
+            'message' => $message,
+        ]);
     }
 
     private function send_order_kept(): void

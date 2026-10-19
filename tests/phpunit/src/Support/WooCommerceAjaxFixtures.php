@@ -36,6 +36,16 @@ trait WooCommerceAjaxFixtures
     private $fixture_user_ids = [];
 
     /**
+     * @var string[] customer ids of the WC sessions replaced during the test
+     */
+    private $fixture_session_keys = [];
+
+    /**
+     * @var array REMOTE_ADDR and HTTP_X_FORWARDED_FOR before the test, null when unset
+     */
+    private $original_server_ip = [];
+
+    /**
      * @var mixed
      */
     private $original_payplug_settings;
@@ -50,6 +60,13 @@ trait WooCommerceAjaxFixtures
         global $wp_filter;
 
         self::boot_woocommerce();
+        self::delete_rate_limit_transients();
+
+        $this->original_server_ip = [];
+        foreach (['REMOTE_ADDR', 'HTTP_X_FORWARDED_FOR'] as $name) {
+            $this->original_server_ip[$name] = $_SERVER[$name] ?? null;
+        }
+        unset($_SERVER['HTTP_X_FORWARDED_FOR']);
 
         $this->hooks_backup = [];
         foreach ($wp_filter as $hook_name => $hook) {
@@ -95,7 +112,7 @@ trait WooCommerceAjaxFixtures
             }
         }
 
-        $session_keys = array_map('strval', $this->fixture_user_ids);
+        $session_keys = array_merge(array_map('strval', $this->fixture_user_ids), $this->fixture_session_keys);
         if (WC()->session) {
             $session_keys[] = (string) WC()->session->get_customer_id();
         }
@@ -122,12 +139,54 @@ trait WooCommerceAjaxFixtures
             update_option('woocommerce_payplug_settings', $this->original_payplug_settings);
         }
 
+        foreach ($this->original_server_ip as $name => $value) {
+            if (null === $value) {
+                unset($_SERVER[$name]);
+            } else {
+                $_SERVER[$name] = $value;
+            }
+        }
+        self::delete_rate_limit_transients();
+
         $_POST = [];
         wp_set_current_user(0);
         JsonStatusSpy::reset();
         $this->fixture_order_ids = [];
         $this->fixture_product_ids = [];
         $this->fixture_user_ids = [];
+        $this->fixture_session_keys = [];
+    }
+
+    /**
+     * Counters of the Apple Pay dummy order rate limiter, kept in transients outside any test transaction.
+     */
+    private static function delete_rate_limit_transients(): void
+    {
+        global $wpdb;
+
+        $prefix = '_transient_payplug_ard_';
+        $names = $wpdb->get_col($wpdb->prepare(
+            "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s",
+            $wpdb->esc_like($prefix) . '%'
+        ));
+        foreach ($names as $name) {
+            delete_transient(substr($name, strlen('_transient_')));
+        }
+    }
+
+    /**
+     * Same browser state as a new visitor without cookie: new WC session, customer and empty cart.
+     */
+    protected function start_new_guest_session(): void
+    {
+        if (WC()->session) {
+            $this->fixture_session_keys[] = (string) WC()->session->get_customer_id();
+        }
+        WC()->session = new \WC_Session_Handler();
+        WC()->session->init();
+        WC()->customer = null;
+        WC()->cart = null;
+        WC()->initialize_cart();
     }
 
     /**

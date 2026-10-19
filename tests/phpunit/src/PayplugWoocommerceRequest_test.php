@@ -2,7 +2,9 @@
 
 namespace Payplug\PayplugWoocommerce\Tests\phpunit\src;
 
+use Payplug\PayplugWoocommerce\Front\ApplePay;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\PayplugWoocommerceRequest;
 use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\FakeGateway;
 use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\FakePayment;
 use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\PayplugWoocommerceRequestDouble;
@@ -825,6 +827,20 @@ class PayplugWoocommerceRequest_test extends TestCase
         });
 
         self::assertSame(0, $this->session_order_id());
+    }
+
+    public function test_the_unhooked_apple_pay_cart_duplicates_are_gone(): void
+    {
+        self::assertFalse(method_exists(PayplugWoocommerceRequest::class, 'applepay_empty_cart'));
+        self::assertFalse(method_exists(PayplugWoocommerceRequest::class, 'applepay_add_to_cart'));
+    }
+
+    public function test_the_apple_pay_front_handlers_stay_hooked(): void
+    {
+        $apple_pay = new ApplePay();
+
+        self::assertSame(10, has_action('wc_ajax_applepay_empty_cart', [$apple_pay, 'applepay_empty_cart']));
+        self::assertSame(10, has_action('wc_ajax_applepay_add_to_cart', [$apple_pay, 'applepay_add_to_cart']));
     }
 
     private function order_pay_invalid_order_response(): array

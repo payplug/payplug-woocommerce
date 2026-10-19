@@ -201,6 +201,7 @@ class ApplePay_test extends TestCase
         $saved = wc_get_order($order->get_id());
         self::assertSame(200, $response['status']);
         self::assertTrue($response['died']);
+        self::assertSame(['success' => true], $response['body']);
         self::assertSame('Martin', $saved->get_shipping_last_name());
         self::assertSame('Lyon', $saved->get_shipping_city());
     }
@@ -216,6 +217,225 @@ class ApplePay_test extends TestCase
 
         self::assertSame(200, $response['status']);
         self::assertSame('Martin', wc_get_order($order->get_id())->get_billing_last_name());
+    }
+
+    public function test_update_applepay_order_answers_success_only_and_never_the_order(): void
+    {
+        $order = $this->make_order();
+        $this->own_in_session($order);
+        $_POST = ['order_id' => (string) $order->get_id(), 'shipping' => ['locality' => 'Lyon']];
+
+        $response = $this->capture_ajax([$this->apple_pay, 'update_applepay_order']);
+
+        self::assertSame(['status' => 200, 'body' => ['success' => true], 'died' => true], $response);
+        self::assertStringNotContainsString($order->get_order_key(), (string) wp_json_encode($response['body']));
+    }
+
+    public function test_update_applepay_order_stores_apostrophes_without_backslashes(): void
+    {
+        $order = $this->make_order();
+        $this->own_in_session($order);
+        $_POST = [
+            'order_id' => (string) $order->get_id(),
+            'shipping' => wp_slash(['familyName' => "O'Brien", 'givenName' => "D'Arcy", 'addressLines' => ["1 rue de l'Eglise", "Bat. d'Or"]]),
+            'billing' => wp_slash(['familyName' => "O'Brien", 'addressLines' => ["2 rue de l'Ouest"]]),
+        ];
+
+        $this->capture_ajax([$this->apple_pay, 'update_applepay_order']);
+
+        $saved = wc_get_order($order->get_id());
+        self::assertSame("O'Brien", $saved->get_shipping_last_name());
+        self::assertSame("D'Arcy", $saved->get_shipping_first_name());
+        self::assertSame("1 rue de l'Eglise", $saved->get_shipping_address_1());
+        self::assertSame("Bat. d'Or", $saved->get_shipping_address_2());
+        self::assertSame("O'Brien", $saved->get_billing_last_name());
+        self::assertSame("2 rue de l'Ouest", $saved->get_billing_address_1());
+    }
+
+    public function garbage_owned_contact_provider(): array
+    {
+        return [
+            'string contacts' => [['shipping' => 'Durand', 'billing' => 'Durand']],
+            'address lines as a string' => [['shipping' => ['addressLines' => '2 place Bellecour'], 'billing' => ['addressLines' => 'x']]],
+            'address lines without a valid line' => [['shipping' => ['addressLines' => [['x'], '']], 'billing' => ['addressLines' => []]]],
+            'nested arrays' => [['shipping' => ['familyName' => ['Durand'], 'locality' => [['x']]], 'billing' => [['x']]]],
+            'unexpected scalars' => [['shipping' => ['postalCode' => true, 'locality' => 12], 'billing' => 'x']],
+        ];
+    }
+
+    /**
+     * @dataProvider garbage_owned_contact_provider
+     */
+    public function test_update_applepay_order_ignores_garbage_contacts_and_keeps_the_address(array $post): void
+    {
+        $order = $this->make_order();
+        $this->own_in_session($order);
+        $_POST = ['order_id' => (string) $order->get_id()] + $post;
+
+        $response = $this->capture_ajax([$this->apple_pay, 'update_applepay_order']);
+
+        $saved = wc_get_order($order->get_id());
+        self::assertSame(['status' => 200, 'body' => ['success' => true], 'died' => true], $response);
+        self::assertSame(['Doe', '1 rue de la Paix', 'Paris', '75002'], [$saved->get_shipping_last_name(), $saved->get_shipping_address_1(), $saved->get_shipping_city(), $saved->get_shipping_postcode()]);
+        self::assertSame(['Doe', '1 rue de la Paix', 'Paris'], [$saved->get_billing_last_name(), $saved->get_billing_address_1(), $saved->get_billing_city()]);
+    }
+
+    public function test_update_applepay_order_with_only_some_contact_fields_updates_only_those(): void
+    {
+        $order = $this->make_order();
+        $this->own_in_session($order);
+        $_POST = ['order_id' => (string) $order->get_id(), 'shipping' => ['familyName' => 'Martin'], 'billing' => ['givenName' => 'Alice']];
+
+        $this->capture_ajax([$this->apple_pay, 'update_applepay_order']);
+
+        $saved = wc_get_order($order->get_id());
+        self::assertSame(['Martin', 'Jane', '1 rue de la Paix'], [$saved->get_shipping_last_name(), $saved->get_shipping_first_name(), $saved->get_shipping_address_1()]);
+        self::assertSame(['Doe', 'Alice', '1 rue de la Paix'], [$saved->get_billing_last_name(), $saved->get_billing_first_name(), $saved->get_billing_address_1()]);
+    }
+
+    public function test_update_applepay_order_ignores_an_invalid_email_and_keeps_the_previous_one(): void
+    {
+        $order = $this->make_order();
+        $this->own_in_session($order);
+        $_POST = ['order_id' => (string) $order->get_id(), 'shipping' => ['emailAddress' => 'not-an-email', 'locality' => 'Lyon']];
+
+        $this->capture_ajax([$this->apple_pay, 'update_applepay_order']);
+
+        $saved = wc_get_order($order->get_id());
+        self::assertSame('jane.doe@example.test', $saved->get_billing_email());
+        self::assertSame('Lyon', $saved->get_shipping_city());
+    }
+
+    public function test_update_applepay_order_never_takes_the_email_or_the_phone_of_the_billing_contact(): void
+    {
+        $order = $this->make_order();
+        $this->own_in_session($order);
+        $_POST = ['order_id' => (string) $order->get_id(), 'billing' => ['emailAddress' => 'other@example.test', 'phoneNumber' => '0699999999']];
+
+        $this->capture_ajax([$this->apple_pay, 'update_applepay_order']);
+
+        $saved = wc_get_order($order->get_id());
+        self::assertSame('jane.doe@example.test', $saved->get_billing_email());
+        self::assertSame('', $saved->get_billing_phone());
+    }
+
+    public function test_update_applepay_order_stores_a_full_valid_payload_as_before(): void
+    {
+        $order = $this->make_order();
+        $this->own_in_session($order);
+        $_POST = [
+            'order_id' => (string) $order->get_id(),
+            'shipping' => ['familyName' => 'Martin', 'givenName' => 'Alice', 'country' => 'FR', 'locality' => 'Lyon', 'phoneNumber' => '0612345678', 'postalCode' => '69001', 'addressLines' => ['2 place Bellecour', 'Appt 4'], 'emailAddress' => 'alice@example.test'],
+            'billing' => ['familyName' => 'Durand', 'givenName' => 'Bob', 'addressLines' => ['3 rue X'], 'locality' => 'Nice', 'country' => 'FR', 'postalCode' => '06000'],
+        ];
+
+        $this->capture_ajax([$this->apple_pay, 'update_applepay_order']);
+
+        $saved = wc_get_order($order->get_id());
+        self::assertSame(
+            ['Martin', 'Alice', 'FR', 'Lyon', '0612345678', '69001', '2 place Bellecour', 'Appt 4', 'alice@example.test'],
+            [$saved->get_shipping_last_name(), $saved->get_shipping_first_name(), $saved->get_shipping_country(), $saved->get_shipping_city(), $saved->get_shipping_phone(), $saved->get_shipping_postcode(), $saved->get_shipping_address_1(), $saved->get_shipping_address_2(), $saved->get_billing_email()]
+        );
+        self::assertSame(
+            ['Durand', 'Bob', '3 rue X', 'Nice', 'FR', '06000'],
+            [$saved->get_billing_last_name(), $saved->get_billing_first_name(), $saved->get_billing_address_1(), $saved->get_billing_city(), $saved->get_billing_country(), $saved->get_billing_postcode()]
+        );
+    }
+
+    public function test_place_order_with_dummy_data_refuses_beyond_the_limit_in_http_200_without_creating_an_order(): void
+    {
+        $this->limit_dummy_orders(1, 0);
+        WC()->cart->add_to_cart($this->make_product()->get_id());
+        $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+        $this->track_order($this->apple_pay->cart_payment['order_id']);
+        $this->apple_pay->cart_payment = null;
+        WC()->cart->add_to_cart($this->make_product()->get_id());
+        $orders_before = $this->pending_order_ids();
+
+        $response = $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+
+        $message = 'Too many Apple Pay attempts. Please wait a few minutes and try again.';
+        self::assertSame(['status' => 200, 'body' => ['success' => false, 'data' => ['msg' => $message, 'message' => $message]], 'died' => true], $response);
+        self::assertNull($this->apple_pay->cart_payment);
+        self::assertSame($orders_before, $this->pending_order_ids());
+        self::assertSame(1, WC()->cart->get_cart_contents_count());
+    }
+
+    public function test_place_order_with_dummy_data_refuses_another_session_beyond_the_ip_limit(): void
+    {
+        $this->limit_dummy_orders(0, 1);
+        $_SERVER['REMOTE_ADDR'] = '203.0.113.9';
+        WC()->cart->add_to_cart($this->make_product()->get_id());
+        $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+        $this->track_order($this->apple_pay->cart_payment['order_id']);
+        $this->apple_pay->cart_payment = null;
+        $this->start_new_guest_session();
+        WC()->cart->add_to_cart($this->make_product()->get_id());
+        $orders_before = $this->pending_order_ids();
+
+        $response = $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+
+        self::assertFalse($response['body']['success']);
+        self::assertNull($this->apple_pay->cart_payment);
+        self::assertSame($orders_before, $this->pending_order_ids());
+    }
+
+    public function test_place_order_with_dummy_data_with_an_empty_cart_does_not_use_the_quota(): void
+    {
+        $this->limit_dummy_orders(1, 1);
+        $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+        $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+        WC()->cart->add_to_cart($this->make_product()->get_id());
+
+        $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+
+        self::assertNotNull($this->apple_pay->cart_payment);
+        $this->track_order($this->apple_pay->cart_payment['order_id']);
+    }
+
+    public function test_place_order_with_dummy_data_counts_a_failed_order_creation(): void
+    {
+        $this->limit_dummy_orders(1, 0);
+        $fail_creation = static function (): void {
+            throw new \Exception('creation failed');
+        };
+        add_action('woocommerce_order_before_calculate_taxes', $fail_creation);
+        WC()->cart->add_to_cart($this->make_product()->get_id());
+        $orders_before = $this->pending_order_ids();
+        $failed = $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+        remove_action('woocommerce_order_before_calculate_taxes', $fail_creation);
+        foreach (array_diff($this->pending_order_ids(), $orders_before) as $order_id) {
+            $this->track_order($order_id);
+        }
+
+        $response = $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+
+        self::assertSame(['success' => false, 'data' => ['message' => 'Your order was cancelled.']], $failed['body']);
+        self::assertSame('Too many Apple Pay attempts. Please wait a few minutes and try again.', $response['body']['data']['msg']);
+        self::assertNull($this->apple_pay->cart_payment);
+    }
+
+    public function test_place_order_with_dummy_data_lets_a_buyer_retry_up_to_the_default_limit(): void
+    {
+        for ($attempt = 1; $attempt <= 10; ++$attempt) {
+            WC()->cart->add_to_cart($this->make_product()->get_id());
+            $this->apple_pay->cart_payment = null;
+            $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+            self::assertNotNull($this->apple_pay->cart_payment, 'attempt ' . $attempt);
+            $this->track_order($this->apple_pay->cart_payment['order_id']);
+        }
+    }
+
+    public function test_place_order_with_dummy_data_is_not_limited_when_the_filter_disables_the_limits(): void
+    {
+        add_filter('payplug_applepay_dummy_order_rate_limit', '__return_false');
+        for ($attempt = 1; $attempt <= 12; ++$attempt) {
+            WC()->cart->add_to_cart($this->make_product()->get_id());
+            $this->apple_pay->cart_payment = null;
+            $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+            self::assertNotNull($this->apple_pay->cart_payment, 'attempt ' . $attempt);
+            $this->track_order($this->apple_pay->cart_payment['order_id']);
+        }
     }
 
     /**
@@ -1132,6 +1352,25 @@ class ApplePay_test extends TestCase
         }
 
         return $variations;
+    }
+
+    private function limit_dummy_orders(int $subject_limit, int $ip_limit): void
+    {
+        add_filter('payplug_applepay_dummy_order_rate_limit', static fn (): array => [
+            'subject' => ['limit' => $subject_limit, 'window' => 600],
+            'ip' => ['limit' => $ip_limit, 'window' => 600],
+        ]);
+    }
+
+    /**
+     * @return int[] sorted
+     */
+    private function pending_order_ids(): array
+    {
+        $ids = array_map('intval', wc_get_orders(['limit' => -1, 'return' => 'ids', 'status' => 'pending']));
+        sort($ids);
+
+        return $ids;
     }
 
     private function order_product_id(\WC_Order $order): int

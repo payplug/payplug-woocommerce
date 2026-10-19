@@ -26,6 +26,22 @@ class PayplugWoocommerceHelper
     use ServiceGetter;
 
     /**
+     * Maximum number of characters stored per text field of an Apple Pay contact.
+     */
+    private const APPLE_PAY_CONTACT_MAX_LENGTHS = [
+        'familyName' => 100,
+        'givenName' => 100,
+        'locality' => 100,
+        'country' => 100,
+        'postalCode' => 20,
+        'phoneNumber' => 30,
+    ];
+
+    private const APPLE_PAY_EMAIL_MAX_LENGTH = 255;
+
+    private const APPLE_PAY_ADDRESS_LINE_MAX_LENGTH = 255;
+
+    /**
      * Check if current WooCommerce version is below 3.0.0
      *
      * @return bool
@@ -466,6 +482,60 @@ class PayplugWoocommerceHelper
         $metadata = isset($payment->metadata) ? $payment->metadata : [];
 
         return is_array($metadata) && isset($metadata['order_id']) ? absint($metadata['order_id']) : 0;
+    }
+
+    /**
+     * Valid, cleaned fields of an Apple Pay contact posted by the browser.
+     *
+     * @param mixed $contact $_POST['shipping'] or $_POST['billing'], still slashed
+     *
+     * @return array<string, string|string[]> keyed like the Apple Pay contact; a missing, mistyped or invalid field is left out
+     */
+    public static function sanitize_apple_pay_contact($contact): array
+    {
+        if (!is_array($contact)) {
+            return [];
+        }
+
+        $clean = [];
+        foreach (self::APPLE_PAY_CONTACT_MAX_LENGTHS as $key => $max_length) {
+            if (isset($contact[$key]) && is_string($contact[$key])) {
+                $clean[$key] = self::clean_apple_pay_text($contact[$key], $max_length);
+            }
+        }
+
+        if (isset($contact['emailAddress']) && is_string($contact['emailAddress'])) {
+            $email = sanitize_email(wp_unslash($contact['emailAddress']));
+            if ('' !== $email && strlen($email) <= self::APPLE_PAY_EMAIL_MAX_LENGTH && is_email($email)) {
+                $clean['emailAddress'] = $email;
+            }
+        }
+
+        if (isset($contact['addressLines']) && is_array($contact['addressLines'])) {
+            $lines = [];
+            foreach ($contact['addressLines'] as $line) {
+                if (!is_string($line)) {
+                    continue;
+                }
+                $line = self::clean_apple_pay_text($line, self::APPLE_PAY_ADDRESS_LINE_MAX_LENGTH);
+                if ('' !== $line) {
+                    $lines[] = $line;
+                }
+                if (2 === count($lines)) {
+                    break;
+                }
+            }
+            if ($lines) {
+                $clean['addressLines'] = $lines;
+            }
+        }
+
+        return $clean;
+    }
+
+    private static function clean_apple_pay_text(string $value, int $max_length): string
+    {
+        return mb_substr((string) wc_clean(wp_unslash($value)), 0, $max_length, 'UTF-8');
     }
 
     /**

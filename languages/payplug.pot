@@ -962,3 +962,7 @@ msgstr ""
 #, php-format
 msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
 msgstr ""
+
+#: src/Front/ApplePay.php:593
+msgid "Too many Apple Pay attempts. Please wait a few minutes and try again."
+msgstr ""

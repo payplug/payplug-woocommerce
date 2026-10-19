@@ -409,46 +409,6 @@ class PayplugWoocommerceRequest
     }
 
     /**
-     * Empty cart for Apple Pay on product page
-     */
-    public function applepay_empty_cart(): void
-    {
-        try {
-            WC()->cart->empty_cart();
-            wp_send_json_success();
-        } catch (\Exception $e) {
-            wp_send_json_error([
-                'message' => __('Your order was cancelled.', 'woocommerce'),
-            ]);
-        }
-    }
-
-    /**
-     * Add the product on the current page to the cart for Apple Pay on product page
-     */
-    public function applepay_add_to_cart(): void
-    {
-        try {
-            if (!empty($_POST['product_id'])) {
-                $product_id = $_POST['product_id'];
-            } else {
-                $product_id = $_POST['product_variation_id'];
-            }
-
-            $product_quantity = !empty($_POST['product_quantity']) ? $_POST['product_quantity'] : 1;
-
-            WC()->cart->add_to_cart($product_id, $product_quantity);
-            wp_send_json_success([
-                'total' => WC()->cart->total - WC()->cart->shipping_total,
-            ]);
-        } catch (\Exception $e) {
-            wp_send_json_error([
-                'message' => __('Your order was cancelled.', 'woocommerce'),
-            ]);
-        }
-    }
-
-    /**
      * Limit string length.
      *
      * @param string $value
