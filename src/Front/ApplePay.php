@@ -137,59 +137,78 @@ class ApplePay
             }
 
             try {
-                $checkout = WC()->checkout();
+                $order = $this->create_cart_order($apple_pay);
+                if ($order) {
+                    $cart->empty_cart();
 
-                $order_id = $checkout->create_order(['payment_method' => $apple_pay->id]);
-                $order = wc_get_order($order_id);
+                    // After empty_cart(): emptying the cart clears order_awaiting_payment from the session.
+                    PayplugWoocommerceHelper::remember_order_awaiting_payment($order->get_id());
 
-                $order->set_address([
-                    'first_name' => 'payplug_applepay_first_name',
-                    'last_name' => 'payplug_applepay_last_name',
-                    'address_1' => 'payplug_applepay_address',
-                    'address_2' => '',
-                    'city' => 'payplug_applepay_city',
-                    'postcode' => 'payplug_applepay_psotcode',
-                    'country' => WC()->countries->get_base_country(),
-                    'email' => 'payplug_applepay_email@payplug.com',
-                ], 'billing');
-                $order->set_address([
-                    'first_name' => 'payplug_applepay_first_name',
-                    'last_name' => 'payplug_applepay_last_name',
-                    'address_1' => 'payplug_applepay_address',
-                    'address_2' => '',
-                    'city' => 'payplug_applepay_city',
-                    'postcode' => 'payplug_applepay_psotcode',
-                    'country' => WC()->countries->get_base_country(),
-                    'email' => 'payplug_applepay_email@payplug.com',
-                ], 'shipping');
+                    $this->process_cart_payment($order, $apple_pay);
 
-                $order->set_payment_method($apple_pay);
-                $order->update_meta_data(self::CART_ORDER_META, 'yes');
-
-                $packages = WC()->cart->get_shipping_packages();
-
-                WC()->shipping()->reset_shipping();
-
-                $order->calculate_taxes();
-
-                $order->calculate_totals();
-
-                $order->save();
-
-                $cart->empty_cart();
-
-                // After empty_cart(): emptying the cart clears order_awaiting_payment from the session.
-                PayplugWoocommerceHelper::remember_order_awaiting_payment($order->get_id());
-
-                $this->process_cart_payment($order, $apple_pay);
-            } catch (\Exception $exception) {
-                wp_send_json_error([
-                    'message' => __('Your order was cancelled.', 'woocommerce'),
-                ]);
+                    return;
+                }
+            } catch (\Throwable $e) {
+                PayplugGateway::log(sprintf('Apple Pay: place_order_with_dummy_data failed (%s)', get_class($e)), 'warning');
             }
+
+            $this->send_order_not_created();
         } else {
             wp_send_json_error();
         }
+    }
+
+    /**
+     * Order of the cart with placeholder addresses, null when WooCommerce could not create it.
+     */
+    private function create_cart_order(ApplePayGateway $apple_pay): ?\WC_Order
+    {
+        $order_id = WC()->checkout()->create_order(['payment_method' => $apple_pay->id]);
+        $order = is_wp_error($order_id) ? false : wc_get_order($order_id);
+        if (!$order instanceof \WC_Order) {
+            PayplugGateway::log(sprintf(
+                'Apple Pay: place_order_with_dummy_data could not create the order (%s)',
+                is_wp_error($order_id) ? $order_id->get_error_code() : 'order not found'
+            ), 'warning');
+
+            return null;
+        }
+
+        $order->set_address([
+            'first_name' => 'payplug_applepay_first_name',
+            'last_name' => 'payplug_applepay_last_name',
+            'address_1' => 'payplug_applepay_address',
+            'address_2' => '',
+            'city' => 'payplug_applepay_city',
+            'postcode' => 'payplug_applepay_psotcode',
+            'country' => WC()->countries->get_base_country(),
+            'email' => 'payplug_applepay_email@payplug.com',
+        ], 'billing');
+        $order->set_address([
+            'first_name' => 'payplug_applepay_first_name',
+            'last_name' => 'payplug_applepay_last_name',
+            'address_1' => 'payplug_applepay_address',
+            'address_2' => '',
+            'city' => 'payplug_applepay_city',
+            'postcode' => 'payplug_applepay_psotcode',
+            'country' => WC()->countries->get_base_country(),
+            'email' => 'payplug_applepay_email@payplug.com',
+        ], 'shipping');
+
+        $order->set_payment_method($apple_pay);
+        $order->update_meta_data(self::CART_ORDER_META, 'yes');
+
+        $packages = WC()->cart->get_shipping_packages();
+
+        WC()->shipping()->reset_shipping();
+
+        $order->calculate_taxes();
+
+        $order->calculate_totals();
+
+        $order->save();
+
+        return $order;
     }
 
     public function process_cart_payment($order, $gateway): void
@@ -598,6 +617,19 @@ class ApplePay
         ]);
     }
 
+    /**
+     * The cart and product page JS read data.msg, the Blocks JS reads data.message.
+     */
+    private function send_order_not_created(): void
+    {
+        $message = __('Your order was cancelled.', 'woocommerce');
+
+        wp_send_json_error([
+            'msg' => $message,
+            'message' => $message,
+        ]);
+    }
+
     private function send_order_kept(): void
     {
         wp_send_json_error([
@@ -629,23 +661,49 @@ class ApplePay
 
     public function applepay_add_to_cart(): void
     {
-        try {
-            if (!empty($_POST['product_id'])) {
-                $product_id = $_POST['product_id'];
-            } else {
-                $product_id = $_POST['product_variation_id'];
-            }
+        $product_id = $this->get_posted_id('product_id') ?: $this->get_posted_id('product_variation_id');
+        $quantity = $this->get_posted_quantity();
+        if (!$product_id || $quantity < 1) {
+            $this->send_order_not_created();
 
-            $product_quantity = !empty($_POST['product_quantity']) ? $_POST['product_quantity'] : 1;
-
-            WC()->cart->add_to_cart($product_id, $product_quantity);
-            wp_send_json_success([
-                'total' => WC()->cart->total - WC()->cart->shipping_total,
-            ]);
-        } catch (\Exception $e) {
-            wp_send_json_error([
-                'message' => __('Your order was cancelled.', 'woocommerce'),
-            ]);
+            return;
         }
+
+        try {
+            WC()->cart->add_to_cart($product_id, $quantity);
+            $total = WC()->cart->total - WC()->cart->shipping_total;
+        } catch (\Throwable $e) {
+            $this->send_order_not_created();
+
+            return;
+        }
+
+        wp_send_json_success([
+            'total' => $total,
+        ]);
+    }
+
+    /**
+     * Positive integer posted under $key, 0 when absent or not a positive number.
+     */
+    private function get_posted_id(string $key): int
+    {
+        $value = isset($_POST[$key]) && is_scalar($_POST[$key]) ? wp_unslash($_POST[$key]) : '';
+
+        return is_numeric($value) && $value > 0 ? absint($value) : 0;
+    }
+
+    /**
+     * 1 when no quantity is posted, 0 when the posted quantity is not a scalar.
+     *
+     * @return int|float
+     */
+    private function get_posted_quantity()
+    {
+        if (!isset($_POST['product_quantity']) || '' === $_POST['product_quantity']) {
+            return 1;
+        }
+
+        return is_scalar($_POST['product_quantity']) ? wc_stock_amount(wp_unslash($_POST['product_quantity'])) : 0;
     }
 }

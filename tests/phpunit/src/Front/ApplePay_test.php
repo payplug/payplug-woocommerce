@@ -396,23 +396,84 @@ class ApplePay_test extends TestCase
     public function test_place_order_with_dummy_data_counts_a_failed_order_creation(): void
     {
         $this->limit_dummy_orders(1, 0);
-        $fail_creation = static function (): void {
-            throw new \Exception('creation failed');
-        };
-        add_action('woocommerce_order_before_calculate_taxes', $fail_creation);
+        $this->make_checkout_create_order_fail();
         WC()->cart->add_to_cart($this->make_product()->get_id());
         $orders_before = $this->pending_order_ids();
         $failed = $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
-        remove_action('woocommerce_order_before_calculate_taxes', $fail_creation);
+
+        $response = $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+
+        self::assertSame($this->order_not_created_response(), $failed);
+        self::assertSame($orders_before, $this->pending_order_ids());
+        self::assertSame('Too many Apple Pay attempts. Please wait a few minutes and try again.', $response['body']['data']['msg']);
+        self::assertNull($this->apple_pay->cart_payment);
+    }
+
+    public function test_place_order_with_dummy_data_answers_an_error_and_keeps_the_cart_when_create_order_returns_an_error(): void
+    {
+        $this->log_spy = GatewayLogSpy::start();
+        $this->make_checkout_create_order_fail();
+        WC()->cart->add_to_cart($this->make_product()->get_id());
+        $orders_before = $this->pending_order_ids();
+
+        $response = $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+
+        self::assertSame($this->order_not_created_response(), $response);
+        self::assertNull($this->apple_pay->cart_payment);
+        self::assertSame($orders_before, $this->pending_order_ids());
+        self::assertSame(1, WC()->cart->get_cart_contents_count());
+        self::assertSame(0, $this->session_order_id());
+        self::assertContains('Apple Pay: place_order_with_dummy_data could not create the order (checkout-error)', $this->logged_warnings());
+        $this->assert_no_customer_data_logged();
+    }
+
+    public function test_place_order_with_dummy_data_answers_an_error_and_keeps_the_cart_when_the_created_order_cannot_be_loaded(): void
+    {
+        $this->log_spy = GatewayLogSpy::start();
+        add_filter('woocommerce_create_order', static fn (): int => self::UNKNOWN_ORDER_ID);
+        WC()->cart->add_to_cart($this->make_product()->get_id());
+        $orders_before = $this->pending_order_ids();
+
+        $response = $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
+
+        self::assertSame($this->order_not_created_response(), $response);
+        self::assertNull($this->apple_pay->cart_payment);
+        self::assertSame($orders_before, $this->pending_order_ids());
+        self::assertSame(1, WC()->cart->get_cart_contents_count());
+        self::assertContains('Apple Pay: place_order_with_dummy_data could not create the order (order not found)', $this->logged_warnings());
+    }
+
+    public function throwable_class_provider(): array
+    {
+        return [
+            'Error' => [\Error::class],
+            'TypeError' => [\TypeError::class],
+            'Exception' => [\Exception::class],
+        ];
+    }
+
+    /**
+     * @dataProvider throwable_class_provider
+     */
+    public function test_place_order_with_dummy_data_answers_an_error_and_keeps_the_cart_when_a_step_after_create_order_throws(string $throwable_class): void
+    {
+        $this->log_spy = GatewayLogSpy::start();
+        add_action('woocommerce_order_before_calculate_taxes', static function () use ($throwable_class): void {
+            throw new $throwable_class('jane.doe@example.test');
+        });
+        WC()->cart->add_to_cart($this->make_product()->get_id());
+        $orders_before = $this->pending_order_ids();
+
+        $response = $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
         foreach (array_diff($this->pending_order_ids(), $orders_before) as $order_id) {
             $this->track_order($order_id);
         }
 
-        $response = $this->capture_ajax([$this->apple_pay, 'place_order_with_dummy_data']);
-
-        self::assertSame(['success' => false, 'data' => ['message' => 'Your order was cancelled.']], $failed['body']);
-        self::assertSame('Too many Apple Pay attempts. Please wait a few minutes and try again.', $response['body']['data']['msg']);
+        self::assertSame($this->order_not_created_response(), $response);
         self::assertNull($this->apple_pay->cart_payment);
+        self::assertSame(1, WC()->cart->get_cart_contents_count());
+        self::assertContains(sprintf('Apple Pay: place_order_with_dummy_data failed (%s)', $throwable_class), $this->logged_warnings());
+        $this->assert_no_customer_data_logged();
     }
 
     public function test_place_order_with_dummy_data_lets_a_buyer_retry_up_to_the_default_limit(): void
@@ -436,6 +497,123 @@ class ApplePay_test extends TestCase
             self::assertNotNull($this->apple_pay->cart_payment, 'attempt ' . $attempt);
             $this->track_order($this->apple_pay->cart_payment['order_id']);
         }
+    }
+
+    /**
+     * Each case builds the posted data from the id of an existing simple product.
+     */
+    public function invalid_add_to_cart_post_provider(): array
+    {
+        return [
+            'no product id' => [static fn (int $id): array => []],
+            'empty ids' => [static fn (int $id): array => ['product_id' => '', 'product_variation_id' => '']],
+            'zero ids' => [static fn (int $id): array => ['product_id' => '0', 'product_variation_id' => '0']],
+            'non-numeric product id' => [static fn (int $id): array => ['product_id' => 'abc']],
+            'product id followed by text' => [static fn (int $id): array => ['product_id' => $id . 'abc']],
+            'negative product id' => [static fn (int $id): array => ['product_id' => '-' . $id]],
+            'negative variation id' => [static fn (int $id): array => ['product_variation_id' => '-' . $id]],
+            'quoted product id, slashed' => [static fn (int $id): array => wp_slash(['product_id' => "'" . $id])],
+            'product id in an array' => [static fn (int $id): array => ['product_id' => [(string) $id]]],
+            'variation id in an array' => [static fn (int $id): array => ['product_variation_id' => [(string) $id]]],
+            'quantity 0' => [static fn (int $id): array => ['product_id' => (string) $id, 'product_quantity' => '0']],
+            'negative quantity' => [static fn (int $id): array => ['product_id' => (string) $id, 'product_quantity' => '-2']],
+            'non-numeric quantity' => [static fn (int $id): array => ['product_id' => (string) $id, 'product_quantity' => 'abc']],
+            'quantity in an array' => [static fn (int $id): array => ['product_id' => (string) $id, 'product_quantity' => ['2']]],
+        ];
+    }
+
+    /**
+     * @dataProvider invalid_add_to_cart_post_provider
+     */
+    public function test_applepay_add_to_cart_refuses_an_invalid_product_or_quantity_and_adds_nothing(callable $post): void
+    {
+        $_POST = $post($this->make_product()->get_id());
+
+        $response = $this->capture_ajax([$this->apple_pay, 'applepay_add_to_cart']);
+
+        self::assertSame($this->order_not_created_response(), $response);
+        self::assertTrue(WC()->cart->is_empty());
+    }
+
+    public function default_quantity_provider(): array
+    {
+        return [
+            'quantity absent' => [[]],
+            'quantity empty' => [['product_quantity' => '']],
+        ];
+    }
+
+    /**
+     * @dataProvider default_quantity_provider
+     */
+    public function test_applepay_add_to_cart_adds_one_product_without_quantity(array $quantity): void
+    {
+        $product = $this->make_product();
+        $_POST = wp_slash(['product_id' => (string) $product->get_id()] + $quantity);
+
+        $response = $this->capture_ajax([$this->apple_pay, 'applepay_add_to_cart']);
+
+        self::assertTrue($response['body']['success']);
+        self::assertSame([[$product->get_id(), 0, 1]], $this->cart_lines());
+    }
+
+    public function test_applepay_add_to_cart_adds_the_posted_quantity_of_a_simple_product_and_answers_the_total(): void
+    {
+        $product = $this->make_product();
+        $_POST = wp_slash(['product_id' => (string) $product->get_id(), 'product_quantity' => '3']);
+
+        $response = $this->capture_ajax([$this->apple_pay, 'applepay_add_to_cart']);
+
+        self::assertSame(200, $response['status']);
+        self::assertTrue($response['body']['success']);
+        self::assertArrayHasKey('total', $response['body']['data']);
+        self::assertSame([[$product->get_id(), 0, 3]], $this->cart_lines());
+    }
+
+    public function variation_post_provider(): array
+    {
+        return [
+            'empty product id' => [static fn (int $variation_id): array => ['product_id' => '', 'product_variation_id' => (string) $variation_id]],
+            'no product id' => [static fn (int $variation_id): array => ['product_variation_id' => (string) $variation_id]],
+            'invalid product id' => [static fn (int $variation_id): array => ['product_id' => 'abc', 'product_variation_id' => (string) $variation_id]],
+        ];
+    }
+
+    /**
+     * @dataProvider variation_post_provider
+     */
+    public function test_applepay_add_to_cart_adds_the_variation_posted_as_variation_id(callable $post): void
+    {
+        $variation = $this->make_variations(['M'])['M'];
+        $_POST = wp_slash($post($variation->get_id()) + ['product_quantity' => '2']);
+
+        $response = $this->capture_ajax([$this->apple_pay, 'applepay_add_to_cart']);
+
+        self::assertTrue($response['body']['success']);
+        self::assertSame([[$variation->get_parent_id(), $variation->get_id(), 2]], $this->cart_lines());
+    }
+
+    public function test_applepay_add_to_cart_prefers_the_product_id_over_the_variation_id(): void
+    {
+        $product = $this->make_product();
+        $variation = $this->make_variations(['M'])['M'];
+        $_POST = ['product_id' => (string) $product->get_id(), 'product_variation_id' => (string) $variation->get_id()];
+
+        $this->capture_ajax([$this->apple_pay, 'applepay_add_to_cart']);
+
+        self::assertSame([[$product->get_id(), 0, 1]], $this->cart_lines());
+    }
+
+    public function test_applepay_add_to_cart_answers_an_error_when_adding_to_the_cart_throws(): void
+    {
+        add_action('woocommerce_add_to_cart', static function (): void {
+            throw new \Error('add to cart failed');
+        });
+        $_POST = ['product_id' => (string) $this->make_product()->get_id()];
+
+        $response = $this->capture_ajax([$this->apple_pay, 'applepay_add_to_cart']);
+
+        self::assertSame($this->order_not_created_response(), $response);
     }
 
     /**
@@ -1378,6 +1556,54 @@ class ApplePay_test extends TestCase
         $items = $order->get_items();
 
         return (int) reset($items)->get_product_id();
+    }
+
+    /**
+     * WC_Checkout::create_order() turns the exception into a WP_Error and saves no order.
+     */
+    private function make_checkout_create_order_fail(): void
+    {
+        add_action('woocommerce_checkout_create_order', static function (): void {
+            throw new \Exception('jane.doe@example.test');
+        });
+    }
+
+    /**
+     * @return string[] messages of the warnings logged since the log spy started
+     */
+    private function logged_warnings(): array
+    {
+        return array_column(array_filter($this->log_spy->entries, static fn (array $entry): bool => 'warning' === $entry['level']), 'message');
+    }
+
+    private function assert_no_customer_data_logged(): void
+    {
+        foreach ($this->log_spy->entries as $entry) {
+            self::assertStringNotContainsString('jane.doe@example.test', $entry['message']);
+        }
+    }
+
+    /**
+     * @return array[] product id, variation id and quantity of each cart line
+     */
+    private function cart_lines(): array
+    {
+        $lines = [];
+        foreach (WC()->cart->get_cart() as $item) {
+            $lines[] = [(int) $item['product_id'], (int) $item['variation_id'], (int) $item['quantity']];
+        }
+
+        return $lines;
+    }
+
+    /**
+     * The cart and product page JS read data.msg, the Blocks JS reads data.message.
+     */
+    private function order_not_created_response(): array
+    {
+        $message = 'Your order was cancelled.';
+
+        return ['status' => 200, 'body' => ['success' => false, 'data' => ['msg' => $message, 'message' => $message]], 'died' => true];
     }
 
     private function cancelled_error_response(): array
