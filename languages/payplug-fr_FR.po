@@ -1364,7 +1364,7 @@ msgid "payplug_hosted_fields_tokenization_error"
 msgstr "Une erreur est survenue lors de la vérification de votre carte. Merci de réessayer."
 
 msgid "payplug_hosted_fields_unsupported_brand_error"
-msgstr "Ce type de carte n'est pas accepté avec ce mode de paiement. Merci d'utiliser une carte CB, Visa ou Mastercard."
+msgstr "Ce type de carte n'est pas accepté avec ce mode de paiement. Merci d'utiliser une carte Visa ou Mastercard."
 
 msgid "payplug_hosted_fields_missing_token"
 msgstr "Nous n'avons pas pu récupérer les informations de votre carte. Merci de réessayer."
