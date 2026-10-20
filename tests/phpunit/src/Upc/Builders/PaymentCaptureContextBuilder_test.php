@@ -165,7 +165,6 @@ class PaymentCaptureContextBuilder_test extends TestCase
             'lowercase visa' => ['visa'],
             'uppercase VISA' => ['VISA'],
             'mixed-case Mastercard' => ['Mastercard'],
-            'CB' => ['CB'],
         ];
     }
 
@@ -186,6 +185,8 @@ class PaymentCaptureContextBuilder_test extends TestCase
     {
         return [
             'unknown brand' => ['AMEX'],
+            'CB, only accepted in EUR' => ['CB'],
+            'lowercase cb' => ['cb'],
             'reflected markup' => ['<script>alert(1)</script>'],
             'empty string' => [''],
         ];
@@ -202,5 +203,24 @@ class PaymentCaptureContextBuilder_test extends TestCase
         $dto = (new PaymentCaptureContextBuilder())->build($this->order, 'hf_token_123', $brand, false);
 
         $this->assertSame('', $dto->paymentMethod['details']['selectedBrand']);
+    }
+
+    /**
+     * @dataProvider provideAllowedBrands
+     */
+    public function testIsAllowedBrandAcceptsVisaAndMastercard(string $brand): void
+    {
+        $this->assertTrue(PaymentCaptureContextBuilder::is_allowed_brand($brand));
+    }
+
+    /**
+     * PRE-3746: CB is only accepted in EUR and UHF only handles non-EUR carts - HostedFieldsPaymentProcessor
+     * refuses the payment with the unsupported-brand message when this returns false.
+     *
+     * @dataProvider provideDisallowedBrands
+     */
+    public function testIsAllowedBrandRejectsEverythingElse(string $brand): void
+    {
+        $this->assertFalse(PaymentCaptureContextBuilder::is_allowed_brand($brand));
     }
 }

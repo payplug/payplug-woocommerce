@@ -7,7 +7,10 @@ var HostedFields = {
 		fieldsInvalid: { cardHolder: true, pan: true, exp: true, cvv: true },
 		fieldsEmpty: { cardHolder: true, pan: true, exp: true, cvv: true },
 	},
-	ALLOWED_BRANDS: ['CB', 'VISA', 'MASTERCARD'],
+	// Keep in sync with ALLOWED_BRANDS in resources/js/frontend/wc-payplug-hostedFields-blocks.js
+	// and PaymentCaptureContextBuilder::ALLOWED_BRANDS (server side). No CB: UHF only handles
+	// non-EUR carts, where CB isn't accepted.
+	ALLOWED_BRANDS: ['VISA', 'MASTERCARD'],
 	CARDHOLDER_PATTERN: /^[A-Za-zÀ-ÖØ-öø-ÿ' .-]{2,}$/,
 	form: function () {
 		if (jQuery('form.woocommerce-checkout').length) {
