@@ -180,6 +180,18 @@ class HostedFieldsPaymentProcessor
                 return (new PaymentCaptureOutcomeApplier())->apply($order, $output);
             }
 
+            // Server-side twin of the client-side brand check (e.g. a CB card, refused on a non-EUR
+            // cart): a forged or stale POST must get the same message, not a payment sent with an
+            // emptied brand. Only checked here, once a new payment is really about to be created, so
+            // the guards above (terminal order, lock, in-flight 3DS attempt) keep answering first.
+            if (!PaymentCaptureContextBuilder::is_allowed_brand($selected_brand)) {
+                // Logged, or support would only see an order stuck in pending.
+                PayplugGateway::log(sprintf('UHF payment refused for order #%s: brand "%s" not allowed.', $order_id, $selected_brand), 'error');
+                wc_add_notice(__('payplug_hosted_fields_unsupported_brand_error', 'payplug'), 'error');
+
+                return ['result' => 'failure'];
+            }
+
             $dto = (new PaymentCaptureContextBuilder())->build($order, $hf_token, $selected_brand, $save_card, $cardholder);
             $output = (new UnifiedApiPaymentServiceFactory())->create()->createPayment($dto);
 

@@ -839,6 +839,145 @@ class PayplugCreditCard_test extends TestCase
         $this->assertStringNotContainsString('(', $note);
     }
 
+    /**
+     * @return string[][]
+     */
+    public function provide_brands_refused_by_uhf(): array
+    {
+        return [
+            'CB, only accepted in EUR' => ['CB'],
+            'lowercase cb' => ['cb'],
+            'unknown brand' => ['AMEX'],
+            'no brand posted' => [''],
+        ];
+    }
+
+    /**
+     * PRE-3746: UHF only handles non-EUR carts, where CB isn't accepted - a forged or stale POST
+     * carrying a disallowed brand must be refused with the same message as the client-side
+     * check, without ever calling the API, and without keeping the order locked.
+     *
+     * @dataProvider provide_brands_refused_by_uhf
+     */
+    public function test_process_payment_refuses_a_disallowed_brand_without_calling_the_api(string $brand): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['embedded_mode'] = 'hosted_fields';
+        $settings['debug'] = true;
+        update_option('woocommerce_payplug_settings', $settings);
+
+        // Same valid-total gotcha as above.
+        $order = wc_create_order();
+        $order->set_total(50.00);
+        $order->save();
+
+        $http_calls = [];
+        add_filter('pre_http_request', function ($preempt, $args, $url) use (&$http_calls) {
+            $http_calls[] = $url;
+
+            return new \WP_Error('http_request_blocked', 'No HTTP call expected in this test.');
+        }, 10, 3);
+
+        // Support only sees an order stuck in pending otherwise: the refusal must leave a trace.
+        $logged = [];
+        $capture_log = function ($message, $level, $context) use (&$logged) {
+            if ('payplug_gateway' === ($context['source'] ?? '')) {
+                $logged[] = [$level, $message];
+            }
+
+            return $message;
+        };
+        add_filter('woocommerce_logger_log_message', $capture_log, 10, 3);
+
+        $_POST['hf_token'] = 'hf_token_123';
+        $_POST['hf_selected_brand'] = $brand;
+
+        $result = (new PayplugCreditCard())->process_payment($order->get_id());
+
+        $this->assertSame('failure', $result['result']);
+        $this->assertLastErrorNotice('payplug_hosted_fields_unsupported_brand_error');
+        $this->assertSame([], $http_calls, 'No payment must be created.');
+        $this->assertSame('', wc_get_order($order->get_id())->get_meta('_payplug_upc_operation_id'));
+        $this->assertContains(
+            ['error', sprintf('UHF payment refused for order #%s: brand "%s" not allowed.', $order->get_id(), $brand)],
+            $logged
+        );
+
+        $lock_key = 'payplug_upc_process_payment_' . $order->get_id();
+        $lock = new WooCommerceLock();
+        $this->assertTrue($lock->acquire($lock_key, 30), 'The refusal must release the order lock.');
+        $lock->release($lock_key);
+
+        remove_filter('woocommerce_logger_log_message', $capture_log, 10);
+        wc_clear_notices();
+        unset($_POST['hf_token'], $_POST['hf_selected_brand']);
+        wp_delete_post($order->get_id(), true);
+    }
+
+    /**
+     * @return string[][]
+     */
+    public function provide_brands_accepted_by_uhf(): array
+    {
+        return [
+            'VISA' => ['VISA'],
+            'MASTERCARD' => ['MASTERCARD'],
+        ];
+    }
+
+    /**
+     * PRE-3746: the nominal path of the brand check - an allowed brand must get past it and reach
+     * the payment creation call, with the brand relayed as-is. The payment endpoint answers a 500
+     * here, so the flow then ends in the generic API-failure branch.
+     *
+     * @dataProvider provide_brands_accepted_by_uhf
+     */
+    public function test_process_payment_sends_an_allowed_brand_to_the_payment_creation_call(string $brand): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['embedded_mode'] = 'hosted_fields';
+        $settings['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] = 'acc_test_123';
+        update_option('woocommerce_payplug_settings', $settings);
+
+        // Same valid-total gotcha as above.
+        $order = wc_create_order();
+        $order->set_currency('USD');
+        $order->set_total(50.00);
+        $order->save();
+
+        $payment_requests = [];
+        add_filter('pre_http_request', function ($preempt, $args, $url) use (&$payment_requests) {
+            if (false !== strpos($url, '/oauth2/token')) {
+                return [
+                    'response' => ['code' => 200, 'message' => 'OK'],
+                    'body' => json_encode(['access_token' => 'test_token', 'expires_in' => 3600, 'token_type' => 'Bearer']),
+                    'headers' => [],
+                    'cookies' => [],
+                ];
+            }
+
+            $payment_requests[] = json_decode((string) ($args['body'] ?? ''), true);
+
+            return ['response' => ['code' => 500, 'message' => 'Error'], 'body' => '', 'headers' => [], 'cookies' => []];
+        }, 10, 3);
+
+        $_POST['hf_token'] = 'hf_token_123';
+        $_POST['hf_selected_brand'] = $brand;
+
+        $result = (new PayplugCreditCard())->process_payment($order->get_id());
+
+        $this->assertCount(1, $payment_requests, 'The payment creation call must be reached.');
+        $this->assertSame($brand, $payment_requests[0]['paymentMethod']['details']['selectedBrand'] ?? null);
+        $this->assertSame('failure', $result['result']);
+        $this->assertLastErrorNotice('payplug_hosted_fields_tokenization_error');
+
+        wc_clear_notices();
+        unset($_POST['hf_token'], $_POST['hf_selected_brand']);
+        wp_delete_post($order->get_id(), true);
+    }
+
     private function assertLastErrorNotice(string $msgid): void
     {
         $notices = wc_get_notices('error');

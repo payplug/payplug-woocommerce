@@ -14,8 +14,20 @@ class PaymentCaptureContextBuilder
      * re-asserted here because Front\UpcCheckoutReturn::render_upc_3ds_redirect() echoes the Unified
      * API's challenge HTML unescaped on the shop's own origin, and selectedBrand reaches that API
      * call with nothing but sanitize_text_field() applied to raw checkout POST data.
+     *
+     * Keep the three lists in sync.
+     *
+     * No CB: it is only accepted in EUR, and UHF only ever handles non-EUR carts (a EUR shop is
+     * never in hosted_fields mode, see PayplugCreditCard's constructor).
      */
-    private const ALLOWED_BRANDS = ['CB', 'VISA', 'MASTERCARD'];
+    private const ALLOWED_BRANDS = ['VISA', 'MASTERCARD'];
+
+    public static function is_allowed_brand(string $selectedBrand): bool
+    {
+        // Case-insensitive so an already-valid value's own casing is preserved verbatim
+        // (the client sends it uppercased, but nothing here requires that).
+        return in_array(strtoupper($selectedBrand), self::ALLOWED_BRANDS, true);
+    }
 
     /**
      * @param string $cardholder the name typed in the card form's cardholder field - the billing
@@ -23,9 +35,9 @@ class PaymentCaptureContextBuilder
      */
     public function build(\WC_Order $order, string $hfToken, string $selectedBrand, bool $saveCard, string $cardholder = ''): HostedFieldDto
     {
-        if (!in_array(strtoupper($selectedBrand), self::ALLOWED_BRANDS, true)) {
-            // Case-insensitive so an already-valid value's own casing is preserved verbatim
-            // (the client sends it uppercased, but nothing here requires that).
+        if (!self::is_allowed_brand($selectedBrand)) {
+            // Defense in depth: HostedFieldsPaymentProcessor already refuses a disallowed brand
+            // before calling build(), but this builder must stay safe for any other caller.
             $selectedBrand = '';
         }
 

@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
-const ALLOWED_BRANDS = ['CB', 'VISA', 'MASTERCARD'];
+// Keep in sync with HostedFields.ALLOWED_BRANDS in assets/js/payplug-hosted-fields.js and
+// PaymentCaptureContextBuilder::ALLOWED_BRANDS (server side). No CB: UHF only handles non-EUR
+// carts, where CB isn't accepted.
+const ALLOWED_BRANDS = ['VISA', 'MASTERCARD'];
 const CARDHOLDER_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ' .-]{2,}$/;
 const FIELDS = ['cardHolder', 'pan', 'exp', 'cvv'];
 
