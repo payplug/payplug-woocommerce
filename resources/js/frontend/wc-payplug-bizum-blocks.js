@@ -2,11 +2,11 @@ import { __ } from '@wordpress/i18n';
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
+import { isEligible } from './helper/wc-payplug-ppro-eligibility';
 
 const settings = getSetting( 'bizum_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
 const label = decodeEntities( settings?.title ) || defaultLabel;
-const allowed_country_codes = settings?.allowed_country_codes;
 
 /**
  * Content component
@@ -41,13 +41,7 @@ const Bizum = {
 	label: <Label />,
 	content: <Content />,
 	edit: <Content />,
-	canMakePayment: data => {
-		if (allowed_country_codes.includes(data.billingData.country)) {
-			return true;
-		} else {
-			return false;
-		}
-	},
+	canMakePayment: ( data ) => isEligible( settings.ppro_restrictions, data ),
 	ariaLabel: label,
 	supports: {
 		features: settings.supports,

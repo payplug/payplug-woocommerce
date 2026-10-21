@@ -13,6 +13,7 @@ use Payplug\Exception\HttpException;
 use Payplug\Payplug;
 use Payplug\PayplugWoocommerce\Helper\Lock;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Service\ApmEligibility;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
@@ -1343,6 +1344,9 @@ class PayplugGateway extends WC_Payment_Gateway_CC
         if (!empty(WC()->cart) && isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id) {
             $order_amount = $this->get_order_total();
             foreach ($gateways[$this->id]->settings['payment_methods']['permissions'] as $key => &$permission) {
+                if (ApmEligibility::is_restricted_apm($key)) {
+                    continue;
+                }
                 $method_amounts = json_decode($permission['amounts'], true);
                 if ($order_amount < $method_amounts['min']['EUR'] / 100 || $order_amount > $method_amounts['max']['EUR'] / 100) {
                     unset($gateways[$key]);

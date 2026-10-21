@@ -2,6 +2,10 @@
 
 namespace Payplug\PayplugWoocommerce\Admin;
 
+use Payplug\PayplugWoocommerce\Service\ApmAmountsSave;
+use Payplug\PayplugWoocommerce\Service\ApmCountriesSave;
+use Payplug\PayplugWoocommerce\Service\ApmEligibility;
+
 class Validator
 {
     public static function enabled($value)
@@ -168,40 +172,79 @@ class Validator
     }
 
     /**
-     * Reject Scalapay min/max amounts (cents) that are inconsistent, or that widen beyond
-     * what the PayPlug account currently authorizes (also in cents). The merchant can only
-     * narrow the account's range, never widen it.
+     * Validate the min/max amounts posted for a PPRO payment method; an invalid value aborts the
+     * whole save with an explicit message.
      *
-     * @param $min
-     * @param $max
-     * @param $account_min
-     * @param $account_max
+     * @param mixed $min euros, null when not posted
+     * @param mixed $max euros, null when not posted
+     * @param int $api_min cents
+     * @param int $api_max cents
      *
-     * @return array{min: int, max: int}
+     * @return array|null cents to store ({} = none), null when the amounts were not posted
      */
-    public static function scalapay_thresholds($min, $max, $account_min, $account_max)
+    public static function apm_amounts(string $apm, $min, $max, int $api_min, int $api_max)
     {
-        if ($min > $max) {
-            http_response_code(200);
-            wp_send_json_error([
-                'msg' => __('payplug_thresholds_scalapay_error_mintext_msg', 'payplug'),
-                'class' => 'error',
-                'title' => __('payplug_thresholds_scalapay_error_title', 'payplug'),
-                'close' => __('payplug_ok', 'payplug'),
-            ]);
+        $result = ApmAmountsSave::parse($min, $max, $api_min, $api_max);
+        if ($result['skip']) {
+            return null;
         }
 
-        if ($min < $account_min || $max > $account_max) {
-            http_response_code(200);
-            wp_send_json_error([
-                'msg' => __('payplug_thresholds_scalapay_error_msg', 'payplug'),
-                'class' => 'error',
-                'title' => __('payplug_thresholds_scalapay_error_title', 'payplug'),
-                'close' => __('payplug_ok', 'payplug'),
-            ]);
+        if (null !== $result['error']) {
+            $brand = ApmEligibility::brand($apm);
+            switch ($result['error']) {
+                case 'out_of_bounds':
+                    $message = sprintf(__('payplug_apm_amount_out_of_bounds_error', 'payplug'), $brand, ApmAmountsSave::euros($api_min), ApmAmountsSave::euros($api_max));
+                    break;
+                case 'max_gt_min':
+                    $message = sprintf(__('payplug_apm_amount_max_gt_min_error', 'payplug'), $brand);
+                    break;
+                default:
+                    $message = sprintf(__('payplug_apm_amount_invalid_error', 'payplug'), $brand);
+                    break;
+            }
+            self::apm_error($message);
         }
 
-        return ['min' => $min, 'max' => $max];
+        return $result['store'];
+    }
+
+    /**
+     * Validate the billing countries posted for a PPRO payment method; a country that cannot be
+     * proposed aborts the whole save.
+     *
+     * @param mixed $submitted posted <apm>_countries
+     * @param string[]|null $stored null = no restriction stored
+     * @param string[]|null $api_countries null = ALL
+     * @param string[] $shop_countries
+     *
+     * @return string|null value to store ('' = no restriction), null to keep the stored one
+     */
+    public static function apm_countries(string $apm, $submitted, ?array $stored, ?array $api_countries, array $shop_countries)
+    {
+        $proposable = ApmCountriesSave::proposable($api_countries, $shop_countries);
+        $result = is_array($submitted)
+            ? ApmCountriesSave::normalise($stored, $submitted, $proposable, $api_countries, $shop_countries)
+            : ['skip' => false, 'error' => 'country_invalid', 'value' => null];
+
+        if (null !== $result['error']) {
+            self::apm_error(sprintf(__('payplug_apm_country_invalid_error', 'payplug'), ApmEligibility::brand($apm)));
+        }
+        if ($result['skip']) {
+            return null;
+        }
+
+        return null === $result['value'] ? '' : json_encode($result['value']);
+    }
+
+    private static function apm_error(string $message): void
+    {
+        http_response_code(200);
+        wp_send_json_error([
+            'msg' => $message,
+            'class' => 'error',
+            'title' => null,
+            'close' => __('payplug_ok', 'payplug'),
+        ]);
     }
 
     public static function oney_product_animation($status)

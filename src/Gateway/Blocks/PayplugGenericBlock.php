@@ -4,6 +4,8 @@ namespace Payplug\PayplugWoocommerce\Gateway\Blocks;
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Service\ApmEligibility;
+use Payplug\PayplugWoocommerce\Service\ApmSettings;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
 class PayplugGenericBlock extends AbstractPaymentMethodType
@@ -34,6 +36,10 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
                     return false;
                 }
 
+                if (ApmEligibility::is_restricted_apm($this->name)) {
+                    return $this->ppro_block_active();
+                }
+
                 $active = false;
                 if (method_exists($this->gateway, 'is_available')) {
                     $active = $this->gateway->is_available();
@@ -46,6 +52,34 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
                 return $active && $this->gateway->check_gateway(WC()->payment_gateways->payment_gateways());
             }
         }
+    }
+
+    /**
+     * Cart and billing country independent: the checkout script re-evaluates them with ppro_restrictions.
+     */
+    protected function ppro_block_active(): bool
+    {
+        return method_exists($this->gateway, 'is_available') && (bool) $this->gateway->is_available();
+    }
+
+    /**
+     * Effective limits of a PPRO payment method, as of the page load.
+     *
+     * @return array{min: int, max: int, countries: string[]|null, currency: string, ok: bool}
+     */
+    protected function ppro_restrictions(): array
+    {
+        $options = $this->get_service('configuration')->get_options();
+        $config = ApmSettings::config_for(is_array($options) ? $options : [], $this->name);
+        $amounts = ApmEligibility::effective_amounts($config['limits'], $config['custom_amounts']);
+
+        return [
+            'min' => null === $amounts ? 0 : $amounts['min'],
+            'max' => null === $amounts ? 0 : $amounts['max'],
+            'countries' => ApmEligibility::effective_countries($config['limits'], $config['custom_countries']),
+            'currency' => ApmEligibility::CURRENCY,
+            'ok' => null !== $amounts && $amounts['min'] < $amounts['max'],
+        ];
     }
 
     /**
@@ -97,8 +131,11 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
      */
     public function get_payment_method_data()
     {
-        $account = PayplugWoocommerceHelper::generic_get_account_data_from_options($this->name);
-        $this->allowed_country_codes = !empty($account['payment_methods'][$this->name]['allowed_countries']) ? $account['payment_methods'][$this->name]['allowed_countries'] : null;
+        $restricted = ApmEligibility::is_restricted_apm($this->name);
+        if (!$restricted) {
+            $account = PayplugWoocommerceHelper::generic_get_account_data_from_options($this->name);
+            $this->allowed_country_codes = !empty($account['payment_methods'][$this->name]['allowed_countries']) ? $account['payment_methods'][$this->name]['allowed_countries'] : null;
+        }
 
         // Only show saved cards when order amount is between min and max allowed values
         $cart_total = WC()->cart ? WC()->cart->get_total('') : 0;
@@ -110,14 +147,21 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
             && $cart_total_cents >= $min_amount
             && $cart_total_cents <= $max_amount;
 
-        return [
+        $data = [
             'enabled' => $this->is_active(),
             'name' => $this->gateway->id,
             'title' => $this->gateway->title,
             'description' => $this->gateway->description,
-            'allowed_country_codes' => $this->allowed_country_codes,
             'save_card' => $save_card,
             'wp_nonce' => wp_create_nonce('woocommerce-process_checkout'),
         ];
+
+        if ($restricted) {
+            $data['ppro_restrictions'] = $this->ppro_restrictions();
+        } else {
+            $data['allowed_country_codes'] = $this->allowed_country_codes;
+        }
+
+        return $data;
     }
 }
