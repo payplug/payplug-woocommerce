@@ -371,17 +371,13 @@ class Vue
                 (new PaymentMethods($this->options))->payment_method_standard(),
                 PaymentMethods::payment_method_amex($payment_configuration['american_express']['active']),
                 PaymentMethods::payment_method_applepay($payment_configuration['apple_pay']['active'], $this->options, $carriers),
-                PaymentMethods::payment_method_bancontact($payment_configuration['bancontact']['active']),
-                PaymentMethods::payment_method_satispay($payment_configuration['satispay']['active']),
-                PaymentMethods::payment_method_mybank($payment_configuration['mybank']['active']),
-                PaymentMethods::payment_method_ideal($payment_configuration['ideal']['active']),
-                PaymentMethods::payment_method_wero($payment_configuration['wero']['active']),
-                PaymentMethods::payment_method_bizum($payment_configuration['bizum']['active']),
-                PaymentMethods::payment_method_scalapay(
-                    $payment_configuration['scalapay']['active'],
-                    $payment_configuration['scalapay'],
-                    $this->options['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
-                ),
+                PaymentMethods::payment_method_bancontact($payment_configuration['bancontact']['active'], $this->options),
+                PaymentMethods::payment_method_satispay($payment_configuration['satispay']['active'], $this->options),
+                PaymentMethods::payment_method_mybank($payment_configuration['mybank']['active'], $this->options),
+                PaymentMethods::payment_method_ideal($payment_configuration['ideal']['active'], $this->options),
+                PaymentMethods::payment_method_wero($payment_configuration['wero']['active'], $this->options),
+                PaymentMethods::payment_method_bizum($payment_configuration['bizum']['active'], $this->options),
+                PaymentMethods::payment_method_scalapay($payment_configuration['scalapay']['active'], $this->options),
             ],
         ];
 

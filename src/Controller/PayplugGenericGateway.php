@@ -8,6 +8,9 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Interfaces\PayplugGatewayBuilder;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Service\ApmCheckoutContext;
+use Payplug\PayplugWoocommerce\Service\ApmEligibility;
+use Payplug\PayplugWoocommerce\Service\ApmSettings;
 use Payplug\Resource\Payment as PaymentResource;
 use Payplug\Resource\Refund as RefundResource;
 
@@ -23,10 +26,75 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
      */
     protected $allowed_country_codes;
 
+    /**
+     * @var bool[] payment method ids already logged, one warning per request
+     */
+    private static $inconsistent_bounds_logged = [];
+
     public function __construct()
     {
         parent::__construct();
         add_action('woocommerce_after_order_itemmeta', [$this, 'hide_wc_refund_button'], 10, 3);
+        add_action('woocommerce_after_checkout_validation', [$this, 'validate_apm_checkout'], 10, 2);
+    }
+
+    /**
+     * Classic checkout: refuse a PPRO payment method that is not eligible for the posted billing
+     * country and the cart, before the order is created.
+     *
+     * @param array $data posted checkout data
+     * @param \WP_Error|null $errors
+     *
+     * @throws \Exception
+     */
+    public function validate_apm_checkout($data, $errors = null): void
+    {
+        if (!ApmEligibility::is_restricted_apm($this->id) || !is_array($data) || ($data['payment_method'] ?? '') !== $this->id) {
+            return;
+        }
+
+        $context = ApmCheckoutContext::current();
+        if (null === $context) {
+            return;
+        }
+        if (isset($data['billing_country'])) {
+            $context['country'] = (string) $data['billing_country'];
+        }
+
+        if (null === $this->apm_not_eligible_reason($context)) {
+            return;
+        }
+
+        if ($errors instanceof \WP_Error) {
+            $errors->add('payment', __('payplug_apm_not_eligible_error', 'payplug'));
+
+            return;
+        }
+
+        throw new \Exception(__('payplug_apm_not_eligible_error', 'payplug'));
+    }
+
+    /**
+     * Refuse to create the payment of a PPRO order that is not eligible (amount, currency, billing country).
+     *
+     * @param \WC_Order $order
+     *
+     * @throws \Exception
+     */
+    protected function assert_apm_order_eligible($order): void
+    {
+        if (!ApmEligibility::is_restricted_apm($this->id) || !$order instanceof \WC_Order) {
+            return;
+        }
+
+        $reason = $this->apm_not_eligible_reason(ApmCheckoutContext::from_order($order));
+        if (null === $reason) {
+            return;
+        }
+
+        PayplugGateway::log(sprintf('Payment creation refused for order #%s: %s not eligible (%s)', $order->get_id(), $this->id, $reason), 'warning');
+
+        throw new \Exception(__('payplug_apm_not_eligible_error', 'payplug'));
     }
 
     /**
@@ -69,12 +137,21 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
             return false;
         }
 
-        // todo: delete this usage to avoid call to getAccount resource each checkout loading
-        $account = PayplugWoocommerceHelper::generic_get_account_data_from_options($this->id);
         $options = PayplugWoocommerceHelper::get_payplug_options();
+        $restricted = ApmEligibility::is_restricted_apm($this->id);
 
-        if (!$this->check_api_gateway_enable($account)) {
-            return false;
+        if ($restricted) {
+            // Amount and billing country are checked by check_gateway(), on every checkout update.
+            if (null === ApmSettings::config_for(is_array($options) ? $options : [], $this->id)['limits']) {
+                return false;
+            }
+            $account = null;
+        } else {
+            // todo: delete this usage to avoid call to getAccount resource each checkout loading
+            $account = PayplugWoocommerceHelper::generic_get_account_data_from_options($this->id);
+            if (!$this->check_api_gateway_enable($account)) {
+                return false;
+            }
         }
 
         if (!isset($options['payment_methods']) || empty($options['payment_methods'])) {
@@ -108,6 +185,10 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
                 }
             }
 
+            if ($restricted) {
+                return true;
+            }
+
             $source_before_fallback = $country_code_billing;
             if (empty($country_code_billing)) {
                 $country_code_billing = method_exists(WC()->customer, 'get_billing_country') ? WC()->customer->get_billing_country() : null;
@@ -121,6 +202,57 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
         }
 
         return true;
+    }
+
+    /**
+     * Remove a PPRO payment method that is not eligible for the current cart or order-pay order.
+     *
+     * @param array $gateways
+     *
+     * @return array
+     */
+    public function check_gateway($gateways)
+    {
+        $gateways = parent::check_gateway($gateways);
+
+        if (!ApmEligibility::is_restricted_apm($this->id) || !isset($gateways[$this->id])) {
+            return $gateways;
+        }
+
+        $context = ApmCheckoutContext::current();
+        if (null === $context) {
+            return $gateways;
+        }
+
+        $reason = $this->apm_not_eligible_reason($context);
+        if (null !== $reason) {
+            unset($gateways[$this->id]);
+        }
+
+        return $gateways;
+    }
+
+    /**
+     * @param array{amount: int, currency: string, country: string} $context
+     *
+     * @return string|null ApmEligibility::reason_not_eligible() code
+     */
+    protected function apm_not_eligible_reason(array $context)
+    {
+        $options = PayplugWoocommerceHelper::get_payplug_options();
+        $reason = ApmEligibility::reason_not_eligible(
+            ApmSettings::config_for(is_array($options) ? $options : [], $this->id),
+            $context['amount'],
+            $context['currency'],
+            $context['country']
+        );
+
+        if ('inconsistent_bounds' === $reason && empty(self::$inconsistent_bounds_logged[$this->id])) {
+            self::$inconsistent_bounds_logged[$this->id] = true;
+            PayplugGateway::log(sprintf('%s hidden: the effective minimum amount is not below the maximum', $this->id), 'warning');
+        }
+
+        return $reason;
     }
 
     /**
@@ -263,6 +395,8 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
     public function process_standard_payment($order, $amount, $customer_id)
     {
+        $this->assert_apm_order_eligible($order);
+
         $intent = $this->process_standard_intent_payment($order);
         if (!empty($intent)) {
             return $intent;

@@ -1221,9 +1221,6 @@ msgstr "La visualizzazione del pagamento integrato è compatibile solo con una p
 msgid "payment_method"
 msgstr "Metodo di pagamento"
 
-msgid "payplug_payment_gateways_country_permissions"
-msgstr "%s è disponibile solo per i clienti con indirizzo di fatturazione in : "
-
 msgid "oney_financing_cost"
 msgstr "Di cui una commissione :"
 
@@ -1304,25 +1301,106 @@ msgstr "Nuova modalità di accesso in fase di rilascio progressivo. L’accesso 
 msgid "payplug_section_oauth_login_title"
 msgstr "Accesso via OAuth2 (nuovo)"
 
-msgid "payplug_thresholds_scalapay_title"
-msgstr "Personalizza i limiti di importo di Scalapay"
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_title"
+msgstr "Paesi di fatturazione"
 
-msgid "payplug_thresholds_scalapay_description"
-msgstr "Mostra Scalapay al checkout solo per un carrello compreso tra"
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_description"
+msgstr "Il metodo di pagamento viene mostrato solo ai clienti il cui indirizzo di fatturazione si trova in uno dei paesi selezionati."
 
-msgid "payplug_thresholds_scalapay_error_msg"
-msgstr "L'importo deve rientrare nei limiti autorizzati da PayPlug."
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_help"
+msgstr "Vengono proposti solo i paesi attivati nel tuo negozio e accettati da %s."
 
-msgid "payplug_thresholds_scalapay_error_maxtext_msg"
-msgstr "Attenzione, l'importo massimo inserito è inferiore all'importo minimo inserito."
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_empty"
+msgstr "%1$s non è accettato in nessuno dei paesi attivati nel tuo negozio. Per proporlo ai tuoi clienti, attiva almeno uno di questi paesi nel tuo negozio: %2$s."
 
-msgid "payplug_thresholds_scalapay_error_mintext_msg"
-msgstr "Attenzione, l'importo minimo inserito è superiore all'importo massimo inserito."
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_removed"
+msgstr "Questi paesi erano selezionati ma non sono più disponibili per questo metodo di pagamento: %s. Verranno rimossi dalla tua selezione al prossimo salvataggio."
 
-msgid "payplug_thresholds_scalapay_error_title"
-msgstr "Limiti di importo Scalapay non validi"
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_warning"
+msgstr "Nessun paese selezionato: questo metodo di pagamento non verrà proposto a nessun cliente."
 
-#: src/Gateway/PPRO/Scalapay.php:78
-#, php-format
-msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
-msgstr "L'importo totale dell'ordine deve essere compreso tra %s€ e %s€ per pagare tramite Scalapay."
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_search"
+msgstr "Cerca un paese..."
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_select_all"
+msgstr "Seleziona tutto"
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_unselect_all"
+msgstr "Deseleziona tutto"
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_all"
+msgstr "Tutti i paesi (%s)"
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_selected"
+msgstr "%1$s paesi selezionati su %2$s"
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_none"
+msgstr "Nessun paese selezionato"
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_no_match"
+msgstr "Nessun paese corrisponde a «%s»"
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_remove"
+msgstr "Rimuovi %s"
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_title"
+msgstr "Importo del carrello"
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_description"
+msgstr "Il metodo di pagamento viene mostrato solo se l'importo del carrello è compreso tra questi due valori."
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_min"
+msgstr "Minimo"
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_max"
+msgstr "Massimo"
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_error_text"
+msgstr "L'importo deve essere compreso tra %s€ e %s€."
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_error_maxtext"
+msgstr "Il massimo deve essere superiore al minimo."
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_error_mintext"
+msgstr "Il minimo deve essere inferiore al massimo."
+
+#: src/Admin/Validator.php
+msgid "payplug_apm_amount_out_of_bounds_error"
+msgstr "Impossibile salvare la configurazione. Gli importi %1$s devono essere compresi tra %2$s€ e %3$s€, i limiti autorizzati dal tuo account Payplug."
+
+#: src/Admin/Validator.php
+msgid "payplug_apm_amount_max_gt_min_error"
+msgstr "Impossibile salvare la configurazione. L'importo massimo di %s deve essere superiore all'importo minimo."
+
+#: src/Admin/Validator.php
+msgid "payplug_apm_amount_invalid_error"
+msgstr "Impossibile salvare la configurazione. Gli importi %s devono essere numeri positivi."
+
+#: src/Admin/Validator.php
+msgid "payplug_apm_country_invalid_error"
+msgstr "Impossibile salvare la configurazione. I paesi %s devono essere scelti tra quelli autorizzati dal tuo account Payplug."
+
+#: src/Controller/PayplugGenericGateway.php
+msgid "payplug_apm_not_eligible_error"
+msgstr "Questo metodo di pagamento non è disponibile per il tuo ordine. Scegli un altro metodo di pagamento."

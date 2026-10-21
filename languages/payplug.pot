@@ -940,25 +940,106 @@ msgstr "Pay with Bizum"
 msgid "pay_with_scalapay"
 msgstr "Pay with Scalapay"
 
-msgid "payplug_thresholds_scalapay_title"
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_title"
 msgstr ""
 
-msgid "payplug_thresholds_scalapay_description"
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_description"
 msgstr ""
 
-msgid "payplug_thresholds_scalapay_error_msg"
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_help"
 msgstr ""
 
-msgid "payplug_thresholds_scalapay_error_maxtext_msg"
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_empty"
 msgstr ""
 
-msgid "payplug_thresholds_scalapay_error_mintext_msg"
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_removed"
 msgstr ""
 
-msgid "payplug_thresholds_scalapay_error_title"
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_warning"
 msgstr ""
 
-#: src/Gateway/PPRO/Scalapay.php:78
-#, php-format
-msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_search"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_select_all"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_unselect_all"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_all"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_selected"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_none"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_no_match"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_countries_remove"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_title"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_description"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_min"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_max"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_error_text"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_error_maxtext"
+msgstr ""
+
+#: src/Admin/Vue/ApmRestrictionsBlock.php
+msgid "payplug_apm_thresholds_error_mintext"
+msgstr ""
+
+#: src/Admin/Validator.php
+msgid "payplug_apm_amount_out_of_bounds_error"
+msgstr ""
+
+#: src/Admin/Validator.php
+msgid "payplug_apm_amount_max_gt_min_error"
+msgstr ""
+
+#: src/Admin/Validator.php
+msgid "payplug_apm_amount_invalid_error"
+msgstr ""
+
+#: src/Admin/Validator.php
+msgid "payplug_apm_country_invalid_error"
+msgstr ""
+
+#: src/Controller/PayplugGenericGateway.php
+msgid "payplug_apm_not_eligible_error"
 msgstr ""

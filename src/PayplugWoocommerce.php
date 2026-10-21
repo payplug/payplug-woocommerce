@@ -27,6 +27,7 @@ use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney4xWithoutFees;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugSatispay;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugScalapay;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugWero;
+use Payplug\PayplugWoocommerce\Service\ApmMigration;
 use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
@@ -230,8 +231,13 @@ class PayplugWoocommerce
         }
     }
 
-    private function check_upgrade()
+    private function check_upgrade(): void
     {
-        return $this->get_service('upgrade')->run_upgrade();
+        $this->get_service('upgrade')->run_upgrade();
+
+        // Its best-effort getAccount call must not run on a shopper request.
+        if (is_admin()) {
+            ApmMigration::create()->run();
+        }
     }
 }
