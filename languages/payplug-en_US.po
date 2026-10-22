@@ -710,3 +710,13 @@ msgstr "Please note that the minimum amount entered is greater than the maximum 
 
 msgid "payplug_thresholds_scalapay_error_title"
 msgstr "Invalid Scalapay amount limits"
+
+#: src/PayplugWoocommerceRequest.php:483
+#, php-format
+msgid "Payplug payment %1$s failed (%2$s: %3$s)."
+msgstr "Payplug payment %1$s failed (%2$s: %3$s)."
+
+#: src/PayplugWoocommerceRequest.php:484
+#, php-format
+msgid "Payplug payment %s was not completed."
+msgstr "Payplug payment %s was not completed."

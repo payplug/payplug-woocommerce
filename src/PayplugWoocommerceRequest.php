@@ -479,7 +479,10 @@ class PayplugWoocommerceRequest
         }
         $return_url = esc_url_raw($order->get_checkout_order_received_url());
         if ((isset($payment->failure)) && (!empty($payment->failure)) || ($payment->is_paid === false && is_null($payment->paid_at))) {
-            $order->update_status('failed', __('Order cancelled by customer.', 'woocommerce'));
+            $note = !empty($payment->failure)
+                ? sprintf(__('Payplug payment %1$s failed (%2$s: %3$s).', 'payplug'), wc_clean($payment->id), wc_clean($payment->failure->code), wc_clean($payment->failure->message))
+                : sprintf(__('Payplug payment %s was not completed.', 'payplug'), wc_clean($payment->id));
+            $order->update_status('failed', $note);
             wp_send_json_error(
                 [
                     'code' => isset($payment->failure->code) ? $payment->failure->code : 500,
