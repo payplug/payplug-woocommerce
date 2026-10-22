@@ -127,8 +127,12 @@ var IntegratedPayment = {
 					success: function (response) {
 						if (response.success === false) {
 							IntegratedPayment.form().unblock();
-							var error_messages = response.data.message || '';
-							IntegratedPayment.submit_error(error_messages);
+							var error_message = typeof response.data === 'string' ? response.data : (response.data && response.data.message) || '';
+							if (!error_message) {
+								error_message = payplug_integrated_payment_params.check_payment_error;
+							}
+							var escaped_message = jQuery('<div></div>').text(error_message).html();
+							IntegratedPayment.submit_error('<ul class="woocommerce-error" role="alert"><li>' + escaped_message + '</li></ul>');
 							jQuery(".payplug.IntegratedPayment_error.-payment").show();
 							IntegratedPayment.resetIntegratedForm();
 							return;
