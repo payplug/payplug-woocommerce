@@ -285,6 +285,23 @@ class PayplugWoocommerceRequest_test extends TestCase
         self::assertSame('failed', wc_get_order($order->get_id())->get_status());
     }
 
+    public function test_check_payment_with_a_3ds_declined_payment_fails_the_order_and_returns_the_code(): void
+    {
+        $order = $this->make_order(['transaction_id' => true]);
+        $this->own_in_session($order);
+        $this->request->payment = new FakePayment($order->get_transaction_id(), $order->get_id());
+        $this->request->payment->failure = (object) ['code' => '3ds_declined', 'message' => 'The 3DS authentication failed.'];
+        $_POST = ['payment_id' => $order->get_transaction_id()];
+
+        $response = $this->capture_ajax([$this->request, 'check_payment']);
+
+        self::assertFalse($response['body']['success']);
+        self::assertSame('3ds_declined', $response['body']['data']['code']);
+        self::assertSame('The 3DS authentication failed.', $response['body']['data']['message']);
+        self::assertSame(esc_url_raw($order->get_cancel_order_url_raw()), $response['body']['data']['cancel_url']);
+        self::assertSame('failed', wc_get_order($order->get_id())->get_status());
+    }
+
     public function paid_order_status_provider(): array
     {
         return [

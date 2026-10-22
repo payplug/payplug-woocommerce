@@ -125,21 +125,17 @@ var IntegratedPayment = {
 						IntegratedPayment.resetIntegratedForm();
 					},
 					success: function (response) {
-
-						//Exception made for SMP-1755
-						if (response.success === false && response.data.code !== "3ds_declined" ) {
+						if (response.success === false) {
 							IntegratedPayment.form().unblock();
 							var error_messages = response.data.message || '';
 							IntegratedPayment.submit_error(error_messages);
 							jQuery(".payplug.IntegratedPayment_error.-payment").show();
 							IntegratedPayment.resetIntegratedForm();
 							return;
-
-						} else {
-							jQuery(".payplug.IntegratedPayment_error.-payment").hide();
-							window.location.href = IntegratedPayment.props.return_url;
 						}
 
+						jQuery(".payplug.IntegratedPayment_error.-payment").hide();
+						window.location.href = IntegratedPayment.props.return_url;
 					}
 				});
 
