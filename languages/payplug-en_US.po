@@ -753,6 +753,9 @@ msgstr "The card was deleted."
 msgid "payplug_uhf_saved_cards_invalid_notice"
 msgstr "Invalid card."
 
+msgid "payplug_payment_currency_not_supported"
+msgstr "This payment method is not available for orders in this currency."
+
 #: src/PayplugWoocommerceRequest.php:485
 #, php-format
 msgid "Payplug payment %1$s failed (%2$s: %3$s)."

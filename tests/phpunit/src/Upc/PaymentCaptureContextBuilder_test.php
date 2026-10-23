@@ -54,6 +54,34 @@ class PaymentCaptureContextBuilder_test extends TestCase
         $this->assertSame('hf_token_123', $dto->hfToken);
     }
 
+    /**
+     * PRE-3727: the amount is sent in the minor units of the ORDER's currency - 1:1 for a
+     * zero-decimal currency, x100 for a 2-decimal one.
+     */
+    public function testBuildSendsAZeroDecimalOrderAmountAsIs(): void
+    {
+        $this->order->set_currency('JPY');
+        $this->order->set_total(1000);
+        $this->order->save();
+
+        $dto = (new PaymentCaptureContextBuilder())->build($this->order, 'hf_token_123', 'VISA', false);
+
+        $this->assertSame(1000, $dto->common->amount);
+        $this->assertSame('JPY', $dto->common->currency);
+    }
+
+    public function testBuildSendsATwoDecimalOrderAmountInCents(): void
+    {
+        $this->order->set_currency('EUR');
+        $this->order->set_total(1000);
+        $this->order->save();
+
+        $dto = (new PaymentCaptureContextBuilder())->build($this->order, 'hf_token_123', 'VISA', false);
+
+        $this->assertSame(100000, $dto->common->amount);
+        $this->assertSame('EUR', $dto->common->currency);
+    }
+
     public function testBuildSetsTheNotificationUrlToTheFixedIpnRoute(): void
     {
         $dto = (new PaymentCaptureContextBuilder())->build($this->order, 'hf_token_123', 'visa', false);

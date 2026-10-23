@@ -260,7 +260,7 @@ class Mcp
         // Prepare DTO parameters
         $dto_params = [
             'order_id' => $order->get_id(),
-            'amount' => PayplugWoocommerceHelper::get_payplug_amount($order_total),
+            'amount' => PayplugWoocommerceHelper::get_payplug_amount($order_total, $currency),
             'currency_iso_code' => $currency,
             'customer' => [
                 'identifier' => $customer['customer_id'],

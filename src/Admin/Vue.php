@@ -491,10 +491,11 @@ class Vue
         $default_amounts = json_decode($this->options['payment_methods']['configuration']['oney']['default_amounts'], true);
 
         // Convert cents
-        $min = AmountHelper::fromCents((int) $min);
-        $max = AmountHelper::fromCents((int) $max);
-        $default_amounts['min'] = AmountHelper::fromCents((int) $default_amounts['min']);
-        $default_amounts['max'] = AmountHelper::fromCents((int) $default_amounts['max']);
+        // Oney is Euro-only.
+        $min = AmountHelper::fromCents((int) $min, PayplugWoocommerceHelper::EURO_CURRENCY);
+        $max = AmountHelper::fromCents((int) $max, PayplugWoocommerceHelper::EURO_CURRENCY);
+        $default_amounts['min'] = AmountHelper::fromCents((int) $default_amounts['min'], PayplugWoocommerceHelper::EURO_CURRENCY);
+        $default_amounts['max'] = AmountHelper::fromCents((int) $default_amounts['max'], PayplugWoocommerceHelper::EURO_CURRENCY);
         //
 
         $thresholds = [

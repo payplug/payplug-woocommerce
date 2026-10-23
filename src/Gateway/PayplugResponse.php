@@ -286,7 +286,7 @@ class PayplugResponse
         }
 
         $refund = wc_create_refund([
-            'amount' => AmountHelper::fromCents((int) $resource->amount),
+            'amount' => AmountHelper::fromCents((int) $resource->amount, $order->get_currency()),
             'reason' => isset($resource->metadata['reason']) ? $resource->metadata['reason'] : null,
             'order_id' => (int) $order_id,
             'refund_id' => 0,
@@ -304,7 +304,7 @@ class PayplugResponse
             $order->save();
         }
 
-        $note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($resource->id), wc_price(AmountHelper::fromCents((int) $resource->amount)));
+        $note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($resource->id), wc_price(AmountHelper::fromCents((int) $resource->amount, $order->get_currency()), ['currency' => $order->get_currency()]));
         if (!empty($resource->metadata['reason'])) {
             $note .= sprintf(' (%s)', esc_html($resource->metadata['reason']));
         }

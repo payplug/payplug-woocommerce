@@ -202,6 +202,18 @@ class PaymentCaptureOutcomeApplier
             return;
         }
 
+        if (!isset($data['id']) || !is_scalar($data['id']) || '' === (string) $data['id']) {
+            // Not fatal for the payment itself (webhooks and the reconciler bind by operation id),
+            // but refunds are made on the PAYMENT id: on staging, refunding with an operation id
+            // fails with "reference transaction not found", so this order can't be refunded
+            // through Payplug until the API returns the payment id.
+            (new WooCommerceLogger())->error(sprintf(
+                'UPC payment creation response for order #%s has no top-level payment id: the order is bound to operation id "%s" instead, and refunding it will likely fail.',
+                $order->get_id(),
+                $operation_id
+            ));
+        }
+
         // Read before save() below overwrites it: isTreated()/markTreated() (Front\UpcWebhook,
         // PaymentReconciler, and this class's own apply_terminal_outcome()) are keyed by whichever
         // operation id currently matches the order, not by the specific operation that was
@@ -215,7 +227,7 @@ class PaymentCaptureOutcomeApplier
                 $operation_id,
                 $exec_code,
                 $outcome,
-                AmountHelper::toCents((float) $order->get_total()),
+                AmountHelper::toCents((float) $order->get_total(), $order->get_currency()),
                 (string) $order->get_id()
             ));
 

@@ -170,8 +170,8 @@ class ApplePay
     {
         $order_id = PayplugWoocommerceHelper::is_pre_30() ? $order->id : $order->get_id();
         $customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
-        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total() - ($order->get_shipping_tax() + $order->get_shipping_total()));
-        $amount = $gateway->validate_order_amount($amount);
+        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total() - ($order->get_shipping_tax() + $order->get_shipping_total()), $order->get_currency());
+        $amount = $gateway->validate_order_amount($amount, $order->get_currency());
         wp_send_json([
             'total' => $amount,
             'order_id' => $order_id,
@@ -372,8 +372,8 @@ class ApplePay
         }
 
         // The order total already holds the shipping method chosen in the sheet (update_applepay_order).
-        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total());
-        $amount = $applepay->validate_order_amount($amount);
+        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total(), $order->get_currency());
+        $amount = $applepay->validate_order_amount($amount, $order->get_currency());
         if (is_wp_error($amount)) {
             wp_send_json_error(['message' => $amount->get_error_message()]);
 
