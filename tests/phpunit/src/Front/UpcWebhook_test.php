@@ -42,7 +42,7 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
             'id' => self::OPERATION_ID,
             'execCode' => $execCode,
             'orderId' => (string) $this->order->get_id(),
-            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
         ]);
     }
 
@@ -83,7 +83,7 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
             'id' => self::OPERATION_ID,
             'execCode' => '0000',
             'orderId' => (string) $this->order->get_id(),
-            'amount' => AmountHelper::toCents((float) $this->order->get_total()) + 100,
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()) + 100,
         ]);
 
         ob_start();
@@ -103,7 +103,7 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
             'id' => 'op_forged_999',
             'execCode' => '0000',
             'orderId' => (string) $this->order->get_id(),
-            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
         ]);
 
         ob_start();
@@ -130,7 +130,7 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
             'id' => 'op_alt_456',
             'execCode' => '0000',
             'orderId' => (string) $this->order->get_id(),
-            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
         ]);
 
         ob_start();
@@ -158,7 +158,7 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
             'id' => 'op_forged_999',
             'execCode' => '0000',
             'orderId' => (string) $this->order->get_id(),
-            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
         ]);
 
         ob_start();
@@ -186,7 +186,7 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
             'id' => 'op_superseded_999',
             'execCode' => '0000',
             'orderId' => (string) $this->order->get_id(),
-            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
         ]);
 
         ob_start();
@@ -292,7 +292,7 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
             'id' => self::OPERATION_ID,
             'execCode' => '0000',
             'orderId' => (string) $this->order->get_id(),
-            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
             'paymentMethod' => [
                 'id' => 'alias_webhook_1',
                 'card' => ['network' => 'VISA', 'code6x4' => '424242XXXXXX4242'],
@@ -324,7 +324,7 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
             'id' => self::OPERATION_ID,
             'execCode' => '0000',
             'orderId' => (string) $this->order->get_id(),
-            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
             'paymentMethod' => [
                 'id' => 'alias_webhook_2',
                 'card' => ['network' => 'VISA', 'code6x4' => '424242XXXXXX4242'],
@@ -351,7 +351,7 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
             'id' => self::OPERATION_ID,
             'execCode' => '0001',
             'orderId' => (string) $this->order->get_id(),
-            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
             'paymentMethod' => [
                 'id' => 'alias_webhook_3',
                 'card' => ['network' => 'VISA', 'code6x4' => '424242XXXXXX4242'],

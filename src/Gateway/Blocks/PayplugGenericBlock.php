@@ -76,7 +76,7 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
 
         // Only include tokenization in supported features when order amount is between min and max allowed values
         $cart_total = WC()->cart ? WC()->cart->get_total('') : 0;
-        $cart_total_cents = (int) PayplugWoocommerceHelper::get_payplug_amount($cart_total);
+        $cart_total_cents = (int) PayplugWoocommerceHelper::get_payplug_amount($cart_total, get_woocommerce_currency());
         $min_amount = PayplugWoocommerceHelper::get_minimum_amount();
         $max_amount = PayplugWoocommerceHelper::get_maximum_amount();
 
@@ -102,7 +102,7 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
 
         // Only show saved cards when order amount is between min and max allowed values
         $cart_total = WC()->cart ? WC()->cart->get_total('') : 0;
-        $cart_total_cents = (int) PayplugWoocommerceHelper::get_payplug_amount($cart_total);
+        $cart_total_cents = (int) PayplugWoocommerceHelper::get_payplug_amount($cart_total, get_woocommerce_currency());
         $min_amount = PayplugWoocommerceHelper::get_minimum_amount();
         $max_amount = PayplugWoocommerceHelper::get_maximum_amount();
         $configuration = $this->get_service('configuration');

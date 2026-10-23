@@ -43,7 +43,7 @@ class PaymentReconciler_test extends TestCase
         return json_encode([
             'id' => 'op_pending_123',
             'execCode' => $execCode,
-            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
         ]);
     }
 
@@ -84,7 +84,7 @@ class PaymentReconciler_test extends TestCase
         $body = json_encode([
             'id' => 'op_pending_123',
             'execCode' => '0000',
-            'amount' => AmountHelper::toCents((float) $this->order->get_total()) + 100,
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()) + 100,
         ]);
 
         (new PaymentReconciler())->apply_reconciled_state($this->order, 'op_pending_123', $body);
@@ -135,7 +135,7 @@ class PaymentReconciler_test extends TestCase
         $body = json_encode([
             'id' => 'op_pending_123',
             'execCode' => '0000',
-            'amount' => AmountHelper::toCents((float) $this->order->get_total()),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
             'paymentMethod' => [
                 'id' => 'alias_reconciled_1',
                 'card' => ['network' => 'visa', 'code6x4' => '424242XXXXXX4242'],

@@ -210,7 +210,7 @@ class UpcWebhook
             return 409;
         }
 
-        if (AmountHelper::toCents((float) $order->get_total()) !== $operation_data->amount) {
+        if (AmountHelper::toCents((float) $order->get_total(), $order->get_currency()) !== $operation_data->amount) {
             $logger->error(sprintf('UPC webhook notification amount mismatch for order #%s.', $order->get_id()));
 
             return 400;
