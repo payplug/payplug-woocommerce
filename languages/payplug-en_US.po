@@ -762,6 +762,12 @@ msgstr "This payment method is not available for orders in this currency."
 msgid "Payplug payment %s from an earlier attempt on this order was confirmed as paid. The customer may have been charged twice: check the transactions and refund the duplicate if needed."
 msgstr "Payplug payment %s from an earlier attempt on this order was confirmed as paid. The customer may have been charged twice: check the transactions and refund the duplicate if needed."
 
+msgid "payplug_section_oauth_reconnect_title"
+msgstr "Reconnect with OAuth2"
+
+msgid "payplug_section_oauth_reconnect_description"
+msgstr "Your account is connected with the classic login, which cannot be used with Hosted Fields in your shop's currency. Log out, then reconnect with OAuth2 to use Hosted Fields."
+
 #: src/PayplugWoocommerceRequest.php:485
 #, php-format
 msgid "Payplug payment %1$s failed (%2$s: %3$s)."

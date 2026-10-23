@@ -1415,6 +1415,12 @@ msgstr "Remboursement : %s"
 msgid "Payplug payment %s from an earlier attempt on this order was confirmed as paid. The customer may have been charged twice: check the transactions and refund the duplicate if needed."
 msgstr "Le paiement Payplug %s d'une tentative précédente sur cette commande a été confirmé comme payé. Le client a pu être débité deux fois : vérifiez les transactions et remboursez le doublon si nécessaire."
 
+msgid "payplug_section_oauth_reconnect_title"
+msgstr "Reconnectez-vous avec OAuth2"
+
+msgid "payplug_section_oauth_reconnect_description"
+msgstr "Votre compte est connecté via la connexion classique, qui ne permet pas d’utiliser les Hosted Fields dans la devise de votre boutique. Déconnectez-vous, puis reconnectez-vous via OAuth2 pour les utiliser."
+
 #: src/PayplugWoocommerceRequest.php:485
 #, php-format
 msgid "Payplug payment %1$s failed (%2$s: %3$s)."
