@@ -35,6 +35,7 @@ class PayplugCreditCard_test extends TestCase
         }
         delete_option('woocommerce_payplug_settings');
         delete_option('woocommerce_currency');
+        delete_transient('payplug_config_test');
         remove_all_filters('pre_http_request');
         // WooCommerceConfigurationRepository::getClientId() returns '' in every test here (no
         // oauth_client_data option set), so every stubbed OAuth exchange below mints and caches
@@ -303,6 +304,79 @@ class PayplugCreditCard_test extends TestCase
 
         $this->assertFalse($gateway->hosted_fields_available);
         $this->assertFalse($gateway->is_available());
+    }
+
+    private function hosted_fields_unavailable_cause(PayplugCreditCard $gateway): ?string
+    {
+        $method = (new \ReflectionClass(PayplugCreditCard::class))->getMethod('hosted_fields_unavailable_cause');
+        $method->setAccessible(true);
+
+        return $method->invoke($gateway);
+    }
+
+    private function create_hosted_fields_gateway(string $oauth_client_data, string $identifier = 'ACC-1', bool $with_company_ref = true): PayplugCreditCard
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['oauth_client_data'] = $oauth_client_data;
+        $settings['payment_methods']['configuration']['payplug']['embedded_mode'] = 'hosted_fields';
+        $settings['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] = $identifier;
+        update_option('woocommerce_payplug_settings', $settings);
+        // GET /account result, so that only the OAuth2 credentials, the identifier and the SDK URL are left to check
+        if ($with_company_ref) {
+            set_transient('payplug_config_test', ['company_ref' => 'cr_1']);
+        }
+
+        return new PayplugCreditCard();
+    }
+
+    public function test_hosted_fields_are_not_offered_without_oauth2_credentials(): void
+    {
+        $gateway = $this->create_hosted_fields_gateway('{}');
+
+        $this->assertSame('OAuth2 connection is missing for the current mode', $this->hosted_fields_unavailable_cause($gateway));
+        $this->assertFalse($gateway->hosted_fields_available);
+        $this->assertFalse($gateway->is_available());
+    }
+
+    public function test_hosted_fields_are_not_offered_when_oauth2_credentials_are_for_the_other_mode(): void
+    {
+        $gateway = $this->create_hosted_fields_gateway('{"live":{"client_id":"id","client_secret":"secret"},"test":[]}');
+
+        $this->assertSame('OAuth2 connection is missing for the current mode', $this->hosted_fields_unavailable_cause($gateway));
+        $this->assertFalse($gateway->is_available());
+    }
+
+    public function test_hosted_fields_are_not_offered_without_an_identifier(): void
+    {
+        $gateway = $this->create_hosted_fields_gateway('{"test":{"client_id":"id","client_secret":"secret"},"live":[]}', '');
+
+        $this->assertSame('hosted_fields identifier (account id) is not set', $this->hosted_fields_unavailable_cause($gateway));
+        $this->assertFalse($gateway->hosted_fields_available);
+        $this->assertFalse($gateway->is_available());
+    }
+
+    public function test_hosted_fields_are_not_offered_with_a_whitespace_identifier(): void
+    {
+        $gateway = $this->create_hosted_fields_gateway('{"test":{"client_id":"id","client_secret":"secret"},"live":[]}', "  \t ");
+
+        $this->assertSame('hosted_fields identifier (account id) is not set', $this->hosted_fields_unavailable_cause($gateway));
+        $this->assertFalse($gateway->is_available());
+    }
+
+    public function test_missing_identifier_is_reported_before_the_account_data_is_needed(): void
+    {
+        $gateway = $this->create_hosted_fields_gateway('{"test":{"client_id":"id","client_secret":"secret"},"live":[]}', '', false);
+
+        $this->assertSame('hosted_fields identifier (account id) is not set', $this->hosted_fields_unavailable_cause($gateway));
+    }
+
+    public function test_oauth2_credentials_for_the_current_mode_and_an_identifier_pass_the_hosted_fields_check(): void
+    {
+        $gateway = $this->create_hosted_fields_gateway('{"test":{"client_id":"id","client_secret":"secret"},"live":[]}');
+
+        // HOSTED_FIELDS_SDK_URL is empty in the test environment: it is the only cause left
+        $this->assertSame('HOSTED_FIELDS_SDK_URL is not configured', $this->hosted_fields_unavailable_cause($gateway));
     }
 
     /**

@@ -6,17 +6,29 @@ use Payplug\PayplugWoocommerce\Controller\HostedFields;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
 use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceConfigurationRepository;
 use Payplug\PayplugWoocommerce\Upc\HostedFieldsPaymentProcessor;
 
 class PayplugCreditCard extends PayplugGateway
 {
+    private const CAUSE_NO_OAUTH2 = 'OAuth2 connection is missing for the current mode';
+    private const CAUSE_NO_IDENTIFIER = 'hosted_fields identifier (account id) is not set';
+
+    /**
+     * Hosted Fields unavailable because the merchant setup is incomplete (e.g. classic login on a
+     * non-EUR shop): an expected state, logged as info rather than error on every page load.
+     */
+    private const SETUP_INCOMPLETE_CAUSES = [self::CAUSE_NO_OAUTH2, self::CAUSE_NO_IDENTIFIER];
+
     public $save_card = false;
 
     /**
-     * Whether the hosted_fields mode can actually render a working card form: both
-     * HOSTED_FIELDS_SDK_URL and the account's company_ref (from GET /account) must be
-     * available, or the SDK is given an empty src/companyId and silently renders nothing
-     * (see hosted_fields_scripts() and payment_fields()).
+     * Whether the hosted_fields mode can actually render a working card form: the merchant
+     * must be connected with OAuth2 for the current mode (the Unified API authenticates with
+     * those credentials) and have a hosted_fields identifier (the account id sent with every
+     * UHF payment and refund), and both HOSTED_FIELDS_SDK_URL and the account's company_ref
+     * (from GET /account) must be available, or the SDK is given an empty src/companyId and
+     * silently renders nothing (see hosted_fields_scripts() and payment_fields()).
      */
     public bool $hosted_fields_available = true;
 
@@ -50,14 +62,14 @@ class PayplugCreditCard extends PayplugGateway
         }
 
         if ('hosted_fields' === $this->embedded_mode) {
-            $company_ref = PayplugWoocommerceHelper::get_account_data_from_options()['company_ref'] ?? '';
-            $this->hosted_fields_available = !empty($company_ref) && !empty(HOSTED_FIELDS_SDK_URL);
+            $unavailable_cause = $this->hosted_fields_unavailable_cause();
+            $this->hosted_fields_available = null === $unavailable_cause;
 
             if (!$this->hosted_fields_available) {
-                PayplugGateway::log(sprintf(
-                    'Hosted Fields form not rendered: %s.',
-                    empty($company_ref) ? 'company_ref is empty (GET /account failed?)' : 'HOSTED_FIELDS_SDK_URL is not configured'
-                ), 'error');
+                PayplugGateway::log(
+                    sprintf('Hosted Fields form not rendered: %s.', $unavailable_cause),
+                    in_array($unavailable_cause, self::SETUP_INCOMPLETE_CAUSES, true) ? 'info' : 'error'
+                );
             }
         }
 
@@ -104,6 +116,32 @@ class PayplugCreditCard extends PayplugGateway
                 2
             );
         }
+    }
+
+    /**
+     * @return string|null why the Hosted Fields card form cannot render, null when it can
+     */
+    private function hosted_fields_unavailable_cause(): ?string
+    {
+        if (!PayplugWoocommerceHelper::is_oauth2_connected()) {
+            return self::CAUSE_NO_OAUTH2;
+        }
+
+        // checked before company_ref, which can trigger a GET /account call
+        if ('' === trim((new WooCommerceConfigurationRepository())->getPublicKeyId())) {
+            return self::CAUSE_NO_IDENTIFIER;
+        }
+
+        $company_ref = PayplugWoocommerceHelper::get_account_data_from_options()['company_ref'] ?? '';
+        if (empty($company_ref)) {
+            return 'company_ref is empty (GET /account failed?)';
+        }
+
+        if (empty(HOSTED_FIELDS_SDK_URL)) {
+            return 'HOSTED_FIELDS_SDK_URL is not configured';
+        }
+
+        return null;
     }
 
     /**
@@ -346,8 +384,8 @@ class PayplugCreditCard extends PayplugGateway
 
         // The Dalenys SDK's companyId must be the account's UUID company_ref (from
         // GET /account, mirroring the Sylius PayPlug plugin) - not the merchant-entered
-        // Account ID (hosted_fields.identifier), which is a different value reserved for
-        // a future server-side payment-capture call.
+        // Account ID (hosted_fields.identifier), which is a different value: the account
+        // id sent with every UHF payment and refund call.
         $account = PayplugWoocommerceHelper::get_account_data_from_options();
 
         // No ajax_url/nonce: the client never round-trips the token through a separate
