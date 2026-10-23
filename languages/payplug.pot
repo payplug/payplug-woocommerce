@@ -1029,3 +1029,9 @@ msgstr ""
 
 msgid "Payplug payment %s from an earlier attempt on this order was confirmed as paid. The customer may have been charged twice: check the transactions and refund the duplicate if needed."
 msgstr ""
+
+msgid "payplug_section_oauth_reconnect_title"
+msgstr ""
+
+msgid "payplug_section_oauth_reconnect_description"
+msgstr ""
