@@ -9,7 +9,7 @@ VueJs Payplug UI lib tag: 1.7.12
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-PlayPlug is a French payment solution allowing small and medium e-commerce companies to accept online payments from Visa, MasterCard and CB cards.
+PayPlug is a French payment solution allowing small and medium e-commerce companies to accept online payments from Visa, MasterCard and CB cards.
 
 == Description ==
 
