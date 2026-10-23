@@ -846,6 +846,25 @@ class PayplugWoocommerceHelper
     }
 
     /**
+     * Whether the merchant has OAuth2 client credentials for a mode, the ones
+     * WooCommerceConfigurationRepository hands to the Unified API. A classic e-mail/password
+     * login stores none.
+     *
+     * @param bool|null $live true for live, false for test, null for the stored mode
+     *
+     * @return bool
+     */
+    public static function is_oauth2_connected(?bool $live = null): bool
+    {
+        $options = self::get_payplug_options();
+        $live = $live ?? (bool) ($options['mode'] ?? false);
+        $oauth_client_data = json_decode((string) ($options['oauth_client_data'] ?? ''), true);
+        $credentials = is_array($oauth_client_data) ? ($oauth_client_data[$live ? 'live' : 'test'] ?? null) : null;
+
+        return is_array($credentials) && !empty($credentials['client_id']) && !empty($credentials['client_secret']);
+    }
+
+    /**
      * Domain the Integrated Payment SDK should submit card-tokenization requests to. Depends
      * on whether the connected merchant account is QA or production, which is a build-time
      * distinction (see SECURE_DOMAIN in payplug-config.php), not something this can derive

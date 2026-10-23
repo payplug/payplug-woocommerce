@@ -79,8 +79,9 @@ class PaymentMethods
         // The front-end (PayplugStandard.vue) only guards `typeof data.advanced_settings
         // == "object"` - since `typeof null === "object"` in JS, sending an explicit
         // `null` here still passes that guard and then crashes on `Object.keys(null)`.
-        // The key must be omitted entirely for a EUR shop, not set to null.
-        if (!PayplugWoocommerceHelper::is_eur_shop()) {
+        // The key must be omitted entirely, not set to null, for a EUR shop and when the
+        // merchant has no OAuth2 credentials for the stored mode (Hosted Fields needs them).
+        if (!PayplugWoocommerceHelper::is_eur_shop() && PayplugWoocommerceHelper::is_oauth2_connected()) {
             $result['advanced_settings'] = $this->hosted_fields_advanced_settings();
         }
 
