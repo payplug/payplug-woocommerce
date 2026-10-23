@@ -110,7 +110,7 @@ class PaymentReconciler
         // would apply an outcome for an amount that no longer matches what the order now owes.
         $amount = isset($data['amount']) && is_scalar($data['amount']) ? (int) $data['amount'] : null;
 
-        if (null === $amount || AmountHelper::toCents((float) $order->get_total()) !== $amount) {
+        if (null === $amount || AmountHelper::toCents((float) $order->get_total(), $order->get_currency()) !== $amount) {
             (new WooCommerceLogger())->error(sprintf('UPC payment reconciliation amount mismatch for order #%s.', $order->get_id()));
 
             return;
@@ -141,7 +141,7 @@ class PaymentReconciler
                 $operation_id,
                 $exec_code,
                 $outcome,
-                AmountHelper::toCents((float) $order->get_total()),
+                AmountHelper::toCents((float) $order->get_total(), $order->get_currency()),
                 (string) $order->get_id()
             ));
 

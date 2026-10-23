@@ -752,3 +752,6 @@ msgstr "The card was deleted."
 
 msgid "payplug_uhf_saved_cards_invalid_notice"
 msgstr "Invalid card."
+
+msgid "payplug_payment_currency_not_supported"
+msgstr "This payment method is not available for orders in this currency."

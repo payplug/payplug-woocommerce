@@ -665,8 +665,8 @@ class PayplugWoocommerceRequest
         $customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
         $return_url = esc_url_raw($order->get_checkout_order_received_url());
         $address_data = PayplugAddressData::from_order($order);
-        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total());
-        $amount = $this->gateway->validate_order_amount($amount);
+        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total(), $order->get_currency());
+        $amount = $this->gateway->validate_order_amount($amount, $order->get_currency());
 
         $payment_data = [
             'amount' => $amount,
