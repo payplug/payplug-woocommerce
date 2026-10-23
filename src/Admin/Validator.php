@@ -122,12 +122,14 @@ class Validator
      *
      * @param string $embedded_mode
      * @param string $identifier
+     * @param bool $oauth_connected false when the merchant has no OAuth2 credentials for the saved
+     *                              mode: Hosted Fields is not offered then, so the identifier is not required
      *
      * @return bool
      */
-    public static function hostedFieldsPaymentGatewayOptions(string $embedded_mode, string $identifier): bool
+    public static function hostedFieldsPaymentGatewayOptions(string $embedded_mode, string $identifier, bool $oauth_connected = true): bool
     {
-        if ($embedded_mode !== 'hosted_fields') {
+        if ($embedded_mode !== 'hosted_fields' || !$oauth_connected) {
             return true;
         }
 

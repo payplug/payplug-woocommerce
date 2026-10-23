@@ -94,7 +94,7 @@ class Vue
         $callback_uri = get_admin_url(null, '/admin.php?page=wc-settings&tab=checkout&section=payplug');
         $register_url = $this->payplug_api->retrieve_register_url($callback_uri);
 
-        return [
+        $section = [
             'title' => __('payplug_section_logged_title', 'payplug'),
             'descriptions' => [
                 'live' => [
@@ -169,6 +169,27 @@ class Vue
                 ],
             ],
         ];
+
+        if (!PayplugWoocommerceHelper::is_eur_shop() && $this->get_gateway('account')->is_legacy_logged()) {
+            $section['oauth_reconnect'] = $this->payplug_section_oauth_reconnect();
+        }
+
+        return $section;
+    }
+
+    /**
+     * Notice for a merchant connected with the classic login on a non-EUR shop, where Hosted
+     * Fields needs OAuth2.
+     *
+     * @return array
+     */
+    private function payplug_section_oauth_reconnect()
+    {
+        return [
+            'active' => true,
+            'title' => __('payplug_section_oauth_reconnect_title', 'payplug'),
+            'description' => __('payplug_section_oauth_reconnect_description', 'payplug'),
+        ];
     }
 
     /**
@@ -223,66 +244,64 @@ class Vue
         $callback_uri = get_admin_url(null, '/admin.php?page=wc-settings&tab=checkout&section=payplug');
         $register_url = $this->payplug_api->retrieve_register_url($callback_uri);
 
+        // Non-EUR shops go through the Unified API, which needs OAuth2: without `form` the UI
+        // shows the SSO block alone, and without `sso.information` it hides the hint to keep
+        // using the classic login.
+        $oauth_only = !PayplugWoocommerceHelper::is_eur_shop();
         $oauth_login = [
             'name' => 'oauthLogin',
             'title' => __('payplug_section_logged_title', 'payplug'),
             'descriptions' => [
-                'live' => [
-                    'description' => __('payplug_section_oauth_login_description', 'payplug'),
-                    'form' => [
-                        'email' => [
-                            'label' => __('payplug_section_login_email_label', 'payplug'),
-                            'placeholder' => __('payplug_section_login_email_label', 'payplug'),
-                        ],
-                        'password' => [
-                            'label' => __('payplug_section_login_password_label', 'payplug'),
-                            'placeholder' => __('payplug_section_login_password_label', 'payplug'),
-                        ],
-                        'connexion' => __('payplug_section_login_connect', 'payplug'),
-                        'create_account' => __('payplug_section_login_not_registered', 'payplug'),
-                        'forgot_password' => __('payplug_section_login_forgot_password', 'payplug'),
-                        'error' => __('payplug_section_login_error', 'payplug'),
-                        'create_account_url' => 'https://portal.payplug.com/auth/signup',
-                        'forgot_password_url' => 'https://portal.payplug.com/forgot_password',
-                    ],
-                    'sso' => [
-                        'title' => __('payplug_section_oauth_login_title', 'payplug'),
-                        'description' => __('payplug_section_oauth_login_description', 'payplug'),
-                        'information' => __('payplug_section_oauth_info', 'payplug'),
-                        'button' => __('payplug_section_oauth_login_btn_connect', 'payplug'),
-                        'button_url' => $register_url,
-                    ],
-                ],
-                'sandbox' => [
-                    'description' => __('payplug_section_oauth_login_description', 'payplug'),
-                    'form' => [
-                        'email' => [
-                            'label' => __('payplug_section_login_email_label', 'payplug'),
-                            'placeholder' => __('payplug_section_login_email_label', 'payplug'),
-                        ],
-                        'password' => [
-                            'label' => __('payplug_section_login_password_label', 'payplug'),
-                            'placeholder' => __('payplug_section_login_password_label', 'payplug'),
-                        ],
-                        'connexion' => __('payplug_section_login_connect', 'payplug'),
-                        'create_account' => __('payplug_section_login_not_registered', 'payplug'),
-                        'forgot_password' => __('payplug_section_login_forgot_password', 'payplug'),
-                        'error' => __('payplug_section_login_error', 'payplug'),
-                        'create_account_url' => 'https://portal.payplug.com/auth/signup',
-                        'forgot_password_url' => 'https://portal.payplug.com/forgot_password',
-                    ],
-                    'sso' => [
-                        'title' => __('payplug_section_oauth_login_title', 'payplug'),
-                        'description' => __('payplug_section_oauth_login_description', 'payplug'),
-                        'information' => __('payplug_section_oauth_info', 'payplug'),
-                        'button' => __('payplug_section_oauth_login_btn_connect', 'payplug'),
-                        'button_url' => $register_url,
-                    ],
-                ],
+                'live' => $this->oauth_login_mode($register_url, $oauth_only),
+                'sandbox' => $this->oauth_login_mode($register_url, $oauth_only),
             ],
         ];
 
         return $oauth_login;
+    }
+
+    /**
+     * @param mixed $register_url
+     * @param bool $oauth_only
+     *
+     * @return array
+     */
+    private function oauth_login_mode($register_url, bool $oauth_only)
+    {
+        $mode = [
+            'description' => __('payplug_section_oauth_login_description', 'payplug'),
+        ];
+        if (!$oauth_only) {
+            $mode['form'] = [
+                'email' => [
+                    'label' => __('payplug_section_login_email_label', 'payplug'),
+                    'placeholder' => __('payplug_section_login_email_label', 'payplug'),
+                ],
+                'password' => [
+                    'label' => __('payplug_section_login_password_label', 'payplug'),
+                    'placeholder' => __('payplug_section_login_password_label', 'payplug'),
+                ],
+                'connexion' => __('payplug_section_login_connect', 'payplug'),
+                'create_account' => __('payplug_section_login_not_registered', 'payplug'),
+                'forgot_password' => __('payplug_section_login_forgot_password', 'payplug'),
+                'error' => __('payplug_section_login_error', 'payplug'),
+                'create_account_url' => 'https://portal.payplug.com/auth/signup',
+                'forgot_password_url' => 'https://portal.payplug.com/forgot_password',
+            ];
+        }
+
+        $sso = [
+            'title' => __('payplug_section_oauth_login_title', 'payplug'),
+            'description' => __('payplug_section_oauth_login_description', 'payplug'),
+        ];
+        if (!$oauth_only) {
+            $sso['information'] = __('payplug_section_oauth_info', 'payplug');
+        }
+        $sso['button'] = __('payplug_section_oauth_login_btn_connect', 'payplug');
+        $sso['button_url'] = $register_url;
+        $mode['sso'] = $sso;
+
+        return $mode;
     }
 
     /**
