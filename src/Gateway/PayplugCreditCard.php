@@ -2,12 +2,23 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway;
 
+use Payplug\PayplugWoocommerce\Controller\HostedFields;
 use Payplug\PayplugWoocommerce\Controller\IntegratedPayment;
+use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Upc\HostedFieldsPaymentProcessor;
 
 class PayplugCreditCard extends PayplugGateway
 {
     public $save_card = false;
+
+    /**
+     * Whether the hosted_fields mode can actually render a working card form: both
+     * HOSTED_FIELDS_SDK_URL and the account's company_ref (from GET /account) must be
+     * available, or the SDK is given an empty src/companyId and silently renders nothing
+     * (see hosted_fields_scripts() and payment_fields()).
+     */
+    public bool $hosted_fields_available = true;
 
     public function __construct()
     {
@@ -23,6 +34,32 @@ class PayplugCreditCard extends PayplugGateway
         $this->description = $this->get_configuration()->get_option('payment_methods.configuration.payplug.description');
         $this->save_card = $this->get_configuration()->get_option('payment_methods.configuration.payplug.save_card') && is_user_logged_in();
         $this->embedded_mode = $this->get_configuration()->get_option('payment_methods.configuration.payplug.embedded_mode');
+
+        // A shop's stored mode can predate its current currency (e.g. it was 'popup'
+        // before switching to a non-EUR currency, or vice versa) - satisfy_requirements()
+        // no longer blocks the whole gateway on currency, so a stale mode would otherwise
+        // reach checkout and render the wrong flow for the current currency. Mirrors the
+        // BO-display normalization in PaymentMethods::payment_method_standard(); this
+        // doesn't persist anything, the stored value is only corrected once the merchant
+        // saves the BO settings again.
+        $is_eur_shop = PayplugWoocommerceHelper::is_eur_shop();
+        if ($is_eur_shop && !in_array($this->embedded_mode, ['redirect', 'popup', 'integrated'], true)) {
+            $this->embedded_mode = 'redirect';
+        } elseif (!$is_eur_shop && 'hosted_fields' !== $this->embedded_mode) {
+            $this->embedded_mode = 'hosted_fields';
+        }
+
+        if ('hosted_fields' === $this->embedded_mode) {
+            $company_ref = PayplugWoocommerceHelper::get_account_data_from_options()['company_ref'] ?? '';
+            $this->hosted_fields_available = !empty($company_ref) && !empty(HOSTED_FIELDS_SDK_URL);
+
+            if (!$this->hosted_fields_available) {
+                PayplugGateway::log(sprintf(
+                    'Hosted Fields form not rendered: %s.',
+                    empty($company_ref) ? 'company_ref is empty (GET /account failed?)' : 'HOSTED_FIELDS_SDK_URL is not configured'
+                ), 'error');
+            }
+        }
 
         $this->supports = [
             'products',
@@ -52,7 +89,7 @@ class PayplugCreditCard extends PayplugGateway
         }
 
         //add fields of IP to the description
-        if ('integrated' == $this->embedded_mode) {
+        if ('integrated' == $this->embedded_mode || 'hosted_fields' == $this->embedded_mode) {
             $this->has_fields = true;
         }
 
@@ -67,6 +104,63 @@ class PayplugCreditCard extends PayplugGateway
                 2
             );
         }
+    }
+
+    /**
+     * A hosted_fields gateway whose card form can't render (see $hosted_fields_available) must
+     * not be offered at all: the shopper would otherwise see "Card" with nothing to fill in and
+     * only get a "missing token" error on submit. Non-EUR shops are forced into hosted_fields,
+     * so they have no other card flow to fall back to.
+     */
+    public function is_available()
+    {
+        if ('hosted_fields' === $this->embedded_mode && !$this->hosted_fields_available) {
+            return false;
+        }
+
+        return parent::is_available();
+    }
+
+    /**
+     * @param int $order_id
+     *
+     * @return array
+     */
+    public function process_payment($order_id)
+    {
+        if ('hosted_fields' !== $this->embedded_mode) {
+            return parent::process_payment($order_id);
+        }
+
+        return (new HostedFieldsPaymentProcessor($this))->process_payment((int) $order_id);
+    }
+
+    /**
+     * @param int $order_id
+     * @param float|string|null $amount
+     * @param string $reason
+     *
+     * @return bool|\WP_Error
+     */
+    public function process_refund($order_id, $amount = null, $reason = '')
+    {
+        $order = wc_get_order($order_id);
+
+        // No such order, or one paid via the Retail API (no UPC operation on it): both keep
+        // going through the inherited Retail process_refund() untouched - only a UPC-paid order
+        // takes this path. Delegating a missing order to it, rather than duplicating its own
+        // "order does not exist" WP_Error here, avoids a second untested error-message copy.
+        if (!$order instanceof \WC_Order) {
+            return parent::process_refund($order_id, $amount, $reason);
+        }
+
+        $operation_id = (string) $order->get_meta('_payplug_upc_operation_id');
+
+        if ('' === $operation_id) {
+            return parent::process_refund($order_id, $amount, $reason);
+        }
+
+        return (new HostedFieldsPaymentProcessor($this))->process_refund($order, $operation_id, $amount, (string) $reason);
     }
 
     /**
@@ -87,15 +181,28 @@ class PayplugCreditCard extends PayplugGateway
     }
 
     /**
+     * Hosted fields (UHF) is only offered for non-EUR currencies, where CB cards aren't
+     * accepted: its logo shows Visa and Mastercard only.
+     */
+    public static function scheme_logo_url(?string $embedded_mode): string
+    {
+        if ('hosted_fields' === $embedded_mode) {
+            return PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/checkout/logos_scheme_visa_mastercard.svg';
+        }
+
+        return ('it_IT' === get_locale())
+            ? PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_PostePay.svg'
+            : PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_CB.svg';
+    }
+
+    /**
      * Get payment icons.
      *
      * @return string
      */
     public function get_icon()
     {
-        $src = ('it_IT' === get_locale())
-            ? PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_PostePay.svg'
-            : PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/logos_scheme_CB.svg';
+        $src = self::scheme_logo_url($this->embedded_mode);
 
         $icons = apply_filters('payplug_payment_icons', [
             'payplug' => sprintf('<img src="%s" alt="Visa & Mastercard" class="payplug-payment-icon" />', esc_url($src)),
@@ -147,6 +254,10 @@ class PayplugCreditCard extends PayplugGateway
         if (('popup' == $this->embedded_mode) && ('payplug' == $this->id || 'american_express' == $this->id) && !PayplugWoocommerceHelper::is_checkout_block()) {
             $this->popup_payments_scripts();
         }
+
+        if ('hosted_fields' == $this->embedded_mode && (!PayplugWoocommerceHelper::is_checkout_block() || is_wc_endpoint_url('order-pay'))) {
+            $this->hosted_fields_scripts();
+        }
     }
 
     /**
@@ -176,7 +287,7 @@ class PayplugCreditCard extends PayplugGateway
         /**x
          * Integrated payments scripts
          */
-        wp_enqueue_style('payplugIP', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-integrated-payments.css', [], PAYPLUG_GATEWAY_VERSION);
+        wp_enqueue_style('payplug-card-form', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-card-form.css', [], PAYPLUG_GATEWAY_VERSION);
 
         wp_register_script('payplug-domain', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-domain.js', [], 'v1.0');
         wp_enqueue_script('payplug-domain');
@@ -216,6 +327,57 @@ class PayplugCreditCard extends PayplugGateway
     }
 
     /**
+     * Hosted Fields payment form scripts.
+     *
+     * Register scripts and additional data needed for the
+     * hosted fields payment form.
+     */
+    public function hosted_fields_scripts(): void
+    {
+        // An empty HOSTED_FIELDS_SDK_URL registers a script with no src (prints nothing,
+        // window.dalenys stays undefined) and an empty companyId renders a card form the
+        // SDK will never fill in - both silently, with no console error. Bail instead of
+        // enqueueing a form that can never work; payment_fields() uses the same
+        // hosted_fields_available flag (computed once in the constructor) to skip
+        // rendering the template altogether.
+        if (!$this->hosted_fields_available) {
+            return;
+        }
+
+        // The Dalenys SDK's companyId must be the account's UUID company_ref (from
+        // GET /account, mirroring the Sylius PayPlug plugin) - not the merchant-entered
+        // Account ID (hosted_fields.identifier), which is a different value reserved for
+        // a future server-side payment-capture call.
+        $account = PayplugWoocommerceHelper::get_account_data_from_options();
+
+        // No ajax_url/nonce: the client never round-trips the token through a separate
+        // endpoint (see payplug-hosted-fields.js's tokenize()) - process_payment() reads
+        // hf_token straight from the real checkout POST once the order exists.
+        $translations = [
+            'company_id' => $account['company_ref'] ?? '',
+            'placeholder_pan' => __('payplug_integrated_payment_card_number', 'payplug'),
+            'placeholder_exp' => __('payplug_integrated_payment_expiration_date', 'payplug'),
+            'placeholder_cvv' => __('payplug_integrated_payment_cvv', 'payplug'),
+        ];
+
+        wp_enqueue_style('payplug-card-form', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-card-form.css', [], PAYPLUG_GATEWAY_VERSION);
+
+        wp_register_script('payplug-hosted-fields-sdk', HOSTED_FIELDS_SDK_URL, [], null, true);
+        wp_enqueue_script('payplug-hosted-fields-sdk');
+
+        // jquery-bind-first isn't guaranteed registered by the other embedded modes
+        // (hosted_fields and integrated are mutually exclusive), so it's registered here
+        // too rather than assumed - same handle/asset integrated_payments_scripts() uses.
+        wp_register_script('jquery-bind-first', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/jquery.bind-first-0.2.3.min.js', ['jquery'], '1.0.0', true);
+        wp_enqueue_script('jquery-bind-first');
+
+        wp_register_script('payplug-hosted-fields', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/payplug-hosted-fields.js', ['jquery', 'jquery-bind-first', 'payplug-hosted-fields-sdk'], PAYPLUG_GATEWAY_VERSION, true);
+        wp_enqueue_script('payplug-hosted-fields');
+
+        wp_localize_script('payplug-hosted-fields', 'payplug_hosted_fields_params', $translations);
+    }
+
+    /**
      * extra payment fields
      */
     public function payment_fields(): void
@@ -230,7 +392,18 @@ class PayplugCreditCard extends PayplugGateway
             echo IntegratedPayment::template_form($this->save_card);
         }
 
-        if ($this->save_card_available()) {
+        // Deliberately elseif, not two independent ifs: a UHF alias is never a WC_Payment_Token
+        // (see Controller/HostedFields.php), so WooCommerce's native saved_payment_methods()
+        // list would show the merchant's Retail-tokenized cards even though hosted_fields mode
+        // can never charge them - worse than not showing them at all. A merchant switching to
+        // hosted_fields therefore does lose the Retail card list from checkout with no
+        // migration; that's the intended trade-off, not an oversight.
+        if ('hosted_fields' == $this->embedded_mode && $this->hosted_fields_available) {
+            $cards = ($this->save_card && is_user_logged_in())
+                ? UhfCard::get_customer_cards(get_current_user_id(), $this->mode)
+                : [];
+            echo HostedFields::template_form($this->save_card, $cards);
+        } elseif ($this->save_card_available()) {
             $this->tokenization_script();
             $this->saved_payment_methods();
         }
@@ -264,7 +437,7 @@ class PayplugCreditCard extends PayplugGateway
             throw new \Exception(__('Invalid payment method.', 'payplug'));
         }
 
-        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($amount);
+        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($amount, $order->get_currency());
 
         try {
             $address_data = PayplugAddressData::from_order($order);

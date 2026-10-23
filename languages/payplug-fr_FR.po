@@ -1335,3 +1335,82 @@ msgstr "Limites de montant Scalapay invalides"
 #, php-format
 msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
 msgstr "Le montant total de votre panier doit être compris entre %s€ et %s€ pour payer avec Scalapay."
+
+msgid "payplug_section_standard_payment_option_hosted_fields_label"
+msgstr "Advanced (beta) Hosted Fields"
+
+msgid "payplug_section_standard_payment_hosted_fields_description"
+msgstr "Vos clients verront apparaître le formulaire de paiement directement sur la page de checkout de votre boutique, via des champs hébergés et sécurisés par Payplug (fonctionnalité en version bêta)."
+
+msgid "payplug_section_advanced_configuration_title"
+msgstr "Configuration avancée"
+
+msgid "payplug_hosted_fields_title"
+msgstr "Advanced (beta) Hosted Fields"
+
+msgid "payplug_hosted_fields_description"
+msgstr "Contactez votre Account Manager pour obtenir votre Account ID."
+
+msgid "payplug_hosted_fields_identifier_label"
+msgstr "Account ID"
+
+msgid "hosted_fields_option_validation_title"
+msgstr "Impossible d'enregistrer la configuration."
+
+msgid "hosted_fields_identifier_required"
+msgstr "Merci de renseigner l'Account ID pour activer le mode Advanced (beta) Hosted Fields."
+
+msgid "payplug_hosted_fields_tokenization_error"
+msgstr "Une erreur est survenue lors de la vérification de votre carte. Merci de réessayer."
+
+msgid "payplug_hosted_fields_unsupported_brand_error"
+msgstr "Ce type de carte n'est pas accepté avec ce mode de paiement. Merci d'utiliser une carte Visa ou Mastercard."
+
+msgid "payplug_hosted_fields_missing_token"
+msgstr "Nous n'avons pas pu récupérer les informations de votre carte. Merci de réessayer."
+
+msgid "payplug_hosted_fields_payment_in_progress"
+msgstr "Un paiement est déjà en cours pour cette commande, sa confirmation peut prendre quelques minutes. Merci de ne pas payer à nouveau : réessayez plus tard uniquement si la commande n'est toujours pas payée."
+
+msgid "payplug_hosted_fields_pay_with_another_card"
+msgstr "Payer avec une autre carte"
+
+msgid "payplug_uhf_saved_cards_deleted_notice"
+msgstr "La carte a été supprimée."
+
+msgid "payplug_uhf_saved_cards_invalid_notice"
+msgstr "Carte invalide."
+
+msgid "payplug_payment_currency_not_supported"
+msgstr "Ce moyen de paiement n’est pas disponible pour les commandes dans cette devise."
+
+msgid "Your payment was not completed. Please try again."
+msgstr "Votre paiement n'a pas abouti. Merci de réessayer."
+
+msgid "This payment confirmation link has expired."
+msgstr "Ce lien de confirmation de paiement a expiré."
+
+msgid "Order not found."
+msgstr "Commande introuvable."
+
+#, php-format
+msgid "Refund for order #%s"
+msgstr "Remboursement de la commande n°%s"
+
+#, php-format
+msgid "refunded %s"
+msgstr "%s remboursé(s)"
+
+msgid "fully refunded"
+msgstr "remboursement total"
+
+#, php-format
+msgid "Refund %s: %s"
+msgstr "Remboursement %s : %s"
+
+#, php-format
+msgid "Refund: %s"
+msgstr "Remboursement : %s"
+
+msgid "Payplug payment %s from an earlier attempt on this order was confirmed as paid. The customer may have been charged twice: check the transactions and refund the duplicate if needed."
+msgstr "Le paiement Payplug %s d'une tentative précédente sur cette commande a été confirmé comme payé. Le client a pu être débité deux fois : vérifiez les transactions et remboursez le doublon si nécessaire."

@@ -15,6 +15,7 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayOney3x;
 use Payplug\PayplugWoocommerce\Gateway\PayplugPermissions;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 use Payplug\Resource\APIResource;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 use WC_Blocks_Utils;
 use WC_Subscriptions;
 
@@ -24,6 +25,23 @@ use WC_Subscriptions;
 class PayplugWoocommerceHelper
 {
     use ServiceGetter;
+
+    /**
+     * Every payment method except the UHF card (Retail API card, Oney, Scalapay, Bancontact,
+     * Apple Pay, ...) only accepts EUR: their amounts and thresholds are always in euro cents,
+     * whatever the shop or order currency.
+     */
+    public const EURO_CURRENCY = 'EUR';
+
+    /**
+     * Check if the shop's payment currency is Euro.
+     *
+     * @return bool
+     */
+    public static function is_eur_shop()
+    {
+        return self::EURO_CURRENCY === get_woocommerce_currency();
+    }
 
     /**
      * Check if current WooCommerce version is below 3.0.0
@@ -370,19 +388,22 @@ class PayplugWoocommerceHelper
     }
 
     /**
-     * Convert amount in cents.
+     * Convert an amount to the minor units of its currency (cents for EUR/USD, units for a
+     * zero-decimal currency such as JPY).
      *
      * @param float $amount
+     * @param string|null $currency ISO 4217 code of $amount: pass the order's currency whenever
+     *                              there is an order; defaults to the shop currency
      *
      * @return int
      */
-    public static function get_payplug_amount($amount)
+    public static function get_payplug_amount($amount, ?string $currency = null)
     {
         if (is_null($amount)) {
             return $amount;
         }
 
-        return absint(wc_format_decimal(((float) $amount * 100), wc_get_price_decimals()));
+        return AmountHelper::toCents((float) $amount, $currency ?? get_woocommerce_currency());
     }
 
     /**
