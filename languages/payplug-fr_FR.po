@@ -1335,3 +1335,13 @@ msgstr "Limites de montant Scalapay invalides"
 #, php-format
 msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
 msgstr "Le montant total de votre panier doit être compris entre %s€ et %s€ pour payer avec Scalapay."
+
+#: src/PayplugWoocommerceRequest.php:485
+#, php-format
+msgid "Payplug payment %1$s failed (%2$s: %3$s)."
+msgstr "Le paiement Payplug %1$s a échoué (%2$s : %3$s)."
+
+#: src/PayplugWoocommerceRequest.php:486
+#, php-format
+msgid "Payplug payment %s was not completed."
+msgstr "Le paiement Payplug %s n'a pas abouti."
