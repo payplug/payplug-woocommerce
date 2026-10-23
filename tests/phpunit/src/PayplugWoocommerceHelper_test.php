@@ -10,6 +10,7 @@ class PayplugWoocommerceHelper_test extends TestCase
     protected function tearDown(): void
     {
         delete_option('woocommerce_currency');
+        delete_option('woocommerce_payplug_settings');
         parent::tearDown();
     }
 
@@ -51,5 +52,55 @@ class PayplugWoocommerceHelper_test extends TestCase
     public function test_get_payplug_amount_rounds_half_cent_up(): void
     {
         self::assertSame(2000, PayplugWoocommerceHelper::get_payplug_amount(19.995, 'EUR'));
+    }
+
+    private function seed_oauth_client_data(bool $live, string $oauth_client_data): void
+    {
+        update_option('woocommerce_payplug_settings', [
+            'mode' => $live,
+            'oauth_client_data' => $oauth_client_data,
+        ]);
+    }
+
+    public function test_is_oauth2_connected_when_the_stored_mode_has_client_credentials(): void
+    {
+        $this->seed_oauth_client_data(true, '{"live":{"client_id":"id","client_secret":"secret"},"test":[]}');
+
+        self::assertTrue(PayplugWoocommerceHelper::is_oauth2_connected());
+    }
+
+    public function test_is_oauth2_connected_checks_the_requested_mode_only(): void
+    {
+        $this->seed_oauth_client_data(true, '{"live":[],"test":{"client_id":"id","client_secret":"secret"}}');
+
+        self::assertFalse(PayplugWoocommerceHelper::is_oauth2_connected());
+        self::assertFalse(PayplugWoocommerceHelper::is_oauth2_connected(true));
+        self::assertTrue(PayplugWoocommerceHelper::is_oauth2_connected(false));
+    }
+
+    public function test_is_not_oauth2_connected_with_the_classic_login_default(): void
+    {
+        $this->seed_oauth_client_data(false, '{}');
+
+        self::assertFalse(PayplugWoocommerceHelper::is_oauth2_connected());
+    }
+
+    public function test_is_not_oauth2_connected_when_the_client_secret_is_missing(): void
+    {
+        $this->seed_oauth_client_data(false, '{"test":{"client_id":"id","client_secret":""}}');
+
+        self::assertFalse(PayplugWoocommerceHelper::is_oauth2_connected());
+    }
+
+    public function test_is_not_oauth2_connected_when_the_oauth_client_data_is_malformed(): void
+    {
+        $this->seed_oauth_client_data(false, 'not json');
+
+        self::assertFalse(PayplugWoocommerceHelper::is_oauth2_connected());
+    }
+
+    public function test_is_not_oauth2_connected_without_settings(): void
+    {
+        self::assertFalse(PayplugWoocommerceHelper::is_oauth2_connected());
     }
 }

@@ -77,10 +77,11 @@ class PayplugCreditCard extends PayplugGenericBlock
                 $data['wp_nonce'] = wp_create_nonce('woocommerce-process_checkout');
                 break;
             case 'hosted_fields':
-                // Same guard as PayplugCreditCard::hosted_fields_available - an empty
-                // company_ref (failed GET /account) or empty HOSTED_FIELDS_SDK_URL means
-                // the SDK can never render a working form. Skip exposing hostedFields
-                // entirely rather than have wc-payplug-blocks.js mount a dead component.
+                // Same guard as PayplugCreditCard::hosted_fields_available - no OAuth2
+                // connection for the current mode, no hosted_fields identifier, an empty
+                // company_ref (failed GET /account) or an empty HOSTED_FIELDS_SDK_URL means the
+                // payment cannot go through. Skip exposing hostedFields entirely rather than have
+                // wc-payplug-blocks.js mount a dead component.
                 if (!$this->gateway->hosted_fields_available) {
                     PayplugGateway::log('Hosted Fields block not exposed: hosted_fields_available is false (see PayplugCreditCard constructor log for the specific cause).', 'error');
 
@@ -91,7 +92,7 @@ class PayplugCreditCard extends PayplugGenericBlock
                 // The Dalenys SDK's companyId must be the account's UUID company_ref (from
                 // GET /account, mirroring the Sylius PayPlug plugin) - not the
                 // merchant-entered Account ID (hosted_fields.identifier), which is a
-                // different value reserved for a future server-side payment-capture call.
+                // different value: the account id sent with every UHF payment and refund call.
                 $data['hostedFieldsCompanyId'] = PayplugWoocommerceHelper::get_account_data_from_options()['company_ref'] ?? '';
                 // No ajax url/nonce: the client never round-trips the token through a separate
                 // endpoint before resolving onPaymentSetup (see wc-payplug-hostedFields-blocks.js) -
