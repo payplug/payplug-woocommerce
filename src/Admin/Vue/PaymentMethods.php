@@ -2,8 +2,9 @@
 
 namespace Payplug\PayplugWoocommerce\Admin\Vue;
 
-use Payplug\PayplugWoocommerce\Gateway\PPRO\Scalapay;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Service\ApmEligibility;
+use Payplug\PayplugWoocommerce\Service\ApmSettings;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
 class PaymentMethods
@@ -316,9 +317,9 @@ class PaymentMethods
      *
      * @return array
      */
-    public static function payment_method_bancontact($active = false)
+    public static function payment_method_bancontact($active = false, $options = [])
     {
-        return [
+        return array_merge([
             'type' => 'payment_method',
             'name' => 'bancontact',
             'title' => __('payplug_section_bancontact_payment_title', 'payplug'),
@@ -335,7 +336,7 @@ class PaymentMethods
                     'link_know_more' => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_bancontact_more_url', 'payplug'), '_blank'),
                 ],
             ],
-        ];
+        ], self::apm_restrictions('bancontact', $options));
     }
 
     /**
@@ -370,9 +371,9 @@ class PaymentMethods
      *
      * @return array
      */
-    public static function payment_method_satispay($active = false)
+    public static function payment_method_satispay($active = false, $options = [])
     {
-        return [
+        return array_merge([
             'type' => 'payment_method',
             'name' => 'satispay',
             'title' => __('payplug_satispay_activate', 'payplug'),
@@ -389,10 +390,7 @@ class PaymentMethods
                     'link_know_more' => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_satispay_more_url', 'payplug'), '_blank'),
                 ],
             ],
-            'options' => [
-                self::get_allowed_countries('satispay'),
-            ],
-        ];
+        ], self::apm_restrictions('satispay', $options));
     }
 
     /**
@@ -400,9 +398,9 @@ class PaymentMethods
      *
      * @return array
      */
-    public static function payment_method_mybank($active = false)
+    public static function payment_method_mybank($active = false, $options = [])
     {
-        return [
+        return array_merge([
             'type' => 'payment_method',
             'name' => 'mybank',
             'title' => __('payplug_mybank_activate', 'payplug'),
@@ -419,10 +417,7 @@ class PaymentMethods
                     'link_know_more' => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_mybank_more_url', 'payplug'), '_blank'),
                 ],
             ],
-            'options' => [
-                self::get_allowed_countries('mybank'),
-            ],
-        ];
+        ], self::apm_restrictions('mybank', $options));
     }
 
     /**
@@ -430,9 +425,9 @@ class PaymentMethods
      *
      * @return array
      */
-    public static function payment_method_ideal($active = false)
+    public static function payment_method_ideal($active = false, $options = [])
     {
-        return [
+        return array_merge([
             'type' => 'payment_method',
             'name' => 'ideal',
             'title' => __('payplug_ideal_activate', 'payplug'),
@@ -449,10 +444,7 @@ class PaymentMethods
                     'link_know_more' => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_ideal_more_url', 'payplug'), '_blank'),
                 ],
             ],
-            'options' => [
-                self::get_allowed_countries('ideal'),
-            ],
-        ];
+        ], self::apm_restrictions('ideal', $options));
     }
 
     /**
@@ -460,9 +452,9 @@ class PaymentMethods
      *
      * @return array
      */
-    public static function payment_method_wero($active = false)
+    public static function payment_method_wero($active = false, $options = [])
     {
-        return [
+        return array_merge([
             'type' => 'payment_method',
             'name' => 'wero',
             'title' => __('payplug_wero_activate', 'payplug'),
@@ -479,10 +471,7 @@ class PaymentMethods
                     'link_know_more' => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_wero_more_url', 'payplug'), '_blank'),
                 ],
             ],
-            'options' => [
-                self::get_allowed_countries('wero'),
-            ],
-        ];
+        ], self::apm_restrictions('wero', $options));
     }
 
     /**
@@ -490,9 +479,9 @@ class PaymentMethods
      *
      * @return array
      */
-    public static function payment_method_bizum($active = false)
+    public static function payment_method_bizum($active = false, $options = [])
     {
-        return [
+        return array_merge([
             'type' => 'payment_method',
             'name' => 'bizum',
             'title' => __('payplug_bizum_activate', 'payplug'),
@@ -509,23 +498,17 @@ class PaymentMethods
                     'link_know_more' => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_bizum_more_url', 'payplug'), '_blank'),
                 ],
             ],
-            'options' => [
-                self::get_allowed_countries('bizum'),
-            ],
-        ];
+        ], self::apm_restrictions('bizum', $options));
     }
 
     /**
      * @param $active
-     * @param $config payment_methods.configuration.scalapay options (active/custom_amounts/default_amounts)
-     * @param $api_amounts payment_methods.permissions.scalapay.amounts - the account's live PayPlug-authorized
-     *                     bounds, JSON-encoded {"min":{"EUR":n},"max":{"EUR":n}} (see AccountGateway::map())
      *
      * @return array
      */
-    public static function payment_method_scalapay($active = false, $config = [], $api_amounts = '{}')
+    public static function payment_method_scalapay($active = false, $options = [])
     {
-        return [
+        return array_merge([
             'type' => 'payment_method',
             'name' => 'scalapay',
             'title' => __('payplug_scalapay_activate', 'payplug'),
@@ -542,85 +525,47 @@ class PaymentMethods
                     'link_know_more' => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_scalapay_more_url', 'payplug'), '_blank'),
                 ],
             ],
-            'options' => [
-                self::get_allowed_countries('scalapay'),
-            ],
-            'advanced_options' => [
-                self::scalapay_thresholds_option($config, $api_amounts),
-            ],
-        ];
+        ], self::apm_restrictions('scalapay', $options));
     }
 
     /**
+     * Amount range and billing countries blocks, none without cached API limits.
+     *
+     * @param string $apm
+     * @param array $options woocommerce_payplug_settings
+     *
      * @return array
      */
-    private static function scalapay_thresholds_option($config, $api_amounts)
+    private static function apm_restrictions($apm, $options)
     {
-        // Shared with Scalapay::check_gateway()'s checkout-time enforcement, so the BO
-        // display and the actual gating logic can't silently drift apart.
-        [$min, $max] = Scalapay::effective_bounds($config, $api_amounts);
-
-        // The widget's client-side validation ceiling is always the account's raw
-        // authorized range (matching the save-time validator), not the merchant's own
-        // possibly-narrower custom choice.
-        [$authorized_min, $authorized_max] = Scalapay::authorized_bounds($config, $api_amounts);
-
-        // Convert cents to euros for display
-        $min = $min / 100;
-        $max = $max / 100;
-        $authorized_min = $authorized_min / 100;
-        $authorized_max = $authorized_max / 100;
-
-        return [
-            'name' => 'thresholds',
-            'image_url' => esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/images/thresholds.svg'),
-            'title' => __('payplug_thresholds_scalapay_title', 'payplug'),
-            'descriptions' => [
-                'description' => __('payplug_thresholds_scalapay_description', 'payplug'),
-                'min_amount' => [
-                    'name' => 'scalapay_min_amounts',
-                    'value' => $min,
-                    'placeholder' => $min,
-                    'default' => $authorized_min,
-                ],
-                'inter' => __('and', 'payplug'),
-                'max_amount' => [
-                    'name' => 'scalapay_max_amounts',
-                    'value' => $max,
-                    'placeholder' => $max,
-                    'default' => $authorized_max,
-                ],
-                'error' => [
-                    'text' => __('payplug_thresholds_scalapay_error_msg', 'payplug'),
-                    'maxtext' => __('payplug_thresholds_scalapay_error_maxtext_msg', 'payplug'),
-                    'mintext' => __('payplug_thresholds_scalapay_error_mintext_msg', 'payplug'),
-                ],
-            ],
-            'switch' => false,
-        ];
-    }
-
-    /**
-     * @param $id
-     *
-     * @return false|string
-     */
-    private static function get_allowed_countries($id)
-    {
-        $account = PayplugWoocommerceHelper::get_account_data_from_options();
-
-        if (empty($account['payment_methods'][$id])) {
-            return false;
+        $config = ApmSettings::config_for(is_array($options) ? $options : [], $apm);
+        $limits = $config['limits'];
+        if (null === $limits) {
+            return [];
         }
 
-        $arr = [
-            'type' => 'info_message',
-            'sub_type' => 'text',
-            'name' => 'allowed_countries',
-            'payment_method' => $id,
-            'description' => trim(sprintf(__('payplug_payment_gateways_country_permissions', 'payplug'), ucfirst($id))) . implode(', ', $account['payment_methods'][$id]['allowed_countries']) . '.',
-        ];
+        $builder = new ApmRestrictionsBlock(static fn (string $key): string => __($key, 'payplug'));
 
-        return $arr;
+        $country_names = [];
+        foreach (WC()->countries->get_countries() as $code => $name) {
+            $country_names[$code] = html_entity_decode($name, ENT_QUOTES, 'UTF-8');
+        }
+
+        return [
+            'advanced_options' => [
+                $builder->thresholds(
+                    $apm,
+                    ApmEligibility::effective_amounts($limits, $config['custom_amounts']),
+                    ['min' => $limits['min'], 'max' => $limits['max']]
+                ),
+            ],
+            'countries' => $builder->countries(
+                $apm,
+                $limits['countries'],
+                $config['custom_countries'],
+                array_keys(WC()->countries->get_allowed_countries()),
+                $country_names
+            ),
+        ];
     }
 }
