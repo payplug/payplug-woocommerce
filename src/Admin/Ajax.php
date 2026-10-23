@@ -685,8 +685,8 @@ class Ajax
             $options['payment_methods']['configuration']['oney']['active'] = (bool) $data['enable_oney'];
             $options['payment_methods']['configuration']['oney']['cta_product'] = (bool) $data['enable_oney_product_animation'];
             $options['payment_methods']['configuration']['oney']['custom_amounts'] = json_encode([
-                'min' => AmountHelper::toCents((float) $data['oney_min_amounts']),
-                'max' => AmountHelper::toCents((float) $data['oney_max_amounts']),
+                'min' => AmountHelper::toCents((float) $data['oney_min_amounts'], PayplugWoocommerceHelper::EURO_CURRENCY),
+                'max' => AmountHelper::toCents((float) $data['oney_max_amounts'], PayplugWoocommerceHelper::EURO_CURRENCY),
             ]);
             $options['payment_methods']['configuration']['oney']['with_fees'] = 'with_fees' == (string) $data['payplug_oney'];
         }
@@ -702,11 +702,11 @@ class Ajax
                 $options['payment_methods']['configuration']['scalapay'] ?? [],
                 $options['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
             );
-            // round() before the cast: the submitted values are euros, so a bare (int) cast
-            // would bind tighter than the * 100 and truncate the cents (49.99 -> 4900).
+            // Scalapay is Euro-only: the submitted values are euros. AmountHelper rounds before
+            // casting, so 49.99 can't truncate to 4900.
             $scalapay_thresholds = Validator::scalapay_thresholds(
-                (int) round((float) $data['scalapay_min_amounts'] * 100),
-                (int) round((float) $data['scalapay_max_amounts'] * 100),
+                AmountHelper::toCents((float) $data['scalapay_min_amounts'], PayplugWoocommerceHelper::EURO_CURRENCY),
+                AmountHelper::toCents((float) $data['scalapay_max_amounts'], PayplugWoocommerceHelper::EURO_CURRENCY),
                 $scalapay_authorized_min,
                 $scalapay_authorized_max
             );

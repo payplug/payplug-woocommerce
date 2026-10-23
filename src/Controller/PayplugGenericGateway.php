@@ -430,7 +430,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
         ];
 
         if (!is_null($amount)) {
-            $data['amount'] = PayplugWoocommerceHelper::get_payplug_amount($amount);
+            $data['amount'] = PayplugWoocommerceHelper::get_payplug_amount($amount, $order->get_currency());
         }
 
         if (!empty($reason)) {
@@ -472,7 +472,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
                 $order->save();
             }
 
-            $note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($refund->id), wc_price(AmountHelper::fromCents((int) $refund->amount)));
+            $note = sprintf(__('Refund %s : Refunded %s', 'payplug'), wc_clean($refund->id), wc_price(AmountHelper::fromCents((int) $refund->amount, $order->get_currency()), ['currency' => $order->get_currency()]));
             if (!empty($refund->metadata['reason'])) {
                 $note .= sprintf(' (%s)', esc_html($refund->metadata['reason']));
             }

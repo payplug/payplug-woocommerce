@@ -1341,6 +1341,7 @@ msgstr "Límites de importe de Scalapay no válidos"
 #, php-format
 msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
 msgstr "El importe total de su carrito debe estar entre %s€ y %s€ para pagar con Scalapay."
+
 msgid "payplug_section_standard_payment_option_hosted_fields_label"
 msgstr "Advanced (beta) Hosted Fields"
 
@@ -1382,6 +1383,9 @@ msgstr "La tarjeta ha sido eliminada."
 
 msgid "payplug_uhf_saved_cards_invalid_notice"
 msgstr "Tarjeta no válida."
+
+msgid "payplug_payment_currency_not_supported"
+msgstr "Este método de pago no está disponible para pedidos en esta moneda."
 
 #: src/PayplugWoocommerceRequest.php:485
 #, php-format

@@ -26,7 +26,7 @@ trait BuildsCommonFields
 
         $common = new CommonFieldsDto(
             $configuration_repository->getPublicKeyId(),
-            AmountHelper::toCents((float) $order->get_total()),
+            AmountHelper::toCents((float) $order->get_total(), $order->get_currency()),
             $order->get_currency(),
             (string) $order->get_id(),
             ''

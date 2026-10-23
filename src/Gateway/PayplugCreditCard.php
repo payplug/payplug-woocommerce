@@ -171,7 +171,7 @@ class PayplugCreditCard extends PayplugGateway
         // the terminal-status short-circuit above: an order that already succeeded must still
         // redirect to the order-received page even if its amount would fail this check today
         // (e.g. the account's thresholds were tightened after the order was paid).
-        $validated_amount = $this->validate_order_amount(AmountHelper::toCents((float) $order->get_total()));
+        $validated_amount = $this->validate_order_amount(AmountHelper::toCents((float) $order->get_total(), $order->get_currency()), $order->get_currency());
 
         if (is_wp_error($validated_amount)) {
             self::log(sprintf('Invalid amount %s for order #%s.', $order->get_total(), $order_id), 'error');
@@ -353,7 +353,7 @@ class PayplugCreditCard extends PayplugGateway
         }
 
         try {
-            $amount_in_cents = null !== $amount ? AmountHelper::toCents((float) $amount) : null;
+            $amount_in_cents = null !== $amount ? AmountHelper::toCents((float) $amount, $order->get_currency()) : null;
 
             $response = (new UnifiedApiPaymentServiceFactory())->create()->createRefund(
                 $operation_id,
@@ -409,6 +409,10 @@ class PayplugCreditCard extends PayplugGateway
      * of the same order - using it would give two refunds the same dedupe key. The top-level id
      * remains a fallback for a response without operationIds. Returns null for a body that
      * doesn't parse or carries neither, so an unrecognized shape degrades to "no id persisted".
+     *
+     * Assumption, to be confirmed with the API team: operationIds[0] is THIS refund's operation.
+     * Every refund response seen on staging (EUR, USD and JPY accounts) carried exactly one id.
+     * If the API ever returns several, only the first is used as the dedupe key.
      */
     public function extract_refund_id(string $response_body): ?string
     {
@@ -429,7 +433,7 @@ class PayplugCreditCard extends PayplugGateway
     public function build_refund_note(?int $amount_in_cents, string $currency, string $reason, ?string $refund_id = null): string
     {
         $amount_text = null !== $amount_in_cents
-            ? sprintf(__('refunded %s', 'payplug'), wc_price(AmountHelper::fromCents($amount_in_cents), ['currency' => $currency]))
+            ? sprintf(__('refunded %s', 'payplug'), wc_price(AmountHelper::fromCents($amount_in_cents, $currency), ['currency' => $currency]))
             : __('fully refunded', 'payplug');
 
         $note = null !== $refund_id
@@ -702,7 +706,7 @@ class PayplugCreditCard extends PayplugGateway
             throw new \Exception(__('Invalid payment method.', 'payplug'));
         }
 
-        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($amount);
+        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($amount, $order->get_currency());
 
         try {
             $address_data = PayplugAddressData::from_order($order);
