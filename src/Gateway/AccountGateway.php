@@ -177,6 +177,18 @@ class AccountGateway
     }
 
     /**
+     * Connected through the classic e-mail/password login: a session without OAuth data (jwt).
+     *
+     * @return bool
+     */
+    public function is_legacy_logged(): bool
+    {
+        $jwt = json_decode((string) $this->get_configuration()->get_option('jwt'), true);
+
+        return $this->is_logged() && empty($jwt);
+    }
+
+    /**
      * @return void
      */
     public function logout(): void

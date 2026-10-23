@@ -1405,3 +1405,9 @@ msgstr "Rimborso: %s"
 
 msgid "Payplug payment %s from an earlier attempt on this order was confirmed as paid. The customer may have been charged twice: check the transactions and refund the duplicate if needed."
 msgstr "Il pagamento Payplug %s di un tentativo precedente su questo ordine è stato confermato come pagato. Il cliente potrebbe essere stato addebitato due volte: verifica le transazioni e rimborsa il duplicato se necessario."
+
+msgid "payplug_section_oauth_reconnect_title"
+msgstr "Riconnettiti con OAuth2"
+
+msgid "payplug_section_oauth_reconnect_description"
+msgstr "Il tuo account è collegato tramite l’accesso classico, che non consente di utilizzare gli Hosted Fields nella valuta del tuo negozio. Esci, quindi accedi di nuovo tramite OAuth2 per utilizzarli."

@@ -63,9 +63,9 @@ class PayplugApi
      *
      * @param string $current_mode The current mode (test or live) for which to refresh the JWT.
      *
-     * @return bool
+     * @return string The refreshed access token, or an empty string if it could not be refreshed.
      */
-    private function try_refresh_jwt($current_mode)
+    private function try_refresh_jwt($current_mode): string
     {
         if (class_exists('Payplug\\PayplugWoocommerce\\Service\\Api')) {
             $apiService = $this->get_api();
@@ -86,12 +86,12 @@ class PayplugApi
                     $configuration->update_option('jwt', json_encode($jwt));
                     $configuration->update_option('api_key', json_encode($api_keys));
 
-                    return true;
+                    return (string) $new_jwt['access_token'];
                 }
             }
         }
 
-        return false;
+        return '';
     }
 
     /**
@@ -113,24 +113,26 @@ class PayplugApi
                 sprintf('WooCommerce/%s', WC()->version)
             );
         } catch (ConfigurationException $e) {
-            if ($this->try_refresh_jwt($current_mode)) {
-                if (!is_string($bearer_token) || empty($bearer_token)) {
-                    PayplugWoocommerceHelper::payplug_logout();
-                    throw $e;
-                }
-                $this->api_payplug = Payplug::init([
-                    'secretKey' => (string) $bearer_token,
-                    'apiVersion' => '2019-08-06',
-                ]);
-                HttpClient::setDefaultUserAgentProduct(
-                    'PayPlug-WooCommerce',
-                    PAYPLUG_GATEWAY_VERSION,
-                    sprintf('WooCommerce/%s', WC()->version)
+            $bearer_token = $this->try_refresh_jwt($current_mode);
+            $this->bearer_token = $bearer_token;
+            if ('' === $bearer_token) {
+                wc_get_logger()->error(
+                    sprintf('No PayPlug token for the %s mode, logging the merchant out: %s', $current_mode, $e->getMessage()),
+                    ['source' => 'payplug_gateway']
                 );
-            } else {
                 PayplugWoocommerceHelper::payplug_logout();
-                throw $e;
+
+                return;
             }
+            $this->api_payplug = Payplug::init([
+                'secretKey' => $bearer_token,
+                'apiVersion' => '2019-08-06',
+            ]);
+            HttpClient::setDefaultUserAgentProduct(
+                'PayPlug-WooCommerce',
+                PAYPLUG_GATEWAY_VERSION,
+                sprintf('WooCommerce/%s', WC()->version)
+            );
         }
     }
 
