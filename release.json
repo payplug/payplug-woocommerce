@@ -1,5 +1,5 @@
 {
-  "version": "3.1.2",
+  "version": "3.2.0",
   "wc_tested_up_to": "10.6.1",
   "wp_tested_up_to": "6.9.4",
   "changelog": "* Fix: integrated payment on the classic checkout now shows the error and keeps the customer on the checkout when 3D Secure is declined, instead of redirecting to the order confirmation page\n* Fix: integrated payment on the classic checkout now always shows an error message when the payment cannot be confirmed, instead of an empty notice\n* Fix: when an integrated card payment fails on the checkout, the order note now gives the Payplug payment ID and the failure reason (for example 3D Secure declined) instead of \"Order cancelled by customer.\""

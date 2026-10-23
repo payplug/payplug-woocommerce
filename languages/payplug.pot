@@ -963,12 +963,12 @@ msgstr ""
 msgid "The total amount of your order should be between %s€ and %s€ to pay with Scalapay."
 msgstr ""
 
-#: src/PayplugWoocommerceRequest.php:483
+#: src/PayplugWoocommerceRequest.php:485
 #, php-format
 msgid "Payplug payment %1$s failed (%2$s: %3$s)."
 msgstr ""
 
-#: src/PayplugWoocommerceRequest.php:484
+#: src/PayplugWoocommerceRequest.php:486
 #, php-format
 msgid "Payplug payment %s was not completed."
 msgstr ""
