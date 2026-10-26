@@ -211,16 +211,70 @@ class AccountGateway
      */
     public function initialize_permisssion(): void
     {
-        // get the permissions
-        $permissions = $this->get_permissions();
+        $this->refresh_payment_permissions();
 
         // then get test merchant id
         $company_id = $this->get_merchant_id();
-        $permissions['global']['company_id'] = $company_id;
+        $this->get_configuration()->update_options(['company_id' => $company_id]);
+    }
 
-        // and update options
-        $this->get_configuration()->update_options($permissions['global']);
-        $this->get_configuration()->update_payment_permissions($permissions['payment_methods']);
+    /**
+     * Refresh the cached payment permissions (API limits) from the account of the given mode.
+     * On any failure the stored permissions and apm_cache_mode are left untouched.
+     *
+     * @param string $mode live|test, '' = current mode
+     */
+    public function refresh_payment_permissions(string $mode = ''): bool
+    {
+        if (!in_array($mode, ['live', 'test'], true)) {
+            $mode = (bool) $this->get_configuration()->get_option('mode') ? 'live' : 'test';
+        }
+
+        try {
+            $response = $this->fetch_account($mode);
+            if (!self::is_valid_account_response($response)) {
+                PayplugGateway::log(sprintf('APM limits refresh failed (%s mode): invalid account response', $mode), 'warning');
+
+                return false;
+            }
+            $permissions = $this->format_account_permissions($response);
+        } catch (\Throwable $e) {
+            PayplugGateway::log(sprintf('APM limits refresh failed (%s mode): %s', $mode, $e->getMessage()), 'warning');
+
+            return false;
+        }
+
+        $global = isset($permissions['global']) && is_array($permissions['global']) ? $permissions['global'] : [];
+        unset($global['company_id']);
+
+        $options = $this->get_configuration()->get_options();
+        $options = is_array($options) ? $options : [];
+        $options = array_merge($options, $global);
+        $options['payment_methods']['permissions'] = $permissions['payment_methods'];
+        $options['apm_cache_mode'] = $mode;
+        $this->get_configuration()->update_options($options);
+
+        return true;
+    }
+
+    /**
+     * @param mixed $response raw GET /v1/account response
+     */
+    public static function is_valid_account_response($response): bool
+    {
+        return is_array($response)
+            && !empty($response['payment_methods']) && is_array($response['payment_methods'])
+            && !empty($response['configuration']) && is_array($response['configuration']);
+    }
+
+    /**
+     * @return array|null raw GET /v1/account response of the given mode
+     */
+    protected function fetch_account(string $mode)
+    {
+        $account = $this->get_service('api')->get_account($mode);
+
+        return $account['response'] ?? null;
     }
 
     /**

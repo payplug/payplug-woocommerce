@@ -8,7 +8,6 @@ class Ideal extends PayplugGenericGateway
 {
     protected $min_thresholds;
     protected $max_thresholds;
-    protected $allowed_country_codes = [];
     protected $enable_refund = true;
     public const ENABLE_ON_TEST_MODE = false;
 

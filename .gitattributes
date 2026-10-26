@@ -30,3 +30,4 @@ node_modules export-ignore
 *.sql export-ignore
 *.tar.gz export-ignore
 *.zip export-ignore
+*.test.js export-ignore

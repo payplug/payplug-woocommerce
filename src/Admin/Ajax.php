@@ -19,6 +19,10 @@ use Payplug\PayplugWoocommerce\Gateway\PPRO\Satispay;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Scalapay;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Wero;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Service\ApmAmountsSave;
+use Payplug\PayplugWoocommerce\Service\ApmEligibility;
+use Payplug\PayplugWoocommerce\Service\ApmRefreshPolicy;
+use Payplug\PayplugWoocommerce\Service\ApmSettings;
 use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
 use WP_REST_Request;
 
@@ -212,6 +216,10 @@ class Ajax
                 ]
             );
         }
+
+        // The site has just been switched to live: the cached APM limits may come from the test
+        // account. A failed refresh keeps the last known limits and does not fail the request.
+        $this->get_gateway('account')->refresh_payment_permissions('live');
 
         wp_send_json_success(
             [
@@ -474,8 +482,14 @@ class Ajax
     {
         $wp_nonce = wp_create_nonce();
 
+        $account = $this->get_gateway('account');
+        $logged = $account->is_logged();
+        if ($logged) {
+            $account->refresh_payment_permissions();
+        }
+
         $wp = [
-            'logged' => $this->get_gateway('account')->is_logged(),
+            'logged' => $logged,
             'mode' => PayplugWoocommerceHelper::check_mode() ? 0 : 1,
             'WP' => [
                 '_wpnonce' => $wp_nonce,
@@ -613,6 +627,15 @@ class Ajax
         $payplug = new PayplugGateway();
         $options = $payplug->settings;
 
+        // The posted mode is not stored yet: the refresh gets it explicitly, and the settings
+        // are reloaded so that the posted values apply on top of the refreshed limits.
+        $target_mode = (bool) $data['payplug_sandbox'] ? 'test' : 'live';
+        if (ApmRefreshPolicy::needs_refresh_on_save(is_array($options) ? $options : [], $target_mode)
+            && $this->get_gateway('account')->refresh_payment_permissions($target_mode)) {
+            $payplug->init_settings();
+            $options = $payplug->settings;
+        }
+
         // global configuration
         $options['enabled'] = (bool) $data['payplug_enable'];
         $options['debug'] = (bool) $data['enable_debug'];
@@ -671,26 +694,33 @@ class Ajax
         ]);
         $options['payment_methods']['configuration']['oney']['with_fees'] = 'with_fees' == (string) $data['payplug_oney'];
 
-        // scalapay payment - the thresholds widget isn't necessarily rendered (a stale admin
-        // JS bundle right after a deploy, for instance). Its absence must not reach
-        // Validator::scalapay_thresholds(), which would read the missing values as 0, fail
-        // the "below the account minimum" check and abort the whole request via
-        // wp_send_json_error() - discarding every other setting in this save, since
-        // update_options() only runs at the end of this method.
-        if (array_key_exists('scalapay_min_amounts', $data) && array_key_exists('scalapay_max_amounts', $data)) {
-            [$scalapay_authorized_min, $scalapay_authorized_max] = Scalapay::authorized_bounds(
-                $options['payment_methods']['configuration']['scalapay'] ?? [],
-                $options['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
+        // PPRO restrictions: the keys are absent when the BO bundle does not render the blocks,
+        // which must leave the stored restrictions untouched.
+        $shop_countries = array_keys(WC()->countries->get_allowed_countries());
+        foreach (ApmEligibility::APMS as $apm) {
+            $apm_config = ApmSettings::config_for($options, $apm);
+            $limits = $apm_config['limits'];
+            if (null === $limits || !isset($options['payment_methods']['configuration'][$apm])) {
+                continue;
+            }
+
+            $custom_amounts = Validator::apm_amounts(
+                $apm,
+                ApmAmountsSave::posted($data, $apm . '_min_amounts'),
+                ApmAmountsSave::posted($data, $apm . '_max_amounts'),
+                $limits['min'],
+                $limits['max']
             );
-            // round() before the cast: the submitted values are euros, so a bare (int) cast
-            // would bind tighter than the * 100 and truncate the cents (49.99 -> 4900).
-            $scalapay_thresholds = Validator::scalapay_thresholds(
-                (int) round((float) $data['scalapay_min_amounts'] * 100),
-                (int) round((float) $data['scalapay_max_amounts'] * 100),
-                $scalapay_authorized_min,
-                $scalapay_authorized_max
-            );
-            $options['payment_methods']['configuration']['scalapay']['custom_amounts'] = json_encode($scalapay_thresholds);
+            if (null !== $custom_amounts) {
+                $options['payment_methods']['configuration'][$apm]['custom_amounts'] = empty($custom_amounts) ? '{}' : json_encode($custom_amounts);
+            }
+
+            if (array_key_exists($apm . '_countries', $data)) {
+                $custom_countries = Validator::apm_countries($apm, $data[$apm . '_countries'], $apm_config['custom_countries'], $limits['countries'], $shop_countries);
+                if (null !== $custom_countries) {
+                    $options['payment_methods']['configuration'][$apm]['custom_countries'] = $custom_countries;
+                }
+            }
         }
 
         // Force-disable methods unavailable in test mode: submitted 'active' flags are
