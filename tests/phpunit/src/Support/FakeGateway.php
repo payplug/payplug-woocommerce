@@ -25,6 +25,11 @@ class FakeGateway extends \WC_Payment_Gateway
     public $on_process;
 
     /**
+     * @var bool answer of requires_phone_region_match()
+     */
+    public $phone_region_match = false;
+
+    /**
      * @param string $id
      */
     public function __construct($id)
@@ -51,5 +56,10 @@ class FakeGateway extends \WC_Payment_Gateway
     public function save_card_available(): bool
     {
         return false;
+    }
+
+    public function requires_phone_region_match(): bool
+    {
+        return $this->phone_region_match;
     }
 }
