@@ -357,6 +357,10 @@ class HostedFieldsPaymentProcessor
             // not this endpoint's raw {status, body} array - firing it here would hand them a
             // shape they don't expect, a behavior change for anyone already hooking it.
             $order->add_order_note($this->build_refund_note($amount_in_cents, $order->get_currency(), $reason, $refund_id));
+            // Only a refund made from the WooCommerce screen reaches the snapshot: there is no refund
+            // notification handler for UHF, so a refund made from the PayPlug portal leaves the
+            // metabox on "Paid" (spec PRE-3748, question Q5).
+            (new UpcTransactionMetadataRecorder())->record_refund($order, $amount_in_cents);
             PayplugGateway::log(sprintf('UPC refund complete for order #%s.', $order_id));
 
             return true;

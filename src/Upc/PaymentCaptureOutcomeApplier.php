@@ -43,7 +43,8 @@ class PaymentCaptureOutcomeApplier
                 $data,
                 '' !== $exec_code ? $exec_code : self::PENDING_THREE_DS_EXEC_CODE,
                 PaymentOutcome::THREE_DS_PENDING,
-                $save_card
+                $save_card,
+                true
             );
 
             set_transient('payplug_upc_redirect_html_' . $order->get_id(), $output->redirectHtml, self::REDIRECT_HTML_TTL_SECONDS);
@@ -66,7 +67,8 @@ class PaymentCaptureOutcomeApplier
                 $data,
                 '' !== $exec_code ? $exec_code : self::PENDING_THREE_DS_EXEC_CODE,
                 PaymentOutcome::THREE_DS_PENDING,
-                $save_card
+                $save_card,
+                true
             );
 
             return ['result' => 'success', 'redirect' => $output->redirectUrl];
@@ -168,7 +170,7 @@ class PaymentCaptureOutcomeApplier
      *
      * @param array<string, mixed> $data the json_decode()'d payment-creation response body
      */
-    private function persist_operation(\WC_Order $order, array $data, string $exec_code, string $outcome, bool $save_card = false): void
+    private function persist_operation(\WC_Order $order, array $data, string $exec_code, string $outcome, bool $save_card = false, bool $three_ds = false): void
     {
         $operation_id = self::extract_operation_id($data);
         $operation_id_alt = isset($data['operationIds']) && is_array($data['operationIds']) && isset($data['operationIds'][0]) && is_scalar($data['operationIds'][0])
@@ -248,6 +250,8 @@ class PaymentCaptureOutcomeApplier
             }
 
             $order->save();
+
+            (new UpcTransactionMetadataRecorder())->record_created($order, $operation_id, $three_ds);
         } catch (InvalidOperationDataException $e) {
             (new WooCommerceLogger())->error(sprintf('UPC operation "%s" could not be persisted for order #%s: %s', $operation_id, $order->get_id(), $e->getMessage()));
         } catch (PaymentNotFoundException $e) {

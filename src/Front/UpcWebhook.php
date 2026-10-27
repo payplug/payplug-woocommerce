@@ -7,6 +7,7 @@ use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLogger;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOrderStateMutator;
 use Payplug\PayplugWoocommerce\Upc\Card\CardRecorderFromOperation;
 use Payplug\PayplugWoocommerce\Upc\OperationOutcomeProcessor;
+use Payplug\PayplugWoocommerce\Upc\UpcTransactionMetadataRecorder;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PayplugUnifiedCore\Exceptions\InvalidNotificationException;
@@ -247,6 +248,10 @@ class UpcWebhook
                 $this->maybe_persist_uhf_card($order, $raw_body);
             });
 
+            if (PaymentOutcome::PAID === $operation_data->outcome) {
+                $this->record_card_details($order, $raw_body);
+            }
+
             return 200;
         } catch (InvalidOperationDataException $e) {
             // Not expected in practice - $stored_operation_id is non-empty here (guaranteed by
@@ -329,6 +334,19 @@ class UpcWebhook
         }
 
         (new CardRecorderFromOperation())->maybe_persist($order, $decoded);
+    }
+
+    /**
+     * Runs whatever the processor returned: the synchronous payment response carries no card, so
+     * a webhook arriving after that path already treated the operation still brings it.
+     */
+    private function record_card_details(\WC_Order $order, string $raw_body): void
+    {
+        $decoded = json_decode($raw_body, true);
+
+        if (is_array($decoded)) {
+            (new UpcTransactionMetadataRecorder())->record_card($order, $decoded);
+        }
     }
 
     /**

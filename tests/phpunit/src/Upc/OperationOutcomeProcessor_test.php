@@ -4,6 +4,7 @@ namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc;
 
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\OperationOutcomeProcessor;
+use Payplug\PayplugWoocommerce\Upc\UpcTransactionMetadataRecorder;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +29,8 @@ class OperationOutcomeProcessor_test extends TestCase
 
     protected function tearDown(): void
     {
-        wp_delete_post($this->order->get_id(), true);
+        delete_option('woocommerce_payplug_settings');
+        $this->order->delete(true);
         parent::tearDown();
     }
 
@@ -117,5 +119,106 @@ class OperationOutcomeProcessor_test extends TestCase
         $this->assertSame(OperationOutcomeProcessor::LOCKED, $result);
         $this->assertSame('pending', $this->reload()->get_status());
         $this->assertSame('', $this->reload()->get_meta('_payplug_upc_treated'));
+    }
+
+    private function snapshot(): array
+    {
+        $meta = $this->reload()->get_meta(UpcTransactionMetadataRecorder::META_KEY);
+
+        return is_array($meta) ? $meta : [];
+    }
+
+    private function record_created(): void
+    {
+        update_option('woocommerce_payplug_settings', ['mode' => true]);
+        (new UpcTransactionMetadataRecorder())->record_created($this->order, self::OPERATION_ID, true);
+    }
+
+    public function test_a_paid_outcome_marks_the_snapshot_paid(): void
+    {
+        $this->record_created();
+
+        (new OperationOutcomeProcessor())->process($this->operation('0000', PaymentOutcome::PAID));
+
+        $meta = $this->snapshot();
+        self::assertTrue($meta['paid']);
+        self::assertEqualsWithDelta(time(), $meta['paid_at'], 5);
+        self::assertTrue($meta['3ds']);
+        self::assertSame(self::OPERATION_ID, $meta['transaction_id']);
+    }
+
+    public function test_a_failed_outcome_leaves_the_snapshot_unpaid(): void
+    {
+        $this->record_created();
+
+        (new OperationOutcomeProcessor())->process($this->operation('0002', PaymentOutcome::FAILED));
+
+        self::assertFalse($this->snapshot()['paid']);
+        self::assertSame(0, $this->snapshot()['paid_at']);
+    }
+
+    public function test_a_replayed_paid_outcome_does_not_change_paid_at(): void
+    {
+        $this->record_created();
+        $processor = new OperationOutcomeProcessor();
+        $processor->process($this->operation('0000', PaymentOutcome::PAID));
+        $order = $this->reload();
+        $meta = $this->snapshot();
+        $meta['paid_at'] = 1600000000;
+        $order->update_meta_data(UpcTransactionMetadataRecorder::META_KEY, $meta);
+        $order->save();
+
+        $result = $processor->process($this->operation('0000', PaymentOutcome::PAID));
+
+        self::assertSame(OperationOutcomeProcessor::ALREADY_TREATED, $result);
+        self::assertSame(1600000000, $this->snapshot()['paid_at']);
+    }
+
+    public function test_a_locked_operation_leaves_the_snapshot_unpaid(): void
+    {
+        $this->record_created();
+        $lock_key = 'payplug_upc_treat_' . self::OPERATION_ID;
+        $lock = new WooCommerceLock();
+        $lock->acquire($lock_key, 30);
+
+        (new OperationOutcomeProcessor())->process($this->operation('0000', PaymentOutcome::PAID));
+
+        $lock->release($lock_key);
+        self::assertFalse($this->snapshot()['paid']);
+    }
+
+    public function test_a_corrupt_snapshot_is_rebuilt_and_the_operation_still_marked_treated(): void
+    {
+        update_option('woocommerce_payplug_settings', ['mode' => true]);
+        $this->order->update_meta_data(UpcTransactionMetadataRecorder::META_KEY, 'corrupt');
+        $this->order->save();
+
+        $result = (new OperationOutcomeProcessor())->process($this->operation('0000', PaymentOutcome::PAID));
+
+        self::assertSame(OperationOutcomeProcessor::APPLIED, $result);
+        self::assertSame('yes', $this->reload()->get_meta('_payplug_upc_treated'));
+        self::assertTrue($this->snapshot()['paid']);
+        self::assertSame(5000, $this->snapshot()['amount']);
+    }
+
+    public function test_a_recorder_failure_does_not_prevent_marking_the_operation_treated(): void
+    {
+        delete_option('woocommerce_payplug_settings');
+        $failing_mode = static function (): void {
+            throw new \RuntimeException('configuration unavailable');
+        };
+        add_filter('option_woocommerce_payplug_settings', $failing_mode);
+        add_filter('default_option_woocommerce_payplug_settings', $failing_mode);
+
+        try {
+            $result = (new OperationOutcomeProcessor())->process($this->operation('0000', PaymentOutcome::PAID));
+        } finally {
+            remove_filter('option_woocommerce_payplug_settings', $failing_mode);
+            remove_filter('default_option_woocommerce_payplug_settings', $failing_mode);
+        }
+
+        self::assertSame(OperationOutcomeProcessor::APPLIED, $result);
+        self::assertSame('yes', $this->reload()->get_meta('_payplug_upc_treated'));
+        self::assertSame([], $this->snapshot());
     }
 }

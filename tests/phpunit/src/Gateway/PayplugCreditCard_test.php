@@ -6,6 +6,7 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugCreditCard;
 use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\HostedFieldsPaymentProcessor;
+use Payplug\PayplugWoocommerce\Upc\UpcTransactionMetadataRecorder;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PHPUnit\Framework\TestCase;
 
@@ -1058,5 +1059,149 @@ class PayplugCreditCard_test extends TestCase
 
         $this->assertNotEmpty($notices, 'Expected an error notice to have been added.');
         $this->assertSame(__($msgid, 'payplug'), end($notices)['notice']);
+    }
+
+    private function create_paid_uhf_order(string $operation_id, ?string $currency = null, float $total = 50.00): \WC_Order
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] = 'acct_test';
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $order = wc_create_order();
+        if (null !== $currency) {
+            $order->set_currency($currency);
+        }
+        $order->set_total($total);
+        $order->update_meta_data('_payplug_upc_operation_id', $operation_id);
+        $order->save();
+
+        $recorder = new UpcTransactionMetadataRecorder();
+        $recorder->record_created($order, $operation_id, false);
+        $recorder->record_paid($order);
+
+        return $order;
+    }
+
+    private function stub_successful_refund(): void
+    {
+        $this->stub_upc_http_requests([
+            'response' => ['code' => 200, 'message' => 'OK'],
+            'body' => json_encode(['id' => 'op_refund_snapshot', 'operationIds' => ['refund_snapshot_1']]),
+            'headers' => [],
+            'cookies' => [],
+        ]);
+    }
+
+    private function upc_snapshot(\WC_Order $order): array
+    {
+        $meta = wc_get_order($order->get_id())->get_meta(UpcTransactionMetadataRecorder::META_KEY);
+
+        return is_array($meta) ? $meta : [];
+    }
+
+    public function test_a_partial_uhf_refund_marks_the_snapshot_partially_refunded(): void
+    {
+        $order = $this->create_paid_uhf_order('op_refund_snapshot');
+        $this->stub_successful_refund();
+
+        $result = (new PayplugCreditCard())->process_refund($order->get_id(), 10.00);
+
+        $meta = $this->upc_snapshot($order);
+        $this->assertTrue($result);
+        $this->assertFalse($meta['refunded']);
+        $this->assertSame(1000, $meta['amount_refunded']);
+        $this->assertTrue($meta['paid']);
+
+        $order->delete(true);
+    }
+
+    public function test_a_second_refund_completing_the_amount_marks_it_refunded(): void
+    {
+        $order = $this->create_paid_uhf_order('op_refund_snapshot');
+        $this->stub_successful_refund();
+
+        (new PayplugCreditCard())->process_refund($order->get_id(), 10.00);
+        $result = (new PayplugCreditCard())->process_refund($order->get_id(), 40.00);
+
+        $meta = $this->upc_snapshot($order);
+        $this->assertTrue($result);
+        $this->assertTrue($meta['refunded']);
+        $this->assertSame(5000, $meta['amount_refunded']);
+
+        $order->delete(true);
+    }
+
+    public function test_a_refund_without_amount_marks_it_refunded(): void
+    {
+        $order = $this->create_paid_uhf_order('op_refund_snapshot');
+        $this->stub_successful_refund();
+
+        $result = (new PayplugCreditCard())->process_refund($order->get_id(), null);
+
+        $meta = $this->upc_snapshot($order);
+        $this->assertTrue($result);
+        $this->assertTrue($meta['refunded']);
+        $this->assertSame(5000, $meta['amount_refunded']);
+
+        $order->delete(true);
+    }
+
+    public function test_a_partial_refund_in_a_zero_decimal_currency_is_recorded_in_its_minor_units(): void
+    {
+        $order = $this->create_paid_uhf_order('op_refund_snapshot', 'JPY', 1000);
+        $this->stub_successful_refund();
+
+        (new PayplugCreditCard())->process_refund($order->get_id(), 300);
+
+        $meta = $this->upc_snapshot($order);
+        $this->assertSame(1000, $meta['amount']);
+        $this->assertSame(300, $meta['amount_refunded']);
+        $this->assertFalse($meta['refunded']);
+
+        $order->delete(true);
+    }
+
+    /**
+     * @return array<string, array{0: array<string, mixed>, 1: float}>
+     */
+    public function rejected_refund_provider(): array
+    {
+        return [
+            'api error' => [['response' => ['code' => 400, 'message' => 'Bad Request'], 'body' => '{"error":"boom"}', 'headers' => [], 'cookies' => []], 10.00],
+            'invalid amount' => [['response' => ['code' => 200, 'message' => 'OK'], 'body' => '{"id":"refund_789"}', 'headers' => [], 'cookies' => []], 0.00],
+        ];
+    }
+
+    /**
+     * @dataProvider rejected_refund_provider
+     */
+    public function test_a_rejected_refund_leaves_the_snapshot_unchanged(array $refund_response, float $amount): void
+    {
+        $order = $this->create_paid_uhf_order('op_refund_snapshot');
+        $before = $this->upc_snapshot($order);
+        $this->stub_upc_http_requests($refund_response);
+
+        $result = (new PayplugCreditCard())->process_refund($order->get_id(), $amount);
+
+        $this->assertInstanceOf(\WP_Error::class, $result);
+        $this->assertSame($before, $this->upc_snapshot($order));
+
+        $order->delete(true);
+    }
+
+    public function test_a_retail_order_refund_never_writes_the_upc_snapshot(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        update_option('woocommerce_payplug_settings', $this->base_settings);
+        $order = wc_create_order();
+        $order->set_total(50.00);
+        $order->save();
+
+        (new PayplugCreditCard())->process_refund($order->get_id(), 50.00);
+
+        $this->assertSame('', wc_get_order($order->get_id())->get_meta(UpcTransactionMetadataRecorder::META_KEY));
+
+        $order->delete(true);
     }
 }
