@@ -4,9 +4,9 @@ namespace Payplug\PayplugWoocommerce\Gateway;
 
 use Payplug\PayplugWoocommerce\Controller\PayplugGenericGateway;
 use Payplug\PayplugWoocommerce\Gateway\Oney\OneyAccountMapper;
+use Payplug\PayplugWoocommerce\Helper\PhoneNumberHelper;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
-use PayplugUnifiedCore\Utilities\Helpers\PhoneHelper;
 
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
@@ -288,6 +288,14 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
     }
 
     /**
+     * @return bool
+     */
+    public function requires_phone_region_match()
+    {
+        return true;
+    }
+
+    /**
      * @param \WC_Order $order
      * @param int $amount
      * @param int $customer_id
@@ -312,7 +320,7 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
             $country = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();
             $phone = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_phone : $order->get_billing_phone();
             $billing_email = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_email : $order->get_billing_email();
-            if (!PhoneHelper::isMobile($phone, $country)) {
+            if (!PhoneNumberHelper::isMobile($phone, $country, $this->requires_phone_region_match())) {
                 throw new \Exception(__('Mobile phone number fullfilled is invalid. Please retry.', 'payplug'));
             }
 
@@ -320,7 +328,7 @@ class PayplugGatewayOney3x extends PayplugGenericGateway
                 throw new \Exception(__('Your email address is too long and the + character is not valid, please change it to another address (max 100 characters).', 'payplug'));
             }
 
-            $address_data = PayplugAddressData::from_order($order);
+            $address_data = PayplugAddressData::from_order($order, $this->requires_phone_region_match());
 
             $return_url = esc_url_raw($order->get_checkout_order_received_url());
 
