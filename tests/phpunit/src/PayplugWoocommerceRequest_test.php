@@ -573,6 +573,43 @@ class PayplugWoocommerceRequest_test extends TestCase
         self::assertSame($order->get_id(), $this->persisted_session_value('order_awaiting_payment'));
     }
 
+    /**
+     * @dataProvider phone_region_match_provider
+     */
+    public function test_create_payment_intent_reads_the_phone_number_with_the_gateway_region_match(
+        bool $phone_region_match,
+        ?string $sent_phone
+    ): void {
+        $order = $this->make_order();
+        $order->set_currency('EUR');
+        $order->set_billing_country('DE');
+        $order->set_billing_phone('+33612345678');
+        $order->save();
+        $this->request->gateway_double = new FakeGateway('apple_pay');
+        $this->request->gateway_double->phone_region_match = $phone_region_match;
+        $this->request->payment = new FakePayment('pay_test_intent', $order->get_id());
+        $_POST = [
+            'woocommerce-process-checkout-nonce' => $this->checkout_nonce(),
+            'order_id' => (string) $order->get_id(),
+            'order_pay_key' => $order->get_order_key(),
+            'gateway' => 'apple_pay',
+        ];
+
+        $this->capture_ajax([$this->request, 'create_payment_intent']);
+
+        self::assertSame(['create_payment'], $this->request->calls);
+        self::assertSame($sent_phone, $this->request->payment_data['billing']['mobile_phone_number'] ?? null);
+        self::assertArrayNotHasKey('landline_phone_number', $this->request->payment_data['billing']);
+    }
+
+    public function phone_region_match_provider(): array
+    {
+        return [
+            'region match not required' => [false, '+33612345678'],
+            'region match required' => [true, null],
+        ];
+    }
+
     public function test_create_payment_intent_session_owner_without_key_is_allowed(): void
     {
         $order = $this->make_order();
