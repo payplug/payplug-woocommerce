@@ -860,6 +860,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     }
 
     /**
+     * Whether the phone number sent with the payment must belong to the billing country.
+     *
+     * @return bool
+     */
+    public function requires_phone_region_match()
+    {
+        return false;
+    }
+
+    /**
      * @param \WC_Order $order
      * @param int $amount
      * @param int $customer_id

@@ -7,9 +7,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+use Payplug\PayplugWoocommerce\Helper\PhoneNumberHelper;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
-use PayplugUnifiedCore\Exceptions\InvalidPhoneNumberException;
-use PayplugUnifiedCore\Utilities\Helpers\PhoneHelper;
 
 class PayplugAddressData
 {
@@ -44,12 +43,13 @@ class PayplugAddressData
      * Get address data from order.
      *
      * @param $order
+     * @param bool $require_phone_region_match whether the phone number must belong to the billing country
      *
      * @throws \InvalidArgumentException
      *
      * @return PayplugAddressData
      */
-    public static function from_order($order)
+    public static function from_order($order, $require_phone_region_match = false)
     {
         if (!is_a($order, '\WC_Order')) {
             throw new \InvalidArgumentException(
@@ -58,7 +58,7 @@ class PayplugAddressData
         }
 
         $address_data = new self();
-        $address_data->prepare_address_data($order);
+        $address_data->prepare_address_data($order, (bool) $require_phone_region_match);
 
         return $address_data;
     }
@@ -153,7 +153,7 @@ class PayplugAddressData
      *
      * @param \WC_Order $order
      */
-    protected function prepare_address_data($order): void
+    protected function prepare_address_data($order, bool $require_phone_region_match = false): void
     {
         $customer = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
 
@@ -271,21 +271,15 @@ class PayplugAddressData
         $country = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();
         $phone = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_phone : $order->get_billing_phone();
         if (!empty($phone) && !empty($country)) {
-            try {
-                // toE164() and isMobile() each parse/validate $phone independently - PhoneHelper
-                // doesn't expose the parsed number, so there's no cheaper way to get both the
-                // formatted number and its type without UPC adding that API.
-                $e164_phone = PhoneHelper::toE164($phone, $country);
+            $resolved_phone = PhoneNumberHelper::resolve($phone, $country, $require_phone_region_match);
 
-                if (PhoneHelper::isMobile($phone, $country)) {
-                    $this->billing['mobile_phone_number'] = $e164_phone;
-                    $this->shipping['mobile_phone_number'] = $e164_phone;
+            if (null !== $resolved_phone) {
+                if ($resolved_phone['mobile']) {
+                    $this->billing['mobile_phone_number'] = $resolved_phone['e164'];
+                    $this->shipping['mobile_phone_number'] = $resolved_phone['e164'];
                 } else {
-                    $this->billing['landline_phone_number'] = $e164_phone;
+                    $this->billing['landline_phone_number'] = $resolved_phone['e164'];
                 }
-            } catch (InvalidPhoneNumberException $e) {
-                // Fail to parse phone number.
-                // Could be an incorrect number or the number doesn't belong to the billing country.
             }
         }
     }

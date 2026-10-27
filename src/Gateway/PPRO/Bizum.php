@@ -33,4 +33,12 @@ class Bizum extends PayplugGenericGateway
 
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'refund_not_available']);
     }
+
+    /**
+     * @return bool
+     */
+    public function requires_phone_region_match()
+    {
+        return true;
+    }
 }

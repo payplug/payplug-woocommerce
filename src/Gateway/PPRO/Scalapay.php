@@ -5,9 +5,9 @@ namespace Payplug\PayplugWoocommerce\Gateway\PPRO;
 use Payplug\PayplugWoocommerce\Controller\PayplugGenericGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
+use Payplug\PayplugWoocommerce\Helper\PhoneNumberHelper;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
-use PayplugUnifiedCore\Utilities\Helpers\PhoneHelper;
 
 class Scalapay extends PayplugGenericGateway
 {
@@ -183,7 +183,7 @@ class Scalapay extends PayplugGenericGateway
             $country = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();
             $phone = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_phone : $order->get_billing_phone();
             $billing_email = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_email : $order->get_billing_email();
-            if (!PhoneHelper::isMobile($phone, $country)) {
+            if (!PhoneNumberHelper::isMobile($phone, $country)) {
                 throw new \Exception(__('Mobile phone number fullfilled is invalid. Please retry.', 'payplug'));
             }
 

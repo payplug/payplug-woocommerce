@@ -288,7 +288,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
                 throw new \Exception(__('Payment processing failed. Please retry.', 'payplug'));
             }
 
-            $address_data = PayplugAddressData::from_order($order);
+            $address_data = PayplugAddressData::from_order($order, $this->requires_phone_region_match());
             $return_url = esc_url_raw($order->get_checkout_order_received_url());
 
             if (!(substr($return_url, 0, 4) === 'http')) {

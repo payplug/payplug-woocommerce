@@ -6,8 +6,7 @@ use Payplug\PayplugWoocommerce\Service\Mcp;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Covers Mcp::normalizePhoneNumber(), migrated from direct libphonenumber calls to UPC's
- * PhoneHelper::toE164() (PRE-3634). The method is protected - invoked via reflection, as it
+ * Covers Mcp::normalizePhoneNumber(). The method is protected - invoked via reflection, as it
  * has no WordPress/order dependency of its own.
  */
 class Mcp_test extends TestCase
@@ -49,5 +48,28 @@ class Mcp_test extends TestCase
     public function test_empty_country_returns_null(): void
     {
         self::assertNull($this->normalizePhoneNumber('0612345678', ''));
+    }
+
+    /**
+     * @dataProvider foreign_and_overseas_number_provider
+     */
+    public function test_valid_number_of_another_country_is_normalized_to_e164(string $phone, string $country, string $e164): void
+    {
+        self::assertSame($e164, $this->normalizePhoneNumber($phone, $country));
+    }
+
+    public function foreign_and_overseas_number_provider(): array
+    {
+        return [
+            'BE mobile on a FR address' => ['+32470123456', 'FR', '+32470123456'],
+            'FR mobile with 00 prefix on a BE address' => ['0033609860479', 'BE', '+33609860479'],
+            'metropolitan mobile on a MQ address' => ['07 81 23 45 67', 'MQ', '+33781234567'],
+            'MQ mobile on a MQ address' => ['0696 12 34 56', 'MQ', '+596696123456'],
+        ];
+    }
+
+    public function test_invalid_number_of_its_own_country_returns_null(): void
+    {
+        self::assertNull($this->normalizePhoneNumber('234234234', 'IT'));
     }
 }
