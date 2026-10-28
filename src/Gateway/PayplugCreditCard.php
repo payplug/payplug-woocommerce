@@ -8,6 +8,7 @@ use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceConfigurationRepository;
 use Payplug\PayplugWoocommerce\Upc\HostedFieldsPaymentProcessor;
+use Payplug\PayplugWoocommerce\Upc\UpcOrderAmount;
 
 class PayplugCreditCard extends PayplugGateway
 {
@@ -148,7 +149,8 @@ class PayplugCreditCard extends PayplugGateway
      * A hosted_fields gateway whose card form can't render (see $hosted_fields_available) must
      * not be offered at all: the shopper would otherwise see "Card" with nothing to fill in and
      * only get a "missing token" error on submit. Non-EUR shops are forced into hosted_fields,
-     * so they have no other card flow to fall back to.
+     * so they have no other card flow to fall back to. The same goes for a currency the Unified
+     * API can't take (e.g. KWD): the payment could only fail on submit.
      */
     public function is_available()
     {
@@ -156,7 +158,23 @@ class PayplugCreditCard extends PayplugGateway
             return false;
         }
 
+        if ('hosted_fields' === $this->embedded_mode && !$this->is_checkout_currency_supported()) {
+            return false;
+        }
+
         return parent::is_available();
+    }
+
+    /**
+     * Checks the order's own currency on the order-pay page (a multi-currency shop may have
+     * created it in another one), the current shop currency otherwise.
+     */
+    private function is_checkout_currency_supported(): bool
+    {
+        $order_id = absint(get_query_var('order-pay'));
+        $order = $order_id > 0 ? wc_get_order($order_id) : null;
+
+        return UpcOrderAmount::is_supported_currency($order instanceof \WC_Order ? $order->get_currency() : get_woocommerce_currency());
     }
 
     /**

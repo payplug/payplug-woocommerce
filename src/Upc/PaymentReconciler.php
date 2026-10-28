@@ -9,7 +9,6 @@ use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PayplugUnifiedCore\Exceptions\InvalidOperationDataException;
 use PayplugUnifiedCore\Exceptions\PaymentNotFoundException;
 use PayplugUnifiedCore\Exceptions\PayplugException;
-use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 use PayplugUnifiedCore\Utilities\Helpers\ExecCodeMapper;
 
 /**
@@ -106,7 +105,14 @@ class PaymentReconciler
         // would apply an outcome for an amount that no longer matches what the order now owes.
         $amount = isset($data['amount']) && is_scalar($data['amount']) ? (int) $data['amount'] : null;
 
-        if (null === $amount || AmountHelper::toCents((float) $order->get_total(), $order->get_currency()) !== $amount) {
+        $order_amount = UpcOrderAmount::total($order);
+
+        if (null === $order_amount) {
+            // Already logged: the amount can't be checked, so nothing is applied - same as a mismatch.
+            return;
+        }
+
+        if (null === $amount || $order_amount !== $amount) {
             (new WooCommerceLogger())->error(sprintf('UPC payment reconciliation amount mismatch for order #%s.', $order->get_id()));
 
             return;
@@ -121,13 +127,14 @@ class PaymentReconciler
                     $operation_id,
                     $exec_code,
                     $outcome,
-                    AmountHelper::toCents((float) $order->get_total(), $order->get_currency()),
+                    $order_amount,
                     (string) $order->get_id()
                 ),
                 function () use ($order, $data): void {
                     // The body just fetched is the operation resource, the same
                     // paymentMethod.{id, card, details} shape the webhook carries - no second fetch.
                     (new CardRecorderFromOperation())->maybe_persist($order, $data);
+                    (new UpcTransactionMetadataRecorder())->record_card($order, $data);
                 }
             );
         } catch (InvalidOperationDataException $e) {
