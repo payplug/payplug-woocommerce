@@ -3,6 +3,7 @@
 namespace Payplug\PayplugWoocommerce\Upc\Builders;
 
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceConfigurationRepository;
+use Payplug\PayplugWoocommerce\Upc\UpcOrderAmount;
 use PayplugUnifiedCore\Dto\AddressDto;
 use PayplugUnifiedCore\Dto\BillingDto;
 use PayplugUnifiedCore\Dto\BrowserDto;
@@ -10,7 +11,7 @@ use PayplugUnifiedCore\Dto\CommonFieldsDto;
 use PayplugUnifiedCore\Dto\ContactDto;
 use PayplugUnifiedCore\Dto\CustomerDto;
 use PayplugUnifiedCore\Dto\ShippingDto;
-use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
+use PayplugUnifiedCore\Exceptions\InvalidCurrencyException;
 
 /**
  * Shared by PaymentCaptureContextBuilder (HostedFieldDto) and AliasPaymentContextBuilder
@@ -23,10 +24,17 @@ trait BuildsCommonFields
     private function build_common(\WC_Order $order): CommonFieldsDto
     {
         $configuration_repository = new WooCommerceConfigurationRepository();
+        $amount = UpcOrderAmount::total($order);
+
+        if (null === $amount) {
+            // HostedFieldsPaymentProcessor already refuses such an order before building anything;
+            // a PayplugException keeps any other caller on its own controlled-failure path.
+            throw new InvalidCurrencyException(sprintf('Order #%s total could not be converted for the Unified API.', $order->get_id()));
+        }
 
         $common = new CommonFieldsDto(
             $configuration_repository->getPublicKeyId(),
-            AmountHelper::toCents((float) $order->get_total(), $order->get_currency()),
+            $amount,
             $order->get_currency(),
             (string) $order->get_id(),
             ''

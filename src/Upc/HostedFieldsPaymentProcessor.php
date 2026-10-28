@@ -83,7 +83,17 @@ class HostedFieldsPaymentProcessor
         // the terminal-status short-circuit above: an order that already succeeded must still
         // redirect to the order-received page even if its amount would fail this check today
         // (e.g. the account's thresholds were tightened after the order was paid).
-        $validated_amount = $this->gateway->validate_order_amount(AmountHelper::toCents((float) $order->get_total(), $order->get_currency()), $order->get_currency());
+        $order_amount = UpcOrderAmount::total($order);
+
+        if (null === $order_amount) {
+            // Currency the Unified API can't take (e.g. KWD): already logged, and the shopper gets
+            // the generic card error rather than UPC's internal message.
+            wc_add_notice(__('payplug_hosted_fields_tokenization_error', 'payplug'), 'error');
+
+            return ['result' => 'failure'];
+        }
+
+        $validated_amount = $this->gateway->validate_order_amount($order_amount, $order->get_currency());
 
         if (is_wp_error($validated_amount)) {
             PayplugGateway::log(sprintf('Invalid amount %s for order #%s.', $order->get_total(), $order_id), 'error');
@@ -357,6 +367,10 @@ class HostedFieldsPaymentProcessor
             // not this endpoint's raw {status, body} array - firing it here would hand them a
             // shape they don't expect, a behavior change for anyone already hooking it.
             $order->add_order_note($this->build_refund_note($amount_in_cents, $order->get_currency(), $reason, $refund_id));
+            // Only a refund made from the WooCommerce screen reaches the snapshot: there is no refund
+            // notification handler for UHF, so a refund made from the PayPlug portal leaves the
+            // metabox on "Paid" (spec PRE-3748, question Q5).
+            (new UpcTransactionMetadataRecorder())->record_refund($order, $amount_in_cents);
             PayplugGateway::log(sprintf('UPC refund complete for order #%s.', $order_id));
 
             return true;

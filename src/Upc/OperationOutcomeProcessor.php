@@ -62,6 +62,14 @@ class OperationOutcomeProcessor
             $payment_repository->save($operation);
             (new WooCommerceOrderStateMutator())->apply($operation->orderId, $operation->outcome);
 
+            if (PaymentOutcome::PAID === $operation->outcome) {
+                $order = wc_get_order((int) $operation->orderId);
+
+                if ($order instanceof \WC_Order) {
+                    (new UpcTransactionMetadataRecorder())->record_paid($order);
+                }
+            }
+
             if (PaymentOutcome::PAID === $operation->outcome && null !== $on_paid) {
                 $on_paid();
             }

@@ -6,6 +6,7 @@ use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\PaymentReconciler;
+use Payplug\PayplugWoocommerce\Upc\UpcTransactionMetadataRecorder;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 use PHPUnit\Framework\TestCase;
@@ -29,7 +30,8 @@ class PaymentReconciler_test extends TestCase
 
     protected function tearDown(): void
     {
-        wp_delete_post($this->order->get_id(), true);
+        delete_option('woocommerce_payplug_settings');
+        $this->order->delete(true);
         parent::tearDown();
     }
 
@@ -88,6 +90,20 @@ class PaymentReconciler_test extends TestCase
             'execCode' => '0000',
             'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()) + 100,
         ]);
+
+        (new PaymentReconciler())->apply_reconciled_state($this->order, 'op_pending_123', $body);
+
+        $order = $this->reload();
+        $this->assertSame('pending', $order->get_status());
+        $this->assertSame('', $order->get_meta('_payplug_upc_treated'));
+    }
+
+    public function testAnOrderInAnUnsupportedCurrencyIsLeftUntouchedWithoutAFatal(): void
+    {
+        // A 3-decimal currency: UPC's AmountHelper throws InvalidCurrencyException for it.
+        $this->order->set_currency('KWD');
+        $this->order->save();
+        $body = json_encode(['id' => 'op_pending_123', 'execCode' => '0000', 'amount' => 50000]);
 
         (new PaymentReconciler())->apply_reconciled_state($this->order, 'op_pending_123', $body);
 
@@ -208,5 +224,52 @@ class PaymentReconciler_test extends TestCase
         (new PaymentReconciler())->apply_reconciled_state($this->order, 'op_pending_123', $this->body('0000'));
 
         $this->assertSame('on-hold', $this->reload()->get_status());
+    }
+
+    private function snapshot(): array
+    {
+        $meta = $this->reload()->get_meta(UpcTransactionMetadataRecorder::META_KEY);
+
+        return is_array($meta) ? $meta : [];
+    }
+
+    private function body_with_card(string $exec_code): string
+    {
+        return json_encode([
+            'id' => 'op_pending_123',
+            'execCode' => $exec_code,
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
+            'paymentMethod' => [
+                'card' => ['network' => 'mastercard', 'code6x4' => '555555XXXXXX4444'],
+                'details' => ['validityDate' => '2031-01'],
+            ],
+        ]);
+    }
+
+    public function test_a_paid_reconciliation_marks_the_snapshot_paid_and_merges_the_card(): void
+    {
+        update_option('woocommerce_payplug_settings', ['mode' => true]);
+        (new UpcTransactionMetadataRecorder())->record_created($this->order, 'op_pending_123', true);
+
+        (new PaymentReconciler())->apply_reconciled_state($this->reload(), 'op_pending_123', $this->body_with_card('0000'));
+
+        $meta = $this->snapshot();
+        self::assertTrue($meta['paid']);
+        self::assertTrue($meta['3ds']);
+        self::assertSame('MASTERCARD', $meta['card_brand']);
+        self::assertSame('4444', $meta['card_last4']);
+        self::assertSame(1, $meta['card_exp_month']);
+        self::assertSame(2031, $meta['card_exp_year']);
+    }
+
+    public function test_a_failed_reconciliation_merges_no_card(): void
+    {
+        update_option('woocommerce_payplug_settings', ['mode' => true]);
+        (new UpcTransactionMetadataRecorder())->record_created($this->order, 'op_pending_123', true);
+
+        (new PaymentReconciler())->apply_reconciled_state($this->reload(), 'op_pending_123', $this->body_with_card('0300'));
+
+        self::assertFalse($this->snapshot()['paid']);
+        self::assertSame('', $this->snapshot()['card_brand']);
     }
 }

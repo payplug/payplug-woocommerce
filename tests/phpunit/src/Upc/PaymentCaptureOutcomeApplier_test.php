@@ -6,6 +6,7 @@ use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\PaymentCaptureOutcomeApplier;
+use Payplug\PayplugWoocommerce\Upc\UpcTransactionMetadataRecorder;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PayplugUnifiedCore\Output\PaymentOutput;
 use PHPUnit\Framework\TestCase;
@@ -30,7 +31,8 @@ class PaymentCaptureOutcomeApplier_test extends TestCase
             $wpdb->query('TRUNCATE TABLE ' . $wpdb->base_prefix . 'woocommerce_payplug_uhf_cards');
         }
         delete_transient('payplug_upc_redirect_html_' . $this->order->get_id());
-        wp_delete_post($this->order->get_id(), true);
+        delete_option('woocommerce_payplug_settings');
+        $this->order->delete(true);
         parent::tearDown();
     }
 
@@ -111,6 +113,22 @@ class PaymentCaptureOutcomeApplier_test extends TestCase
         $this->assertSame('op_direct_1', $order->get_meta('_payplug_upc_operation_id'));
         $this->assertSame('0000', $order->get_meta('_payplug_upc_exec_code'));
         $this->assertSame(PaymentOutcome::PAID, $order->get_meta('_payplug_upc_outcome'));
+    }
+
+    public function testDirectSuccessForAnOrderInAnUnsupportedCurrencyIsAppliedWithoutBindingTheOperation(): void
+    {
+        // A 3-decimal currency: UPC's AmountHelper throws InvalidCurrencyException for it. The
+        // payment went through, so the outcome is applied directly, like an unbound response.
+        $this->order->set_currency('KWD');
+        $this->order->save();
+        $output = new PaymentOutput(200, '{"id":"op_direct_1","execCode":"0000"}', null, null, null);
+
+        $result = (new PaymentCaptureOutcomeApplier())->apply($this->order, $output);
+
+        $order = $this->reload();
+        $this->assertSame('success', $result['result']);
+        $this->assertTrue($order->is_paid());
+        $this->assertSame('', $order->get_meta('_payplug_upc_operation_id'));
     }
 
     public function testAnOperationIdsEntryIsBoundAsTheAlternateOperationIdAlongsideTheTopLevelId(): void
@@ -360,5 +378,99 @@ class PaymentCaptureOutcomeApplier_test extends TestCase
         (new PaymentCaptureOutcomeApplier())->apply($this->reload(), $second_output, false);
 
         $this->assertSame('', $this->reload()->get_meta('_payplug_uhf_save_card'));
+    }
+
+    private function prepare_snapshot_order(): void
+    {
+        update_option('woocommerce_payplug_settings', ['mode' => true]);
+        $this->order->set_currency('USD');
+        $this->order->set_total(50.00);
+        $this->order->save();
+    }
+
+    private function snapshot(): array
+    {
+        $meta = $this->reload()->get_meta(UpcTransactionMetadataRecorder::META_KEY);
+
+        return is_array($meta) ? $meta : [];
+    }
+
+    public function test_a_three_ds_redirect_response_records_an_unpaid_three_ds_snapshot(): void
+    {
+        $this->prepare_snapshot_order();
+        $output = new PaymentOutput(200, '{"id":"op_html_1","execCode":"0001"}', null, '<html>3ds form</html>', null);
+
+        (new PaymentCaptureOutcomeApplier())->apply($this->order, $output);
+
+        $meta = $this->snapshot();
+        self::assertSame('op_html_1', $meta['transaction_id']);
+        self::assertFalse($meta['paid']);
+        self::assertTrue($meta['3ds']);
+        self::assertSame(5000, $meta['amount']);
+        self::assertTrue($meta['live']);
+    }
+
+    public function test_a_three_ds_redirect_url_response_records_a_three_ds_snapshot(): void
+    {
+        $this->prepare_snapshot_order();
+        $output = new PaymentOutput(200, '{"id":"op_url_1"}', 'https://bank.example.test/challenge', null, null);
+
+        (new PaymentCaptureOutcomeApplier())->apply($this->order, $output);
+
+        self::assertTrue($this->snapshot()['3ds']);
+        self::assertFalse($this->snapshot()['paid']);
+    }
+
+    public function test_a_direct_paid_response_records_a_paid_non_three_ds_snapshot_with_the_operation_id(): void
+    {
+        $this->prepare_snapshot_order();
+        $output = new PaymentOutput(200, '{"id":"op_direct_1","execCode":"0000"}', null, null, null);
+
+        (new PaymentCaptureOutcomeApplier())->apply($this->order, $output);
+
+        $meta = $this->snapshot();
+        self::assertSame('op_direct_1', $meta['transaction_id']);
+        self::assertTrue($meta['paid']);
+        self::assertEqualsWithDelta(time(), $meta['paid_at'], 5);
+        self::assertFalse($meta['3ds']);
+        self::assertSame(5000, $meta['amount']);
+    }
+
+    public function test_a_direct_failed_response_records_an_unpaid_snapshot(): void
+    {
+        $this->prepare_snapshot_order();
+        $output = new PaymentOutput(200, '{"id":"op_direct_2","execCode":"9999"}', null, null, null);
+
+        (new PaymentCaptureOutcomeApplier())->apply($this->order, $output);
+
+        self::assertSame('op_direct_2', $this->snapshot()['transaction_id']);
+        self::assertFalse($this->snapshot()['paid']);
+        wc_clear_notices();
+    }
+
+    public function test_a_retried_operation_id_resets_the_snapshot(): void
+    {
+        $this->prepare_snapshot_order();
+        (new PaymentCaptureOutcomeApplier())->apply($this->order, new PaymentOutput(200, '{"id":"op_attempt_1","execCode":"0001"}', null, '<html>3ds form</html>', null));
+        (new UpcTransactionMetadataRecorder())->record_card($this->reload(), ['paymentMethod' => ['card' => ['network' => 'visa', 'code6x4' => '4242']]]);
+
+        (new PaymentCaptureOutcomeApplier())->apply($this->reload(), new PaymentOutput(200, '{"id":"op_attempt_2","execCode":"0000"}', null, null, null));
+
+        $meta = $this->snapshot();
+        self::assertSame('op_attempt_2', $meta['transaction_id']);
+        self::assertFalse($meta['3ds']);
+        self::assertTrue($meta['paid']);
+        self::assertSame('', $meta['card_brand']);
+        self::assertSame('', $meta['card_last4']);
+    }
+
+    public function test_a_response_without_operation_id_records_nothing(): void
+    {
+        $this->prepare_snapshot_order();
+        $output = new PaymentOutput(200, '{"execCode":"0000"}', null, null, null);
+
+        (new PaymentCaptureOutcomeApplier())->apply($this->order, $output);
+
+        self::assertSame('', $this->reload()->get_meta(UpcTransactionMetadataRecorder::META_KEY));
     }
 }
