@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 
 use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Upc\UpcTransactionMetadataRecorder;
 use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 use WP_Post;
 
@@ -65,6 +66,10 @@ class Metabox
         }
 
         $metadata = PayplugWoocommerceHelper::get_transaction_metadata($order);
+        if (empty($metadata)) {
+            $upc_metadata = $order->get_meta(UpcTransactionMetadataRecorder::META_KEY);
+            $metadata = is_array($upc_metadata) && [] === array_diff(['transaction_id', 'amount', 'live'], array_keys($upc_metadata)) ? $upc_metadata : $metadata;
+        }
         $date_format = get_option('date_format', 'j F Y');
         $time_format = get_option('time_format', 'G \h i \m\i\n');
         if (empty($metadata)) : ?>
@@ -93,7 +98,7 @@ class Metabox
 
 				<?php if (!empty($metadata['card_brand'])) { ?>
 					<li><span><?php _e('Credit card', 'payplug'); ?>
-							:</span> <?php echo !empty($metadata['card_brand']) ? esc_html(sprintf('%s (%s)', $metadata['card_brand'], $metadata['card_country'])) : ''; ?>
+							:</span> <?php echo empty($metadata['card_country']) ? esc_html($metadata['card_brand']) : esc_html(sprintf('%s (%s)', $metadata['card_brand'], $metadata['card_country'])); ?>
 					</li>
 				<?php } ?>
 

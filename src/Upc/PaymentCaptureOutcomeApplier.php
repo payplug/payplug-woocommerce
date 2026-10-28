@@ -14,7 +14,6 @@ use PayplugUnifiedCore\Exceptions\ApiException;
 use PayplugUnifiedCore\Exceptions\InvalidOperationDataException;
 use PayplugUnifiedCore\Exceptions\PaymentNotFoundException;
 use PayplugUnifiedCore\Output\PaymentOutput;
-use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 use PayplugUnifiedCore\Utilities\Helpers\ExecCodeMapper;
 
 class PaymentCaptureOutcomeApplier
@@ -43,7 +42,8 @@ class PaymentCaptureOutcomeApplier
                 $data,
                 '' !== $exec_code ? $exec_code : self::PENDING_THREE_DS_EXEC_CODE,
                 PaymentOutcome::THREE_DS_PENDING,
-                $save_card
+                $save_card,
+                true
             );
 
             set_transient('payplug_upc_redirect_html_' . $order->get_id(), $output->redirectHtml, self::REDIRECT_HTML_TTL_SECONDS);
@@ -66,7 +66,8 @@ class PaymentCaptureOutcomeApplier
                 $data,
                 '' !== $exec_code ? $exec_code : self::PENDING_THREE_DS_EXEC_CODE,
                 PaymentOutcome::THREE_DS_PENDING,
-                $save_card
+                $save_card,
+                true
             );
 
             return ['result' => 'success', 'redirect' => $output->redirectUrl];
@@ -103,8 +104,9 @@ class PaymentCaptureOutcomeApplier
     private function apply_terminal_outcome(\WC_Order $order, array $data, string $exec_code, string $outcome): void
     {
         $operation_id = self::extract_operation_id($data);
+        $order_amount = UpcOrderAmount::total($order);
 
-        if ('' === $operation_id || '' === $exec_code) {
+        if ('' === $operation_id || '' === $exec_code || null === $order_amount) {
             // persist_operation() already logged this - the order isn't bound to any operation,
             // so no webhook can ever race this attempt: apply directly.
             (new WooCommerceOrderStateMutator())->apply((string) $order->get_id(), $outcome);
@@ -117,7 +119,7 @@ class PaymentCaptureOutcomeApplier
                 $operation_id,
                 $exec_code,
                 $outcome,
-                AmountHelper::toCents((float) $order->get_total(), $order->get_currency()),
+                $order_amount,
                 (string) $order->get_id()
             ));
         } catch (InvalidOperationDataException | PaymentNotFoundException $e) {
@@ -168,7 +170,7 @@ class PaymentCaptureOutcomeApplier
      *
      * @param array<string, mixed> $data the json_decode()'d payment-creation response body
      */
-    private function persist_operation(\WC_Order $order, array $data, string $exec_code, string $outcome, bool $save_card = false): void
+    private function persist_operation(\WC_Order $order, array $data, string $exec_code, string $outcome, bool $save_card = false, bool $three_ds = false): void
     {
         $operation_id = self::extract_operation_id($data);
         $operation_id_alt = isset($data['operationIds']) && is_array($data['operationIds']) && isset($data['operationIds'][0]) && is_scalar($data['operationIds'][0])
@@ -181,6 +183,14 @@ class PaymentCaptureOutcomeApplier
                 $order->get_id()
             ));
 
+            return;
+        }
+
+        $order_amount = UpcOrderAmount::total($order);
+
+        if (null === $order_amount) {
+            // Already logged. Same consequence as the missing operation id above: nothing is
+            // bound to this order.
             return;
         }
 
@@ -210,7 +220,7 @@ class PaymentCaptureOutcomeApplier
                 $operation_id,
                 $exec_code,
                 $outcome,
-                AmountHelper::toCents((float) $order->get_total(), $order->get_currency()),
+                $order_amount,
                 (string) $order->get_id()
             ));
 
@@ -248,6 +258,8 @@ class PaymentCaptureOutcomeApplier
             }
 
             $order->save();
+
+            (new UpcTransactionMetadataRecorder())->record_created($order, $operation_id, $three_ds);
         } catch (InvalidOperationDataException $e) {
             (new WooCommerceLogger())->error(sprintf('UPC operation "%s" could not be persisted for order #%s: %s', $operation_id, $order->get_id(), $e->getMessage()));
         } catch (PaymentNotFoundException $e) {

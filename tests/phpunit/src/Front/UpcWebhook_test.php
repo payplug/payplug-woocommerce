@@ -5,6 +5,7 @@ namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Front;
 use Payplug\PayplugWoocommerce\Front\UpcWebhook;
 use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Upc\UpcTransactionMetadataRecorder;
 use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
 class UpcWebhook_test extends \WP_Ajax_UnitTestCase
@@ -118,6 +119,30 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
 
         $this->assertSame(400, $status);
         $this->assertSame('pending', $order->get_status());
+    }
+
+    public function testANotificationForAnOrderInAnUnsupportedCurrencyIsRefusedWithoutAFatal(): void
+    {
+        // A 3-decimal currency: UPC's AmountHelper throws InvalidCurrencyException for it.
+        $this->order->set_currency('KWD');
+        $this->order->save();
+        $controller = new UpcWebhook();
+        $body = json_encode([
+            'id' => self::OPERATION_ID,
+            'execCode' => '0000',
+            'orderId' => (string) $this->order->get_id(),
+            'amount' => 50000,
+        ]);
+
+        ob_start();
+        $status = $controller->receive_notification($body);
+        ob_get_clean();
+
+        $order = wc_get_order($this->order->get_id());
+
+        $this->assertSame(400, $status);
+        $this->assertSame('pending', $order->get_status());
+        $this->assertSame('', $order->get_meta('_payplug_upc_treated'));
     }
 
     public function testANotificationForAnOperationTheOrderIsNotBoundToIsRejected(): void
@@ -444,5 +469,146 @@ class UpcWebhook_test extends \WP_Ajax_UnitTestCase
 
         $mode = PayplugWoocommerceHelper::check_mode() ? 'live' : 'test';
         $this->assertNull(UhfCard::find_by_alias('alias_webhook_3', $mode));
+    }
+
+    /**
+     * Each test binds its own operation id: orders created in setUp() outlive the test
+     * transaction, and an earlier order bound to the same id would answer the lookup.
+     */
+    private function bind_snapshot_order(): string
+    {
+        $operation_id = 'op_snapshot_' . $this->order->get_id();
+        $this->order->update_meta_data('_payplug_upc_operation_id', $operation_id);
+        $this->order->save();
+        update_option('woocommerce_payplug_settings', ['mode' => true]);
+        (new UpcTransactionMetadataRecorder())->record_created($this->order, $operation_id, true);
+
+        return $operation_id;
+    }
+
+    private function card_notification_body(string $operation_id, string $exec_code, bool $with_card = true): string
+    {
+        $body = [
+            'id' => $operation_id,
+            'execCode' => $exec_code,
+            'orderId' => (string) $this->order->get_id(),
+            'amount' => AmountHelper::toCents((float) $this->order->get_total(), $this->order->get_currency()),
+        ];
+
+        if ($with_card) {
+            $body['paymentMethod'] = [
+                'id' => 'alias_snapshot_1',
+                'card' => ['network' => 'visa', 'code6x4' => '424242XXXXXX4242'],
+                'details' => ['validityDate' => '2030-07'],
+            ];
+        }
+
+        return json_encode($body);
+    }
+
+    private function snapshot(): array
+    {
+        $meta = wc_get_order($this->order->get_id())->get_meta(UpcTransactionMetadataRecorder::META_KEY);
+
+        return is_array($meta) ? $meta : [];
+    }
+
+    private function receive(string $body): int
+    {
+        ob_start();
+        $status = (new UpcWebhook())->receive_notification($body);
+        ob_get_clean();
+
+        return $status;
+    }
+
+    public function test_a_paid_notification_marks_the_snapshot_paid_and_merges_the_card(): void
+    {
+        $operation_id = $this->bind_snapshot_order();
+
+        $status = $this->receive($this->card_notification_body($operation_id, '0000'));
+
+        $meta = $this->snapshot();
+        self::assertSame(200, $status);
+        self::assertTrue($meta['paid']);
+        self::assertTrue($meta['3ds']);
+        self::assertSame('VISA', $meta['card_brand']);
+        self::assertSame('4242', $meta['card_last4']);
+        self::assertSame(7, $meta['card_exp_month']);
+        self::assertSame(2030, $meta['card_exp_year']);
+    }
+
+    public function test_a_paid_notification_for_an_already_treated_operation_still_merges_the_card(): void
+    {
+        $operation_id = $this->bind_snapshot_order();
+        (new UpcTransactionMetadataRecorder())->record_paid($this->order);
+        $order = wc_get_order($this->order->get_id());
+        $order->update_status('processing');
+        $order->update_meta_data('_payplug_upc_treated', 'yes');
+        $order->save();
+
+        $status = $this->receive($this->card_notification_body($operation_id, '0000'));
+
+        $meta = $this->snapshot();
+        self::assertSame(200, $status);
+        self::assertTrue($meta['paid']);
+        self::assertSame('VISA', $meta['card_brand']);
+        self::assertSame('4242', $meta['card_last4']);
+    }
+
+    public function test_a_three_ds_pending_notification_merges_no_card(): void
+    {
+        $operation_id = $this->bind_snapshot_order();
+
+        $this->receive($this->card_notification_body($operation_id, '0001'));
+
+        self::assertSame('', $this->snapshot()['card_brand']);
+        self::assertFalse($this->snapshot()['paid']);
+    }
+
+    public function test_a_failed_notification_merges_no_card(): void
+    {
+        $operation_id = $this->bind_snapshot_order();
+
+        $this->receive($this->card_notification_body($operation_id, '0300'));
+
+        self::assertSame('', $this->snapshot()['card_brand']);
+        self::assertFalse($this->snapshot()['paid']);
+    }
+
+    public function test_a_notification_for_an_operation_not_bound_to_the_order_merges_no_card(): void
+    {
+        $this->bind_snapshot_order();
+
+        $status = $this->receive($this->card_notification_body('op_forged_999', '0000'));
+
+        self::assertSame(409, $status);
+        self::assertSame('', $this->snapshot()['card_brand']);
+        self::assertFalse($this->snapshot()['paid']);
+    }
+
+    public function test_a_paid_notification_with_a_mismatched_amount_merges_no_card(): void
+    {
+        $operation_id = $this->bind_snapshot_order();
+        $body = json_decode($this->card_notification_body($operation_id, '0000'), true);
+        $body['amount'] += 100;
+
+        $status = $this->receive(json_encode($body));
+
+        self::assertSame(400, $status);
+        self::assertSame('', $this->snapshot()['card_brand']);
+    }
+
+    public function test_a_paid_notification_without_payment_method_keeps_the_snapshot_card_data(): void
+    {
+        $operation_id = $this->bind_snapshot_order();
+        (new UpcTransactionMetadataRecorder())->record_card($this->order, json_decode($this->card_notification_body($operation_id, '0000'), true));
+
+        $this->receive($this->card_notification_body($operation_id, '0000', false));
+
+        $meta = $this->snapshot();
+        self::assertTrue($meta['paid']);
+        self::assertSame('VISA', $meta['card_brand']);
+        self::assertSame('4242', $meta['card_last4']);
     }
 }

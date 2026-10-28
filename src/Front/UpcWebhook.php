@@ -7,12 +7,13 @@ use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLogger;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceOrderStateMutator;
 use Payplug\PayplugWoocommerce\Upc\Card\CardRecorderFromOperation;
 use Payplug\PayplugWoocommerce\Upc\OperationOutcomeProcessor;
+use Payplug\PayplugWoocommerce\Upc\UpcOrderAmount;
+use Payplug\PayplugWoocommerce\Upc\UpcTransactionMetadataRecorder;
 use PayplugUnifiedCore\DataValues\OperationData;
 use PayplugUnifiedCore\DataValues\PaymentOutcome;
 use PayplugUnifiedCore\Exceptions\InvalidNotificationException;
 use PayplugUnifiedCore\Exceptions\InvalidOperationDataException;
 use PayplugUnifiedCore\Exceptions\PaymentNotFoundException;
-use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 use PayplugUnifiedCore\Utilities\Helpers\WebhookNotificationHelper;
 
 class UpcWebhook
@@ -219,7 +220,15 @@ class UpcWebhook
             return 409;
         }
 
-        if (AmountHelper::toCents((float) $order->get_total(), $order->get_currency()) !== $operation_data->amount) {
+        $order_amount = UpcOrderAmount::total($order);
+
+        if (null === $order_amount) {
+            // Currency the Unified API can't take (already logged): the notification can't be
+            // checked, so it is refused like an amount mismatch rather than left to a fatal.
+            return 400;
+        }
+
+        if ($order_amount !== $operation_data->amount) {
             $logger->error(sprintf('UPC webhook notification amount mismatch for order #%s.', $order->get_id()));
 
             return 400;
@@ -246,6 +255,10 @@ class UpcWebhook
             (new OperationOutcomeProcessor())->process($operation, function () use ($order, $raw_body): void {
                 $this->maybe_persist_uhf_card($order, $raw_body);
             });
+
+            if (PaymentOutcome::PAID === $operation_data->outcome) {
+                $this->record_card_details($order, $raw_body);
+            }
 
             return 200;
         } catch (InvalidOperationDataException $e) {
@@ -329,6 +342,19 @@ class UpcWebhook
         }
 
         (new CardRecorderFromOperation())->maybe_persist($order, $decoded);
+    }
+
+    /**
+     * Runs whatever the processor returned: the synchronous payment response carries no card, so
+     * a webhook arriving after that path already treated the operation still brings it.
+     */
+    private function record_card_details(\WC_Order $order, string $raw_body): void
+    {
+        $decoded = json_decode($raw_body, true);
+
+        if (is_array($decoded)) {
+            (new UpcTransactionMetadataRecorder())->record_card($order, $decoded);
+        }
     }
 
     /**
