@@ -5,6 +5,7 @@ namespace Payplug\PayplugWoocommerce\Admin\Vue;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Scalapay;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
 class PaymentMethods
 {
@@ -28,14 +29,28 @@ class PaymentMethods
             'redirect' => false,
             'popup' => false,
             'integrated' => false,
+            'hosted_fields' => false,
         ];
 
         $embedded_mode = $this->configuration->get_option('payment_methods.configuration.payplug.embedded_mode');
+
+        // A shop's stored mode can predate its current currency (e.g. it was 'popup' before
+        // switching to a non-EUR currency): embeded_option() only ever renders the modes
+        // valid for the current currency, so falling through to the stored value here would
+        // leave the radio group with nothing checked. Normalize to a mode that's actually
+        // rendered; this doesn't persist anything - the stored value is only corrected once
+        // the merchant saves again.
+        $is_eur_shop = PayplugWoocommerceHelper::is_eur_shop();
+        if ($is_eur_shop && !in_array($embedded_mode, ['redirect', 'popup', 'integrated'], true)) {
+            $embedded_mode = 'redirect';
+        } elseif (!$is_eur_shop && $embedded_mode !== 'hosted_fields') {
+            $embedded_mode = 'hosted_fields';
+        }
         $method[$embedded_mode] = true;
 
         $active = $this->configuration->get_option('payment_methods.configuration.payplug.active');
 
-        return [
+        $result = [
             'type' => 'payment_method',
             'name' => 'standard',
             'title' => __('payplug_section_standard_payment_title', 'payplug'),
@@ -58,6 +73,53 @@ class PaymentMethods
                 $this->embeded_option($method),
                 $this->standard_warning_message(),
                 $this->one_click_option(),
+            ],
+        ];
+
+        // The front-end (PayplugStandard.vue) only guards `typeof data.advanced_settings
+        // == "object"` - since `typeof null === "object"` in JS, sending an explicit
+        // `null` here still passes that guard and then crashes on `Object.keys(null)`.
+        // The key must be omitted entirely, not set to null, for a EUR shop and when the
+        // merchant has no OAuth2 credentials for the stored mode (Hosted Fields needs them).
+        if (!PayplugWoocommerceHelper::is_eur_shop() && PayplugWoocommerceHelper::is_oauth2_connected()) {
+            $result['advanced_settings'] = $this->hosted_fields_advanced_settings();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array
+     */
+    private function hosted_fields_advanced_settings()
+    {
+        $identifier = (string) ($this->configuration->get_option('payment_methods.configuration.payplug.hosted_fields.identifier') ?? '');
+
+        return [
+            'title' => __('payplug_section_advanced_configuration_title', 'payplug'),
+            'options' => [
+                [
+                    'name' => 'hosted_fields',
+                    'title' => __('payplug_hosted_fields_title', 'payplug'),
+                    'class' => '-hosted_fields',
+                    'descriptions' => [
+                        'live' => [
+                            'description' => __('payplug_hosted_fields_description', 'payplug'),
+                        ],
+                        'sandbox' => [
+                            'description' => __('payplug_hosted_fields_description', 'payplug'),
+                        ],
+                    ],
+                    'options' => [
+                        [
+                            'type' => 'input',
+                            'label' => __('payplug_hosted_fields_identifier_label', 'payplug'),
+                            'placeholder' => '',
+                            'name' => 'identifier',
+                            'value' => $identifier,
+                        ],
+                    ],
+                ],
             ],
         ];
     }
@@ -168,7 +230,7 @@ class PaymentMethods
      */
     public function embeded_option($method)
     {
-        $options = [
+        $options = PayplugWoocommerceHelper::is_eur_shop() ? [
             [
                 'name' => 'payplug_embedded',
                 'label' => __('payplug_section_standard_payment_option_integrated_label', 'payplug'),
@@ -187,6 +249,13 @@ class PaymentMethods
                 'value' => 'redirect',
                 'checked' => $method['redirect'],
             ],
+        ] : [
+            [
+                'name' => 'payplug_embedded',
+                'label' => __('payplug_section_standard_payment_option_hosted_fields_label', 'payplug'),
+                'value' => 'hosted_fields',
+                'checked' => $method['hosted_fields'],
+            ],
         ];
 
         return [
@@ -199,6 +268,7 @@ class PaymentMethods
                     'description_redirect' => __('payplug_section_standard_payment_redirected_description', 'payplug'),
                     'description_popup' => __('payplug_section_standard_payment_popup_description', 'payplug'),
                     'description_integrated' => __('payplug_section_standard_payment_integrated_description', 'payplug'),
+                    'description_hosted_fields' => __('payplug_section_standard_payment_hosted_fields_description', 'payplug'),
                     'link_know_more' => Component::link(
                         __('payplug_know_more_label', 'payplug'),
                         __('payplug_embeded_option_url', 'payplug'),
@@ -209,6 +279,7 @@ class PaymentMethods
                     'description_redirect' => __('payplug_section_standard_payment_redirected_description', 'payplug'),
                     'description_popup' => __('payplug_section_standard_payment_popup_description', 'payplug'),
                     'description_integrated' => __('payplug_section_standard_payment_integrated_description', 'payplug'),
+                    'description_hosted_fields' => __('payplug_section_standard_payment_hosted_fields_description', 'payplug'),
                     'link_know_more' => Component::link(
                         __('payplug_know_more_label', 'payplug'),
                         __('payplug_embeded_option_url', 'payplug'),
@@ -565,11 +636,11 @@ class PaymentMethods
         // possibly-narrower custom choice.
         [$authorized_min, $authorized_max] = Scalapay::authorized_bounds($config, $api_amounts);
 
-        // Convert cents to euros for display
-        $min = $min / 100;
-        $max = $max / 100;
-        $authorized_min = $authorized_min / 100;
-        $authorized_max = $authorized_max / 100;
+        // Convert cents to euros for display (Scalapay is Euro-only)
+        $min = AmountHelper::fromCents((int) $min, PayplugWoocommerceHelper::EURO_CURRENCY);
+        $max = AmountHelper::fromCents((int) $max, PayplugWoocommerceHelper::EURO_CURRENCY);
+        $authorized_min = AmountHelper::fromCents((int) $authorized_min, PayplugWoocommerceHelper::EURO_CURRENCY);
+        $authorized_max = AmountHelper::fromCents((int) $authorized_max, PayplugWoocommerceHelper::EURO_CURRENCY);
 
         return [
             'name' => 'thresholds',

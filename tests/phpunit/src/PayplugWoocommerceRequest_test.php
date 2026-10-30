@@ -7,6 +7,7 @@ use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\FakeGateway;
 use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\FakePayment;
 use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\PayplugWoocommerceRequestDouble;
 use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\WooCommerceAjaxFixtures;
+use Payplug\Resource\PaymentPaymentFailure;
 use PHPUnit\Framework\TestCase;
 
 class PayplugWoocommerceRequest_test extends TestCase
@@ -268,6 +269,7 @@ class PayplugWoocommerceRequest_test extends TestCase
         self::assertSame(esc_url_raw($order->get_cancel_order_url_raw()), $response['body']['data']['cancel_url']);
         self::assertSame(['load_payment'], $this->request->calls);
         self::assertSame('failed', wc_get_order($order->get_id())->get_status());
+        self::assertFailureNote(sprintf('Payplug payment %s was not completed.', $order->get_transaction_id()), $order->get_id());
     }
 
     public function test_check_payment_owner_with_refused_payment_returns_the_failure(): void
@@ -283,6 +285,93 @@ class PayplugWoocommerceRequest_test extends TestCase
         self::assertSame('card_declined', $response['body']['data']['code']);
         self::assertSame('The card was declined.', $response['body']['data']['message']);
         self::assertSame('failed', wc_get_order($order->get_id())->get_status());
+        self::assertFailureNote(sprintf('Payplug payment %s failed (card_declined: The card was declined.).', $order->get_transaction_id()), $order->get_id());
+    }
+
+    public function test_check_payment_owner_with_an_sdk_refused_payment_returns_the_failure(): void
+    {
+        $order = $this->make_order(['transaction_id' => true]);
+        $this->own_in_session($order);
+        $this->request->payment = new FakePayment($order->get_transaction_id(), $order->get_id());
+        $this->request->payment->failure = PaymentPaymentFailure::fromAttributes(['code' => 'card_declined', 'message' => 'The card was declined.']);
+        $_POST = ['payment_id' => $order->get_transaction_id()];
+
+        $response = $this->capture_ajax([$this->request, 'check_payment']);
+
+        self::assertFalse($response['body']['success']);
+        self::assertSame('card_declined', $response['body']['data']['code']);
+        self::assertSame('The card was declined.', $response['body']['data']['message']);
+        self::assertSame('failed', wc_get_order($order->get_id())->get_status());
+        self::assertFailureNote(sprintf('Payplug payment %s failed (card_declined: The card was declined.).', $order->get_transaction_id()), $order->get_id());
+    }
+
+    public function test_check_payment_strips_markup_from_the_failure_in_the_order_note(): void
+    {
+        $order = $this->make_order(['transaction_id' => true]);
+        $this->own_in_session($order);
+        $this->request->payment = new FakePayment($order->get_transaction_id(), $order->get_id());
+        $this->request->payment->failure = (object) ['code' => '<b>card_declined</b>', 'message' => '<script>alert(1)</script>The card was <a href="https://evil.test">declined</a>.'];
+        $_POST = ['payment_id' => $order->get_transaction_id()];
+
+        $this->capture_ajax([$this->request, 'check_payment']);
+
+        self::assertFailureNote(sprintf('Payplug payment %s failed (card_declined: The card was declined.).', $order->get_transaction_id()), $order->get_id());
+    }
+
+    public function test_check_payment_with_a_3ds_declined_payment_fails_the_order_and_returns_the_code(): void
+    {
+        $order = $this->make_order(['transaction_id' => true]);
+        $this->own_in_session($order);
+        $this->request->payment = new FakePayment($order->get_transaction_id(), $order->get_id());
+        $this->request->payment->failure = (object) ['code' => '3ds_declined', 'message' => 'The 3DS authentication failed.'];
+        $_POST = ['payment_id' => $order->get_transaction_id()];
+
+        $response = $this->capture_ajax([$this->request, 'check_payment']);
+
+        self::assertFalse($response['body']['success']);
+        self::assertSame('3ds_declined', $response['body']['data']['code']);
+        self::assertSame('The 3DS authentication failed.', $response['body']['data']['message']);
+        self::assertSame(esc_url_raw($order->get_cancel_order_url_raw()), $response['body']['data']['cancel_url']);
+        self::assertSame('failed', wc_get_order($order->get_id())->get_status());
+        self::assertFailureNote(sprintf('Payplug payment %s failed (3ds_declined: The 3DS authentication failed.).', $order->get_transaction_id()), $order->get_id());
+    }
+
+    public function incomplete_failure_provider(): array
+    {
+        return [
+            'without a code' => [(object) ['message' => 'The card was declined.'], 500, 'The card was declined.'],
+            'without a message' => [(object) ['code' => 'card_declined'], 'card_declined', null],
+            'with a null message' => [(object) ['code' => 'card_declined', 'message' => null], 'card_declined', null],
+            'with a code that is only markup' => [(object) ['code' => '<b></b>', 'message' => 'The card was declined.'], '<b></b>', 'The card was declined.'],
+            'with no fields' => [(object) [], 500, null],
+            'SDK failure without a message' => [PaymentPaymentFailure::fromAttributes(['code' => 'card_declined']), 'card_declined', null],
+            'SDK failure without a code' => [PaymentPaymentFailure::fromAttributes(['message' => 'The card was declined.']), 500, 'The card was declined.'],
+        ];
+    }
+
+    /**
+     * @dataProvider incomplete_failure_provider
+     *
+     * @param object $failure
+     * @param int|string $expected_code
+     * @param string|null $expected_message null for the generic integrated payment error
+     */
+    public function test_check_payment_with_an_incomplete_failure_fails_the_order_with_the_generic_note($failure, $expected_code, ?string $expected_message): void
+    {
+        $order = $this->make_order(['transaction_id' => true]);
+        $this->own_in_session($order);
+        $this->request->payment = new FakePayment($order->get_transaction_id(), $order->get_id());
+        $this->request->payment->failure = $failure;
+        $_POST = ['payment_id' => $order->get_transaction_id()];
+
+        $response = $this->capture_ajax([$this->request, 'check_payment']);
+
+        self::assertSame(200, $response['status']);
+        self::assertFalse($response['body']['success']);
+        self::assertSame($expected_code, $response['body']['data']['code']);
+        self::assertSame($expected_message ?? __('payplug_integrated_payment_error', 'payplug'), $response['body']['data']['message']);
+        self::assertSame('failed', wc_get_order($order->get_id())->get_status());
+        self::assertFailureNote(sprintf('Payplug payment %s was not completed.', $order->get_transaction_id()), $order->get_id());
     }
 
     public function paid_order_status_provider(): array
@@ -849,6 +938,15 @@ class PayplugWoocommerceRequest_test extends TestCase
         });
 
         return $lookups;
+    }
+
+    private static function assertFailureNote(string $expected, int $order_id): void
+    {
+        $notes = wc_get_order_notes(['order_id' => $order_id, 'limit' => 1]);
+
+        self::assertCount(1, $notes);
+        self::assertStringStartsWith($expected, $notes[0]->content);
+        self::assertStringNotContainsString('Order cancelled by customer.', $notes[0]->content);
     }
 
     private function make_available_gateway(string $id): FakeGateway

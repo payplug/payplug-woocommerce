@@ -50,7 +50,6 @@ class PayplugGatewayRequirements
         return $this->valid_php()
                && $this->valid_curl()
                && $this->valid_openssl()
-               && $this->valid_currency()
                && $this->valid_account();
     }
 
@@ -84,17 +83,6 @@ class PayplugGatewayRequirements
         return [
             'status' => $this->valid_openssl(),
             'text' => __('payplug_section_status_ssl', 'payplug'),
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function currency_requirement()
-    {
-        return [
-            'status' => $this->valid_currency(),
-            'text' => __('payplug_section_status_currency', 'payplug'),
         ];
     }
 
@@ -147,16 +135,6 @@ class PayplugGatewayRequirements
     public function valid_openssl()
     {
         return OPENSSL_VERSION_NUMBER >= self::OPENSSL_MIN;
-    }
-
-    /**
-     * Check if the shop currency is Euro.
-     *
-     * @return bool
-     */
-    public function valid_currency()
-    {
-        return 'EUR' === get_woocommerce_currency();
     }
 
     /**
