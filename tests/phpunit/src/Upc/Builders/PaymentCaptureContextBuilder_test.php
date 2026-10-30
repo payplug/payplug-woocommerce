@@ -100,11 +100,12 @@ class PaymentCaptureContextBuilder_test extends TestCase
         $this->assertSame('Jane', $dto->common->billing->contact->firstName);
     }
 
-    public function testBuildOmitsCustomerForAGuestOrder(): void
+    public function testBuildSendsAPerOrderCustomerForAGuestOrder(): void
     {
         $dto = (new PaymentCaptureContextBuilder())->build($this->order, 'hf_token_123', 'visa', false);
 
-        $this->assertNull($dto->customer);
+        $this->assertSame('guest-' . $this->order->get_id(), $dto->customer->id);
+        $this->assertSame('jane@example.test', $dto->customer->email);
     }
 
     public function testBuildSetsCustomerForARegisteredCustomer(): void
