@@ -110,12 +110,16 @@ trait BuildsCommonFields
         );
     }
 
-    private function build_customer(\WC_Order $order): ?CustomerDto
+    /**
+     * The Unified API requires customer.email on every payment, guest checkouts included: a guest
+     * has no WordPress user id, so it gets a per-order one instead.
+     */
+    private function build_customer(\WC_Order $order): CustomerDto
     {
-        if (0 === $order->get_customer_id()) {
-            return null;
-        }
+        $customer_id = 0 === $order->get_customer_id()
+            ? 'guest-' . $order->get_id()
+            : (string) $order->get_customer_id();
 
-        return new CustomerDto((string) $order->get_customer_id(), $order->get_billing_email());
+        return new CustomerDto($customer_id, $order->get_billing_email());
     }
 }

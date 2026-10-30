@@ -48,6 +48,9 @@ jobs:
       api-payplug: ${{ secrets.PAYPLUG_API_QA }}
       api-payplug-retail: ${{ secrets.API_RETAIL_QA }}
       oney-loader-url: ${{ secrets.ONEY_LOADER_URL_QA }}
+      hosted-fields-sdk: ${{ secrets.HOSTED_FIELDS_SDK_URL_QA }}
+      upc-oauth-base-url: ${{ secrets.PAYPLUG_API_QA }}
+      upc-api-base-url: ${{ secrets.UPC_UNIFIED_API_BASE_URL_QA }}
 
   # -----------------------------------------------------------------------
   # 4. SONARCLOUD — code quality analysis (develop PRs only)
