@@ -81,6 +81,29 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 2. Display on a WordPress website
 
 == Changelog ==
+= 3.2.0 =
+* Fix: integrated payment on the classic checkout now shows the error and keeps the customer on the checkout when 3D Secure is declined, instead of redirecting to the order confirmation page
+* Fix: integrated payment on the classic checkout now always shows an error message when the payment cannot be confirmed, instead of an empty notice
+* Fix: when an integrated card payment fails on the checkout, the order note now gives the Payplug payment ID and the failure reason (for example 3D Secure declined) instead of "Order cancelled by customer."
+* Fix: remove PHP warnings in the back office when Scalapay is activated
+* Fix: fix order lookup in check_payment for integrated payment
+* Fix: secure the OAuth setup callback and the PayPlug REST routes (capability check, nonce, POST only)
+* Change: PayPlug settings now require the WooCommerce manage_woocommerce capability (editors lose access, shop managers gain it, GET on payplug_api routes is removed)
+* Fix: Apple Pay and integrated/popup card AJAX endpoints now check that the order belongs to the current customer
+* Fix: order-pay Apple Pay and card payment creation refuse orders that no longer need payment
+* Fix: Apple Pay payment update charges the order total instead of the amount sent by the browser, and cancelling the Apple Pay sheet only deletes orders created by the Apple Pay cart button
+* Feat: Add Unified Hosted Fields (UHF) card payment, with back-office configuration, on classic and Blocks checkout
+* Feat: Allow customers to save and reuse their card with UHF
+* Feat: Support 3D Secure confirmation by webhook for UHF payments
+* Feat: Support refunds for UHF orders
+* Refactor: Connect the plugin to Unified Plugin Core (UPC) for authentication, payment creation and amount/phone conversion
+* Fix: Send amounts in the minor units of the order currency, so zero-decimal currencies such as JPY are no longer multiplied by 100
+* Fix: Hide Apple Pay on non-EUR shops and reject non-EUR orders on EUR-only payment methods
+* Fix: On non-EUR shops, only offer the OAuth2 login in the back office and invite merchants connected with the classic login to reconnect with OAuth2
+* Fix: Do not require the UHF identifier when the merchant is not connected with OAuth2 for the current mode, and only offer UHF card payment at checkout once OAuth2 and the UHF identifier are both set up
+* Fix: Log the merchant out instead of crashing the site when no PayPlug token can be found or refreshed for the current mode
+* Fix: Show the PayPlug payment details of UHF orders on the order page, in the order currency, with the status following refunds
+
 = 3.1.1 =
 * Fix: remove PHP warnings in the back office when Scalapay is activated
 * Fix: fix order lookup in check_payment for integrated payment
