@@ -397,17 +397,13 @@ class Vue
         if (PayplugWoocommerceHelper::is_eur_shop()) {
             $method_options[] = PaymentMethods::payment_method_amex($payment_configuration['american_express']['active']);
             $method_options[] = PaymentMethods::payment_method_applepay($payment_configuration['apple_pay']['active'], $this->options, $carriers);
-            $method_options[] = PaymentMethods::payment_method_bancontact($payment_configuration['bancontact']['active']);
-            $method_options[] = PaymentMethods::payment_method_satispay($payment_configuration['satispay']['active']);
-            $method_options[] = PaymentMethods::payment_method_mybank($payment_configuration['mybank']['active']);
-            $method_options[] = PaymentMethods::payment_method_ideal($payment_configuration['ideal']['active']);
-            $method_options[] = PaymentMethods::payment_method_wero($payment_configuration['wero']['active']);
-            $method_options[] = PaymentMethods::payment_method_bizum($payment_configuration['bizum']['active']);
-            $method_options[] = PaymentMethods::payment_method_scalapay(
-                $payment_configuration['scalapay']['active'],
-                $payment_configuration['scalapay'],
-                $this->options['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
-            );
+            $method_options[] = PaymentMethods::payment_method_bancontact($payment_configuration['bancontact']['active'], $this->options);
+            $method_options[] = PaymentMethods::payment_method_satispay($payment_configuration['satispay']['active'], $this->options);
+            $method_options[] = PaymentMethods::payment_method_mybank($payment_configuration['mybank']['active'], $this->options);
+            $method_options[] = PaymentMethods::payment_method_ideal($payment_configuration['ideal']['active'], $this->options);
+            $method_options[] = PaymentMethods::payment_method_wero($payment_configuration['wero']['active'], $this->options);
+            $method_options[] = PaymentMethods::payment_method_bizum($payment_configuration['bizum']['active'], $this->options);
+            $method_options[] = PaymentMethods::payment_method_scalapay($payment_configuration['scalapay']['active'], $this->options);
         }
 
         $section = [
