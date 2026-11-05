@@ -1,13 +1,33 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
-/******/ 	var __webpack_modules__ = ({
+/******/ 	// The require scope
+/******/ 	const __webpack_require__ = {};
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/concatenation wrap */
+/******/ 	// wrap a concatenated module body as a lazy, memoized accessor; mod is
+/******/ 	// set before the body runs so re-entrant calls (require cycles) observe
+/******/ 	// the partial exports like Node.js
+/******/ 	__webpack_require__.cw = (body) => {
+/******/ 		var mod;
+/******/ 		return () => {
+/******/ 			if (body) {
+/******/ 				var fn = body;
+/******/ 				body = 0;
+/******/ 				mod = { exports: {} };
+/******/ 				fn.call(mod.exports, mod, mod.exports);
+/******/ 			}
+/******/ 			return mod.exports;
+/******/ 		};
+/******/ 	};
+/******/ 	
+/************************************************************************/
+/*!*************************************************************************!*\
+  !*** ./resources/js/frontend/wc-payplug-scalapay-blocks.js + 8 modules ***!
+  \*************************************************************************/
 
-/***/ "./node_modules/react/cjs/react-jsx-runtime.development.js"
-/*!*****************************************************************!*\
-  !*** ./node_modules/react/cjs/react-jsx-runtime.development.js ***!
-  \*****************************************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
-
+// MODULE: ./node_modules/react/cjs/react-jsx-runtime.development.js
+var react_jsx_runtime_development_namespaceFn = /*#__PURE__*/__webpack_require__.cw(function(module, exports) {
 /**
  * @license React
  * react-jsx-runtime.development.js
@@ -24,7 +44,7 @@ if (true) {
   (function() {
 'use strict';
 
-var React = __webpack_require__(/*! react */ "react");
+var React = (external_React_namespaceFn());
 
 // ATTENTION
 // When adding new symbols to this file,
@@ -1342,173 +1362,78 @@ exports.jsxs = jsxs;
   })();
 }
 
+});
 
-/***/ },
-
-/***/ "./node_modules/react/jsx-runtime.js"
-/*!*******************************************!*\
-  !*** ./node_modules/react/jsx-runtime.js ***!
-  \*******************************************/
-(module, __unused_webpack_exports, __webpack_require__) {
-
+// MODULE: ./node_modules/react/jsx-runtime.js
+var jsx_runtime_namespaceFn = /*#__PURE__*/__webpack_require__.cw(function(module, exports) {
 
 
 if (false) // removed by dead control flow
 {} else {
-  module.exports = __webpack_require__(/*! ./cjs/react-jsx-runtime.development.js */ "./node_modules/react/cjs/react-jsx-runtime.development.js");
+  module.exports = (react_jsx_runtime_development_namespaceFn());
 }
 
+});
 
-/***/ },
-
-/***/ "react"
-/*!************************!*\
-  !*** external "React" ***!
-  \************************/
-(module) {
-
+// MODULE: external "React"
+var external_React_namespaceFn = /*#__PURE__*/__webpack_require__.cw(function(module, exports) {
 module.exports = window["React"];
+});
 
-/***/ },
+;// external ["wp","i18n"]
+const external_wp_i18n_namespaceObject = window["wp"]["i18n"];
+;// external ["wc","wcBlocksRegistry"]
+const external_wc_wcBlocksRegistry_namespaceObject = window["wc"]["wcBlocksRegistry"];
+;// external ["wp","htmlEntities"]
+const external_wp_htmlEntities_namespaceObject = window["wp"]["htmlEntities"];
+;// external ["wc","wcSettings"]
+const external_wc_wcSettings_namespaceObject = window["wc"]["wcSettings"];
+;// ./resources/js/frontend/helper/wc-payplug-ppro-eligibility.js
+/**
+ * Whether a PPRO payment method can be offered for the current cart and billing address.
+ *
+ * @param {Object} restrictions ppro_restrictions of the payment method data: min and max in cents,
+ *                              countries (null for any country), currency, ok.
+ * @param {Object} data         canMakePayment argument of WooCommerce Blocks.
+ * @return {boolean} Eligibility.
+ */
+const isEligible = (restrictions, data) => {
+  if (!restrictions || !restrictions.ok || !data || !data.cartTotals) {
+    return false;
+  }
+  const totals = data.cartTotals;
+  if (String(totals.currency_code || '').toUpperCase() !== String(restrictions.currency || '').toUpperCase()) {
+    return false;
+  }
+  const total = parseInt(totals.total_price, 10);
+  if (Number.isNaN(total)) {
+    return false;
+  }
+  const minorUnit = Number.isInteger(totals.currency_minor_unit) ? totals.currency_minor_unit : 2;
+  const cents = Math.round(total * Math.pow(10, 2 - minorUnit));
+  if (cents < restrictions.min || cents > restrictions.max) {
+    return false;
+  }
+  const address = data.billingAddress || data.billingData || {};
+  const country = String(address.country || '').toUpperCase();
+  if ('' === country) {
+    return false;
+  }
+  return null === restrictions.countries || Array.isArray(restrictions.countries) && restrictions.countries.includes(country);
+};
+;// ./node_modules/react/jsx-runtime.js
+jsx_runtime_namespaceFn();
 
-/***/ "@woocommerce/blocks-registry"
-/*!******************************************!*\
-  !*** external ["wc","wcBlocksRegistry"] ***!
-  \******************************************/
-(module) {
-
-module.exports = window["wc"]["wcBlocksRegistry"];
-
-/***/ },
-
-/***/ "@woocommerce/settings"
-/*!************************************!*\
-  !*** external ["wc","wcSettings"] ***!
-  \************************************/
-(module) {
-
-module.exports = window["wc"]["wcSettings"];
-
-/***/ },
-
-/***/ "@wordpress/html-entities"
-/*!**************************************!*\
-  !*** external ["wp","htmlEntities"] ***!
-  \**************************************/
-(module) {
-
-module.exports = window["wp"]["htmlEntities"];
-
-/***/ },
-
-/***/ "@wordpress/i18n"
-/*!******************************!*\
-  !*** external ["wp","i18n"] ***!
-  \******************************/
-(module) {
-
-module.exports = window["wp"]["i18n"];
-
-/***/ }
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		if (!(moduleId in __webpack_modules__)) {
-/******/ 			delete __webpack_module_cache__[moduleId];
-/******/ 			var e = new Error("Cannot find module '" + moduleId + "'");
-/******/ 			e.code = 'MODULE_NOT_FOUND';
-/******/ 			throw e;
-/******/ 		}
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/************************************************************************/
-var __webpack_exports__ = {};
-// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
-(() => {
-/*!*************************************************************!*\
-  !*** ./resources/js/frontend/wc-payplug-scalapay-blocks.js ***!
-  \*************************************************************/
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @woocommerce/blocks-registry */ "@woocommerce/blocks-registry");
-/* harmony import */ var _woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _wordpress_html_entities__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/html-entities */ "@wordpress/html-entities");
-/* harmony import */ var _wordpress_html_entities__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_html_entities__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _woocommerce_settings__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @woocommerce/settings */ "@woocommerce/settings");
-/* harmony import */ var _woocommerce_settings__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_woocommerce_settings__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+;// ./resources/js/frontend/wc-payplug-scalapay-blocks.js
 
 
 
 
 
-const settings = (0,_woocommerce_settings__WEBPACK_IMPORTED_MODULE_3__.getSetting)('scalapay_data', {});
-const defaultLabel = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Gateway method title', 'payplug');
-const label = (0,_wordpress_html_entities__WEBPACK_IMPORTED_MODULE_2__.decodeEntities)(settings?.title) || defaultLabel;
+
+const settings = (0,external_wc_wcSettings_namespaceObject.getSetting)('scalapay_data', {});
+const defaultLabel = (0,external_wp_i18n_namespaceObject.__)('Gateway method title', 'payplug');
+const label = (0,external_wp_htmlEntities_namespaceObject.decodeEntities)(settings?.title) || defaultLabel;
 
 /**
  * Content component
@@ -1521,15 +1446,15 @@ const Content = () => {
  *
  */
 const Label = () => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("span", {
+  return /*#__PURE__*/(0,react_jsx_runtime_development_namespaceFn().jsxs)("span", {
     style: {
       width: '100%'
     },
-    children: [label, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(Icon, {})]
+    children: [label, /*#__PURE__*/(0,react_jsx_runtime_development_namespaceFn().jsx)(Icon, {})]
   });
 };
 const Icon = () => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("img", {
+  return /*#__PURE__*/(0,react_jsx_runtime_development_namespaceFn().jsx)("img", {
     src: settings?.icon.src,
     alt: settings?.icon.icon_alt,
     className: "payplug-payment-icon",
@@ -1544,10 +1469,10 @@ const Icon = () => {
  */
 const Scalapay = {
   name: "scalapay",
-  label: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(Label, {}),
-  content: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(Content, {}),
-  edit: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(Content, {}),
-  canMakePayment: () => true,
+  label: /*#__PURE__*/(0,react_jsx_runtime_development_namespaceFn().jsx)(Label, {}),
+  content: /*#__PURE__*/(0,react_jsx_runtime_development_namespaceFn().jsx)(Content, {}),
+  edit: /*#__PURE__*/(0,react_jsx_runtime_development_namespaceFn().jsx)(Content, {}),
+  canMakePayment: data => isEligible(settings.ppro_restrictions, data),
   ariaLabel: label,
   supports: {
     features: settings.supports
@@ -1555,9 +1480,7 @@ const Scalapay = {
 };
 
 // Register the defined payment method object
-(0,_woocommerce_blocks_registry__WEBPACK_IMPORTED_MODULE_1__.registerPaymentMethod)(Scalapay);
-})();
-
+(0,external_wc_wcBlocksRegistry_namespaceObject.registerPaymentMethod)(Scalapay);
 /******/ })()
 ;
 //# sourceMappingURL=wc-payplug-scalapay-blocks.js.map

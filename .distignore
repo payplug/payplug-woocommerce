@@ -55,3 +55,4 @@ vendor/giggsey/locale/
 vendor/payplug/payplug-php/tests/
 vendor/payplug/payplug-plugin-mcp/tests/
 vendor/payplug/unified-plugin-core/tests/
+*.test.js

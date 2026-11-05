@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
+import { isEligible } from './helper/wc-payplug-ppro-eligibility';
 
 const settings = getSetting( 'scalapay_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
@@ -40,7 +41,7 @@ const Scalapay = {
 	label: <Label />,
 	content: <Content />,
 	edit: <Content />,
-	canMakePayment: () => true,
+	canMakePayment: ( data ) => isEligible( settings.ppro_restrictions, data ),
 	ariaLabel: label,
 	supports: {
 		features: settings.supports,
