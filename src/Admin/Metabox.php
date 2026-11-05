@@ -9,6 +9,8 @@ if (!defined('ABSPATH')) {
 
 use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Upc\UpcTransactionMetadataRecorder;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 use WP_Post;
 
 /**
@@ -64,6 +66,10 @@ class Metabox
         }
 
         $metadata = PayplugWoocommerceHelper::get_transaction_metadata($order);
+        if (empty($metadata)) {
+            $upc_metadata = $order->get_meta(UpcTransactionMetadataRecorder::META_KEY);
+            $metadata = is_array($upc_metadata) && [] === array_diff(['transaction_id', 'amount', 'live'], array_keys($upc_metadata)) ? $upc_metadata : $metadata;
+        }
         $date_format = get_option('date_format', 'j F Y');
         $time_format = get_option('time_format', 'G \h i \m\i\n');
         if (empty($metadata)) : ?>
@@ -85,14 +91,14 @@ class Metabox
 					<li><span><?php _e('payment_method', 'payplug'); ?>:</span> <?php echo str_replace('_', ' ', ucfirst($order->get_payment_method())); ?></li>
 				<?php } ?>
 				<li><span><?php _e('Amount', 'payplug'); ?>
-						:</span> <?php echo wc_price((int) $metadata['amount'] / 100); ?></li>
+						:</span> <?php echo wc_price(AmountHelper::fromCents((int) $metadata['amount'], $order->get_currency()), ['currency' => $order->get_currency()]); ?></li>
 				<li><span><?php _e('Paid at', 'payplug'); ?>
 						:</span> <?php echo !empty($metadata['paid_at']) ? esc_html(date_i18n(sprintf('%s %s', $date_format, $time_format), $metadata['paid_at'])) : ''; ?>
 				</li>
 
 				<?php if (!empty($metadata['card_brand'])) { ?>
 					<li><span><?php _e('Credit card', 'payplug'); ?>
-							:</span> <?php echo !empty($metadata['card_brand']) ? esc_html(sprintf('%s (%s)', $metadata['card_brand'], $metadata['card_country'])) : ''; ?>
+							:</span> <?php echo empty($metadata['card_country']) ? esc_html($metadata['card_brand']) : esc_html(sprintf('%s (%s)', $metadata['card_brand'], $metadata['card_country'])); ?>
 					</li>
 				<?php } ?>
 

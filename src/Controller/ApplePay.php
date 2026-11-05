@@ -117,6 +117,14 @@ class ApplePay extends PayplugGateway
             return false;
         }
 
+        // Apple Pay is EUR-only, but extends PayplugGateway directly rather than
+        // PayplugGenericGateway, so PayplugGenericGateway::checkGateway()'s currency guard never
+        // runs for it. Without this, a shop that enabled Apple Pay in EUR and later switched
+        // currency keeps showing the button on cart, product and checkout pages.
+        if (!PayplugWoocommerceHelper::is_eur_shop()) {
+            return false;
+        }
+
         //it's disabled
         if (!(bool) $options['payment_methods']['configuration']['apple_pay']['active']) {
             return false;

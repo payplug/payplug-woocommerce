@@ -27,7 +27,67 @@ class PayplugGatewayOney3x_test extends TestCase
     protected function tearDown(): void
     {
         delete_option('woocommerce_payplug_settings');
+        delete_transient('payplug_config_test');
         parent::tearDown();
+    }
+
+    /**
+     * min_amounts/max_amounts (account, in cents) drive $gateway->min_oney_price/max_oney_price
+     * via AmountHelper::fromCents() in set_oney_configuration() - validate_order_amount()
+     * exercises that conversion end-to-end (PRE-3634: UPC AmountHelper migration).
+     */
+    private function withAccountThresholds(int $min_cents, int $max_cents): void
+    {
+        set_transient('payplug_config_test', [
+            'configuration' => [
+                'oney' => [
+                    'min_amounts' => ['EUR' => $min_cents],
+                    'max_amounts' => ['EUR' => $max_cents],
+                    'allowed_countries' => ['FR'],
+                ],
+            ],
+        ]);
+    }
+
+    public function test_validate_order_amount_within_account_thresholds_is_accepted(): void
+    {
+        update_option('woocommerce_payplug_settings', $this->base_settings);
+        $this->withAccountThresholds(10000, 300000); // 100.00€ - 3000.00€
+
+        $gateway = new PayplugGatewayOney3x();
+
+        self::assertSame(150000, $gateway->validate_order_amount(150000));
+    }
+
+    public function test_validate_order_amount_below_account_minimum_is_rejected(): void
+    {
+        update_option('woocommerce_payplug_settings', $this->base_settings);
+        $this->withAccountThresholds(10000, 300000); // 100.00€ - 3000.00€
+
+        $gateway = new PayplugGatewayOney3x();
+
+        self::assertInstanceOf(\WP_Error::class, $gateway->validate_order_amount(9999));
+    }
+
+    public function test_validate_order_amount_above_account_maximum_is_rejected(): void
+    {
+        update_option('woocommerce_payplug_settings', $this->base_settings);
+        $this->withAccountThresholds(10000, 300000); // 100.00€ - 3000.00€
+
+        $gateway = new PayplugGatewayOney3x();
+
+        self::assertInstanceOf(\WP_Error::class, $gateway->validate_order_amount(300001));
+    }
+
+    public function test_validate_order_amount_at_exact_boundaries_is_accepted(): void
+    {
+        update_option('woocommerce_payplug_settings', $this->base_settings);
+        $this->withAccountThresholds(10000, 300000); // 100.00€ - 3000.00€
+
+        $gateway = new PayplugGatewayOney3x();
+
+        self::assertSame(10000, $gateway->validate_order_amount(10000));
+        self::assertSame(300000, $gateway->validate_order_amount(300000));
     }
 
     public function test_gateway_disabled_on_wc_payments_page_when_oney_inactive(): void

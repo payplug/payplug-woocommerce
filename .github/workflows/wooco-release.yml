@@ -28,6 +28,9 @@ jobs:
       api-payplug-retail: ${{ secrets.API_RETAIL_QA }}
       github-token: ${{ secrets.GITHUB_TOKEN }}
       oney-loader-url: ${{ secrets.ONEY_LOADER_URL_QA }}
+      hosted-fields-sdk: ${{ secrets.HOSTED_FIELDS_SDK_URL_QA }}
+      upc-oauth-base-url: ${{ secrets.PAYPLUG_API_QA }}
+      upc-api-base-url: ${{ secrets.UPC_UNIFIED_API_BASE_URL_QA }}
 
   # --------------------------------------------------------------------------------
   # 2. REUSE QA ARTIFACT — download from any PR run and re-upload on develop merge
@@ -82,3 +85,6 @@ jobs:
       api-payplug-retail: ${{ secrets.API_RETAIL_PROD }}
       github-token: ${{ secrets.GITHUB_TOKEN }}
       oney-loader-url: ${{ secrets.ONEY_LOADER_URL_PROD }}
+      hosted-fields-sdk: ${{ secrets.HOSTED_FIELDS_SDK_URL_PROD }}
+      upc-oauth-base-url: ${{ secrets.PAYPLUG_API_PROD }}
+      upc-api-base-url: ${{ secrets.UPC_UNIFIED_API_BASE_URL_PROD }}

@@ -479,7 +479,12 @@ class PayplugWoocommerceRequest
         }
         $return_url = esc_url_raw($order->get_checkout_order_received_url());
         if ((isset($payment->failure)) && (!empty($payment->failure)) || ($payment->is_paid === false && is_null($payment->paid_at))) {
-            $order->update_status('failed', __('Order cancelled by customer.', 'woocommerce'));
+            $failure_code = wc_clean($payment->failure->code ?? '');
+            $failure_message = wc_clean($payment->failure->message ?? '');
+            $note = ('' !== $failure_code && '' !== $failure_message)
+                ? sprintf(__('Payplug payment %1$s failed (%2$s: %3$s).', 'payplug'), wc_clean($payment->id), $failure_code, $failure_message)
+                : sprintf(__('Payplug payment %s was not completed.', 'payplug'), wc_clean($payment->id));
+            $order->update_status('failed', $note);
             wp_send_json_error(
                 [
                     'code' => isset($payment->failure->code) ? $payment->failure->code : 500,
@@ -665,8 +670,8 @@ class PayplugWoocommerceRequest
         $customer_id = PayplugWoocommerceHelper::is_pre_30() ? $order->customer_user : $order->get_customer_id();
         $return_url = esc_url_raw($order->get_checkout_order_received_url());
         $address_data = PayplugAddressData::from_order($order);
-        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total());
-        $amount = $this->gateway->validate_order_amount($amount);
+        $amount = (int) PayplugWoocommerceHelper::get_payplug_amount($order->get_total(), $order->get_currency());
+        $amount = $this->gateway->validate_order_amount($amount, $order->get_currency());
 
         $payment_data = [
             'amount' => $amount,
