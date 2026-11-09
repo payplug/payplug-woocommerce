@@ -730,6 +730,28 @@ class PayplugWoocommerceHelper
     }
 
     /**
+     * Loads the build-time constants (SECURE_DOMAIN, UPC_UNIFIED_API_BASE_URL, ...). Safe to call
+     * more than once.
+     *
+     * payplug-config.local.php (gitignored) holds a developer's real local/staging values and is
+     * loaded first; payplug-config.php is always loaded too, its guarded define() calls only filling
+     * in what the local file left unset.
+     */
+    public static function load_config(): void
+    {
+        $local_config = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'payplug-config.local.php';
+        $default_config = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'payplug-config.php';
+
+        if (file_exists($local_config)) {
+            require_once $local_config;
+        }
+
+        if (file_exists($default_config)) {
+            require_once $default_config;
+        }
+    }
+
+    /**
      * Load translations from plugin languages folder.
      *
      * @param string $plugin_rel_path

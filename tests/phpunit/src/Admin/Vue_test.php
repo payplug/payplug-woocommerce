@@ -289,4 +289,32 @@ class Vue_test extends TestCase
         self::assertArrayHasKey('form', $back_to_eur['oauth_login']['descriptions']['live']);
         self::assertArrayNotHasKey('oauth_reconnect', $back_to_eur['logged']);
     }
+
+    private function payment_method(array $section, string $name): ?array
+    {
+        foreach ($section['options'] as $method) {
+            if ($name === $method['name']) {
+                return $method;
+            }
+        }
+
+        return null;
+    }
+
+    public function test_apple_pay_section_carries_the_domain_association_diagnostic(): void
+    {
+        $this->seed('EUR', $this->legacy_session());
+
+        $applepay = $this->payment_method((new Vue())->payplug_section_payment_methods(), 'applepay');
+
+        self::assertSame('not_synced', $applepay['domain_association']['state']);
+        self::assertArrayHasKey('resync', $applepay['domain_association']['texts']);
+    }
+
+    public function test_apple_pay_and_its_diagnostic_are_absent_on_a_non_eur_shop(): void
+    {
+        $this->seed('USD', $this->oauth_session());
+
+        self::assertNull($this->payment_method((new Vue())->payplug_section_payment_methods(), 'applepay'));
+    }
 }

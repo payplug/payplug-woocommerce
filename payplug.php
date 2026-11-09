@@ -28,6 +28,15 @@ define('PAYPLUG_GATEWAY_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('PAYPLUG_GATEWAY_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('PAYPLUG_GATEWAY_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
+// Composer prepends its loader: requiring it once every plugin file is included keeps this
+// plugin's dependencies ahead of the copies other plugins ship.
+add_action('plugins_loaded', function (): void {
+    if (file_exists(plugin_dir_path(__FILE__) . '/vendor/autoload.php')) {
+        require_once plugin_dir_path(__FILE__) . '/vendor/autoload.php';
+        \Payplug\PayplugWoocommerce\Upc\ApplePay\DomainAssociationBootstrap::boot();
+    }
+}, PHP_INT_MIN);
+
 /**
  * Plugin bootstrap function.
  */
@@ -46,26 +55,7 @@ function init(): void
         require_once plugin_dir_path(__FILE__) . '/vendor/autoload.php';
     }
 
-    // payplug-config.local.php (gitignored) is where a developer fills in real local/staging
-    // values (HOSTED_FIELDS_SDK_URL, UPC_OAUTH_BASE_URL, UPC_UNIFIED_API_BASE_URL, ...) without
-    // ever risking committing them - payplug-config.php itself must always ship with empty
-    // placeholder values. Loaded first, then payplug-config.php is ALWAYS also loaded (not
-    // elseif): its own define() calls are individually guarded (defined('X') || define('X', ''))
-    // so it only fills in whatever the local file left unset. An elseif here would mean a local
-    // file overriding just one constant leaves every other one undefined - a fatal Error in
-    // PHP 8 the moment any of them is referenced, not the harmless "already defined" E_WARNING
-    // define() actually emits on a genuine double-define.
-    $local_config = plugin_dir_path(__FILE__) . DIRECTORY_SEPARATOR . 'payplug-config.local.php';
-    $default_config = plugin_dir_path(__FILE__) . DIRECTORY_SEPARATOR . 'payplug-config.php';
-
-    if (file_exists($local_config)) {
-        require_once $local_config;
-    }
-
-    if (file_exists($default_config)) {
-        require_once $default_config;
-    }
-
+    PayplugWoocommerceHelper::load_config();
     PayplugWoocommerceHelper::load_plugin_textdomain(plugin_basename(dirname(__FILE__)) . '/languages');
     PayplugWoocommerce::get_instance();
 

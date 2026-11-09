@@ -290,4 +290,13 @@ class PayplugWoocommerceHelper_test extends TestCase
     {
         self::assertFalse(PayplugWoocommerceHelper::is_oauth2_connected());
     }
+
+    public function test_load_config_defines_the_config_constants_and_can_run_twice(): void
+    {
+        PayplugWoocommerceHelper::load_config();
+        PayplugWoocommerceHelper::load_config();
+
+        self::assertTrue(defined('SECURE_DOMAIN'));
+        self::assertTrue(defined('UPC_UNIFIED_API_BASE_URL'));
+    }
 }
