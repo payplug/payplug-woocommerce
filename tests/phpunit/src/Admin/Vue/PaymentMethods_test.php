@@ -63,4 +63,22 @@ class PaymentMethods_test extends TestCase
 
         self::assertArrayNotHasKey('advanced_settings', $this->payment_method_standard());
     }
+
+    public function test_apple_pay_carries_the_domain_association_diagnostic_when_given(): void
+    {
+        $options = (new Configuration())->extract_options_from_fields();
+        $diagnostic = ['state' => 'not_synced', 'texts' => ['resync' => 'Resync']];
+
+        $method = PaymentMethods::payment_method_applepay(true, $options, [], $diagnostic);
+
+        self::assertSame($diagnostic, $method['domain_association']);
+        self::assertArrayNotHasKey('domain_association', $method['options']);
+    }
+
+    public function test_apple_pay_without_a_diagnostic_has_no_domain_association_key(): void
+    {
+        $options = (new Configuration())->extract_options_from_fields();
+
+        self::assertArrayNotHasKey('domain_association', PaymentMethods::payment_method_applepay(true, $options, []));
+    }
 }

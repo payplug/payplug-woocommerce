@@ -24,6 +24,7 @@ use Payplug\PayplugWoocommerce\Service\ApmEligibility;
 use Payplug\PayplugWoocommerce\Service\ApmRefreshPolicy;
 use Payplug\PayplugWoocommerce\Service\ApmSettings;
 use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
+use Payplug\PayplugWoocommerce\Upc\ApplePay\DomainAssociationBootstrap;
 use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 use WP_REST_Request;
 
@@ -149,12 +150,27 @@ class Ajax
                 'permission_callback' => [$this, 'check_permission'],
                 'show_in_index' => false,
             ]);
+            register_rest_route('payplug_api', '/apple_pay_resync/', [
+                'methods' => 'POST',
+                'callback' => [$this, 'apple_pay_resync'],
+                'permission_callback' => [$this, 'check_permission'],
+                'show_in_index' => false,
+            ]);
         });
     }
 
     public function check_permission(): bool
     {
         return current_user_can('manage_woocommerce');
+    }
+
+    /**
+     * Always answers 200 with `success`, `status` and the refreshed `diagnostics`; on a failed
+     * download `success` is false and `diagnostics.last_error` carries the reason.
+     */
+    public function apple_pay_resync(WP_REST_Request $request): \WP_REST_Response
+    {
+        return new \WP_REST_Response(DomainAssociationBootstrap::resync()->handle(), 200);
     }
 
     public function refresh_keys(WP_REST_Request $request): void
