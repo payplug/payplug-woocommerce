@@ -1419,6 +1419,33 @@ msgstr "Reconnectez-vous avec OAuth2"
 msgid "payplug_section_oauth_reconnect_description"
 msgstr "Votre compte est connecté via la connexion classique, qui ne permet pas d’utiliser les Hosted Fields dans la devise de votre boutique. Déconnectez-vous, puis reconnectez-vous via OAuth2 pour les utiliser."
 
+msgid "payplug_applepay_domain_title"
+msgstr "Vérification du domaine Apple Pay"
+
+msgid "payplug_applepay_domain_state_synced"
+msgstr "Fichier de vérification synchronisé"
+
+msgid "payplug_applepay_domain_state_not_synced"
+msgstr "Fichier de vérification non synchronisé"
+
+msgid "payplug_applepay_domain_last_success"
+msgstr "Dernière synchronisation réussie"
+
+msgid "payplug_applepay_domain_last_error"
+msgstr "Dernière erreur"
+
+msgid "payplug_applepay_domain_never"
+msgstr "Jamais"
+
+msgid "payplug_applepay_domain_resync"
+msgstr "Resynchroniser"
+
+msgid "payplug_applepay_domain_resync_error"
+msgstr "La synchronisation a échoué. Veuillez réessayer ou contacter le support."
+
+msgid "payplug_applepay_domain_root_file"
+msgstr "Un fichier de vérification est déjà présent à la racine de votre site : il est servi par votre serveur web."
+
 #: src/PayplugWoocommerceRequest.php:485
 #, php-format
 msgid "Payplug payment %1$s failed (%2$s: %3$s)."

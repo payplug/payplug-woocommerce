@@ -293,10 +293,11 @@ class PaymentMethods
 
     /**
      * @param $active
+     * @param array|null $domain_association see DomainAssociationDiagnostics::payload()
      *
      * @return array
      */
-    public static function payment_method_applepay($active, $options, $carriers = [])
+    public static function payment_method_applepay($active, $options, $carriers = [], ?array $domain_association = null)
     {
         $display = json_decode($options['payment_methods']['configuration']['apple_pay']['display'], true);
         $checkout = (bool) $display['checkout'];
@@ -307,7 +308,7 @@ class PaymentMethods
             $checkout = true;
         }
 
-        return [
+        $method = [
             'type' => 'payment_method',
             'name' => 'applepay',
             'title' => __('payplug_section_applepay_payment_title', 'payplug'),
@@ -380,6 +381,12 @@ class PaymentMethods
                     ],
                 ],
         ];
+
+        if (null !== $domain_association) {
+            $method['domain_association'] = $domain_association;
+        }
+
+        return $method;
     }
 
     /**

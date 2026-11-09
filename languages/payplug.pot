@@ -1117,6 +1117,33 @@ msgstr ""
 msgid "payplug_section_oauth_reconnect_description"
 msgstr ""
 
+msgid "payplug_applepay_domain_title"
+msgstr ""
+
+msgid "payplug_applepay_domain_state_synced"
+msgstr ""
+
+msgid "payplug_applepay_domain_state_not_synced"
+msgstr ""
+
+msgid "payplug_applepay_domain_last_success"
+msgstr ""
+
+msgid "payplug_applepay_domain_last_error"
+msgstr ""
+
+msgid "payplug_applepay_domain_never"
+msgstr ""
+
+msgid "payplug_applepay_domain_resync"
+msgstr ""
+
+msgid "payplug_applepay_domain_resync_error"
+msgstr ""
+
+msgid "payplug_applepay_domain_root_file"
+msgstr ""
+
 #: src/PayplugWoocommerceRequest.php:485
 #, php-format
 msgid "Payplug payment %1$s failed (%2$s: %3$s)."

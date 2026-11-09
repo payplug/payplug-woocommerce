@@ -5,6 +5,9 @@ namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Admin;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Payplug\PayplugWoocommerce\Admin\Ajax;
 use Payplug\PayplugWoocommerce\Service\Configuration;
+use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\DomainAssociationFixtures;
+use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceDomainAssociationStorage;
+use Payplug\PayplugWoocommerce\Upc\ApplePay\DomainAssociationBootstrap;
 use PHPUnit\Framework\TestCase;
 
 class Ajax_test extends TestCase
@@ -33,6 +36,7 @@ class Ajax_test extends TestCase
         'wero_permissions',
         'bizum_permissions',
         'scalapay_permissions',
+        'apple_pay_resync',
     ];
 
     private array $user_ids = [];
@@ -57,6 +61,11 @@ class Ajax_test extends TestCase
         remove_filter('wp_doing_ajax', '__return_true');
         remove_all_filters('wp_die_ajax_handler');
         delete_option('woocommerce_payplug_settings');
+        delete_option(WooCommerceDomainAssociationStorage::CONTENT_OPTION);
+        delete_option(WooCommerceDomainAssociationStorage::STATUS_OPTION);
+        DomainAssociationBootstrap::reset();
+        remove_all_filters('pre_http_request');
+        unset($GLOBALS['wp_rest_auth_cookie'], $_REQUEST['_wpnonce']);
         parent::tearDown();
     }
 
@@ -205,6 +214,81 @@ class Ajax_test extends TestCase
         }
     }
 
+    public function test_apple_pay_resync_answers_the_documented_shape_to_a_shop_manager(): void
+    {
+        $this->boot_routes_as($this->login_as('shop_manager'));
+        $this->answer_http_with(200, DomainAssociationFixtures::valid());
+
+        $response = rest_do_request(new \WP_REST_Request('POST', '/payplug_api/apple_pay_resync'));
+
+        self::assertSame(200, $response->get_status());
+        $data = $response->get_data();
+        self::assertTrue($data['success']);
+        self::assertSame('updated', $data['status']);
+        self::assertSame(['state', 'last_attempt_at', 'last_success_at', 'last_error', 'root_file_present'], array_keys($data['diagnostics']));
+        self::assertSame('synced', $data['diagnostics']['state']);
+        self::assertSame(DomainAssociationFixtures::valid(), get_option(WooCommerceDomainAssociationStorage::CONTENT_OPTION));
+    }
+
+    public function test_apple_pay_resync_failure_still_answers_200_with_the_error(): void
+    {
+        $this->boot_routes_as($this->login_as('administrator'));
+        $this->answer_http_with(503, '<html>maintenance</html>');
+
+        $response = rest_do_request(new \WP_REST_Request('POST', '/payplug_api/apple_pay_resync'));
+
+        self::assertSame(200, $response->get_status());
+        $data = $response->get_data();
+        self::assertFalse($data['success']);
+        self::assertSame('failed', $data['status']);
+        self::assertSame('not_synced', $data['diagnostics']['state']);
+        self::assertStringContainsString('Unexpected HTTP status 503', $data['diagnostics']['last_error']);
+    }
+
+    /**
+     * @dataProvider refused_roles
+     */
+    public function test_apple_pay_resync_is_refused_without_manage_woocommerce(string $role, int $status): void
+    {
+        $this->boot_routes_as('' === $role ? 0 : $this->login_as($role));
+        $this->answer_http_with(200, DomainAssociationFixtures::valid());
+
+        $response = rest_do_request(new \WP_REST_Request('POST', '/payplug_api/apple_pay_resync'));
+
+        self::assertSame($status, $response->get_status());
+        self::assertFalse(get_option(WooCommerceDomainAssociationStorage::CONTENT_OPTION));
+        self::assertFalse(get_option(WooCommerceDomainAssociationStorage::STATUS_OPTION));
+    }
+
+    public function refused_roles(): array
+    {
+        return [
+            'anonymous' => ['', 401],
+            'customer' => ['customer', 403],
+            'subscriber' => ['subscriber', 403],
+            'editor' => ['editor', 403],
+        ];
+    }
+
+    public function test_cookie_authenticated_rest_calls_need_the_wp_rest_nonce(): void
+    {
+        $user_id = $this->login_as('administrator');
+        $GLOBALS['wp_rest_auth_cookie'] = true;
+
+        self::assertTrue(apply_filters('rest_authentication_errors', null));
+        self::assertSame(0, get_current_user_id());
+
+        wp_set_current_user($user_id);
+        $_REQUEST['_wpnonce'] = 'not-a-nonce';
+        $error = apply_filters('rest_authentication_errors', null);
+        self::assertInstanceOf(\WP_Error::class, $error);
+        self::assertSame('rest_cookie_invalid_nonce', $error->get_error_code());
+
+        $_REQUEST['_wpnonce'] = wp_create_nonce('wp_rest');
+        self::assertTrue(apply_filters('rest_authentication_errors', null));
+        self::assertSame($user_id, get_current_user_id());
+    }
+
     public function routes(): array
     {
         return array_combine(self::ROUTES, array_map(static fn (string $route): array => [$route], self::ROUTES));
@@ -228,6 +312,17 @@ class Ajax_test extends TestCase
                 self::assertSame($expected, call_user_func($endpoint['permission_callback'], $request), $route);
             }
         }
+    }
+
+    private function answer_http_with(int $status, string $body): void
+    {
+        add_filter('pre_http_request', static fn () => [
+            'headers' => [],
+            'body' => $body,
+            'response' => ['code' => $status, 'message' => ''],
+            'cookies' => [],
+            'filename' => null,
+        ]);
     }
 
     private function login_as(string $role): int

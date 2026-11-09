@@ -10,6 +10,7 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayRequirements;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
+use Payplug\PayplugWoocommerce\Upc\ApplePay\DomainAssociationBootstrap;
 use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
 /**
@@ -396,7 +397,12 @@ class Vue
         // Fields) is Euro-only - shops in another currency have no use for them.
         if (PayplugWoocommerceHelper::is_eur_shop()) {
             $method_options[] = PaymentMethods::payment_method_amex($payment_configuration['american_express']['active']);
-            $method_options[] = PaymentMethods::payment_method_applepay($payment_configuration['apple_pay']['active'], $this->options, $carriers);
+            $method_options[] = PaymentMethods::payment_method_applepay(
+                $payment_configuration['apple_pay']['active'],
+                $this->options,
+                $carriers,
+                DomainAssociationBootstrap::diagnostics()->payload()
+            );
             $method_options[] = PaymentMethods::payment_method_bancontact($payment_configuration['bancontact']['active'], $this->options);
             $method_options[] = PaymentMethods::payment_method_satispay($payment_configuration['satispay']['active'], $this->options);
             $method_options[] = PaymentMethods::payment_method_mybank($payment_configuration['mybank']['active'], $this->options);
