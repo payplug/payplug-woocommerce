@@ -48,6 +48,10 @@ class OneyDisplay
 
     public function enqueue_assets(): void
     {
+        if (!PayplugWoocommerceHelper::is_eur_shop()) {
+            return;
+        }
+
         wp_enqueue_style('payplug-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-oney.css', [], PAYPLUG_GATEWAY_VERSION);
         wp_enqueue_script('payplug-oney');
     }
@@ -83,7 +87,7 @@ class OneyDisplay
 
     private function render_badge(float $price, int $total_products): void
     {
-        if (!PayplugWoocommerceHelper::check_order_max_amount($price)) {
+        if (!PayplugWoocommerceHelper::is_eur_shop() || !PayplugWoocommerceHelper::check_order_max_amount($price)) {
             return;
         }
 
