@@ -10,6 +10,7 @@ use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGatewayRequirements;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
 /**
  * PayPlug admin Vue.js dashboard handler.
@@ -34,6 +35,13 @@ class Vue
      */
     public function init()
     {
+        // The front-end (ajax.js) only guards `typeof data.payment_paylater !==
+        // "undefined"` - since `typeof null === "object"` in JS, sending an explicit
+        // `null` here still passes that guard and crashes inside PayplugPaylater's
+        // constructor. The key must be omitted entirely when there's nothing to show
+        // (Oney PayLater is Euro-only), not set to null.
+        $paylater = $this->payplug_section_paylater();
+
         if ($this->get_gateway('account')->is_logged()) {
             $header = $this->payplug_section_header();
             $logged = $this->payplug_section_logged();
@@ -46,27 +54,31 @@ class Vue
             unset($this->options['oauth_code_verifier']);
             unset($this->options['oauth_company_id']);
 
-            return [
+            $data = [
                 'payplug_wooc_settings' => $this->options,
                 'header' => $header,
                 'oauth_login' => $this->payplug_section_oauth_login(),
                 'logged' => $logged,
                 'payment_methods' => $this->payplug_section_payment_methods($this->options),
-                'payment_paylater' => $this->payplug_section_paylater(),
+                'status' => $this->payplug_section_status($this->options),
+                'footer' => $this->payplug_section_footer(),
+            ];
+        } else {
+            $data = [
+                'header' => $this->payplug_section_header(),
+                'oauth_login' => $this->payplug_section_oauth_login(),
+                'subscribe' => $this->payplug_section_subscribe(),
+                'payment_methods' => $this->payplug_section_payment_methods(),
                 'status' => $this->payplug_section_status($this->options),
                 'footer' => $this->payplug_section_footer(),
             ];
         }
 
-        return [
-            'header' => $this->payplug_section_header(),
-            'oauth_login' => $this->payplug_section_oauth_login(),
-            'subscribe' => $this->payplug_section_subscribe(),
-            'payment_methods' => $this->payplug_section_payment_methods(),
-            'payment_paylater' => $this->payplug_section_paylater(),
-            'status' => $this->payplug_section_status(),
-            'footer' => $this->payplug_section_footer(),
-        ];
+        if (null !== $paylater) {
+            $data['payment_paylater'] = $paylater;
+        }
+
+        return $data;
     }
 
     /**
@@ -81,7 +93,7 @@ class Vue
         $this->payplug_api = new PayplugApi($this);
         $register_url = $this->payplug_api->retrieve_register_url(SetupCallback::setup_redirection_uri(), SetupCallback::oauth_callback_uri());
 
-        return [
+        $section = [
             'title' => __('payplug_section_logged_title', 'payplug'),
             'descriptions' => [
                 'live' => [
@@ -156,6 +168,27 @@ class Vue
                 ],
             ],
         ];
+
+        if (!PayplugWoocommerceHelper::is_eur_shop() && $this->get_gateway('account')->is_legacy_logged()) {
+            $section['oauth_reconnect'] = $this->payplug_section_oauth_reconnect();
+        }
+
+        return $section;
+    }
+
+    /**
+     * Notice for a merchant connected with the classic login on a non-EUR shop, where Hosted
+     * Fields needs OAuth2.
+     *
+     * @return array
+     */
+    private function payplug_section_oauth_reconnect()
+    {
+        return [
+            'active' => true,
+            'title' => __('payplug_section_oauth_reconnect_title', 'payplug'),
+            'description' => __('payplug_section_oauth_reconnect_description', 'payplug'),
+        ];
     }
 
     /**
@@ -209,66 +242,65 @@ class Vue
         $this->payplug_api = new PayplugApi($this);
         $register_url = $this->payplug_api->retrieve_register_url(SetupCallback::setup_redirection_uri(), SetupCallback::oauth_callback_uri());
 
+        // Non-EUR shops go through the Unified API, which needs OAuth2: without `form` the UI
+        // shows the SSO block alone, and without `sso.information` it hides the hint to keep
+        // using the classic login.
+        // both modes show the same login block
+        $mode = $this->oauth_login_mode($register_url, !PayplugWoocommerceHelper::is_eur_shop());
         $oauth_login = [
             'name' => 'oauthLogin',
             'title' => __('payplug_section_logged_title', 'payplug'),
             'descriptions' => [
-                'live' => [
-                    'description' => __('payplug_section_oauth_login_description', 'payplug'),
-                    'form' => [
-                        'email' => [
-                            'label' => __('payplug_section_login_email_label', 'payplug'),
-                            'placeholder' => __('payplug_section_login_email_label', 'payplug'),
-                        ],
-                        'password' => [
-                            'label' => __('payplug_section_login_password_label', 'payplug'),
-                            'placeholder' => __('payplug_section_login_password_label', 'payplug'),
-                        ],
-                        'connexion' => __('payplug_section_login_connect', 'payplug'),
-                        'create_account' => __('payplug_section_login_not_registered', 'payplug'),
-                        'forgot_password' => __('payplug_section_login_forgot_password', 'payplug'),
-                        'error' => __('payplug_section_login_error', 'payplug'),
-                        'create_account_url' => 'https://portal.payplug.com/auth/signup',
-                        'forgot_password_url' => 'https://portal.payplug.com/forgot_password',
-                    ],
-                    'sso' => [
-                        'title' => __('payplug_section_oauth_login_title', 'payplug'),
-                        'description' => __('payplug_section_oauth_login_description', 'payplug'),
-                        'information' => __('payplug_section_oauth_info', 'payplug'),
-                        'button' => __('payplug_section_oauth_login_btn_connect', 'payplug'),
-                        'button_url' => $register_url,
-                    ],
-                ],
-                'sandbox' => [
-                    'description' => __('payplug_section_oauth_login_description', 'payplug'),
-                    'form' => [
-                        'email' => [
-                            'label' => __('payplug_section_login_email_label', 'payplug'),
-                            'placeholder' => __('payplug_section_login_email_label', 'payplug'),
-                        ],
-                        'password' => [
-                            'label' => __('payplug_section_login_password_label', 'payplug'),
-                            'placeholder' => __('payplug_section_login_password_label', 'payplug'),
-                        ],
-                        'connexion' => __('payplug_section_login_connect', 'payplug'),
-                        'create_account' => __('payplug_section_login_not_registered', 'payplug'),
-                        'forgot_password' => __('payplug_section_login_forgot_password', 'payplug'),
-                        'error' => __('payplug_section_login_error', 'payplug'),
-                        'create_account_url' => 'https://portal.payplug.com/auth/signup',
-                        'forgot_password_url' => 'https://portal.payplug.com/forgot_password',
-                    ],
-                    'sso' => [
-                        'title' => __('payplug_section_oauth_login_title', 'payplug'),
-                        'description' => __('payplug_section_oauth_login_description', 'payplug'),
-                        'information' => __('payplug_section_oauth_info', 'payplug'),
-                        'button' => __('payplug_section_oauth_login_btn_connect', 'payplug'),
-                        'button_url' => $register_url,
-                    ],
-                ],
+                'live' => $mode,
+                'sandbox' => $mode,
             ],
         ];
 
         return $oauth_login;
+    }
+
+    /**
+     * @param string $register_url
+     * @param bool $oauth_only
+     *
+     * @return array
+     */
+    private function oauth_login_mode($register_url, bool $oauth_only)
+    {
+        $mode = [
+            'description' => __('payplug_section_oauth_login_description', 'payplug'),
+        ];
+        if (!$oauth_only) {
+            $mode['form'] = [
+                'email' => [
+                    'label' => __('payplug_section_login_email_label', 'payplug'),
+                    'placeholder' => __('payplug_section_login_email_label', 'payplug'),
+                ],
+                'password' => [
+                    'label' => __('payplug_section_login_password_label', 'payplug'),
+                    'placeholder' => __('payplug_section_login_password_label', 'payplug'),
+                ],
+                'connexion' => __('payplug_section_login_connect', 'payplug'),
+                'create_account' => __('payplug_section_login_not_registered', 'payplug'),
+                'forgot_password' => __('payplug_section_login_forgot_password', 'payplug'),
+                'error' => __('payplug_section_login_error', 'payplug'),
+                'create_account_url' => 'https://portal.payplug.com/auth/signup',
+                'forgot_password_url' => 'https://portal.payplug.com/forgot_password',
+            ];
+        }
+
+        $sso = [
+            'title' => __('payplug_section_oauth_login_title', 'payplug'),
+            'description' => __('payplug_section_oauth_login_description', 'payplug'),
+        ];
+        if (!$oauth_only) {
+            $sso['information'] = __('payplug_section_oauth_info', 'payplug');
+        }
+        $sso['button'] = __('payplug_section_oauth_login_btn_connect', 'payplug');
+        $sso['button_url'] = $register_url;
+        $mode['sso'] = $sso;
+
+        return $mode;
     }
 
     /**
@@ -356,6 +388,28 @@ class Vue
         $carriers = json_decode($payment_configuration['apple_pay']['carriers'], true);
         $carriers = empty($carriers) ? [] : $carriers;
 
+        $method_options = [
+            (new PaymentMethods($this->options))->payment_method_standard(),
+        ];
+
+        // Every payment method besides the standard card gateway (Retail API / Hosted
+        // Fields) is Euro-only - shops in another currency have no use for them.
+        if (PayplugWoocommerceHelper::is_eur_shop()) {
+            $method_options[] = PaymentMethods::payment_method_amex($payment_configuration['american_express']['active']);
+            $method_options[] = PaymentMethods::payment_method_applepay($payment_configuration['apple_pay']['active'], $this->options, $carriers);
+            $method_options[] = PaymentMethods::payment_method_bancontact($payment_configuration['bancontact']['active']);
+            $method_options[] = PaymentMethods::payment_method_satispay($payment_configuration['satispay']['active']);
+            $method_options[] = PaymentMethods::payment_method_mybank($payment_configuration['mybank']['active']);
+            $method_options[] = PaymentMethods::payment_method_ideal($payment_configuration['ideal']['active']);
+            $method_options[] = PaymentMethods::payment_method_wero($payment_configuration['wero']['active']);
+            $method_options[] = PaymentMethods::payment_method_bizum($payment_configuration['bizum']['active']);
+            $method_options[] = PaymentMethods::payment_method_scalapay(
+                $payment_configuration['scalapay']['active'],
+                $payment_configuration['scalapay'],
+                $this->options['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
+            );
+        }
+
         $section = [
             'name' => 'paymentMethodsBlock',
             'title' => __('payplug_section_payment_methods_title', 'payplug'),
@@ -367,22 +421,7 @@ class Vue
                     'description' => __('payplug_section_payment_methods_description', 'payplug'),
                 ],
             ],
-            'options' => [
-                (new PaymentMethods($this->options))->payment_method_standard(),
-                PaymentMethods::payment_method_amex($payment_configuration['american_express']['active']),
-                PaymentMethods::payment_method_applepay($payment_configuration['apple_pay']['active'], $this->options, $carriers),
-                PaymentMethods::payment_method_bancontact($payment_configuration['bancontact']['active']),
-                PaymentMethods::payment_method_satispay($payment_configuration['satispay']['active']),
-                PaymentMethods::payment_method_mybank($payment_configuration['mybank']['active']),
-                PaymentMethods::payment_method_ideal($payment_configuration['ideal']['active']),
-                PaymentMethods::payment_method_wero($payment_configuration['wero']['active']),
-                PaymentMethods::payment_method_bizum($payment_configuration['bizum']['active']),
-                PaymentMethods::payment_method_scalapay(
-                    $payment_configuration['scalapay']['active'],
-                    $payment_configuration['scalapay'],
-                    $this->options['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
-                ),
-            ],
+            'options' => $method_options,
         ];
 
         return $section;
@@ -391,10 +430,15 @@ class Vue
     /**
      * @param $active
      *
-     * @return array
+     * @return array|null
      */
     public function payplug_section_paylater()
     {
+        // Oney PayLater is Euro-only - shops in another currency have no use for it.
+        if (!PayplugWoocommerceHelper::is_eur_shop()) {
+            return null;
+        }
+
         $custom_amounts = json_decode($this->options['payment_methods']['configuration']['oney']['custom_amounts'], true);
         $default_amounts = json_decode($this->options['payment_methods']['configuration']['oney']['default_amounts'], true);
 
@@ -467,10 +511,11 @@ class Vue
         $default_amounts = json_decode($this->options['payment_methods']['configuration']['oney']['default_amounts'], true);
 
         // Convert cents
-        $min = $min / 100;
-        $max = $max / 100;
-        $default_amounts['min'] = $default_amounts['min'] / 100;
-        $default_amounts['max'] = $default_amounts['max'] / 100;
+        // Oney is Euro-only.
+        $min = AmountHelper::fromCents((int) $min, PayplugWoocommerceHelper::EURO_CURRENCY);
+        $max = AmountHelper::fromCents((int) $max, PayplugWoocommerceHelper::EURO_CURRENCY);
+        $default_amounts['min'] = AmountHelper::fromCents((int) $default_amounts['min'], PayplugWoocommerceHelper::EURO_CURRENCY);
+        $default_amounts['max'] = AmountHelper::fromCents((int) $default_amounts['max'], PayplugWoocommerceHelper::EURO_CURRENCY);
         //
 
         $thresholds = [
@@ -553,7 +598,6 @@ class Vue
                 $payplug_requirements->curl_requirement(),
                 $payplug_requirements->php_requirement(),
                 $payplug_requirements->openssl_requirement(),
-                $payplug_requirements->currency_requirement(), //MISSING THIS MESSAGES
                 $payplug_requirements->account_requirement(),
             ],
             'debug' => [

@@ -365,6 +365,12 @@ class Configuration
                         'type' => 'string',
                         'default' => 'redirect',
                     ],
+                    'hosted_fields' => [
+                        'identifier' => [
+                            'type' => 'string',
+                            'default' => '',
+                        ],
+                    ],
                 ],
                 'installments' => [
                     'active' => [

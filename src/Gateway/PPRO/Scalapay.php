@@ -2,12 +2,12 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway\PPRO;
 
-use libphonenumber\PhoneNumberType;
-use libphonenumber\PhoneNumberUtil;
 use Payplug\PayplugWoocommerce\Controller\PayplugGenericGateway;
 use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
+use PayplugUnifiedCore\Utilities\Helpers\PhoneHelper;
 
 class Scalapay extends PayplugGenericGateway
 {
@@ -69,13 +69,16 @@ class Scalapay extends PayplugGenericGateway
             $this->settings['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
         );
 
-        // Compared in euros rather than multiplying the total by 100: a float cents value
+        // Compared in euros rather than converting the total to cents: a float cents value
         // such as 19.99 * 100 => 1998.9999999999998 can fall the wrong side of an exact
         // boundary, whereas dividing the (integer) bound by 100 yields the same double as
-        // the parsed total. Same direction as PayplugGatewayOney3x's amount checks.
+        // the parsed total. Same direction as PayplugGatewayOney3x's amount checks. Scalapay
+        // is Euro-only, so its bounds are euro cents.
+        $min = AmountHelper::fromCents($min_cents, PayplugWoocommerceHelper::EURO_CURRENCY);
+        $max = AmountHelper::fromCents($max_cents, PayplugWoocommerceHelper::EURO_CURRENCY);
         $order_total = (float) $this->get_order_total();
-        if ($order_total < $min_cents / 100 || $order_total > $max_cents / 100) {
-            throw new \Exception(sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Scalapay.', 'payplug'), $min_cents / 100, $max_cents / 100));
+        if ($order_total < $min || $order_total > $max) {
+            throw new \Exception(sprintf(__('The total amount of your order should be between %s€ and %s€ to pay with Scalapay.', 'payplug'), $min, $max));
         }
     }
 
@@ -102,7 +105,7 @@ class Scalapay extends PayplugGenericGateway
 
             // Euro comparison, for the float-precision reason spelled out in validate_checkout().
             $order_total = (float) $this->get_order_total();
-            if ($order_total < $min_cents / 100 || $order_total > $max_cents / 100) {
+            if ($order_total < AmountHelper::fromCents($min_cents, PayplugWoocommerceHelper::EURO_CURRENCY) || $order_total > AmountHelper::fromCents($max_cents, PayplugWoocommerceHelper::EURO_CURRENCY)) {
                 unset($gateways[$this->id]);
             }
         }
@@ -180,9 +183,7 @@ class Scalapay extends PayplugGenericGateway
             $country = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_country : $order->get_billing_country();
             $phone = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_phone : $order->get_billing_phone();
             $billing_email = PayplugWoocommerceHelper::is_pre_30() ? $order->billing_email : $order->get_billing_email();
-            $phone_number_util = PhoneNumberUtil::getInstance();
-            $phone_number = $phone_number_util->parse($phone, $country);
-            if (PhoneNumberType::MOBILE !== $phone_number_util->getNumberType($phone_number)) {
+            if (!PhoneHelper::isMobile($phone, $country)) {
                 throw new \Exception(__('Mobile phone number fullfilled is invalid. Please retry.', 'payplug'));
             }
 
@@ -202,7 +203,7 @@ class Scalapay extends PayplugGenericGateway
             $items = $order->get_items();
             foreach ($items as $item) {
                 $data = $item->get_data();
-                $total = floatval(round($data['total'], 2)) * 100;
+                $total = AmountHelper::toCents((float) $data['total'], $order->get_currency());
                 $cart_items[] = [
                     'delivery_label' => 'storepickup',
                     'delivery_type' => 'storepickup',
@@ -210,8 +211,8 @@ class Scalapay extends PayplugGenericGateway
                     'merchant_item_id' => 'cart-' . $data['id'] . '-' . $data['product_id'],
                     'name' => $data['name'],
                     'expected_delivery_date' => date('Y-m-d', strtotime('+1 week')),
-                    'total_amount' => (int) $total,
-                    'price' => round($total / $data['quantity']),
+                    'total_amount' => $total,
+                    'price' => (int) round($total / $data['quantity']),
                     'quantity' => $data['quantity'],
                 ];
             }

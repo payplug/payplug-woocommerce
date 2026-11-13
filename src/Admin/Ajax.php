@@ -20,6 +20,7 @@ use Payplug\PayplugWoocommerce\Gateway\PPRO\Scalapay;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Wero;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 use WP_REST_Request;
 
 if (!defined('ABSPATH')) {
@@ -636,6 +637,12 @@ class Ajax
             if (!isset($options['payment_methods']['configuration'][$name])) {
                 continue;
             }
+            // Euro-only methods aren't rendered (so their `enable_*` key is absent from
+            // $data) for a non-EUR shop - leave their stored value untouched rather than
+            // silently disabling them.
+            if (!array_key_exists('enable_' . $name, $data)) {
+                continue;
+            }
             $options['payment_methods']['configuration'][$name]['active'] = (bool) $data['enable_' . $name];
         }
 
@@ -645,31 +652,42 @@ class Ajax
         $options['payment_methods']['configuration']['payplug']['description'] = (string) $data['standard_payment_description'];
         $options['payment_methods']['configuration']['payplug']['embedded_mode'] = (string) $data['payplug_embeded'];
         $options['payment_methods']['configuration']['payplug']['save_card'] = (bool) $data['enable_one_click'];
+        $hosted_fields_identifier = $this->resolve_hosted_fields_identifier(
+            $data,
+            $options['payment_methods']['configuration']['payplug']['embedded_mode'],
+            $payplug->settings
+        );
+        $options['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] = $hosted_fields_identifier;
 
-        // applepay payment
-        $applepay_active = (bool) $data['enable_applepay'];
-        $applepay_carriers = $data['applepay_carriers'];
-        $applepay_cart = (bool) $data['enable_applepay_cart'];
-        $applepay_checkout = (bool) $data['enable_applepay_checkout'];
-        $applepay_product = (bool) $data['enable_applepay_product'];
-        // if product or cart options are checked but no carriers selected, return error
-        $applepay_active = $applepay_active && Validator::applePayPaymentGatewayOptions($applepay_active, $applepay_cart, $applepay_product, $applepay_checkout, $applepay_carriers);
-        $options['payment_methods']['configuration']['apple_pay']['active'] = $applepay_active;
-        $options['payment_methods']['configuration']['apple_pay']['carriers'] = json_encode($applepay_carriers);
-        $options['payment_methods']['configuration']['apple_pay']['display'] = json_encode([
-            'cart' => $applepay_cart,
-            'checkout' => $applepay_checkout,
-            'product' => $applepay_product,
-        ]);
+        // applepay payment - Euro-only, not rendered (so absent from $data) for a non-EUR
+        // shop; leave the stored config untouched rather than silently wiping it.
+        if (array_key_exists('enable_applepay', $data)) {
+            $applepay_active = (bool) $data['enable_applepay'];
+            $applepay_carriers = $data['applepay_carriers'];
+            $applepay_cart = (bool) $data['enable_applepay_cart'];
+            $applepay_checkout = (bool) $data['enable_applepay_checkout'];
+            $applepay_product = (bool) $data['enable_applepay_product'];
+            // if product or cart options are checked but no carriers selected, return error
+            $applepay_active = $applepay_active && Validator::applePayPaymentGatewayOptions($applepay_active, $applepay_cart, $applepay_product, $applepay_checkout, $applepay_carriers);
+            $options['payment_methods']['configuration']['apple_pay']['active'] = $applepay_active;
+            $options['payment_methods']['configuration']['apple_pay']['carriers'] = json_encode($applepay_carriers);
+            $options['payment_methods']['configuration']['apple_pay']['display'] = json_encode([
+                'cart' => $applepay_cart,
+                'checkout' => $applepay_checkout,
+                'product' => $applepay_product,
+            ]);
+        }
 
-        // oney payment
-        $options['payment_methods']['configuration']['oney']['active'] = (bool) $data['enable_oney'];
-        $options['payment_methods']['configuration']['oney']['cta_product'] = (bool) $data['enable_oney_product_animation'];
-        $options['payment_methods']['configuration']['oney']['custom_amounts'] = json_encode([
-            'min' => (int) $data['oney_min_amounts'] * 100,
-            'max' => (int) $data['oney_max_amounts'] * 100,
-        ]);
-        $options['payment_methods']['configuration']['oney']['with_fees'] = 'with_fees' == (string) $data['payplug_oney'];
+        // oney payment - same Euro-only guard as apple pay above.
+        if (array_key_exists('enable_oney', $data)) {
+            $options['payment_methods']['configuration']['oney']['active'] = (bool) $data['enable_oney'];
+            $options['payment_methods']['configuration']['oney']['cta_product'] = (bool) $data['enable_oney_product_animation'];
+            $options['payment_methods']['configuration']['oney']['custom_amounts'] = json_encode([
+                'min' => AmountHelper::toCents((float) $data['oney_min_amounts'], PayplugWoocommerceHelper::EURO_CURRENCY),
+                'max' => AmountHelper::toCents((float) $data['oney_max_amounts'], PayplugWoocommerceHelper::EURO_CURRENCY),
+            ]);
+            $options['payment_methods']['configuration']['oney']['with_fees'] = 'with_fees' == (string) $data['payplug_oney'];
+        }
 
         // scalapay payment - the thresholds widget isn't necessarily rendered (a stale admin
         // JS bundle right after a deploy, for instance). Its absence must not reach
@@ -682,11 +700,11 @@ class Ajax
                 $options['payment_methods']['configuration']['scalapay'] ?? [],
                 $options['payment_methods']['permissions']['scalapay']['amounts'] ?? '{}'
             );
-            // round() before the cast: the submitted values are euros, so a bare (int) cast
-            // would bind tighter than the * 100 and truncate the cents (49.99 -> 4900).
+            // Scalapay is Euro-only: the submitted values are euros. AmountHelper rounds before
+            // casting, so 49.99 can't truncate to 4900.
             $scalapay_thresholds = Validator::scalapay_thresholds(
-                (int) round((float) $data['scalapay_min_amounts'] * 100),
-                (int) round((float) $data['scalapay_max_amounts'] * 100),
+                AmountHelper::toCents((float) $data['scalapay_min_amounts'], PayplugWoocommerceHelper::EURO_CURRENCY),
+                AmountHelper::toCents((float) $data['scalapay_max_amounts'], PayplugWoocommerceHelper::EURO_CURRENCY),
                 $scalapay_authorized_min,
                 $scalapay_authorized_max
             );
@@ -738,5 +756,35 @@ class Ajax
                 'close' => __('payplug_ok', 'payplug'),
                 'msg' => 'These settings are already saved !', ]);
         }
+    }
+
+    /**
+     * Hosted Fields identifier to save. The settings page renders the identifier field from the
+     * stored mode, so it is required only when that mode has OAuth2 credentials, whatever mode is
+     * submitted. When the field is absent from $data (EUR shop, field not rendered, or a UI build
+     * that doesn't send it) the stored value is kept and validated. Halts the request via
+     * wp_send_json_error() when a required identifier is empty.
+     *
+     * @param array $data submitted settings
+     * @param string $embedded_mode submitted embedded mode
+     * @param array $stored_options settings as stored before this save
+     *
+     * @return string
+     */
+    public function resolve_hosted_fields_identifier(array $data, string $embedded_mode, array $stored_options): string
+    {
+        if (array_key_exists('identifier', $data)) {
+            $identifier = sanitize_text_field((string) $data['identifier']);
+        } else {
+            $identifier = (string) ($stored_options['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] ?? '');
+        }
+
+        Validator::hostedFieldsPaymentGatewayOptions(
+            $embedded_mode,
+            $identifier,
+            PayplugWoocommerceHelper::is_oauth2_connected((bool) ($stored_options['mode'] ?? false))
+        );
+
+        return $identifier;
     }
 }
