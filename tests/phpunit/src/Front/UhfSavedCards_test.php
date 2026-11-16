@@ -2,14 +2,20 @@
 
 namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Front;
 
+use Automattic\WooCommerce\StoreApi\Utilities\PaymentUtils;
 use Payplug\PayplugWoocommerce\Front\UhfSavedCards;
 use Payplug\PayplugWoocommerce\Model\UhfCard;
 use PHPUnit\Framework\TestCase;
 
 class UhfSavedCards_test extends TestCase
 {
-    /** @var mixed the registered 'payplug' gateway, restored in tearDown() */
-    private $original_gateway;
+    private const NATIVE_GATEWAY_ID = 'payplug_test_native_tokens';
+
+    /** @var array the registered gateways, restored in tearDown() */
+    private $original_gateways;
+
+    /** @var int|string key of the 'payplug' gateway in WC()->payment_gateways()->payment_gateways */
+    private $payplug_key;
 
     /** @var int */
     private $customer_id;
@@ -21,22 +27,30 @@ class UhfSavedCards_test extends TestCase
 
         // UhfSavedCards reads the mode from the registered 'payplug' gateway: pin it to 'test'
         // so these tests don't depend on whatever the suite's stored settings happen to be.
+        // payment_gateways() re-keys the gateways by their id, so the stub replaces the real
+        // 'payplug' entry in place and carries the id and enabled flag WooCommerce reads.
         $gateways = WC()->payment_gateways();
-        $this->original_gateway = $gateways->payment_gateways['payplug'] ?? null;
-        $gateways->payment_gateways['payplug'] = (object) ['mode' => 'test'];
+        $this->original_gateways = $gateways->payment_gateways;
+        $this->payplug_key = 'payplug';
+
+        foreach ($gateways->payment_gateways as $key => $gateway) {
+            if (isset($gateway->id) && 'payplug' === $gateway->id) {
+                $this->payplug_key = $key;
+            }
+        }
+
+        $gateways->payment_gateways[$this->payplug_key] = (object) ['id' => 'payplug', 'mode' => 'test', 'enabled' => 'no'];
 
         $this->customer_id = wp_create_user('uhf_saved_' . wp_rand(), wp_generate_password());
     }
 
     protected function tearDown(): void
     {
-        $gateways = WC()->payment_gateways();
-
-        if (null === $this->original_gateway) {
-            unset($gateways->payment_gateways['payplug']);
-        } else {
-            $gateways->payment_gateways['payplug'] = $this->original_gateway;
+        foreach (\WC_Payment_Tokens::get_customer_tokens($this->customer_id) as $token) {
+            $token->delete(true);
         }
+
+        WC()->payment_gateways()->payment_gateways = $this->original_gateways;
 
         if (UhfCard::check_table_exists()) {
             global $wpdb;
@@ -96,9 +110,110 @@ class UhfSavedCards_test extends TestCase
         $this->assertStringContainsString('payplug_delete_uhf_card=', $list['cc'][0]['actions']['delete']['url']);
     }
 
+    public function testAddCardsToListRowsCarryTheUhfGatewayMarker(): void
+    {
+        UhfCard::insert($this->customer_id, 'alias_marker_1', 'VISA', '4242', 3, 2099, 'test');
+        UhfCard::insert($this->customer_id, 'alias_marker_2', 'MASTERCARD', '4444', 4, 2098, 'test');
+
+        $list = (new UhfSavedCards())->add_cards_to_list([], $this->customer_id);
+
+        $this->assertCount(2, $list['cc']);
+        foreach ($list['cc'] as $row) {
+            $this->assertSame(UhfSavedCards::SAVED_METHOD_GATEWAY, $row['method']['gateway'] ?? null);
+        }
+    }
+
+    public function testAddCardsToListKeepsTheMyAccountTableFields(): void
+    {
+        UhfCard::insert($this->customer_id, 'alias_fields_1', 'VISA', '4242', 3, 2099, 'test');
+
+        $row = (new UhfSavedCards())->add_cards_to_list([], $this->customer_id)['cc'][0];
+
+        $this->assertSame('VISA', $row['method']['brand']);
+        $this->assertSame('4242', $row['method']['last4']);
+        $this->assertSame('03/2099', $row['expires']);
+        $this->assertFalse($row['is_default']);
+        $this->assertSame('Delete', $row['actions']['delete']['name']);
+        $this->assertArrayNotHasKey('default', $row['actions']);
+    }
+
+    public function testAddCardsToListAppendsAfterTheNativeTokenRows(): void
+    {
+        UhfCard::insert($this->customer_id, 'alias_append_1', 'VISA', '4242', 3, 2099, 'test');
+        $native_row = ['method' => ['gateway' => 'payplug', 'last4' => '1111', 'brand' => 'Visa'], 'is_default' => true];
+
+        $list = (new UhfSavedCards())->add_cards_to_list(['cc' => [$native_row]], $this->customer_id);
+
+        $this->assertCount(2, $list['cc']);
+        $this->assertSame($native_row, $list['cc'][0]);
+        $this->assertSame('4242', $list['cc'][1]['method']['last4']);
+    }
+
+    public function testTheUhfGatewayMarkerIsNeverARegisteredGatewayId(): void
+    {
+        $gateway_ids = array_keys(WC()->payment_gateways()->payment_gateways());
+
+        $this->assertContains('payplug', $gateway_ids);
+        $this->assertNotContains(UhfSavedCards::SAVED_METHOD_GATEWAY, $gateway_ids);
+    }
+
+    public function testStoreApiSavedMethodsSkipUhfCardsWithoutAWarning(): void
+    {
+        UhfCard::insert($this->customer_id, 'alias_store_api_1', 'VISA', '4242', 3, 2099, 'test');
+        wp_set_current_user($this->customer_id);
+        $this->assertContains('4242', $this->savedListLast4s(), 'UhfSavedCards must be hooked on the saved-methods list.');
+
+        // The Blocks checkout and the Store API read every row's method.gateway: a missing key
+        // raises a PHP warning, which PHPUnit turns into an error here.
+        $saved_methods = PaymentUtils::get_saved_payment_methods();
+
+        $this->assertSame([], $saved_methods['enabled']['cc']);
+        $this->assertNull($saved_methods['default']);
+    }
+
+    public function testStoreApiStillReturnsANativeTokenNextToAUhfCard(): void
+    {
+        WC()->payment_gateways()->payment_gateways[self::NATIVE_GATEWAY_ID] = (object) ['id' => self::NATIVE_GATEWAY_ID, 'enabled' => 'yes'];
+        $token_id = $this->createNativeToken('1111');
+        UhfCard::insert($this->customer_id, 'alias_store_api_2', 'VISA', '4242', 3, 2099, 'test');
+        wp_set_current_user($this->customer_id);
+        $this->assertContains('1111', $this->savedListLast4s());
+        $this->assertContains('4242', $this->savedListLast4s());
+
+        $saved_methods = PaymentUtils::get_saved_payment_methods();
+
+        $this->assertCount(1, $saved_methods['enabled']['cc']);
+        $this->assertSame(self::NATIVE_GATEWAY_ID, $saved_methods['enabled']['cc'][0]['method']['gateway']);
+        $this->assertSame($token_id, $saved_methods['enabled']['cc'][0]['tokenId']);
+        $this->assertSame($token_id, $saved_methods['default']['tokenId']);
+    }
+
+    private function createNativeToken(string $last4): int
+    {
+        $token = new \WC_Payment_Token_CC();
+        $token->set_token('tok_' . wp_rand());
+        $token->set_gateway_id(self::NATIVE_GATEWAY_ID);
+        $token->set_card_type('visa');
+        $token->set_last4($last4);
+        $token->set_expiry_month('12');
+        $token->set_expiry_year('2099');
+        $token->set_user_id($this->customer_id);
+        $token->set_default(true);
+        $token->save();
+
+        return $token->get_id();
+    }
+
+    private function savedListLast4s(): array
+    {
+        $rows = wc_get_customer_saved_methods_list($this->customer_id)['cc'] ?? [];
+
+        return array_map(static fn (array $row): string => (string) ($row['method']['last4'] ?? ''), $rows);
+    }
+
     public function testAddCardsToListLeavesTheListUntouchedWithoutAPayplugGateway(): void
     {
-        unset(WC()->payment_gateways()->payment_gateways['payplug']);
+        unset(WC()->payment_gateways()->payment_gateways[$this->payplug_key]);
         UhfCard::insert($this->customer_id, 'alias_list_2', 'VISA', '4242', 3, 2099, 'test');
 
         $list = (new UhfSavedCards())->add_cards_to_list(['cc' => []], $this->customer_id);
