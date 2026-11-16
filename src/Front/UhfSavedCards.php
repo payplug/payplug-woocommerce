@@ -17,9 +17,18 @@ use Payplug\PayplugWoocommerce\Model\UhfCard;
  * Deletion is local-only - there is no alias-deletion endpoint on the Unified API today,
  * mirroring how the existing Retail/Integrated Payment token deletion (WC_Payment_Tokens::
  * delete(), native WooCommerce) never calls the Retail API to revoke the card either.
+ * The rows carry SAVED_METHOD_GATEWAY as their gateway, so the Blocks checkout leaves them
+ * out of its own saved-methods list: the checkout shows UHF cards through the plugin itself.
  */
 class UhfSavedCards
 {
+    /**
+     * method.gateway of the injected rows. The Store API (PaymentUtils::get_saved_payment_methods(),
+     * used by the Blocks checkout) reads that key on every row without a guard, and keeps a row only
+     * when it names an enabled gateway: this value must never be a registered gateway id.
+     */
+    public const SAVED_METHOD_GATEWAY = 'payplug_uhf';
+
     private const NONCE_ACTION_PREFIX = 'payplug-delete-uhf-card-';
 
     public function __construct()
@@ -58,6 +67,7 @@ class UhfSavedCards
 
             $list['cc'][] = [
                 'method' => [
+                    'gateway' => self::SAVED_METHOD_GATEWAY,
                     'brand' => $card->brand,
                     'last4' => $card->last4,
                 ],
