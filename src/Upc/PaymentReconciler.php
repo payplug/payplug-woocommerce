@@ -49,7 +49,7 @@ class PaymentReconciler
             return;
         }
 
-        $throttle_key = 'payplug_upc_reconcile_' . $order->get_id();
+        $throttle_key = self::throttle_key($operation_id);
 
         if (!$bypass_throttle && false !== get_transient($throttle_key)) {
             return;
@@ -73,6 +73,17 @@ class PaymentReconciler
         }
 
         $this->apply_reconciled_state($order, $operation_id, $response['body']);
+    }
+
+    /**
+     * Per operation, not per order: a new attempt on the same order gets its own window. md5
+     * keeps the transient name within WordPress's length limit whatever the id's length.
+     *
+     * @internal
+     */
+    public static function throttle_key(string $operation_id): string
+    {
+        return 'payplug_upc_reconcile_' . md5($operation_id);
     }
 
     /**
