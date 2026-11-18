@@ -4,6 +4,7 @@ namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Upc;
 
 use Payplug\PayplugWoocommerce\Model\UhfCard;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use Payplug\PayplugWoocommerce\Service\Configuration;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\PaymentReconciler;
 use Payplug\PayplugWoocommerce\Upc\UpcTransactionMetadataRecorder;
@@ -30,6 +31,11 @@ class PaymentReconciler_test extends TestCase
 
     protected function tearDown(): void
     {
+        remove_all_filters('pre_http_request');
+        delete_transient('upc_token_upc_oauth_token:');
+        foreach (['op_pending_123', 'op_repay_789'] as $operation_id) {
+            delete_transient(PaymentReconciler::throttle_key($operation_id));
+        }
         delete_option('woocommerce_payplug_settings');
         $this->order->delete(true);
         parent::tearDown();
@@ -136,12 +142,80 @@ class PaymentReconciler_test extends TestCase
 
         (new PaymentReconciler())->reconcile($this->reload());
 
-        remove_all_filters('pre_http_request');
-        delete_transient('upc_token_upc_oauth_token:');
-        delete_transient('payplug_upc_reconcile_' . $this->order->get_id());
-
         $this->assertSame('processing', $this->reload()->get_status());
         $this->assertEmpty(array_filter($requested_urls, static fn (string $url): bool => false !== strpos($url, '/api/payment-gateway/payments/')), 'getPayment() must not be called anymore.');
+    }
+
+    /**
+     * Answers every getOperation() with a still-pending execCode and returns the ids fetched.
+     *
+     * @return \ArrayObject<int, string>
+     */
+    private function record_operation_fetches(): \ArrayObject
+    {
+        (new Configuration())->initialize_option();
+        $fetched = new \ArrayObject();
+
+        add_filter('pre_http_request', static function ($preempt, $args, $url) use ($fetched) {
+            if (false !== strpos($url, '/oauth2/token')) {
+                return ['response' => ['code' => 200, 'message' => 'OK'], 'body' => json_encode(['access_token' => 'test_token', 'expires_in' => 3600, 'token_type' => 'Bearer']), 'headers' => [], 'cookies' => []];
+            }
+
+            if (preg_match('#/processing-operations/operations/public/([^/?]+)#', $url, $matches)) {
+                $fetched[] = $matches[1];
+
+                return ['response' => ['code' => 200, 'message' => 'OK'], 'body' => json_encode(['id' => $matches[1], 'execCode' => '0001']), 'headers' => [], 'cookies' => []];
+            }
+
+            return ['response' => ['code' => 404, 'message' => 'Not Found'], 'body' => '', 'headers' => [], 'cookies' => []];
+        }, 10, 3);
+
+        return $fetched;
+    }
+
+    public function testReconcileOfANewAttemptIsNotThrottledByTheReconcileOfThePreviousAttempt(): void
+    {
+        $fetched = $this->record_operation_fetches();
+
+        (new PaymentReconciler())->reconcile($this->reload(), true);
+
+        $order = $this->reload();
+        $order->update_meta_data('_payplug_upc_operation_id', 'op_repay_789');
+        $order->save();
+
+        (new PaymentReconciler())->reconcile($this->reload());
+
+        $this->assertSame(['op_pending_123', 'op_repay_789'], $fetched->getArrayCopy());
+    }
+
+    public function testReconcileOfTheSameOperationIsThrottled(): void
+    {
+        $fetched = $this->record_operation_fetches();
+
+        (new PaymentReconciler())->reconcile($this->reload());
+        (new PaymentReconciler())->reconcile($this->reload());
+
+        $this->assertSame(['op_pending_123'], $fetched->getArrayCopy());
+    }
+
+    public function testABypassedReconcileFetchesTheOperationWithinTheThrottleWindow(): void
+    {
+        $fetched = $this->record_operation_fetches();
+
+        (new PaymentReconciler())->reconcile($this->reload());
+        (new PaymentReconciler())->reconcile($this->reload(), true);
+
+        $this->assertSame(['op_pending_123', 'op_pending_123'], $fetched->getArrayCopy());
+    }
+
+    public function testReconcileThrottlesUnderTheKeyOfTheOperation(): void
+    {
+        $this->record_operation_fetches();
+
+        (new PaymentReconciler())->reconcile($this->reload());
+
+        $this->assertNotFalse(get_transient(PaymentReconciler::throttle_key('op_pending_123')));
+        $this->assertFalse(get_transient(PaymentReconciler::throttle_key('op_repay_789')));
     }
 
     public function testAPaidReconciliationSavesTheCardFromTheFetchedOperationBody(): void

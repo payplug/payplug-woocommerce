@@ -8,11 +8,27 @@ use PHPUnit\Framework\TestCase;
 
 class PaymentCaptureContextBuilder_test extends TestCase
 {
+    private const DALENYS_RETURN_URL = 'https://shop.example.test/checkout/order-pay/551/?IDENTIFIER=JPYCredoraxUHF'
+        . '&OPERATIONTYPE=payment&TRANSACTIONID=A2611171512345678&CLIENTIDENT=guest-551'
+        . '&CLIENTEMAIL=jane%40example.test&ORDERID=551&AMOUNT=2300&VERSION=3.0&LANGUAGE=FR&CURRENCY=USD'
+        . '&EXECCODE=4001&MESSAGE=The+authentication+of+the+cardholder+failed%2E&DESCRIPTOR=PAYPLUG+SHOP'
+        . '&3DSECURE=yes&CARDCODE=402205XXXXXX0001&CARDTYPE=VISA&CARDNETWORK=VISA&CARDVALIDITYDATE=12-30'
+        . '&CARDFULLNAME=Jane+Doe&CARDCOUNTRY=FR&CARDUSAGE=CREDIT&CARD3DSECUREENROLLED=yes'
+        . '&3DSECUREVERSION=2.2.0&3DSGLOBALSTATUS=NOT_AUTHENTICATED&3DSECUREMODE=CHALLENGE'
+        . '&3DSECUREPREFERENCE=SCA&HASH=8f1c2a4b6d8e0f13579bdf2468ace0123456789abcdef0123456789abcdef0123'
+        . '&pay_for_order=true&key=wc_order_Ab3dEfGh1JkLm&payplug_upc_cancelled=1';
+
     /** @var \WC_Order */
     private $order;
 
+    /** @var mixed */
+    private $previous_referer;
+
     protected function setUp(): void
     {
+        $this->previous_referer = $_SERVER['HTTP_REFERER'] ?? null;
+        unset($_SERVER['HTTP_REFERER']);
+
         (new Configuration())->initialize_option();
         $configuration = new Configuration();
         $options = $configuration->get_options();
@@ -40,7 +56,57 @@ class PaymentCaptureContextBuilder_test extends TestCase
     {
         delete_option('woocommerce_payplug_settings');
         wp_delete_post($this->order->get_id(), true);
+        if (null === $this->previous_referer) {
+            unset($_SERVER['HTTP_REFERER']);
+        } else {
+            $_SERVER['HTTP_REFERER'] = $this->previous_referer;
+        }
         parent::tearDown();
+    }
+
+    /**
+     * @return string[][]
+     */
+    public function provideReferers(): array
+    {
+        return [
+            'order-pay page reached back from a failed 3DS' => [self::DALENYS_RETURN_URL, 'https://shop.example.test/checkout/order-pay/551/'],
+            'order-pay link' => ['https://shop.example.test/checkout/order-pay/551/?pay_for_order=true&key=wc_order_Ab3dEfGh1JkLm', 'https://shop.example.test/checkout/order-pay/551/'],
+            'checkout page' => ['https://shop.example.test/checkout/', 'https://shop.example.test/checkout/'],
+            'percent-encoded path' => ['https://shop.example.test/my%20page%40x/?email=jane%40example.test', 'https://shop.example.test/my%20page%40x/'],
+            'credentials' => ['https://user:secret@shop.example.test/checkout/', 'https://shop.example.test/checkout/'],
+            'port and fragment' => ['http://shop.example.test:8080/checkout/#payment', 'http://shop.example.test:8080/checkout/'],
+            'no path' => ['https://shop.example.test', 'https://shop.example.test/'],
+            'uppercase scheme' => ['HTTPS://shop.example.test/checkout/', 'https://shop.example.test/checkout/'],
+            'path over 255 characters' => ['https://shop.example.test/' . str_repeat('a', 400) . '/?utm_source=x', 'https://shop.example.test/'],
+            'host over 255 characters' => ['https://' . str_repeat('a', 300) . '.example.test/checkout/', ''],
+            'not a url' => ['not a url', ''],
+            'javascript scheme' => ['javascript:alert(1)', ''],
+            'ftp scheme' => ['ftp://shop.example.test/checkout/', ''],
+            'scheme-relative' => ['//shop.example.test/checkout/', ''],
+            'no host' => ['http:///checkout/', ''],
+            'empty' => ['', ''],
+        ];
+    }
+
+    /**
+     * @dataProvider provideReferers
+     */
+    public function testBuildSendsTheRefererAsAnAbsoluteUrlWithoutQueryString(string $referer, string $expected): void
+    {
+        $_SERVER['HTTP_REFERER'] = $referer;
+
+        $dto = (new PaymentCaptureContextBuilder())->build($this->order, 'hf_token_123', 'visa', false);
+
+        $this->assertSame($expected, $dto->browser->referrer);
+        $this->assertLessThanOrEqual(255, strlen($dto->browser->referrer));
+    }
+
+    public function testBuildSendsAnEmptyRefererWhenTheRequestHasNone(): void
+    {
+        $dto = (new PaymentCaptureContextBuilder())->build($this->order, 'hf_token_123', 'visa', false);
+
+        $this->assertSame('', $dto->browser->referrer);
     }
 
     public function testBuildSetsTheCommonFieldsFromTheOrder(): void

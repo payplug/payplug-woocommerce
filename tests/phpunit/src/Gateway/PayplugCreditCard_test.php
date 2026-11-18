@@ -4,6 +4,7 @@ namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Gateway;
 
 use Payplug\PayplugWoocommerce\Gateway\PayplugCreditCard;
 use Payplug\PayplugWoocommerce\Model\UhfCard;
+use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\GatewayLogSpy;
 use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLock;
 use Payplug\PayplugWoocommerce\Upc\HostedFieldsPaymentProcessor;
 use Payplug\PayplugWoocommerce\Upc\UpcTransactionMetadataRecorder;
@@ -1120,6 +1121,74 @@ class PayplugCreditCard_test extends TestCase
 
         wc_clear_notices();
         unset($_POST['hf_token'], $_POST['hf_selected_brand']);
+        wp_delete_post($order->get_id(), true);
+    }
+
+    public function test_a_refused_payment_creation_logs_the_length_of_the_referrer_sent_but_not_the_referrer(): void
+    {
+        update_option('woocommerce_currency', 'USD');
+        $settings = $this->base_settings;
+        $settings['payment_methods']['configuration']['payplug']['embedded_mode'] = 'hosted_fields';
+        $settings['payment_methods']['configuration']['payplug']['hosted_fields']['identifier'] = 'acc_test_123';
+        update_option('woocommerce_payplug_settings', $settings);
+
+        $order = wc_create_order();
+        $order->set_currency('USD');
+        $order->set_total(50.00);
+        $order->save();
+
+        $sent_referrers = [];
+        add_filter('pre_http_request', function ($preempt, $args, $url) use (&$sent_referrers) {
+            if (false !== strpos($url, '/oauth2/token')) {
+                return [
+                    'response' => ['code' => 200, 'message' => 'OK'],
+                    'body' => json_encode(['access_token' => 'test_token', 'expires_in' => 3600, 'token_type' => 'Bearer']),
+                    'headers' => [],
+                    'cookies' => [],
+                ];
+            }
+
+            $body = json_decode((string) ($args['body'] ?? ''), true);
+            $sent_referrers[] = $body['browser']['referrer'] ?? null;
+
+            return ['response' => ['code' => 400, 'message' => 'Bad Request'], 'body' => '{"error":"browser.referrer is invalid"}', 'headers' => [], 'cookies' => []];
+        }, 10, 3);
+
+        $server_referer = $_SERVER['HTTP_REFERER'] ?? null;
+        $_SERVER['HTTP_REFERER'] = 'https://shop.example/checkout/order-pay/' . $order->get_id() . '/?pay_for_order=true&key=wc_order_secret';
+        $_POST['hf_token'] = 'hf_token_123';
+        $_POST['hf_selected_brand'] = 'VISA';
+        // After the gateway is built: its constructor sets the logging flag from the debug setting.
+        $gateway = new PayplugCreditCard();
+        $log_spy = GatewayLogSpy::start();
+
+        try {
+            $result = $gateway->process_payment($order->get_id());
+        } finally {
+            $log_spy->stop();
+            if (null === $server_referer) {
+                unset($_SERVER['HTTP_REFERER']);
+            } else {
+                $_SERVER['HTTP_REFERER'] = $server_referer;
+            }
+            unset($_POST['hf_token'], $_POST['hf_selected_brand']);
+        }
+
+        $this->assertSame('failure', $result['result']);
+        $this->assertCount(1, $sent_referrers, 'The payment creation call must be reached.');
+        $this->assertSame('https://shop.example/checkout/order-pay/' . $order->get_id() . '/', $sent_referrers[0]);
+        $prefix = sprintf('UPC payment creation failed for order #%s: ', $order->get_id());
+        $failure_logs = array_values(array_filter(
+            $log_spy->entries,
+            static fn (array $entry): bool => 'error' === $entry['level'] && 0 === strpos($entry['message'], $prefix)
+        ));
+        $this->assertCount(1, $failure_logs);
+        $this->assertStringEndsWith(sprintf(' (browser.referrer length: %d)', strlen($sent_referrers[0])), $failure_logs[0]['message']);
+        foreach ($log_spy->entries as $entry) {
+            $this->assertStringNotContainsString('shop.example', $entry['message']);
+        }
+
+        wc_clear_notices();
         wp_delete_post($order->get_id(), true);
     }
 
