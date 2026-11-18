@@ -105,9 +105,42 @@ trait BuildsCommonFields
     {
         return new BrowserDto(
             isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '',
-            isset($_SERVER['HTTP_REFERER']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_REFERER'])) : '',
+            $this->build_referrer(),
             isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : ''
         );
+    }
+
+    /**
+     * The Unified API rejects a browser.referrer that is too long or not a valid URL, and the
+     * order-pay page reached back from a 3DS challenge carries the gateway's whole return query
+     * string. Only scheme://host[:port]/path is sent, then the origin alone when that exceeds 255
+     * characters, then an empty string: a URL is never truncated, which could split a %XX octet.
+     */
+    private function build_referrer(): string
+    {
+        $referer = isset($_SERVER['HTTP_REFERER']) && is_string($_SERVER['HTTP_REFERER'])
+            ? wp_unslash($_SERVER['HTTP_REFERER'])
+            : '';
+        $parts = wp_parse_url($referer);
+        $scheme = is_array($parts) && !empty($parts['host']) && !empty($parts['scheme'])
+            ? strtolower($parts['scheme'])
+            : '';
+
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            return '';
+        }
+
+        $origin = $scheme . '://' . $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '');
+        $path = isset($parts['path']) && '' !== $parts['path'] ? $parts['path'] : '/';
+
+        foreach ([$origin . $path, $origin . '/'] as $candidate) {
+            $url = esc_url_raw($candidate, ['http', 'https']);
+            if ('' !== $url && strlen($url) <= 255) {
+                return $url;
+            }
+        }
+
+        return '';
     }
 
     /**

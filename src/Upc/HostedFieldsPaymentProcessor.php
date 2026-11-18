@@ -170,6 +170,8 @@ class HostedFieldsPaymentProcessor
             return $in_flight;
         }
 
+        $dto = null;
+
         try {
             if ($use_alias) {
                 $card = UhfCard::find_for_customer((int) $uhf_card_choice, get_current_user_id(), $this->gateway->mode);
@@ -207,7 +209,9 @@ class HostedFieldsPaymentProcessor
 
             return (new PaymentCaptureOutcomeApplier())->apply($order, $output, $save_card, $card_fallback);
         } catch (ApiException $e) {
-            PayplugGateway::log(sprintf('UPC payment creation failed for order #%s: %s', $order_id, $e->getMessage()), 'error');
+            // The length only: the referrer itself can carry personal data.
+            $referrer_length = isset($dto->browser) ? strlen($dto->browser->referrer) : 0;
+            PayplugGateway::log(sprintf('UPC payment creation failed for order #%s: %s (browser.referrer length: %d)', $order_id, $e->getMessage(), $referrer_length), 'error');
         } catch (InvalidHostedFieldException $e) {
             PayplugGateway::log(sprintf('UPC payment creation rejected for order #%s: %s', $order_id, $e->getMessage()), 'error');
         } catch (InvalidPaymentException $e) {

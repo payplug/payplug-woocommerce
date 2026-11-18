@@ -11,8 +11,14 @@ class AliasPaymentContextBuilder_test extends TestCase
     /** @var \WC_Order */
     private $order;
 
+    /** @var mixed */
+    private $previous_referer;
+
     protected function setUp(): void
     {
+        $this->previous_referer = $_SERVER['HTTP_REFERER'] ?? null;
+        unset($_SERVER['HTTP_REFERER']);
+
         (new Configuration())->initialize_option();
         $configuration = new Configuration();
         $options = $configuration->get_options();
@@ -35,6 +41,11 @@ class AliasPaymentContextBuilder_test extends TestCase
     {
         delete_option('woocommerce_payplug_settings');
         wp_delete_post($this->order->get_id(), true);
+        if (null === $this->previous_referer) {
+            unset($_SERVER['HTTP_REFERER']);
+        } else {
+            $_SERVER['HTTP_REFERER'] = $this->previous_referer;
+        }
         parent::tearDown();
     }
 
@@ -62,5 +73,23 @@ class AliasPaymentContextBuilder_test extends TestCase
         $this->assertSame('Jane Doe', $dto->paymentMethod['details']['fullName']);
         $this->assertArrayNotHasKey('saveFutureUsage', $dto->paymentMethod);
         $this->assertArrayNotHasKey('selectedBrand', $dto->paymentMethod['details']);
+    }
+
+    public function testBuildSendsTheRefererWithoutTheGatewayReturnQueryString(): void
+    {
+        $_SERVER['HTTP_REFERER'] = 'https://shop.example.test/checkout/order-pay/551/?IDENTIFIER=JPYCredoraxUHF'
+            . '&EXECCODE=4001&CLIENTEMAIL=jane%40example.test&CARDFULLNAME=Jane+Doe&3DSGLOBALSTATUS=NOT_AUTHENTICATED'
+            . '&HASH=' . str_repeat('8f1c2a4b', 8) . '&pay_for_order=true&key=wc_order_Ab3dEfGh1JkLm&payplug_upc_cancelled=1';
+
+        $dto = (new AliasPaymentContextBuilder())->build($this->order, 'alias_123');
+
+        $this->assertSame('https://shop.example.test/checkout/order-pay/551/', $dto->browser->referrer);
+    }
+
+    public function testBuildSendsAnEmptyRefererWhenTheRequestHasNone(): void
+    {
+        $dto = (new AliasPaymentContextBuilder())->build($this->order, 'alias_123');
+
+        $this->assertSame('', $dto->browser->referrer);
     }
 }
