@@ -1121,7 +1121,7 @@ msgid "pay_with_bizum"
 msgstr "Pagar con Bizum"
 
 msgid "pay_with_scalapay"
-msgstr "Pagar en 3x/4x con Scalapay"
+msgstr "Pagar con Scalapay"
 
 msgid "satispay_threshold"
 msgstr "El importe total de su carrito debe estar entre %s€ y %s€ para pagar con Satispay."
