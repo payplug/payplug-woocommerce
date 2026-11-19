@@ -97,6 +97,11 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 * Fix: Do not require the UHF identifier when the merchant is not connected with OAuth2 for the current mode, and only offer UHF card payment at checkout once OAuth2 and the UHF identifier are both set up
 * Fix: Log the merchant out instead of crashing the site when no PayPlug token can be found or refreshed for the current mode
 * Fix: Show the PayPlug payment details of UHF orders on the order page, in the order currency, with the status following refunds
+* Fix: Back-office card payment options: the "Advanced (beta) Hosted Fields" label no longer overflows its box or overlaps the selection check mark
+* Fix: Hide the Oney badge on the product and cart pages on non-EUR shops
+* Fix: Do not show a PHP warning on the Blocks checkout to logged-in customers who saved a card with UHF
+* Fix: Paying again with UHF after a declined 3D Secure now succeeds and confirms the order as soon as the customer is back from 3D Secure, and a long or encoded checkout or order-pay URL no longer makes a UHF card payment fail
+* Fix: Scalapay is now shown at checkout as "Pay with Scalapay" ("Payez avec Scalapay" in French), without any mention of 3x/4x instalments
 
 = 3.1.1 =
 * Fix: remove PHP warnings in the back office when Scalapay is activated

@@ -495,7 +495,7 @@ msgid "pay_with_bizum"
 msgstr "Pay with Bizum"
 
 msgid "pay_with_scalapay"
-msgstr "Pay in 3x/4x with Scalapay"
+msgstr "Pay with Scalapay"
 
 msgid "satispay_threshold"
 msgstr "The total amount of your order should be between %s€ and %s€ to pay with Satispay."
