@@ -5,6 +5,7 @@ namespace Payplug\PayplugWoocommerce\Admin\Vue;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Service\ApmEligibility;
 use Payplug\PayplugWoocommerce\Service\ApmSettings;
+use Payplug\PayplugWoocommerce\Service\ScalapayWidgetSettings;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
 class PaymentMethods
@@ -585,7 +586,7 @@ class PaymentMethods
      */
     public static function payment_method_scalapay($active = false, $options = [])
     {
-        return array_merge([
+        $method = array_merge([
             'type' => 'payment_method',
             'name' => 'scalapay',
             'title' => __('payplug_scalapay_activate', 'payplug'),
@@ -603,6 +604,42 @@ class PaymentMethods
                 ],
             ],
         ], self::apm_restrictions('scalapay', $options));
+        $method['advanced_options'] = array_merge($method['advanced_options'] ?? [], self::scalapay_widget_switches($options));
+
+        return $method;
+    }
+
+    /**
+     * Product, cart and checkout switches of the Scalapay installment widget.
+     *
+     * @param array $options woocommerce_payplug_settings
+     *
+     * @return array
+     */
+    private static function scalapay_widget_switches($options)
+    {
+        $settings = new ScalapayWidgetSettings(is_array($options) ? $options : []);
+        $texts = [
+            'product' => [__('payplug_scalapay_widget_product_title', 'payplug'), __('payplug_scalapay_widget_product_description', 'payplug')],
+            'cart' => [__('payplug_scalapay_widget_cart_title', 'payplug'), __('payplug_scalapay_widget_cart_description', 'payplug')],
+            'checkout' => [__('payplug_scalapay_widget_checkout_title', 'payplug'), __('payplug_scalapay_widget_checkout_description', 'payplug')],
+        ];
+
+        $switches = [];
+        foreach (ScalapayWidgetSettings::PAGES as $page) {
+            $switches[] = [
+                'name' => 'scalapay_widget_' . $page,
+                'title' => $texts[$page][0],
+                'descriptions' => [[
+                    'description' => $texts[$page][1],
+                    'link_know_more' => Component::link(__('payplug_know_more_label', 'payplug'), __('payplug_scalapay_more_url', 'payplug'), '_blank'),
+                ]],
+                'switch' => true,
+                'checked' => $settings->is_page_enabled($page),
+            ];
+        }
+
+        return $switches;
     }
 
     /**

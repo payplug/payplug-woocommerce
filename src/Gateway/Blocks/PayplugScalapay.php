@@ -2,6 +2,8 @@
 
 namespace Payplug\PayplugWoocommerce\Gateway\Blocks;
 
+use Payplug\PayplugWoocommerce\Front\Scalapay\ScalapayWidgetDisplay;
+
 class PayplugScalapay extends PayplugGenericBlock
 {
     /**
@@ -21,6 +23,7 @@ class PayplugScalapay extends PayplugGenericBlock
             'src' => esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $this->gateway->image),
             'icon_alt' => $data['name'],
         ];
+        $data['widget'] = ScalapayWidgetDisplay::configured_attributes('checkout');
 
         return $data;
     }

@@ -333,6 +333,10 @@ class Configuration
                         'type' => 'string',
                         'default' => '{}', // Contain currency e.g. "{"min":{"EUR": 30}, "max":{"EUR": 2000000}}"
                     ],
+                    'merchant_token' => [
+                        'type' => 'string',
+                        'default' => '', // Scalapay widget merchant token of the account
+                    ],
                 ],
             ],
             'configuration' => [
@@ -544,6 +548,22 @@ class Configuration
                     'custom_countries' => [
                         'type' => 'string',
                         'default' => '', // Merchant billing countries: '' = no restriction, '[]' = nobody, '["BE"]' = subset
+                    ],
+                    'widget_product' => [
+                        'type' => 'bool',
+                        'default' => true,
+                    ],
+                    'widget_cart' => [
+                        'type' => 'bool',
+                        'default' => true,
+                    ],
+                    'widget_checkout' => [
+                        'type' => 'bool',
+                        'default' => true,
+                    ],
+                    'widget_selectors' => [
+                        'type' => 'string',
+                        'default' => '{}', // Amount selectors per page, e.g. "{"product":["#price"]}", default ones for a page not listed
                     ],
                 ],
             ],

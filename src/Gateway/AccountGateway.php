@@ -10,6 +10,8 @@ class AccountGateway
 {
     use ServiceGetter;
 
+    public const SCALAPAY_MERCHANT_TOKEN_PATH = ['payment_methods', 'scalapay', 'merchant_token'];
+
     public function _construct(): void
     {
         $this->configuration = $this->get_service('configuration');
@@ -489,6 +491,40 @@ class AccountGateway
             $formated_account_permissions['payment_methods'][$key] = $payment_permissions;
         }
 
-        return $formated_account_permissions;
+        return $this->with_scalapay_merchant_token($formated_account_permissions, $account_permissions);
+    }
+
+    /**
+     * @param array $account raw GET /v1/account response
+     *
+     * @return string Scalapay widget merchant token, '' when the account has none
+     */
+    public static function scalapay_merchant_token(array $account): string
+    {
+        $value = $account;
+        foreach (self::SCALAPAY_MERCHANT_TOKEN_PATH as $key) {
+            $value = is_array($value) && array_key_exists($key, $value) ? $value[$key] : null;
+        }
+
+        return is_string($value) ? trim($value) : '';
+    }
+
+    /**
+     * @param array $permissions format_account_permissions() result
+     * @param array $account raw GET /v1/account response
+     */
+    private function with_scalapay_merchant_token(array $permissions, array $account): array
+    {
+        if (empty($permissions['payment_methods']['scalapay'])) {
+            return $permissions;
+        }
+
+        $token = self::scalapay_merchant_token($account);
+        if ('' === $token && !empty($permissions['payment_methods']['scalapay']['enabled'])) {
+            PayplugGateway::log('Scalapay merchant token missing from the account: the Scalapay installment widget is not displayed', 'warning');
+        }
+        $permissions['payment_methods']['scalapay']['merchant_token'] = $token;
+
+        return $permissions;
     }
 }

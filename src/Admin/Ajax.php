@@ -23,6 +23,8 @@ use Payplug\PayplugWoocommerce\Service\ApmAmountsSave;
 use Payplug\PayplugWoocommerce\Service\ApmEligibility;
 use Payplug\PayplugWoocommerce\Service\ApmRefreshPolicy;
 use Payplug\PayplugWoocommerce\Service\ApmSettings;
+use Payplug\PayplugWoocommerce\Service\ScalapayTokenSync;
+use Payplug\PayplugWoocommerce\Service\ScalapayWidgetSettings;
 use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
 use Payplug\PayplugWoocommerce\Upc\ApplePay\DomainAssociationBootstrap;
 use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
@@ -647,7 +649,8 @@ class Ajax
         // The posted mode is not stored yet: the refresh gets it explicitly, and the settings
         // are reloaded so that the posted values apply on top of the refreshed limits.
         $target_mode = (bool) $data['payplug_sandbox'] ? 'test' : 'live';
-        if (ApmRefreshPolicy::needs_refresh_on_save(is_array($options) ? $options : [], $target_mode)
+        $stored = is_array($options) ? $options : [];
+        if ((ApmRefreshPolicy::needs_refresh_on_save($stored, $target_mode) || ScalapayTokenSync::create()->claim($stored))
             && $this->get_gateway('account')->refresh_payment_permissions($target_mode)) {
             $payplug->init_settings();
             $options = $payplug->settings;
@@ -728,6 +731,8 @@ class Ajax
             $options['payment_methods']['configuration']['oney']['with_fees'] = 'with_fees' == (string) $data['payplug_oney'];
         }
 
+        $options = $this->save_scalapay_widget_settings($data, $options);
+
         // PPRO restrictions: the keys are absent when the BO bundle does not render the blocks,
         // which must leave the stored restrictions untouched.
         $shop_countries = array_keys(WC()->countries->get_allowed_countries());
@@ -802,6 +807,25 @@ class Ajax
                 'close' => __('payplug_ok', 'payplug'),
                 'msg' => 'These settings are already saved !', ]);
         }
+    }
+
+    /**
+     * Scalapay widget switches and amount selectors; a setting absent from $data keeps its stored value.
+     *
+     * @param array $data submitted settings
+     * @param array $options settings being saved
+     */
+    public function save_scalapay_widget_settings(array $data, array $options): array
+    {
+        if (!isset($options['payment_methods']['configuration']['scalapay'])) {
+            return $options;
+        }
+
+        $scalapay = ScalapayWidgetSettings::with_posted_switches($options['payment_methods']['configuration']['scalapay'], $data);
+        $scalapay['widget_selectors'] = Validator::scalapay_amount_selectors($scalapay['widget_selectors'] ?? '{}', $data);
+        $options['payment_methods']['configuration']['scalapay'] = $scalapay;
+
+        return $options;
     }
 
     /**

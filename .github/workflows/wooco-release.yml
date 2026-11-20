@@ -31,6 +31,7 @@ jobs:
       hosted-fields-sdk: ${{ secrets.HOSTED_FIELDS_SDK_URL_QA }}
       upc-oauth-base-url: ${{ secrets.PAYPLUG_API_QA }}
       upc-api-base-url: ${{ secrets.UPC_UNIFIED_API_BASE_URL_QA }}
+      scalapay-widget-url: ${{ secrets.SCALAPAY_WIDGET_URL_QA }}
 
   # --------------------------------------------------------------------------------
   # 2. REUSE QA ARTIFACT — download from any PR run and re-upload on develop merge
@@ -88,3 +89,4 @@ jobs:
       hosted-fields-sdk: ${{ secrets.HOSTED_FIELDS_SDK_URL_PROD }}
       upc-oauth-base-url: ${{ secrets.PAYPLUG_API_PROD }}
       upc-api-base-url: ${{ secrets.UPC_UNIFIED_API_BASE_URL_PROD }}
+      scalapay-widget-url: ${{ secrets.SCALAPAY_WIDGET_URL_PROD }}

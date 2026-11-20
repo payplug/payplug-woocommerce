@@ -2,7 +2,9 @@
 
 namespace Payplug\PayplugWoocommerce\Tests\phpunit\src\Gateway\Blocks;
 
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugGenericBlock;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugSatispay;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugScalapay;
 use Payplug\PayplugWoocommerce\Gateway\PPRO\Satispay;
 use Payplug\PayplugWoocommerce\Tests\phpunit\src\Support\WooCommerceAjaxFixtures;
 use PHPUnit\Framework\TestCase;
@@ -22,6 +24,8 @@ class PayplugGenericBlock_test extends TestCase
 
     protected function tearDown(): void
     {
+        wp_deregister_script('wc-payplug-scalapay-blocks');
+        wp_deregister_script('wc-payplug-no_bundle-blocks');
         delete_transient('payplug_permission_live');
         delete_option('woocommerce_currency');
         $this->tear_down_wc_frontend();
@@ -84,6 +88,37 @@ class PayplugGenericBlock_test extends TestCase
         update_option('woocommerce_payplug_settings', $settings);
 
         self::assertFalse($this->active($this->block()));
+    }
+
+    public function test_script_is_registered_with_the_dependencies_and_version_of_its_bundle(): void
+    {
+        $asset = require PAYPLUG_GATEWAY_PLUGIN_DIR . 'assets/js/blocks/wc-payplug-scalapay-blocks.asset.php';
+        wp_deregister_script('wc-payplug-scalapay-blocks');
+
+        $handles = (new PayplugScalapay())->get_payment_method_script_handles();
+
+        self::assertSame(['wc-payplug-scalapay-blocks'], $handles);
+        $script = wp_scripts()->registered['wc-payplug-scalapay-blocks'];
+        self::assertContains('wc-blocks-registry', $script->deps);
+        self::assertSame($asset['dependencies'], $script->deps);
+        self::assertSame($asset['version'], $script->ver);
+        self::assertStringStartsWith(PAYPLUG_GATEWAY_PLUGIN_URL, $script->src);
+        self::assertStringEndsWith('assets/js/blocks/wc-payplug-scalapay-blocks.js', $script->src);
+    }
+
+    public function test_script_without_a_bundle_asset_file_is_registered_with_the_defaults(): void
+    {
+        self::assertFileNotExists(PAYPLUG_GATEWAY_PLUGIN_DIR . 'assets/js/blocks/wc-payplug-no_bundle-blocks.asset.php');
+        $block = new class () extends PayplugGenericBlock {
+            protected $name = 'no_bundle';
+        };
+
+        $handles = $block->get_payment_method_script_handles();
+
+        self::assertSame(['wc-payplug-no_bundle-blocks'], $handles);
+        $script = wp_scripts()->registered['wc-payplug-no_bundle-blocks'];
+        self::assertSame([], $script->deps);
+        self::assertSame('1.0.0', $script->ver);
     }
 
     private function block(): PayplugSatispay

@@ -23,6 +23,11 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
     public $image;
 
     /**
+     * @var string
+     */
+    protected $icon_class = 'payplug-payment-icon';
+
+    /**
      * @var array
      */
     protected $allowed_country_codes;
@@ -108,7 +113,7 @@ class PayplugGenericGateway extends PayplugGateway implements PayplugGatewayBuil
 
         //get object $image
         $icons = apply_filters('payplug_payment_icons', [
-            'payplug' => sprintf('<img src="%s" alt="%s" class="payplug-payment-icon" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $this->image), $this->id . ' Icon'),
+            'payplug' => sprintf('<img src="%s" alt="%s" class="%s" />', esc_url(PAYPLUG_GATEWAY_PLUGIN_URL . '/assets/images/checkout/' . $this->image), $this->id . ' Icon', esc_attr($this->icon_class)),
         ]);
 
         $icons_str = '';

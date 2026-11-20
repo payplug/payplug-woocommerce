@@ -99,6 +99,45 @@ class AccountGatewayRefresh_test extends TestCase
         self::assertSame(['bancontact' => ['active' => true]], $options['payment_methods']['configuration']);
     }
 
+    public function test_refresh_stores_the_scalapay_merchant_token(): void
+    {
+        $account = $this->account_gateway(function ($mock): void {
+            $mock->shouldReceive('fetch_account')->andReturn($this->with_scalapay($this->account_response(), 'tok_test_123'));
+        });
+
+        self::assertTrue($account->refresh_payment_permissions('live'));
+
+        $scalapay = get_option('woocommerce_payplug_settings')['payment_methods']['permissions']['scalapay'];
+        self::assertSame('tok_test_123', $scalapay['merchant_token']);
+        self::assertSame([], $this->log->entries);
+    }
+
+    public function test_refresh_without_a_scalapay_token_stores_an_empty_token_and_warns(): void
+    {
+        $account = $this->account_gateway(function ($mock): void {
+            $mock->shouldReceive('fetch_account')->andReturn($this->with_scalapay($this->account_response(), null));
+        });
+
+        self::assertTrue($account->refresh_payment_permissions('live'));
+
+        $scalapay = get_option('woocommerce_payplug_settings')['payment_methods']['permissions']['scalapay'];
+        self::assertSame('', $scalapay['merchant_token']);
+        self::assertSame('warning', $this->log->entries[0]['level']);
+        self::assertStringContainsString('Scalapay merchant token', $this->log->entries[0]['message']);
+    }
+
+    public function test_refresh_without_scalapay_on_the_account_adds_no_token(): void
+    {
+        $account = $this->account_gateway(function ($mock): void {
+            $mock->shouldReceive('fetch_account')->andReturn($this->account_response());
+        });
+
+        self::assertTrue($account->refresh_payment_permissions('live'));
+
+        self::assertSame([], get_option('woocommerce_payplug_settings')['payment_methods']['permissions']['scalapay']);
+        self::assertSame([], $this->log->entries);
+    }
+
     public function test_empty_mode_uses_the_current_mode(): void
     {
         $account = $this->account_gateway(function ($mock): void {
@@ -157,5 +196,25 @@ class AccountGatewayRefresh_test extends TestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * @param mixed $token
+     */
+    private function with_scalapay(array $response, $token): array
+    {
+        $response['payment_methods']['scalapay'] = [
+            'enabled' => true,
+            'allowed_countries' => ['FR'],
+            'min_amounts' => ['EUR' => 500],
+            'max_amounts' => ['EUR' => 200000],
+        ];
+        $node = &$response;
+        foreach (AccountGateway::SCALAPAY_MERCHANT_TOKEN_PATH as $key) {
+            $node = &$node[$key];
+        }
+        $node = $token;
+
+        return $response;
     }
 }

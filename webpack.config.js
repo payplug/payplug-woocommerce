@@ -31,6 +31,7 @@ module.exports = {
 		'wero': '/resources/js/frontend/wc-payplug-wero-blocks.js',
 		'bizum': '/resources/js/frontend/wc-payplug-bizum-blocks.js',
 		'scalapay': '/resources/js/frontend/wc-payplug-scalapay-blocks.js',
+		'scalapay_widget_cart': '/resources/js/frontend/wc-payplug-scalapay_widget_cart-blocks.js',
 		'payplug': '/resources/js/frontend/wc-payplug-blocks.js',
 		'bancontact': '/resources/js/frontend/wc-payplug-bancontact-blocks.js',
 		'american_express': '/resources/js/frontend/wc-payplug-american_express-blocks.js',
