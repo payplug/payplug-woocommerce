@@ -75,7 +75,7 @@ class PayplugGatewayProcessPayment_test extends TestCase
                 return ['result' => 'success'];
             }
 
-            public function validate_order_amount($amount)
+            public function validate_order_amount($amount, ?string $currency = null)
             {
                 return $amount;
             }

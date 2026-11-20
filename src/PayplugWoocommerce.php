@@ -137,6 +137,9 @@ class PayplugWoocommerce
         $this->actions = new WoocommerceActions();
         $this->requests = new PayplugWoocommerceRequest();
         new Front\ApplePay();
+        new Front\UpcWebhook();
+        new Front\UhfSavedCards();
+        new Front\UpcCheckoutReturn();
         $this->ajax = new Ajax();
 
         $this->setup_callback = new SetupCallback();

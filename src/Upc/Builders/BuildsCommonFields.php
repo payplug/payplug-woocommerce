@@ -1,0 +1,158 @@
+<?php
+
+namespace Payplug\PayplugWoocommerce\Upc\Builders;
+
+use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceConfigurationRepository;
+use Payplug\PayplugWoocommerce\Upc\UpcOrderAmount;
+use PayplugUnifiedCore\Dto\AddressDto;
+use PayplugUnifiedCore\Dto\BillingDto;
+use PayplugUnifiedCore\Dto\BrowserDto;
+use PayplugUnifiedCore\Dto\CommonFieldsDto;
+use PayplugUnifiedCore\Dto\ContactDto;
+use PayplugUnifiedCore\Dto\CustomerDto;
+use PayplugUnifiedCore\Dto\ShippingDto;
+use PayplugUnifiedCore\Exceptions\InvalidCurrencyException;
+
+/**
+ * Shared by PaymentCaptureContextBuilder (HostedFieldDto) and AliasPaymentContextBuilder
+ * (PaymentDto) - both build the identical account/amount/currency/orderId/successUrl/cancelUrl/
+ * notificationUrl/billing/shipping/browser/customer context, differing only in their own
+ * payment-method-specific fields (hfToken vs. aliasId).
+ */
+trait BuildsCommonFields
+{
+    private function build_common(\WC_Order $order): CommonFieldsDto
+    {
+        $configuration_repository = new WooCommerceConfigurationRepository();
+        $amount = UpcOrderAmount::total($order);
+
+        if (null === $amount) {
+            // HostedFieldsPaymentProcessor already refuses such an order before building anything;
+            // a PayplugException keeps any other caller on its own controlled-failure path.
+            throw new InvalidCurrencyException(sprintf('Order #%s total could not be converted for the Unified API.', $order->get_id()));
+        }
+
+        $common = new CommonFieldsDto(
+            $configuration_repository->getPublicKeyId(),
+            $amount,
+            $order->get_currency(),
+            (string) $order->get_id(),
+            ''
+        );
+        $common->description = $this->build_description($order);
+        $common->successUrl = $order->get_checkout_order_received_url();
+        // The order-received page would otherwise show "Thank you, your order has been received"
+        // for a payment that was never completed - checkout_payment_url() sends an abandoned 3DS
+        // challenge back to the order-pay page instead.
+        $common->cancelUrl = add_query_arg('payplug_upc_cancelled', '1', $order->get_checkout_payment_url());
+        // Per the UHF spec, the Unified API's own notification mechanism ignores this field
+        // entirely - delivery is exclusively via the account/realm-scoped "Receiver". Sent anyway
+        // to satisfy the DTO's contract.
+        $common->notificationUrl = home_url('/payplug/v2/ipn');
+        $common->billing = $this->build_billing($order);
+        $common->shipping = $this->build_shipping($order);
+
+        return $common;
+    }
+
+    private function build_description(\WC_Order $order): string
+    {
+        $items = $order->get_items();
+        $first_item = reset($items);
+
+        return $first_item instanceof \WC_Order_Item_Product
+            ? (string) $first_item->get_name()
+            : sprintf(__('Order #%s', 'payplug'), $order->get_order_number());
+    }
+
+    private function build_billing(\WC_Order $order): BillingDto
+    {
+        return new BillingDto(
+            new AddressDto(
+                $order->get_billing_address_1(),
+                $order->get_billing_city(),
+                $order->get_billing_country(),
+                $order->get_billing_state(),
+                $order->get_billing_postcode()
+            ),
+            new ContactDto(
+                $order->get_billing_first_name(),
+                $order->get_billing_last_name(),
+                $order->get_billing_phone()
+            )
+        );
+    }
+
+    private function build_shipping(\WC_Order $order): ShippingDto
+    {
+        return new ShippingDto(
+            new AddressDto(
+                $order->get_shipping_address_1(),
+                $order->get_shipping_city(),
+                $order->get_shipping_country(),
+                $order->get_shipping_state(),
+                $order->get_shipping_postcode()
+            ),
+            new ContactDto(
+                $order->get_shipping_first_name(),
+                $order->get_shipping_last_name()
+            ),
+            $order->get_billing_email()
+        );
+    }
+
+    private function build_browser(): BrowserDto
+    {
+        return new BrowserDto(
+            isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '',
+            $this->build_referrer(),
+            isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : ''
+        );
+    }
+
+    /**
+     * The Unified API rejects a browser.referrer that is too long or not a valid URL, and the
+     * order-pay page reached back from a 3DS challenge carries the gateway's whole return query
+     * string. Only scheme://host[:port]/path is sent, then the origin alone when that exceeds 255
+     * characters, then an empty string: a URL is never truncated, which could split a %XX octet.
+     */
+    private function build_referrer(): string
+    {
+        $referer = isset($_SERVER['HTTP_REFERER']) && is_string($_SERVER['HTTP_REFERER'])
+            ? wp_unslash($_SERVER['HTTP_REFERER'])
+            : '';
+        $parts = wp_parse_url($referer);
+        $scheme = is_array($parts) && !empty($parts['host']) && !empty($parts['scheme'])
+            ? strtolower($parts['scheme'])
+            : '';
+
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            return '';
+        }
+
+        $origin = $scheme . '://' . $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '');
+        $path = isset($parts['path']) && '' !== $parts['path'] ? $parts['path'] : '/';
+
+        foreach ([$origin . $path, $origin . '/'] as $candidate) {
+            $url = esc_url_raw($candidate, ['http', 'https']);
+            if ('' !== $url && strlen($url) <= 255) {
+                return $url;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * The Unified API requires customer.email on every payment, guest checkouts included: a guest
+     * has no WordPress user id, so it gets a per-order one instead.
+     */
+    private function build_customer(\WC_Order $order): CustomerDto
+    {
+        $customer_id = 0 === $order->get_customer_id()
+            ? 'guest-' . $order->get_id()
+            : (string) $order->get_customer_id();
+
+        return new CustomerDto($customer_id, $order->get_billing_email());
+    }
+}

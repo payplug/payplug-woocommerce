@@ -4,6 +4,7 @@ namespace Payplug\PayplugWoocommerce\Front\Oney;
 
 use Payplug\PayplugWoocommerce\Gateway\Oney\OneyAccountMapper;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
+use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 
 class OneyDisplay
 {
@@ -47,6 +48,10 @@ class OneyDisplay
 
     public function enqueue_assets(): void
     {
+        if (!PayplugWoocommerceHelper::is_eur_shop()) {
+            return;
+        }
+
         wp_enqueue_style('payplug-oney', PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/css/payplug-oney.css', [], PAYPLUG_GATEWAY_VERSION);
         wp_enqueue_script('payplug-oney');
     }
@@ -82,7 +87,7 @@ class OneyDisplay
 
     private function render_badge(float $price, int $total_products): void
     {
-        if (!PayplugWoocommerceHelper::check_order_max_amount($price)) {
+        if (!PayplugWoocommerceHelper::is_eur_shop() || !PayplugWoocommerceHelper::check_order_max_amount($price)) {
             return;
         }
 
@@ -97,7 +102,8 @@ class OneyDisplay
         }
 
         $fee_mode = !empty($oney_settings['with_fees']) ? 'with_fees' : 'without_fees';
-        $amount_in_cents = (int) round($price * 100);
+        // Oney is Euro-only, and its account bounds are euro cents.
+        $amount_in_cents = AmountHelper::toCents($price, PayplugWoocommerceHelper::EURO_CURRENCY);
         $eligible = $mapper->is_eligible($country, $amount_in_cents);
 
         // Only country + amount-in-range decide eligibility (see is_eligible()), and country
@@ -116,7 +122,7 @@ class OneyDisplay
         $logo_class = 'with_fees' === $fee_mode ? 'oney-3x4x' : 'oney-without-fees-3x4x';
 
         $threshold_attrs = $country_eligible
-            ? sprintf(' data-min-oney="%s" data-max-oney="%s"', esc_attr($mapper->get_min_amount() / 100), esc_attr($mapper->get_max_amount() / 100))
+            ? sprintf(' data-min-oney="%s" data-max-oney="%s"', esc_attr(AmountHelper::fromCents($mapper->get_min_amount(), PayplugWoocommerceHelper::EURO_CURRENCY)), esc_attr(AmountHelper::fromCents($mapper->get_max_amount(), PayplugWoocommerceHelper::EURO_CURRENCY)))
             : '';
 
         printf(
