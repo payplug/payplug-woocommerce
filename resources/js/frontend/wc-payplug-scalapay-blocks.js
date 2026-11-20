@@ -3,6 +3,7 @@ import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
 import { isEligible } from './helper/wc-payplug-ppro-eligibility';
+import { ScalapayWidget } from './helper/wc-payplug-scalapay-widget';
 
 const settings = getSetting( 'scalapay_data', {} );
 const defaultLabel = __('Gateway method title', 'payplug');
@@ -11,8 +12,13 @@ const label = decodeEntities( settings?.title ) || defaultLabel;
 /**
  * Content component
  */
-const Content = () => {
-	return window.wp.htmlEntities.decodeEntities( settings?.description || '' );
+const Content = ( { billing } ) => {
+	return (
+		<>
+			{ window.wp.htmlEntities.decodeEntities( settings?.description || '' ) }
+			<ScalapayWidget widget={ settings?.widget } amountKey={ billing?.cartTotal?.value } />
+		</>
+	);
 };
 /**
  * Label component

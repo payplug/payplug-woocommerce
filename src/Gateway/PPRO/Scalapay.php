@@ -3,6 +3,8 @@
 namespace Payplug\PayplugWoocommerce\Gateway\PPRO;
 
 use Payplug\PayplugWoocommerce\Controller\PayplugGenericGateway;
+use Payplug\PayplugWoocommerce\Front\Scalapay\ScalapayWidgetDisplay;
+use Payplug\PayplugWoocommerce\Front\Scalapay\ScalapayWidgetRenderer;
 use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Helper\PhoneNumberHelper;
@@ -36,6 +38,23 @@ class Scalapay extends PayplugGenericGateway
         }
 
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'refund_not_available']);
+    }
+
+    public function has_fields(): bool
+    {
+        return '' !== $this->checkout_widget();
+    }
+
+    public function payment_fields(): void
+    {
+        parent::payment_fields();
+
+        echo $this->checkout_widget();
+    }
+
+    private function checkout_widget(): string
+    {
+        return ScalapayWidgetRenderer::render(ScalapayWidgetDisplay::configured_attributes('checkout'));
     }
 
     /**

@@ -27,7 +27,9 @@ use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugOney4xWithoutFees;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugSatispay;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugScalapay;
 use Payplug\PayplugWoocommerce\Gateway\Blocks\PayplugWero;
+use Payplug\PayplugWoocommerce\Gateway\Blocks\ScalapayWidgetCartIntegration;
 use Payplug\PayplugWoocommerce\Service\ApmMigration;
+use Payplug\PayplugWoocommerce\Service\ScalapayTokenSync;
 use Payplug\PayplugWoocommerce\Traits\GatewayGetter;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
@@ -141,6 +143,7 @@ class PayplugWoocommerce
         new Front\UpcWebhook();
         new Front\UhfSavedCards();
         new Front\UpcCheckoutReturn();
+        new Front\Scalapay\ScalapayWidgetDisplay();
         $this->ajax = new Ajax();
 
         $this->setup_callback = new SetupCallback();
@@ -232,15 +235,25 @@ class PayplugWoocommerce
                 }
             );
         }
+
+        if (interface_exists('Automattic\WooCommerce\Blocks\Integrations\IntegrationInterface')) {
+            add_action(
+                'woocommerce_blocks_cart_block_registration',
+                static function (\Automattic\WooCommerce\Blocks\Integrations\IntegrationRegistry $integration_registry): void {
+                    $integration_registry->register(new ScalapayWidgetCartIntegration());
+                }
+            );
+        }
     }
 
     private function check_upgrade(): void
     {
         $this->get_service('upgrade')->run_upgrade();
 
-        // Its best-effort getAccount call must not run on a shopper request.
+        // Their best-effort getAccount calls must not run on a shopper request.
         if (is_admin() && !wp_doing_ajax()) {
             ApmMigration::create()->run();
+            ScalapayTokenSync::create()->run();
         }
     }
 }

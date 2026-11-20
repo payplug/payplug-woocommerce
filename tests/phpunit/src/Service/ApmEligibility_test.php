@@ -175,4 +175,25 @@ class ApmEligibility_test extends TestCase
             'custom_countries' => null,
         ], $overrides);
     }
+
+    public function test_client_restrictions_expose_the_effective_limits(): void
+    {
+        $options = ['payment_methods' => [
+            'permissions' => ['scalapay' => ['enabled' => true, 'countries' => '["FR","IT"]', 'amounts' => '{"min":{"EUR":500},"max":{"EUR":200000}}']],
+            'configuration' => ['scalapay' => ['custom_amounts' => '{"min":1000}', 'custom_countries' => '["IT"]']],
+        ]];
+
+        self::assertSame(
+            ['min' => 1000, 'max' => 200000, 'countries' => ['IT'], 'currency' => 'EUR', 'ok' => true],
+            ApmEligibility::client_restrictions($options, 'scalapay')
+        );
+    }
+
+    public function test_client_restrictions_without_limits_are_not_ok(): void
+    {
+        self::assertSame(
+            ['min' => 0, 'max' => 0, 'countries' => [], 'currency' => 'EUR', 'ok' => false],
+            ApmEligibility::client_restrictions([], 'scalapay')
+        );
+    }
 }

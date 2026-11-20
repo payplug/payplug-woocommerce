@@ -33,6 +33,13 @@ class Languages_test extends TestCase
         'payplug_apm_amount_invalid_error',
         'payplug_apm_country_invalid_error',
         'payplug_apm_not_eligible_error',
+        'payplug_scalapay_widget_product_title',
+        'payplug_scalapay_widget_product_description',
+        'payplug_scalapay_widget_cart_title',
+        'payplug_scalapay_widget_cart_description',
+        'payplug_scalapay_widget_checkout_title',
+        'payplug_scalapay_widget_checkout_description',
+        'payplug_scalapay_widget_selectors_error',
     ];
 
     private const LOCALES = ['en_US', 'fr_FR', 'es_ES', 'it_IT'];
@@ -87,6 +94,18 @@ class Languages_test extends TestCase
                 self::assertSame($text, $entries[$key] ?? null, $locale . ' ' . $key);
             }
         }
+    }
+
+    /**
+     * @dataProvider locales_provider
+     */
+    public function test_scalapay_selectors_error_states_the_checked_limits(string $locale): void
+    {
+        $text = self::parse(dirname(__DIR__, 3) . '/languages/payplug-' . $locale . '.po')['payplug_scalapay_widget_selectors_error'] ?? '';
+
+        self::assertStringContainsString('10', $text);
+        self::assertStringContainsString('255', $text);
+        self::assertStringNotContainsString('CSS', $text);
     }
 
     public function test_template_lists_every_key(): void

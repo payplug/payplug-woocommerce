@@ -426,4 +426,64 @@ class Ajax_test extends TestCase
 
         self::assertSame('', $this->resolve_identifier(['identifier' => ''], 'redirect', $stored));
     }
+
+    public function test_scalapay_widget_switches_are_saved(): void
+    {
+        $options = (new Configuration())->extract_options_from_fields();
+
+        $saved = $this->ajax()->save_scalapay_widget_settings([
+            'enable_scalapay' => true,
+            'enable_scalapay_widget_product' => false,
+            'enable_scalapay_widget_cart' => true,
+            'enable_scalapay_widget_checkout' => false,
+        ], $options);
+
+        $scalapay = $saved['payment_methods']['configuration']['scalapay'];
+        self::assertFalse($scalapay['widget_product']);
+        self::assertTrue($scalapay['widget_cart']);
+        self::assertFalse($scalapay['widget_checkout']);
+        self::assertSame('{}', $scalapay['widget_selectors']);
+    }
+
+    public function test_scalapay_widget_settings_are_kept_when_not_posted(): void
+    {
+        $options = (new Configuration())->extract_options_from_fields();
+        $options['payment_methods']['configuration']['scalapay']['widget_cart'] = false;
+        $options['payment_methods']['configuration']['scalapay']['widget_selectors'] = '{"cart":["#total"]}';
+
+        self::assertSame($options, $this->ajax()->save_scalapay_widget_settings(['payplug_enable' => true], $options));
+    }
+
+    public function test_scalapay_widget_settings_are_ignored_without_a_scalapay_configuration(): void
+    {
+        $options = ['payment_methods' => ['configuration' => ['payplug' => ['active' => true]]]];
+
+        self::assertSame($options, $this->ajax()->save_scalapay_widget_settings(['enable_scalapay_widget_cart' => false], $options));
+    }
+
+    public function test_posted_scalapay_amount_selectors_are_saved(): void
+    {
+        $options = (new Configuration())->extract_options_from_fields();
+
+        $saved = $this->ajax()->save_scalapay_widget_settings(['scalapay_widget_cart_amount_selectors' => " #total \n.order-total bdi"], $options);
+
+        self::assertSame('{"cart":["#total",".order-total bdi"]}', $saved['payment_methods']['configuration']['scalapay']['widget_selectors']);
+    }
+
+    public function test_invalid_scalapay_amount_selectors_are_refused(): void
+    {
+        $options = (new Configuration())->extract_options_from_fields();
+
+        $response = $this->capture_json_response(function () use ($options): void {
+            $this->ajax()->save_scalapay_widget_settings(['scalapay_widget_cart_amount_selectors' => ["#total\x07"]], $options);
+        });
+
+        self::assertFalse($response['success']);
+        self::assertSame('payplug_scalapay_widget_selectors_error', $response['data']['msg']);
+    }
+
+    private function ajax(): Ajax
+    {
+        return (new \ReflectionClass(Ajax::class))->newInstanceWithoutConstructor();
+    }
 }

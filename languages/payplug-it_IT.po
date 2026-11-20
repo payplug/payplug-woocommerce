@@ -1526,3 +1526,31 @@ msgstr "Impossibile salvare la configurazione. I paesi %s devono essere scelti t
 #: src/Controller/PayplugGenericGateway.php
 msgid "payplug_apm_not_eligible_error"
 msgstr "Questo metodo di pagamento non è disponibile per il tuo ordine. Scegli un altro metodo di pagamento."
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_product_title"
+msgstr "Visualizza il calendario di pagamento Scalapay nella pagina del prodotto"
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_product_description"
+msgstr "I tuoi clienti potranno visualizzare i dettagli delle loro rate Scalapay prima di aggiungere il prodotto al carrello."
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_cart_title"
+msgstr "Visualizza il calendario di pagamento Scalapay nella pagina del carrello"
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_cart_description"
+msgstr "I tuoi clienti potranno visualizzare i dettagli delle loro rate Scalapay sotto il totale del carrello."
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_checkout_title"
+msgstr "Visualizza il calendario di pagamento Scalapay nella pagina di pagamento"
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_checkout_description"
+msgstr "I tuoi clienti potranno visualizzare i dettagli delle loro rate Scalapay scegliendo Scalapay."
+
+#: src/Admin/Validator.php
+msgid "payplug_scalapay_widget_selectors_error"
+msgstr "Impossibile salvare la configurazione. I selettori di importo del widget Scalapay sono limitati a 10, uno per riga, di massimo 255 caratteri ciascuno, senza tabulazioni né altri caratteri di controllo."

@@ -1153,3 +1153,31 @@ msgstr ""
 #, php-format
 msgid "Payplug payment %s was not completed."
 msgstr ""
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_product_title"
+msgstr ""
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_product_description"
+msgstr ""
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_cart_title"
+msgstr ""
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_cart_description"
+msgstr ""
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_checkout_title"
+msgstr ""
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_checkout_description"
+msgstr ""
+
+#: src/Admin/Validator.php
+msgid "payplug_scalapay_widget_selectors_error"
+msgstr ""

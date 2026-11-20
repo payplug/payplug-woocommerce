@@ -34,6 +34,11 @@ defined('SECURE_DOMAIN') || define('SECURE_DOMAIN', '');
 defined('ONEY_LOADER_URL') || define('ONEY_LOADER_URL', '');
 
 /**
+ *  URL of the Scalapay installment widget script (v5), loaded as a JavaScript module.
+ */
+defined('SCALAPAY_WIDGET_URL') || define('SCALAPAY_WIDGET_URL', 'https://cdn.scalapay.com/widget/v5/js/scalapay-widget.js');
+
+/**
  *  URL of the Payplug (Dalenys) hosted-fields SDK script. Per the UHF spec
  *  (§3.6, flagged there as blocking for production), the official Sylius
  *  PayPlug plugin currently hardcodes a STAGING url

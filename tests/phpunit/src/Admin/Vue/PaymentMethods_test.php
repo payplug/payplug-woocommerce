@@ -81,4 +81,36 @@ class PaymentMethods_test extends TestCase
 
         self::assertArrayNotHasKey('domain_association', PaymentMethods::payment_method_applepay(true, $options, []));
     }
+
+    public function test_scalapay_offers_the_widget_switch_of_each_page(): void
+    {
+        $options = (new Configuration())->extract_options_from_fields();
+        $options['payment_methods']['configuration']['scalapay']['widget_cart'] = false;
+
+        $switches = PaymentMethods::payment_method_scalapay(true, $options)['advanced_options'];
+
+        self::assertSame(['scalapay_widget_product', 'scalapay_widget_cart', 'scalapay_widget_checkout'], array_column($switches, 'name'));
+        self::assertSame([true, false, true], array_column($switches, 'checked'));
+        foreach ($switches as $switch) {
+            self::assertTrue($switch['switch']);
+            self::assertNotEmpty($switch['title']);
+            self::assertNotEmpty($switch['descriptions'][0]['description']);
+        }
+    }
+
+    public function test_scalapay_widget_switches_follow_the_amount_thresholds(): void
+    {
+        update_option('woocommerce_currency', 'EUR');
+        $options = (new Configuration())->extract_options_from_fields();
+        $options['payment_methods']['permissions']['scalapay'] = [
+            'enabled' => true,
+            'countries' => '["FR"]',
+            'amounts' => '{"min":{"EUR":500},"max":{"EUR":200000}}',
+        ];
+
+        $method = PaymentMethods::payment_method_scalapay(true, $options);
+
+        self::assertSame(['thresholds', 'scalapay_widget_product', 'scalapay_widget_cart', 'scalapay_widget_checkout'], array_column($method['advanced_options'], 'name'));
+        self::assertArrayHasKey('countries', $method);
+    }
 }

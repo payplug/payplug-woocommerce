@@ -2,5 +2,5 @@
   "version": "3.3.0",
   "wc_tested_up_to": "10.6.1",
   "wp_tested_up_to": "6.9.4",
-  "changelog": "* Feat: Serve the Apple Pay domain verification file from the plugin when the PayPlug account has Apple Pay, for sites at the root of their domain, with nothing to upload, plus a status block with a Resync button in the Apple Pay settings and the wp payplug apple-pay resync command"
+  "changelog": "* Feat: Serve the Apple Pay domain verification file from the plugin when the PayPlug account has Apple Pay, for sites at the root of their domain, with nothing to upload, plus a status block with a Resync button in the Apple Pay settings and the wp payplug apple-pay resync command\n* Feat: Show the Scalapay installment widget (v5) on the product, cart and checkout pages, with the merchant token taken from the PayPlug account and a setting per page"
 }

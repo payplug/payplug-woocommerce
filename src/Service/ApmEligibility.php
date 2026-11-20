@@ -90,6 +90,27 @@ class ApmEligibility
     }
 
     /**
+     * Effective limits of a PPRO payment method, for the checks made in the browser.
+     *
+     * @param array $options woocommerce_payplug_settings, read raw
+     *
+     * @return array{min: int, max: int, countries: string[]|null, currency: string, ok: bool}
+     */
+    public static function client_restrictions(array $options, string $apm): array
+    {
+        $config = ApmSettings::config_for($options, $apm);
+        $amounts = self::effective_amounts($config['limits'], $config['custom_amounts']);
+
+        return [
+            'min' => null === $amounts ? 0 : $amounts['min'],
+            'max' => null === $amounts ? 0 : $amounts['max'],
+            'countries' => self::effective_countries($config['limits'], $config['custom_countries']),
+            'currency' => self::CURRENCY,
+            'ok' => null !== $amounts && $amounts['min'] < $amounts['max'],
+        ];
+    }
+
+    /**
      * @param array $apm_config limits (ApmLimits::from_permission() result or null), custom_amounts, custom_countries
      *
      * @return string|null null = eligible, else no_limits, currency, no_billing_address, inconsistent_bounds,
