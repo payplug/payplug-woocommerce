@@ -2,6 +2,7 @@
 
 namespace Payplug\PayplugWoocommerce\Front;
 
+use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLogger;
 use Payplug\PayplugWoocommerce\Upc\PaymentReconciler;
 
 /**
@@ -15,6 +16,7 @@ class UpcCheckoutReturn
     {
         add_action('woocommerce_api_payplug_upc_3ds', [$this, 'render_upc_3ds_redirect']);
         add_action('template_redirect', [$this, 'maybe_notice_upc_cancelled']);
+        add_action('template_redirect', [$this, 'maybe_reconcile_on_order_received']);
         add_action('woocommerce_thankyou', [$this, 'maybe_reconcile_pending_upc_payment']);
     }
 
@@ -96,6 +98,40 @@ class UpcCheckoutReturn
     }
 
     /**
+     * Runs before WooCommerce builds the order-received page, so both the classic thankyou.php
+     * template and the block theme's Order Confirmation template render the reconciled status
+     * instead of the one the order had when the shopper left for the bank.
+     *
+     * For a UHF order still in three_ds_pending, reconcile() can block for up to ~20 s (two 10 s
+     * API timeouts) before any output, at most once per operation every 60 s: the throttle is set
+     * before the fetch, so a reload within 60 s of a transient API failure shows the stale status.
+     */
+    public function maybe_reconcile_on_order_received(): void
+    {
+        if (!is_order_received_page()) {
+            return;
+        }
+
+        $order_id = absint(get_query_var('order-received'));
+        $submitted_key = isset($_GET['key']) ? sanitize_text_field(wp_unslash($_GET['key'])) : '';
+        $order = wc_get_order($order_id);
+
+        if (!$order instanceof \WC_Order || '' === $submitted_key || !hash_equals($order->get_order_key(), $submitted_key)) {
+            return;
+        }
+
+        try {
+            (new PaymentReconciler())->reconcile($order);
+        } catch (\Throwable $e) {
+            (new WooCommerceLogger())->error(sprintf('UPC order-received reconciliation failed for order #%s: %s', $order->get_id(), $e->getMessage()));
+        }
+    }
+
+    /**
+     * Fallback for thank-you pages rendered outside the order-received endpoint. On the
+     * order-received page, maybe_reconcile_on_order_received() has already reconciled the
+     * operation, so this call is a no-op under PaymentReconciler's throttle.
+     *
      * @param int $order_id
      */
     public function maybe_reconcile_pending_upc_payment($order_id): void

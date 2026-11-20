@@ -102,6 +102,7 @@ PayPlug offers several plans to suit your needs and business requirements. **No 
 * Fix: Do not show a PHP warning on the Blocks checkout to logged-in customers who saved a card with UHF
 * Fix: Paying again with UHF after a declined 3D Secure now succeeds and confirms the order as soon as the customer is back from 3D Secure, and a long or encoded checkout or order-pay URL no longer makes a UHF card payment fail
 * Fix: Scalapay is now shown at checkout as "Pay with Scalapay" ("Payez avec Scalapay" in French), without any mention of 3x/4x instalments
+* Fix: After paying with UHF and 3D Secure, for example paying again after a declined 3D Secure, the order confirmation page now shows the order as received on the first display, instead of "Order failed" with a button to pay again
 
 = 3.1.1 =
 * Fix: remove PHP warnings in the back office when Scalapay is activated
