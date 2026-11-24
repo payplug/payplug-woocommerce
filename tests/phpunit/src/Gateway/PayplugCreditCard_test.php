@@ -44,6 +44,7 @@ class PayplugCreditCard_test extends TestCase
         // a token under the same transient key - clear it, or a later test that expects a real
         // network failure would instead silently reuse a token this class minted earlier.
         delete_transient('upc_token_upc_oauth_token:');
+        wp_deregister_script('payplug-integrated-payments');
         parent::tearDown();
     }
 
@@ -127,6 +128,19 @@ class PayplugCreditCard_test extends TestCase
         update_option('woocommerce_payplug_settings', $settings);
         $gateway = new PayplugCreditCard();
         self::assertSame('yes', $gateway->enabled);
+    }
+
+    public function test_integrated_payments_scripts_localizes_the_payment_creation_error_message(): void
+    {
+        update_option('woocommerce_currency', 'EUR');
+        update_option('woocommerce_payplug_settings', $this->base_settings);
+        (new PayplugCreditCard())->integrated_payments_scripts();
+
+        $data = (string) wp_scripts()->get_data('payplug-integrated-payments', 'data');
+        self::assertSame(1, preg_match('/var payplug_integrated_payment_params = (\{.*\});/s', $data, $matches));
+        $params = json_decode($matches[1], true);
+
+        self::assertSame(__('payplug_integrated_payment_error', 'payplug'), $params['payment_error'] ?? null);
     }
 
     public function test_has_fields_enabled_for_hosted_fields_mode(): void
