@@ -331,7 +331,7 @@ class UpcWebhook
      * PaymentReconciler, whose own getOperation() fetch can win the race against this webhook and
      * mark the operation treated first, in which case OperationOutcomeProcessor never calls this.
      * No extra API call is made here: the webhook's own raw body is already the same
-     * paymentMethod.{id, card, details} shape CardRecorderFromOperation expects.
+     * paymentMethod.{storedId|id, card, details} shape CardRecorderFromOperation expects.
      */
     private function maybe_persist_uhf_card(\WC_Order $order, string $raw_body): void
     {
