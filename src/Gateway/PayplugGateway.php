@@ -1369,6 +1369,16 @@ class PayplugGateway extends WC_Payment_Gateway_CC
     }
 
     /**
+     * The My Account pages list the saved payment methods, which does not depend on the cart total.
+     * A checkout or order-pay page embedding [woocommerce_my_account] is also an account page,
+     * and keeps the min/max check.
+     */
+    protected function should_check_amounts(): bool
+    {
+        return !is_account_page() || is_checkout();
+    }
+
+    /**
      * Check if the gatteway is allowed for the order amount
      *
      * @param array
@@ -1377,7 +1387,7 @@ class PayplugGateway extends WC_Payment_Gateway_CC
      */
     public function check_gateway($gateways)
     {
-        if (!empty(WC()->cart) && isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id) {
+        if ($this->should_check_amounts() && !empty(WC()->cart) && isset($gateways[$this->id]) && $gateways[$this->id]->id == $this->id) {
             $order_amount = $this->get_order_total();
             foreach ($gateways[$this->id]->settings['payment_methods']['permissions'] as $key => &$permission) {
                 if (ApmEligibility::is_restricted_apm($key)) {
