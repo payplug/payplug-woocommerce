@@ -3,6 +3,7 @@
 namespace Payplug\PayplugWoocommerce\Front;
 
 use Payplug\PayplugWoocommerce\Model\UhfCard;
+use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 
 /**
  * A UHF alias is never a WC_Payment_Token (see Controller/HostedFields.php), so it never
@@ -19,6 +20,7 @@ use Payplug\PayplugWoocommerce\Model\UhfCard;
  * delete(), native WooCommerce) never calls the Retail API to revoke the card either.
  * The rows carry SAVED_METHOD_GATEWAY as their gateway, so the Blocks checkout leaves them
  * out of its own saved-methods list: the checkout shows UHF cards through the plugin itself.
+ * Outside EUR, the class also removes the Retail card rows from that list, except on My Account.
  */
 class UhfSavedCards
 {
@@ -34,6 +36,7 @@ class UhfSavedCards
     public function __construct()
     {
         add_filter('woocommerce_saved_payment_methods_list', [$this, 'add_cards_to_list'], 10, 2);
+        add_filter('woocommerce_saved_payment_methods_list', [$this, 'hide_retail_cards_outside_eur'], 20, 2);
         add_action('template_redirect', [$this, 'maybe_handle_delete']);
         add_filter('woocommerce_credit_card_type_labels', [$this, 'add_cb_label']);
     }
@@ -84,6 +87,27 @@ class UhfSavedCards
                     ],
                 ],
             ];
+        }
+
+        return $list;
+    }
+
+    /**
+     * The Retail API is EUR-only (see PayplugGateway::process_payment()) and a token carries
+     * no currency: outside EUR a saved Retail card could be listed at checkout but never
+     * charged. My Account lists the cards to manage them, not to pay: keep them there.
+     * Priority 20: after WC's own builder and add_cards_to_list() (both 10).
+     */
+    public function hide_retail_cards_outside_eur(array $list, int $customer_id): array
+    {
+        if (empty($list['cc']) || PayplugWoocommerceHelper::is_eur_shop() || is_wc_endpoint_url('payment-methods')) {
+            return $list;
+        }
+
+        $list['cc'] = array_values(array_filter($list['cc'], static fn (array $row): bool => 'payplug' !== ($row['method']['gateway'] ?? '')));
+
+        if ([] === $list['cc']) {
+            unset($list['cc']);
         }
 
         return $list;
