@@ -1,7 +1,9 @@
 import { getSetting } from '@woocommerce/settings';
 import React, { useEffect, useRef } from 'react';
+import { dispatch } from '@wordpress/data';
 const settings = getSetting( 'payplug_data', {} );
 import {getPayment, check_payment } from "./helper/wc-payplug-requests";
+import { getFailureMessage, getPayErrorMessage, clearFields, uncheckSaveCard, createCompletionQueue } from "./helper/wc-payplug-integrated-payment-errors";
 let saved_card = false;
 
 const IntegratedPayment = ({props: props,}) => {
@@ -20,6 +22,7 @@ const IntegratedPayment = ({props: props,}) => {
 		form: {},
 		checkoutForm: null,
 		api: null,
+		completion: null,
 		integratedPayment: null,
 		token: null,
 		notValid: true,
@@ -64,6 +67,8 @@ const IntegratedPayment = ({props: props,}) => {
 		document.body.setAttribute('payplug-domain', settings?.secureDomain);
 		ObjIntegratedPayment.current.api = new Payplug.IntegratedPayment( settings?.mode == 1 ? false : true );
 		ObjIntegratedPayment.current.api.setDisplayMode3ds(Payplug.DisplayMode3ds.LIGHTBOX)
+		ObjIntegratedPayment.current.completion = createCompletionQueue();
+		ObjIntegratedPayment.current.api.onCompleted((event) => ObjIntegratedPayment.current.completion.complete(event));
 		ObjIntegratedPayment.current.form.cardHolder = ObjIntegratedPayment.current.api.cardHolder(document.querySelector('.cardHolder-input-container'), {default: ObjIntegratedPayment.current.inputStyle.default, placeholder: settings?.payplug_integrated_payment_cardholder } );
 		ObjIntegratedPayment.current.form.pan = ObjIntegratedPayment.current.api.cardNumber(document.querySelector('.pan-input-container'), {default: ObjIntegratedPayment.current.inputStyle.default, placeholder: settings?.payplug_integrated_payment_card_number } );
 		ObjIntegratedPayment.current.form.cvv = ObjIntegratedPayment.current.api.cvv(document.querySelector('.cvv-input-container'), {default: ObjIntegratedPayment.current.inputStyle.default, placeholder: settings?.payplug_integrated_payment_cvv } );
@@ -108,27 +113,35 @@ const IntegratedPayment = ({props: props,}) => {
 	// regardless of whether that happened on order-pay (in onPaymentSetup) or regular checkout
 	// (in onCheckoutSuccess, see below).
 	function onCompleteEvent(){
-		return new Promise((resolve, reject) => {
-			ObjIntegratedPayment.current.api.onCompleted(function (event) {
-				check_payment({'payment_id' : event.token}).then((res) => {
-					if (res && res.success === false) {
-						resolve({
-							type: 'error',
-							message: settings?.payplug_integrated_payment_error
-						});
-						return;
-					}
-					resolve({
-						type: 'success',
-					});
-				}).catch(() => {
-					resolve({
-						type: 'error',
-						message: settings?.payplug_integrated_payment_error
-					});
-				});
+		return ObjIntegratedPayment.current.completion.wait().then((event) => {
+			return check_payment({'payment_id' : event.token}).then((res) => {
+				if (res && res.success === false) {
+					resetForm();
+					return paymentError(getFailureMessage(res, settings?.payplug_integrated_payment_check_error));
+				}
+				return {
+					type: 'success',
+				};
+			}).catch(() => {
+				// The payment status is unknown here (it may have succeeded).
+				resetForm();
+				return paymentError(settings?.payplug_integrated_payment_check_error);
 			});
 		});
+	}
+
+	// Without a context, WooCommerce Blocks replaces the message with its generic checkout error.
+	function paymentError(message){
+		return {
+			type: 'error',
+			message: message,
+			messageContext: emitResponse.noticeContexts.PAYMENTS
+		};
+	}
+
+	function resetForm(){
+		clearFields(ObjIntegratedPayment.current.form);
+		uncheckSaveCard(dispatch('wc/store/payment'));
 	}
 
 	useEffect(() => {
@@ -146,10 +159,7 @@ const IntegratedPayment = ({props: props,}) => {
 
 					return await onCompleted;
 				} catch (error) {
-					return {
-						type: 'error',
-						message: error.message
-					}
+					return paymentError(getPayErrorMessage(error, settings?.payplug_integrated_payment_error));
 				}
 			}
 
@@ -166,7 +176,8 @@ const IntegratedPayment = ({props: props,}) => {
 		return () => { unsubscribeAfterProcessing(); };
 
 	}, [
-		onPaymentSetup
+		onPaymentSetup,
+		emitResponse.noticeContexts.PAYMENTS
 	]);
 
 	useEffect(() => {
@@ -193,17 +204,15 @@ const IntegratedPayment = ({props: props,}) => {
 					? { ...result, redirectUrl: ObjIntegratedPayment.current.return_url }
 					: result;
 			} catch (error) {
-				return {
-					type: 'error',
-					message: error.message
-				}
+				return paymentError(getPayErrorMessage(error, settings?.payplug_integrated_payment_error));
 			}
 		}
 		const unsubscribeAfterProcessing = onCheckoutSuccess(handleCheckoutSuccess);
 		return () => { unsubscribeAfterProcessing(); };
 
 	}, [
-		onCheckoutSuccess
+		onCheckoutSuccess,
+		emitResponse.noticeContexts.PAYMENTS
 	]);
 
 
