@@ -338,6 +338,7 @@ class PayplugCreditCard extends PayplugGateway
             'check_payment_url' => \WC_AJAX::get_endpoint('payplug_check_payment'),
             'secureDomain' => PayplugWoocommerceHelper::get_secure_domain(),
             'check_payment_error' => __('payplug_integrated_payment_check_error', 'payplug'),
+            'payment_error' => __('payplug_integrated_payment_error', 'payplug'),
         ];
 
         /**x

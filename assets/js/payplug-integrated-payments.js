@@ -114,10 +114,7 @@ var IntegratedPayment = {
 					async: false,
 					url: payplug_integrated_payment_params.check_payment_url, //NEED TO HAVE AN ENDPOINT FOR THIS,
 					data: {'payment_id' : event.token},
-					error: function (jqXHR, textStatus, errorThrown) {
-						console.log(jqXHR);
-						console.log(textStatus);
-						console.log(errorThrown);
+					error: function () {
 						// The payment status is unknown here (it may have succeeded), so show a neutral
 						// message instead of the "card not charged" payment error.
 						jQuery(".payplug.IntegratedPayment_error.-payment").hide();
@@ -187,13 +184,20 @@ var IntegratedPayment = {
 			url: request_url, //NEED TO HAVE AN ENDPOINT FOR THIS,
 			dataType: 'json',
 			data: IntegratedPayment.form().serialize(),
-			error: function (jqXHR, textStatus, errorThrown) {
-				//integrated.form.clearIntPayment();
-				console.log(jqXHR);
-				console.log(textStatus);
-				console.log(errorThrown);
+			error: function () {
+				// The response could not be read. With a saved card the charge runs inside this
+				// request, so it may have succeeded: show the neutral message, not "card not charged".
+				IntegratedPayment.paymentCreationError(IntegratedPayment.oneClickSelected()
+					? payplug_integrated_payment_params.check_payment_error
+					: payplug_integrated_payment_params.payment_error);
 			},
 			success: function (response) {
+				// wp_send_json_error() (e.g. empty cart): no payment was created.
+				if (response.success === false) {
+					IntegratedPayment.paymentCreationError(payplug_integrated_payment_params.payment_error);
+					return;
+				}
+
 				if (response.result === "failure") {
 					IntegratedPayment.form().unblock();
 					var error_messages = response.messages || '';
@@ -209,8 +213,8 @@ var IntegratedPayment = {
 				IntegratedPayment.props.paymentId = response.payment_id;
 				IntegratedPayment.props.return_url = response.redirect;
 			},
-			complete: function(response) {
-				if (response.responseJSON != null) {
+			complete: function(response, textStatus) {
+				if (textStatus === 'success' && response.responseJSON != null && response.responseJSON.success !== false) {
 					if (response.responseJSON.result != "failure") {
 						if (IntegratedPayment.oneClickSelected()) {
 							return;
@@ -224,6 +228,13 @@ var IntegratedPayment = {
 
 			}
 		});
+	},
+	paymentCreationError: function (message) {
+		// The block under the form may still show the same text from an earlier attempt.
+		jQuery(".payplug.IntegratedPayment_error.-payment").hide();
+		// submit_error() also unblocks the form.
+		IntegratedPayment.submit_error('<ul class="woocommerce-error" role="alert"><li>' + message + '</li></ul>');
+		IntegratedPayment.resetIntegratedForm();
 	},
 	submit_error: function (error_message) {
 		var parsedHtml = jQuery.parseHTML(error_message, document, false);
