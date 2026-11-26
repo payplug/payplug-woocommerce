@@ -143,7 +143,7 @@ class PaymentReconciler
                 ),
                 function () use ($order, $data): void {
                     // The body just fetched is the operation resource, the same
-                    // paymentMethod.{id, card, details} shape the webhook carries - no second fetch.
+                    // paymentMethod.{storedId|id, card, details} shape the webhook carries - no second fetch.
                     (new CardRecorderFromOperation())->maybe_persist($order, $data);
                     (new UpcTransactionMetadataRecorder())->record_card($order, $data);
                 }

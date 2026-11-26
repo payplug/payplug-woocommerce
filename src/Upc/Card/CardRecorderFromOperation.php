@@ -9,7 +9,7 @@ use Payplug\PayplugWoocommerce\Upc\Adapters\WooCommerceLogger;
  * Shared by Front\UpcWebhook (the async notification body) and PaymentReconciler (the
  * synchronous getOperation() fetch on the shopper's return to the order-received page, used as
  * a fallback when the webhook hasn't arrived yet) - both read the identical
- * paymentMethod.{id, card.{network, code6x4}, details.{selectedBrand, validityDate}} shape and
+ * paymentMethod.{storedId|id, card.{network, code6x4}, details.{selectedBrand, validityDate}} shape and
  * both need the exact same "was this order's save-card checkbox actually ticked" gate before
  * persisting anything. Extracted so the reconciliation fallback doesn't silently drop a
  * customer's save-card intent when it wins the race against the webhook for a 3DS-confirmed
@@ -31,9 +31,7 @@ class CardRecorderFromOperation
             return;
         }
 
-        $alias_id = isset($decoded['paymentMethod']['id']) && is_scalar($decoded['paymentMethod']['id'])
-            ? (string) $decoded['paymentMethod']['id']
-            : '';
+        $alias_id = $this->read_alias_id($decoded);
 
         if ('' === $alias_id) {
             (new WooCommerceLogger())->error(sprintf(
@@ -59,5 +57,29 @@ class CardRecorderFromOperation
                 wp_json_encode($card_data)
             ));
         }
+    }
+
+    /**
+     * paymentMethod.storedId first, then paymentMethod.id, string values only: the order and type
+     * UPC uses for PaymentOutput::$aliasId on the direct path, so both paths save the card under
+     * the same alias and UhfCard::insert() finds the existing row instead of adding a second one.
+     *
+     * @param array<string, mixed> $decoded
+     */
+    private function read_alias_id(array $decoded): string
+    {
+        if (!isset($decoded['paymentMethod']) || !is_array($decoded['paymentMethod'])) {
+            return '';
+        }
+
+        foreach (['storedId', 'id'] as $key) {
+            $value = $decoded['paymentMethod'][$key] ?? null;
+
+            if (is_string($value) && '' !== $value) {
+                return $value;
+            }
+        }
+
+        return '';
     }
 }
