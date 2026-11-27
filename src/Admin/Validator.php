@@ -5,6 +5,7 @@ namespace Payplug\PayplugWoocommerce\Admin;
 use Payplug\PayplugWoocommerce\Service\ApmAmountsSave;
 use Payplug\PayplugWoocommerce\Service\ApmCountriesSave;
 use Payplug\PayplugWoocommerce\Service\ApmEligibility;
+use Payplug\PayplugWoocommerce\Service\ScalapayWidgetSettings;
 
 class Validator
 {
@@ -268,6 +269,25 @@ class Validator
         }
 
         return null === $result['value'] ? '' : json_encode($result['value']);
+    }
+
+    /**
+     * Validate the Scalapay widget amount selectors posted per page; an invalid list aborts the
+     * whole save with an explicit message.
+     *
+     * @param mixed $stored widget_selectors
+     * @param array $data submitted settings
+     *
+     * @return string widget_selectors to store
+     */
+    public static function scalapay_amount_selectors($stored, array $data): string
+    {
+        $selectors = ScalapayWidgetSettings::merge_posted_selectors($stored, $data);
+        if (null === $selectors) {
+            self::apm_error(__('payplug_scalapay_widget_selectors_error', 'payplug'));
+        }
+
+        return (string) $selectors;
     }
 
     private static function apm_error(string $message): void

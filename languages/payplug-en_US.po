@@ -887,3 +887,31 @@ msgstr "Unable to save the configuration. The %s countries must be chosen among 
 #: src/Controller/PayplugGenericGateway.php
 msgid "payplug_apm_not_eligible_error"
 msgstr "This payment method is not available for your order. Please choose another payment method."
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_product_title"
+msgstr "Display the Scalapay installments on the Product page"
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_product_description"
+msgstr "Your customers can see the details of their Scalapay installments before adding the product to their cart."
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_cart_title"
+msgstr "Display the Scalapay installments on the Cart page"
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_cart_description"
+msgstr "Your customers can see the details of their Scalapay installments under the cart total."
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_checkout_title"
+msgstr "Display the Scalapay installments on the Checkout page"
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_checkout_description"
+msgstr "Your customers can see the details of their Scalapay installments when they choose Scalapay."
+
+#: src/Admin/Validator.php
+msgid "payplug_scalapay_widget_selectors_error"
+msgstr "Unable to save the configuration. The Scalapay widget amount selectors are limited to 10, one per line, of 255 characters maximum each, without tabs or other control characters."

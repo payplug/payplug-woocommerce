@@ -1535,3 +1535,31 @@ msgstr "Impossible d'enregistrer la configuration. Les pays %s doivent être cho
 #: src/Controller/PayplugGenericGateway.php
 msgid "payplug_apm_not_eligible_error"
 msgstr "Ce moyen de paiement n'est pas disponible pour votre commande. Veuillez choisir un autre moyen de paiement."
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_product_title"
+msgstr "Afficher les échéanciers Scalapay sur la page Produit"
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_product_description"
+msgstr "Vos clients pourront voir le détail de leurs échéances Scalapay avant d'ajouter le produit au panier."
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_cart_title"
+msgstr "Afficher les échéanciers Scalapay sur la page Panier"
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_cart_description"
+msgstr "Vos clients pourront voir le détail de leurs échéances Scalapay sous le total du panier."
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_checkout_title"
+msgstr "Afficher les échéanciers Scalapay sur la page de paiement"
+
+#: src/Admin/Vue/PaymentMethods.php
+msgid "payplug_scalapay_widget_checkout_description"
+msgstr "Vos clients pourront voir le détail de leurs échéances Scalapay en choisissant Scalapay."
+
+#: src/Admin/Validator.php
+msgid "payplug_scalapay_widget_selectors_error"
+msgstr "Impossible d'enregistrer la configuration. Les sélecteurs de montant du widget Scalapay sont limités à 10, un par ligne, de 255 caractères maximum chacun, sans tabulation ni autre caractère de contrôle."

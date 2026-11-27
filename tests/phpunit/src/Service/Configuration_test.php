@@ -27,6 +27,18 @@ class Configuration_test extends TestCase
         self::assertSame('{"min":10000, "max":300000}', $defaults['payment_methods']['configuration']['oney']['default_amounts']);
     }
 
+    public function test_scalapay_widget_is_shown_on_every_page_with_default_selectors_and_no_token(): void
+    {
+        $defaults = $this->configuration()->extract_options_from_fields();
+        $configuration = $defaults['payment_methods']['configuration']['scalapay'];
+
+        self::assertTrue($configuration['widget_product']);
+        self::assertTrue($configuration['widget_cart']);
+        self::assertTrue($configuration['widget_checkout']);
+        self::assertSame('{}', $configuration['widget_selectors']);
+        self::assertSame('', $defaults['payment_methods']['permissions']['scalapay']['merchant_token']);
+    }
+
     private function configuration(): Configuration
     {
         return (new \ReflectionClass(Configuration::class))->newInstanceWithoutConstructor();

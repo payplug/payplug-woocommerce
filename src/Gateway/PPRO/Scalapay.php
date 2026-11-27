@@ -3,6 +3,8 @@
 namespace Payplug\PayplugWoocommerce\Gateway\PPRO;
 
 use Payplug\PayplugWoocommerce\Controller\PayplugGenericGateway;
+use Payplug\PayplugWoocommerce\Front\Scalapay\ScalapayWidgetDisplay;
+use Payplug\PayplugWoocommerce\Front\Scalapay\ScalapayWidgetRenderer;
 use Payplug\PayplugWoocommerce\Gateway\PayplugAddressData;
 use Payplug\PayplugWoocommerce\Gateway\PayplugGateway;
 use Payplug\PayplugWoocommerce\Helper\PhoneNumberHelper;
@@ -12,7 +14,18 @@ use PayplugUnifiedCore\Utilities\Helpers\AmountHelper;
 class Scalapay extends PayplugGenericGateway
 {
     protected $enable_refund = true;
+
+    /**
+     * The checkout widget rewrites the classic title, li.payment_method_scalapay
+     * label[for="payment_method_scalapay"], and keeps the icon carrying scalapay-checkout-label__icon.
+     */
+    protected $icon_class = 'payplug-payment-icon scalapay-checkout-label__icon';
     public const ENABLE_ON_TEST_MODE = false;
+
+    /**
+     * @var string|null
+     */
+    private $checkout_widget;
 
     public function __construct()
     {
@@ -36,6 +49,37 @@ class Scalapay extends PayplugGenericGateway
         }
 
         add_action('woocommerce_order_item_add_action_buttons', [$this, 'refund_not_available']);
+    }
+
+    public function has_fields(): bool
+    {
+        return '' !== $this->checkout_widget();
+    }
+
+    public function payment_fields(): void
+    {
+        parent::payment_fields();
+
+        $widget = $this->checkout_widget();
+        if ('' !== $widget) {
+            ScalapayWidgetDisplay::enqueue_script();
+        }
+
+        echo $widget;
+    }
+
+    /**
+     * The checkout amount selectors match nothing on the order-pay page.
+     */
+    private function checkout_widget(): string
+    {
+        if (null === $this->checkout_widget) {
+            $this->checkout_widget = is_checkout_pay_page()
+                ? ''
+                : ScalapayWidgetRenderer::render(ScalapayWidgetDisplay::configured_attributes('checkout'));
+        }
+
+        return $this->checkout_widget;
     }
 
     /**

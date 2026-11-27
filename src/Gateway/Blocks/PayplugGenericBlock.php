@@ -5,7 +5,6 @@ namespace Payplug\PayplugWoocommerce\Gateway\Blocks;
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 use Payplug\PayplugWoocommerce\PayplugWoocommerceHelper;
 use Payplug\PayplugWoocommerce\Service\ApmEligibility;
-use Payplug\PayplugWoocommerce\Service\ApmSettings;
 use Payplug\PayplugWoocommerce\Traits\ServiceGetter;
 
 class PayplugGenericBlock extends AbstractPaymentMethodType
@@ -70,16 +69,8 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
     protected function ppro_restrictions(): array
     {
         $options = $this->get_service('configuration')->get_options();
-        $config = ApmSettings::config_for(is_array($options) ? $options : [], $this->name);
-        $amounts = ApmEligibility::effective_amounts($config['limits'], $config['custom_amounts']);
 
-        return [
-            'min' => null === $amounts ? 0 : $amounts['min'],
-            'max' => null === $amounts ? 0 : $amounts['max'],
-            'countries' => ApmEligibility::effective_countries($config['limits'], $config['custom_countries']),
-            'currency' => ApmEligibility::CURRENCY,
-            'ok' => null !== $amounts && $amounts['min'] < $amounts['max'],
-        ];
+        return ApmEligibility::client_restrictions(is_array($options) ? $options : [], $this->name);
     }
 
     /**
@@ -90,7 +81,7 @@ class PayplugGenericBlock extends AbstractPaymentMethodType
     public function get_payment_method_script_handles()
     {
         $script_path = '/assets/js/blocks/wc-payplug-' . $this->get_name() . '-blocks.js';
-        $script_asset_path = PAYPLUG_GATEWAY_PLUGIN_URL . 'assets/js/blocks/frontend/wc-payplug-' . $this->get_name() . '-blocks.asset.php';
+        $script_asset_path = PAYPLUG_GATEWAY_PLUGIN_DIR . 'assets/js/blocks/wc-payplug-' . $this->get_name() . '-blocks.asset.php';
         $script_asset = file_exists($script_asset_path) ? require($script_asset_path) : ['dependencies' => [], 'version' => '1.0.0'];
         $script_url = PAYPLUG_GATEWAY_PLUGIN_URL . $script_path;
 
