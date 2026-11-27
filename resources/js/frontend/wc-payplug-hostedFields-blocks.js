@@ -78,6 +78,9 @@ const HostedFields = ({ settings: settings, props: props }) => {
 				card: {
 					id: 'hosted-fields-card',
 					placeholder: settings?.payplug_integrated_payment_card_number,
+					// Required for the brand choice of co-badged cards (PRE-3875): without it a click on
+					// Visa/Mastercard leaves CB selected. Cause not understood, measured on SDK v2.2.0; see PRE-3875.
+					enableAutospacing: true,
 					onInput: handleFieldEvent('pan'),
 				},
 				expiry: {
